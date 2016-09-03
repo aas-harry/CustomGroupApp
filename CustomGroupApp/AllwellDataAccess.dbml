@@ -1,0 +1,169 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="Allwell" Class="AllwellDataAccessDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="WebSettings" ConnectionString="Data Source=localhost;Initial Catalog=Allwell;Integrated Security=True" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="AllwellConnectionString" Provider="System.Data.SqlClient" />
+  <Table Name="dbo.Results" Member="Results">
+    <Type Name="Result">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Testnum" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="Dob" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="Sex" Type="System.Char" DbType="NChar(1)" CanBeNull="true" />
+      <Column Name="Speak" Type="System.Char" DbType="NChar(1)" CanBeNull="true" />
+      <Column Name="Live_in_as" Type="System.Char" DbType="NChar(1)" CanBeNull="true" />
+      <Column Name="Sem" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Form" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="[Level]" Member="Level" Type="System.Char" DbType="NChar(1)" CanBeNull="true" />
+      <Column Name="Retst" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="Genab" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Genab2" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Mathab" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Mathper" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Reading" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Spelling" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Written" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Verbal" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Nonverbal" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Mathcor" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="Sum_code" Type="System.String" DbType="NVarChar(6)" CanBeNull="true" />
+      <Column Name="Vc" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Vr" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Fr" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Qr" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Ca" Type="System.Decimal" DbType="Decimal(5,2)" CanBeNull="true" />
+      <Column Name="Iq1" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Iq2" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Iqs" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Iq12" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Iq22" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Iqs2" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Vil" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Vih" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Vis" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Nvil" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Nvih" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Nvis" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Mrs" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Mst" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Prs" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Pst" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Rrs" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Rst" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Ri1" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Ri2" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Srs" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Sst" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="We" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Wr" Type="System.Decimal" DbType="Decimal(3,1)" CanBeNull="true" />
+      <Column Name="[Group]" Member="Group" Type="System.String" DbType="VarChar(1)" CanBeNull="true" />
+      <Column Name="Math" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Lan_bas_sb" Type="System.String" DbType="VarChar(1)" CanBeNull="true" />
+      <Column Name="Sum_code_r" Type="System.String" DbType="VarChar(3)" CanBeNull="true" />
+      <Column Name="Sum_code_a" Type="System.String" DbType="VarChar(3)" CanBeNull="true" />
+      <Column Name="Sum_code_s" Type="System.String" DbType="VarChar(3)" CanBeNull="true" />
+      <Column Name="Sum_code_i" Type="System.String" DbType="VarChar(3)" CanBeNull="true" />
+      <Column Name="Sum_code_c" Type="System.String" DbType="VarChar(3)" CanBeNull="true" />
+      <Column Name="Sum_code_e" Type="System.String" DbType="VarChar(3)" CanBeNull="true" />
+      <Column Name="Char_wrk_m" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Char_wrk_s" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Char_wrk_d" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Car_aware" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Choice1" Type="System.String" DbType="VarChar(1)" CanBeNull="true" />
+      <Column Name="Choice2" Type="System.String" DbType="VarChar(1)" CanBeNull="true" />
+      <Column Name="Choice3" Type="System.String" DbType="VarChar(1)" CanBeNull="true" />
+      <Column Name="Student_id" Type="System.String" DbType="VarChar(20)" CanBeNull="true" />
+      <Column Name="Csv_genab" Type="System.String" DbType="VarChar(130)" CanBeNull="true" />
+      <Column Name="Csv_read" Type="System.String" DbType="VarChar(70)" CanBeNull="true" />
+      <Column Name="Csv_math" Type="System.String" DbType="VarChar(60)" CanBeNull="true" />
+      <Column Name="Csv_spell" Type="System.String" DbType="VarChar(40)" CanBeNull="true" />
+      <Column Name="S_genab" Type="System.Decimal" DbType="Decimal(5,2)" CanBeNull="true" />
+      <Column Name="S_verbal" Type="System.Decimal" DbType="Decimal(5,2)" CanBeNull="true" />
+      <Column Name="S_nonverb" Type="System.Decimal" DbType="Decimal(5,2)" CanBeNull="true" />
+      <Column Name="S_mathper" Type="System.Decimal" DbType="Decimal(5,2)" CanBeNull="true" />
+      <Column Name="S_reading" Type="System.Decimal" DbType="Decimal(5,2)" CanBeNull="true" />
+      <Column Name="S_written" Type="System.Decimal" DbType="Decimal(5,2)" CanBeNull="true" />
+      <Column Name="S_spelling" Type="System.Decimal" DbType="Decimal(5,2)" CanBeNull="true" />
+      <Column Name="Fkg" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="Edu_plan" Type="System.String" DbType="VarChar(1)" CanBeNull="true" />
+      <Column Name="Custom1" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="IntStudent" Type="System.String" DbType="VarChar(1)" CanBeNull="true" />
+      <Column Name="Form_mod" Type="System.String" DbType="VarChar(1)" CanBeNull="true" />
+      <Column Name="NewWr" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Wrt" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="csv_writing" Type="System.String" DbType="VarChar(40)" CanBeNull="true" />
+      <Column Name="t_genab" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="t_verbal" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="t_nverbal" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="t_pst" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="t_rst" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="t_sst" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="t_wr" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="t_mst" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Serialno" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Wr_task" Type="System.String" DbType="VarChar(1)" CanBeNull="true" />
+      <Column Name="Wr_genre" Type="System.Int16" DbType="SmallInt" CanBeNull="true" />
+      <Column Name="Wr_args" Type="System.Int16" DbType="SmallInt" CanBeNull="true" />
+      <Column Name="Wr_rhtdev" Type="System.Int16" DbType="SmallInt" CanBeNull="true" />
+      <Column Name="Wr_nardev" Type="System.Int16" DbType="SmallInt" CanBeNull="true" />
+      <Column Name="Wr_thmdev" Type="System.Int16" DbType="SmallInt" CanBeNull="true" />
+      <Column Name="Wr_vocab" Type="System.Int16" DbType="SmallInt" CanBeNull="true" />
+      <Column Name="Wr_senstr" Type="System.Int16" DbType="SmallInt" CanBeNull="true" />
+      <Column Name="Wr_synten" Type="System.Int16" DbType="SmallInt" CanBeNull="true" />
+      <Column Name="Wr_punct" Type="System.Int16" DbType="SmallInt" CanBeNull="true" />
+      <Column Name="Wr_spell" Type="System.Int16" DbType="SmallInt" CanBeNull="true" />
+      <Column Name="Wr_level" Type="System.Int16" DbType="SmallInt" CanBeNull="true" />
+      <Column Name="Wr_sem" Type="System.Int16" DbType="SmallInt" CanBeNull="true" />
+      <Column Name="Char_wrk_i" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Genabcor" Type="System.String" DbType="VarChar(130)" CanBeNull="true" />
+      <Column Name="Spellcor" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="Readcor" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="GlobalStudentId" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="SchoolPref1" Type="System.String" DbType="VarChar(120)" CanBeNull="true" />
+      <Column Name="SchoolPref2" Type="System.String" DbType="VarChar(120)" CanBeNull="true" />
+      <Column Name="SchoolPref3" Type="System.String" DbType="VarChar(120)" CanBeNull="true" />
+      <Column Name="SchoolPref4" Type="System.String" DbType="VarChar(120)" CanBeNull="true" />
+      <Column Name="SchoolPref5" Type="System.String" DbType="VarChar(120)" CanBeNull="true" />
+      <Column Name="ScholarshipApplicantId" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Npi_Read" Type="System.Int16" DbType="SmallInt" CanBeNull="true" />
+      <Column Name="Npi_Math" Type="System.Int16" DbType="SmallInt" CanBeNull="true" />
+      <Column Name="Npi_Writing" Type="System.Int16" DbType="SmallInt" CanBeNull="true" />
+      <Column Name="Notes" Type="System.String" DbType="Text" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="Published" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Tests" Member="Tests">
+    <Type Name="Test">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Testnum" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Answer" Type="System.String" DbType="VarChar(4) NOT NULL" CanBeNull="false" />
+      <Column Name="Type" Type="System.String" DbType="VarChar(1) NOT NULL" CanBeNull="false" />
+      <Column Name="Category" Type="System.String" DbType="VarChar(40)" CanBeNull="true" />
+      <Column Name="Scode" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="State" Type="System.String" DbType="VarChar(3)" CanBeNull="true" />
+      <Column Name="Tested" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Testdate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="Grade" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="NameGrade" Type="System.String" DbType="VarChar(5)" CanBeNull="true" />
+      <Column Name="ReadingDb" Type="System.String" DbType="VarChar(10)" CanBeNull="true" />
+      <Column Name="Nq_genab" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Nq_verbal" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Nq_nonverb" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Nq_maths" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Nq_read" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Nq_spell" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Nq_written" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Published" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="MathProfileId" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="ReadProfileId" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="NpiReadingId" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="NpiWritingId" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="NpiMathId" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="NpiReadingMeanCalculation" Type="System.Int16" DbType="SmallInt" CanBeNull="true" />
+      <Column Name="NpiWritingMeanCalculation" Type="System.Int16" DbType="SmallInt" CanBeNull="true" />
+      <Column Name="NpiMathMeanCalculation" Type="System.Int16" DbType="SmallInt" CanBeNull="true" />
+      <Column Name="HasScholarshipInfo" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="IsGroupSchools" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="PublishedBy" Type="System.String" DbType="VarChar(60)" CanBeNull="true" />
+      <Column Name="InternalUse" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="Hidden" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+</Database>

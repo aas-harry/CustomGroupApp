@@ -1,0 +1,40 @@
+﻿<div>
+    <h1>Create Custom Groups</h1>
+    <button onClick="getResults()">Get Results</button>
+    <button onClick="createClasses()">Create Classes</button>
+</div>
+
+<script>
+    var testFile = new TestFile();
+    $(document)
+        .ready(function() {
+        });
+
+    function getResults() {
+        $.ajax({
+            url: '@Url.Action("GetResults", "CustomGroup")',
+            data: { testnum: 1014405 },
+            type: 'POST',
+            cache: false,
+            success: function(data) {
+                testFile.clear();
+                testFile.fileNumber = data.Test.Testnum;
+                testFile.grade = data.Test.Grade;
+                testFile.category = data.Test.Category;
+                testFile.testDate = data.Test.Testdate;
+                testFile.setStudents(data.Results);
+
+
+            },
+            fail: function(data) {
+
+            }
+        });
+    }
+
+    function createClasses() {
+        debugger;
+        var classes = new ClassesDefinition(testFile);
+        classes.singleBand.setClassCount(6, classes.testInfo.studentCount);
+    }
+</script>
