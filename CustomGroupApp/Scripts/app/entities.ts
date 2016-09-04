@@ -139,16 +139,35 @@ class Student {
         this.liveInAus = r.Live_in_as;
         this.ca = r.Ca;
 
-        this.genab = new Score(r.Genab, r.Iqs, r.Tgenab, r.Sgenab, new RangeScore(r.Iq1, r.Iq2), null);
-        this.verbal = new Score(r.Verb, r.Vis, r.Tverb, r.Sverb, new RangeScore(r.Vil, r.Vih), null);
-        this.nonverbal = new Score(r.Nverb, r.Nvis, r.Tnverb, r.Snverb, new RangeScore(r.Nvil, r.Nvih), null);
-        this.mathPerformance = new Score(r.Prs, r.Pst, r.Tpst, r.Smath, null, r.NpiMath);
-        this.reading = new Score(r.Rrs, r.Rst, r.Trst, r.Sread, null, r.NpiRead);
-        this.spelling = new Score(r.Srs, r.Sst, r.Tsst, r.Sspell, null, null);
-        this.writing = new Score(r.Wrs, r.Wrt, r.Twrit, r.Swrit, null, r.NpiWrit);
+        this.genab = new Score(r.Genab, r.Iqs, r.t_genab, r.Sgenab, new RangeScore(r.Iq1, r.Iq2), null);
+        this.verbal = new Score(r.Verb, r.Vis, r.t_verbal, r.Sverb, new RangeScore(r.Vil, r.Vih), null);
+        this.nonverbal = new Score(r.Nverb, r.Nvis, r.t_nverbal, r.Snverb, new RangeScore(r.Nvil, r.Nvih), null);
+        this.mathPerformance = new Score(r.Prs, r.Pst, r.t_pst, r.Smath, null, r.NpiMath);
+        this.reading = new Score(r.Rrs, r.Rst, r.t_rst, r.Sread, null, r.NpiRead);
+        this.spelling = new Score(r.Srs, r.Sst, r.t_sst, r.Sspell, null, null);
+        this.writing = new Score(r.Wrs, r.Wrt, r.t_wr, r.Swrit, null, r.NpiWrit);
         this.raven = new Score(r.Raven, r.Iqs2, r.Tmst, null, new RangeScore(r.Iq12, r.Iq22), null);
 
         this.serialno = r.snow;
+    }
+
+    overallAbilityScore = (): number => {
+        var total = 0;
+        total += this.genab.scaledScore ? this.genab.scaledScore : 0;
+        total += this.mathPerformance.scaledScore ? this.mathPerformance.scaledScore : 0;
+        total += this.reading.scaledScore ? this.reading.scaledScore : 0;
+        total += this.writing.scaledScore ? this.writing.scaledScore : 0;
+        return total;
+    }
+    mathsAchievementScore = (): number => {
+        return this.mathPerformance.scaledScore ? this.mathPerformance.scaledScore : 0;
+    }
+    englishScore = (): number => {
+        var total = 0;
+        total += this.verbal.scaledScore ? this.verbal.scaledScore : 0;
+        total += this.reading.scaledScore ? this.reading.scaledScore : 0;
+        total += this.writing.scaledScore ? this.writing.scaledScore : 0;
+        return total;
     }
 }
 

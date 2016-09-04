@@ -1,13 +1,53 @@
-﻿<div>
+﻿<div class="container-fluid" style="margin: 20px">
     <h1>Create Custom Groups</h1>
-    <button onClick="getResults()">Get Results</button>
-    <button onClick="createClasses()">Create Classes</button>
-</div>
+    <div class="row">
+        <button onClick="getResults()">Get Results</button>
+        <button onClick="createMixClasses()">Create Mix</button>
+        <button onClick="createStreamingClasses()">Create streaming</button>
+        <button onClick="createBandingClasses()">Create Banding</button>
+        <div id="message-text"></div>
+    </div>
 
+    <div class="row" style="margin-bottom: 30px">
+        <div class="col-md-4" id="jqgrid1-container">
+            <table id="jqGrid1"></table>
+        </div>
+        <div class="col-md-4" id="jqgrid2-container">
+            <table id="jqGrid2"></table>
+        </div>
+        <div class="col-md-4" id="jqgrid3-container">
+            <table id="jqGrid3"></table>
+        </div>
+    </div>
+
+    <div class="row" style="margin-bottom: 30px">
+        <div class="col-md-4" id="jqgrid4-container">
+            <table id="jqGrid4"></table>
+        </div>
+        <div class="col-md-4" id="jqgrid5-container">
+            <table id="jqGrid5"></table>
+        </div>
+        <div class="col-md-4" id="jqgrid6-container">
+            <table id="jqGrid6"></table>
+        </div>
+    </div>
+    <div class="row" style="margin-bottom: 30px">
+        <div class="col-md-4" id="summary-container">
+            <table id="summary-grid"></table>
+        </div>
+    </div>
+</div>
 <script>
     var testFile = new TestFile();
+    var data1 = [];
+    var data2 = [];
+    var data3 = [];
+    var data4 = [];
+    var data5 = [];
+    var data6 = [];
     $(document)
         .ready(function() {
+
         });
 
     function getResults() {
@@ -24,7 +64,7 @@
                 testFile.testDate = data.Test.Testdate;
                 testFile.setStudents(data.Results);
 
-
+                $("#message-text").replaceWith("Test file with " + data.Results.length);
             },
             fail: function(data) {
 
@@ -32,9 +72,139 @@
         });
     }
 
-    function createClasses() {
-        debugger;
+    function createMixClasses() {
         var classes = new ClassesDefinition(testFile);
-        classes.singleBand.setClassCount(6, classes.testInfo.studentCount);
+        classes.singleBand.setClassCount(5, testFile.studentCount);
+        classes.singleBand.classes[0].count += 5;
+        classes.singleBand.classes[1].count -= 3;
+        classes.singleBand.classes[2].count -= 2;
+        classes.singleBand.streamType = StreamType.OverallAbilty;
+        classes.singleBand.groupByMixAbility(classes.students, false);
+        
+        for (var i = 1; i <= classes.singleBand.classes.length; i++) {
+
+            $("#jqGrid" + i)
+                .jqGrid({
+                    datatype: "local",
+                    data: classes.singleBand.classes[i - 1].students,
+                    height: 350,
+                    colModel: [
+                        { label: 'Name', name: 'name', width: 150 },
+                        { label: 'Sex', name: 'gender', width: 50 },
+                        { label: 'Score', name: 'score', width: 80 },
+                        { label: 'Class', name: 'classNo', width: 80 }
+                    ],
+                    viewrecords: true, // show the current page, data rang and total records on the toolbar
+                    caption: "Mixability Group " + i
+                });
+        }
+        for (var j = classes.singleBand.classes.length + 1; j <= 6; j++) {
+
+            $("#jqGrid" + j).replaceWith("");
+        }
+
+        classes.singleBand.calculateAverage(classes.singleBand.classes);
+
+        $("#summary-grid")
+            .jqGrid({
+                datatype: "local",
+                data: classes.singleBand.classes,
+                colModel: [
+                    { label: 'Class', name: 'index', width: 150 },
+                    { label: 'Average', name: 'average', width: 50 }
+                ],
+                viewrecords: true, // show the current page, data rang and total records on the toolbar
+                caption: "Group Summary"
+            });
+    }
+
+    function createStreamingClasses() {
+        var classes = new ClassesDefinition(testFile);
+        classes.singleBand.setClassCount(5, testFile.studentCount);
+        classes.singleBand.classes[0].count += 5;
+        classes.singleBand.classes[1].count -= 3;
+        classes.singleBand.classes[2].count -= 2;
+
+        classes.singleBand.streamType = StreamType.English;
+        classes.singleBand.groupByStreaming(classes.students, false);
+        for (var i = 1; i <= classes.singleBand.classes.length; i++) {
+
+            $("#jqGrid" + i)
+                .jqGrid({
+                    datatype: "local",
+                    data: classes.singleBand.classes[i - 1].students,
+                    height: 350,
+                    colModel: [
+                        { label: 'Name', name: 'name', width: 150 },
+                        { label: 'Sex', name: 'gender', width: 50 },
+                        { label: 'Score', name: 'score', width: 80 },
+                        { label: 'Class', name: 'classNo', width: 80 }
+                    ],
+                    viewrecords: true, // show the current page, data rang and total records on the toolbar
+                    caption: "Streaming Group " + i
+                });
+        }
+        for (var j = classes.singleBand.classes.length + 1; j <= 6; j++) {
+
+            $("#jqGrid" + j).replaceWith("");
+        }
+
+        classes.singleBand.calculateAverage(classes.singleBand.classes);
+
+        $("#summary-grid")
+            .jqGrid({
+                datatype: "local",
+                data: classes.singleBand.classes,
+                colModel: [
+                    { label: 'Class', name: 'index', width: 150 },
+                    { label: 'Count', name: 'count', width: 50 },
+                { label: 'Average', name: 'average', width: 50 }
+                ],
+                viewrecords: true, // show the current page, data rang and total records on the toolbar
+                caption: "Group Summary"
+            });
+    }
+
+    function createBandingClasses() {
+        var classes = new ClassesDefinition(testFile);
+        debugger;
+        classes.customBands.createBands("band", 3);
+        classes.customBands.createBandClasses(null, false);
+   //    var tmpClasses = Enumerable.From(classes.customBands).SelectMany(x => x.classes).Select(x => x).ToArray();
+        //for (var i = 1; i <= tmpClasses.length; i++) {
+
+        //    $("#jqGrid" + i)
+        //        .jqGrid({
+        //            datatype: "local",
+        //            data: classes.singleBand.classes[i - 1].students,
+        //            height: 350,
+        //            colModel: [
+        //                { label: 'Name', name: 'name', width: 150 },
+        //                { label: 'Sex', name: 'gender', width: 50 },
+        //                { label: 'Score', name: 'score', width: 80 },
+        //                { label: 'Class', name: 'classNo', width: 80 }
+        //            ],
+        //            viewrecords: true, // show the current page, data rang and total records on the toolbar
+        //            caption: "Group " + i + " of " + tmpClasses[i].bandNo
+        //        });
+        //}
+
+        //for (var j = classes.singleBand.classes.length + 1; j <= 6; j++) {
+        //    $("#jqGrid" + j).replaceWith("");
+        //}
+
+        //classes.singleBand.calculateAverage(classes.singleBand.classes);
+
+        //$("#summary-grid")
+        //    .jqGrid({
+        //        datatype: "local",
+        //        data: classes.singleBand.classes,
+        //        colModel: [
+        //            { label: 'Class', name: 'index', width: 150 },
+        //            { label: 'Average', name: 'average', width: 50 }
+        //        ],
+        //        viewrecords: true, // show the current page, data rang and total records on the toolbar
+        //        caption: "Group Summary"
+        //    });
     }
 </script>
