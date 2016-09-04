@@ -168,7 +168,9 @@
     function createBandingClasses() {
         var classes = new ClassesDefinition(testFile);
         debugger;
-        classes.customBands.createBands("band", 3);
+        classes.customBands.createBands("band", 2);
+        classes.customBands.bands[0].setClassCount(3);
+        classes.customBands.bands[1].setClassCount(3);
         classes.customBands.createBandClasses(null, false);
    //    var tmpClasses = Enumerable.From(classes.customBands).SelectMany(x => x.classes).Select(x => x).ToArray();
         //for (var i = 1; i <= tmpClasses.length; i++) {

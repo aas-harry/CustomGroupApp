@@ -100,11 +100,13 @@ class ClassDefinition {
 
 class BandDefinition {
     constructor(public parent: ClassesDefinition, public bandNo: number, public bandName: string,
-        public bandType: BandType = BandType.None) {
+        public studentCount: number, classCount: number,  public bandType: BandType = BandType.None) {
         this.uid = createUuid();
         this.mixBoysGirls = false;
         this.streamType = StreamType.OverallAbilty;
         this.students = new Array<StudentClass>();
+
+        this.setClassCount(classCount);
     }
     uid: string;
     classes: Array<ClassDefinition> = [];
@@ -113,15 +115,12 @@ class BandDefinition {
     mixBoysGirls: boolean;
     streamType: StreamType;
 
-    get studentCount() {
-        return this.students ? this.students.length : 0;
-    }
     get classCount() {
         return this.classes ? this.classes.length : 0;
     }
 
-    setClassCount = (classCount: number, studentCount: number) => {
-        this.classes = this.calculateClassesSize(this, studentCount, classCount);
+    setClassCount = (classCount: number) => {
+        this.classes = this.calculateClassesSize(this, this.studentCount, classCount);
     }
 
     calculateTotalScore = (students: Array<StudentClass>) => {
@@ -339,7 +338,7 @@ class BandSet {
     constructor(public parent: ClassesDefinition, public name: string) {
         this.students = parent.students;
         this.bandStreamType = BandStreamType.Streaming;
-        this.mixBoysGirls = true;
+        this.mixBoysGirls = false;
     }
 
     get students(): Array<StudentClass> {
@@ -350,18 +349,18 @@ class BandSet {
     mixBoysGirls: boolean;
 
     bands: Array<BandDefinition>;
-    count: number;
+    get count(): number {
+        return this.bands ? this.bands.length : 0;
+    }
 
     createBands = (name: string, bandCount: number) => {
         this.bands = [];
-        this.count = bandCount;
 
         // Create a temporary banddefinition to calculate the band sizes
-        var tempBand = new BandDefinition(this.parent, 1, "Custom", BandType.Custom);
-        var classes = tempBand.calculateClassesSize(tempBand, this.students.length, bandCount);
+        var tempBand = new BandDefinition(this.parent, 1, "Custom", this.students.length, bandCount, BandType.Custom);
 
         for (let i = 0; i < bandCount; i++) {
-            this.bands.push(this.convertFromClasses(classes[i], i +1));
+            this.bands.push(this.convertFromClasses(tempBand.classes[i], i +1));
         }
     };
 
@@ -377,28 +376,27 @@ class BandSet {
         this.mixBoysGirls = mixBoysGirls;
 
         // Create a temporary banddefinition to calculate the band sizes
+        var band = this.convertToClasses(this);
+        band.groupByStreaming(this.students, this.mixBoysGirls);
+        for (let i = 0; i < band.classes.length; i++) {
+            this.bands[i].students = band.classes[i].students;
+        }    
 
-        //for (let i = 0; i < this.count; i++) {
-        //    var tempBand = new BandDefinition(this.parent, 1, "Custom", BandType.Custom);
-        //    tempBand.classes = this.bands[i].
-        //    tempBand.groupByStreaming(this.students, mixBoysGirls);
-
-        //    this.bands[i].students = tempBand.classes[i].students;
-        //}
-        
         for (let i = 0; i < this.bands.length; i++) {
             this.bands[i].groupByMixAbility(this.bands[i].students, this.mixBoysGirls);
         }
     }
 
-    private convertToClasses = (band : BandDefinition): Array<ClassDefinition> => {
-        //let classDefintion = new ClassDefinition(band, 1, b)
-        return null;
+    private convertToClasses = (bandSet: BandSet): BandDefinition => {
+        var band = new BandDefinition(this.parent, 1, "Band", bandSet.students.length, bandSet.bands.length);
+        for (let i = 0; i < bandSet.bands.length; i++) {
+            band.classes[i].count = bandSet.bands[i].studentCount;
+        }
+        
+        return band;
     }
     private convertFromClasses = (classDefinition: ClassDefinition, bandNo: number): BandDefinition => {
-        let bandDefinition = new BandDefinition(this.parent, bandNo, "Band " + bandNo);
-        bandDefinition.classes.push(classDefinition);
-        return bandDefinition;
+        return new BandDefinition(this.parent, bandNo, "Band " + bandNo, classDefinition.count, 1);
     }
 
 }
@@ -409,10 +407,9 @@ class TopMiddleLowestBandSet extends BandSet {
         super(parent, "TopMiddleLowest");
 
         this.bands = [];
-        this.count = 3;
-        this.bands.push(new BandDefinition(this.parent, 1, "Top", BandType.Top));
-        this.bands.push(new BandDefinition(this.parent, 2, "Middle", BandType.Middle));
-        this.bands.push(new BandDefinition(this.parent, 3, "Lowest", BandType.Lowest));
+        this.bands.push(new BandDefinition(this.parent, 1, "Top", 0, 1, BandType.Top));
+        this.bands.push(new BandDefinition(this.parent, 2, "Middle", 0, 1, BandType.Middle));
+        this.bands.push(new BandDefinition(this.parent, 3, "Lowest", 0, 1, BandType.Lowest));
     }
 }
 
@@ -422,12 +419,9 @@ class ClassesDefinition {
         this.groupType = GroupType.MixedAbility;
         this.groupGender = testFile.isUnisex ? Gender.All : (testFile.hasBoys ? Gender.Boys : Gender.Girls);
         this.testInfo = testFile;
-        this.singleBand = new BandDefinition(this, 1, "Class", BandType.None);
-        this.singleBand.classCount = 1;
-        this.singleBand.classes = [new ClassDefinition(this.singleBand, 1, testFile.studentCount)];
+        this.singleBand = new BandDefinition(this, 1, "Class", testFile.studentCount, 1,  BandType.None);
         this.topMiddleLowestBands = new TopMiddleLowestBandSet(this);
         this.customBands = new BandSet(this, "Custom Bands");
-        
 
         this.students = new Array<StudentClass>();
         for (let i = 0; i<testFile.students.length; i++) {
