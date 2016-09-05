@@ -1,4 +1,4 @@
-﻿enum GroupType {
+﻿enum GroupingMethod {
     Unknown = 0,
     MixedAbility = 1,
     Streaming = 2,
@@ -100,26 +100,32 @@ class ClassDefinition {
 
 class BandDefinition {
     constructor(public parent: ClassesDefinition, public bandNo: number, public bandName: string,
-        public studentCount: number, classCount: number,  public bandType: BandType = BandType.None) {
+        classCount: number,
+        public students : Array<StudentClass> = [],
+        public bandType: BandType = BandType.None,
+        public streamType: StreamType = StreamType.OverallAbilty,
+        public groupType: GroupingMethod = GroupingMethod.Streaming,
+        public mixBoysGirls : boolean = false) {
         this.uid = createUuid();
-        this.mixBoysGirls = false;
-        this.streamType = StreamType.OverallAbilty;
-        this.students = new Array<StudentClass>();
 
-        this.setClassCount(classCount);
+        if (!this.students || this.students.length === 0) {
+            this.students = parent.students;
+        } 
+
+        this.initClasses(classCount);
     }
     uid: string;
     classes: Array<ClassDefinition> = [];
-    students: Array<StudentClass> = [];
-    groupType: GroupType;
-    mixBoysGirls: boolean;
-    streamType: StreamType;
+
+    get studentCount() {
+        return this.students.length;
+    }
 
     get classCount() {
         return this.classes ? this.classes.length : 0;
     }
 
-    setClassCount = (classCount: number) => {
+    initClasses = (classCount: number) => {
         this.classes = this.calculateClassesSize(this, this.studentCount, classCount);
     }
 
@@ -135,48 +141,32 @@ class BandDefinition {
         }
     };
 
-    private setOveralAbilityScore = (students: Array<StudentClass>) => {
-        for (let i = 0; i < students.length; i++) {
-            students[i].score = students[i].source.overallAbilityScore();
-        }
-    };
-   
-    private setEnglishScore = (students: Array<StudentClass>) => {
-        for (let i = 0; i < students.length; i++) {
-            students[i].score = students[i].source.englishScore();
-        }
-    };
-
-    private setMathAchievementScore = (students: Array<StudentClass>) => {
-        for (let i = 0; i < students.length; i++) {
-            students[i].score = students[i].source.mathsAchievementScore();
-        }
-    };
-
-    distributeStudents = (groupType: GroupType, streamType: StreamType, mixBoysGirls: boolean) => {
+    distributeStudents = (groupType: GroupingMethod, streamType: StreamType, mixBoysGirls: boolean) => {
         switch (groupType) {
-            case GroupType.MixedAbility:
+            case GroupingMethod.MixedAbility:
                 break;
-            case GroupType.Streaming:
+            case GroupingMethod.Streaming:
                 break;
-            case GroupType.Banding:
+            case GroupingMethod.Banding:
                 break;
-            case GroupType.TopMiddleLowest:
+            case GroupingMethod.TopMiddleLowest:
                 break;
-            case GroupType.Language:
+            case GroupingMethod.Language:
                 break;
-            case GroupType.CustomGroup:
+            case GroupingMethod.CustomGroup:
                 break;
         }
     };
 
-    calculateAverage = (classes: Array<ClassDefinition>) => {
+    calculateClassesAverage = (classes: Array<ClassDefinition>) => {
         for (let i = 0; i < classes.length; i++) {
             classes[i].average = Enumerable.From(classes[i].students).Average(x => x.score);
         }
     };
 
-    groupByMixAbility = (students: Array<StudentClass>, mixBoysGirls: boolean) => {
+    groupByMixAbility = (mixBoysGirls: boolean) => {
+        var students = this.students;
+
         this.calculateTotalScore(students);
 
         if (!mixBoysGirls) {
@@ -206,8 +196,9 @@ class BandDefinition {
 
     };
 
-    groupByStreaming = (students: Array<StudentClass>, mixBoysGirls: boolean) => {
-        this.calculateTotalScore(students);
+    groupByStreaming = (mixBoysGirls: boolean) => {
+        var students = this.students;
+        this.calculateTotalScore(this.students);
 
         if (!mixBoysGirls) {
             this.classes = this.groupByStreamingInternal(students, true);
@@ -241,6 +232,24 @@ class BandDefinition {
             if (i < maleClasses.length) {
                 this.classes[i].students = (this.classes[i].students.concat(maleClasses[i].students));
             }
+        }
+    };
+
+    private setOveralAbilityScore = (students: Array<StudentClass>) => {
+        for (let i = 0; i < students.length; i++) {
+            students[i].score = students[i].source.overallAbilityScore();
+        }
+    };
+
+    private setEnglishScore = (students: Array<StudentClass>) => {
+        for (let i = 0; i < students.length; i++) {
+            students[i].score = students[i].source.englishScore();
+        }
+    };
+
+    private setMathAchievementScore = (students: Array<StudentClass>) => {
+        for (let i = 0; i < students.length; i++) {
+            students[i].score = students[i].source.mathsAchievementScore();
         }
     };
 
@@ -322,7 +331,7 @@ class BandDefinition {
         return classes;
     };
 
-    public calculateClassesSize = (bandDefnition: BandDefinition, totalStudents: number, classCount: number): Array<ClassDefinition> => {
+    private calculateClassesSize = (bandDefnition: BandDefinition, totalStudents: number, classCount: number): Array<ClassDefinition> => {
         var studentInClass = Math.floor(totalStudents / classCount);
         var remainingStudents = totalStudents - (studentInClass * classCount);
 
@@ -357,7 +366,7 @@ class BandSet {
         this.bands = [];
 
         // Create a temporary banddefinition to calculate the band sizes
-        var tempBand = new BandDefinition(this.parent, 1, "Custom", this.students.length, bandCount, BandType.Custom);
+        var tempBand = new BandDefinition(this.parent, 1, "Custom", bandCount, null, BandType.Custom);
 
         for (let i = 0; i < bandCount; i++) {
             this.bands.push(this.convertFromClasses(tempBand.classes[i], i +1));
@@ -377,18 +386,18 @@ class BandSet {
 
         // Create a temporary banddefinition to calculate the band sizes
         var band = this.convertToClasses(this);
-        band.groupByStreaming(this.students, this.mixBoysGirls);
+        band.groupByStreaming(this.mixBoysGirls);
         for (let i = 0; i < band.classes.length; i++) {
             this.bands[i].students = band.classes[i].students;
         }    
 
         for (let i = 0; i < this.bands.length; i++) {
-            this.bands[i].groupByMixAbility(this.bands[i].students, this.mixBoysGirls);
+            this.bands[i].groupByMixAbility(this.mixBoysGirls);
         }
     }
 
     private convertToClasses = (bandSet: BandSet): BandDefinition => {
-        var band = new BandDefinition(this.parent, 1, "Band", bandSet.students.length, bandSet.bands.length);
+        var band = new BandDefinition(this.parent, 1, "Band", bandSet.bands.length);
         for (let i = 0; i < bandSet.bands.length; i++) {
             band.classes[i].count = bandSet.bands[i].studentCount;
         }
@@ -396,7 +405,7 @@ class BandSet {
         return band;
     }
     private convertFromClasses = (classDefinition: ClassDefinition, bandNo: number): BandDefinition => {
-        return new BandDefinition(this.parent, bandNo, "Band " + bandNo, classDefinition.count, 1);
+        return new BandDefinition(this.parent, bandNo, "Band " + bandNo, classDefinition.count);
     }
 
 }
@@ -406,22 +415,18 @@ class TopMiddleLowestBandSet extends BandSet {
     constructor(public parent: ClassesDefinition) {
         super(parent, "TopMiddleLowest");
 
-        this.bands = [];
-        this.bands.push(new BandDefinition(this.parent, 1, "Top", 0, 1, BandType.Top));
-        this.bands.push(new BandDefinition(this.parent, 2, "Middle", 0, 1, BandType.Middle));
-        this.bands.push(new BandDefinition(this.parent, 3, "Lowest", 0, 1, BandType.Lowest));
+        this.createBands("Custom", 3);
+        //this.bands.push(new BandDefinition(this.parent, 1, "Top", 0, 1, BandType.Top));
+        //this.bands.push(new BandDefinition(this.parent, 2, "Middle", 0, 1, BandType.Middle));
+        //this.bands.push(new BandDefinition(this.parent, 3, "Lowest", 0, 1, BandType.Lowest));
     }
 }
 
 class ClassesDefinition {
-    constructor(testFile: TestFile) {
+    constructor(public testFile: TestFile) {
         this.uid = createUuid();
-        this.groupType = GroupType.MixedAbility;
         this.groupGender = testFile.isUnisex ? Gender.All : (testFile.hasBoys ? Gender.Boys : Gender.Girls);
-        this.testInfo = testFile;
-        this.singleBand = new BandDefinition(this, 1, "Class", testFile.studentCount, 1,  BandType.None);
-        this.topMiddleLowestBands = new TopMiddleLowestBandSet(this);
-        this.customBands = new BandSet(this, "Custom Bands");
+        this.testFile = testFile;
 
         this.students = new Array<StudentClass>();
         for (let i = 0; i<testFile.students.length; i++) {
@@ -430,15 +435,24 @@ class ClassesDefinition {
      }
 
     uid: string;  
-    testInfo: TestFile;
     students: Array<StudentClass>;
     groupName: string;
-    groupType: GroupType;
     groupGender: Gender;
     streamType: StreamType;
     singleBand: BandDefinition;
     customBands: BandSet;
-    topMiddleLowestBands: BandSet;
     spreadBoysGirlsEqually = false;
     excludeLeavingStudent = false;
+
+    createBand = (name: string, streamType: StreamType, students: Array<StudentClass> = []): BandDefinition => {
+        return new BandDefinition(this, 1, name, 1, students,  BandType.None, streamType);
+    }
+
+    createBandSet = (name: string): BandSet => {
+        return new BandSet(this, name);
+    }
+
+    createTopMiddleBottomBandSet = (): TopMiddleLowestBandSet => {
+        return new TopMiddleLowestBandSet(this);
+    }
 }
