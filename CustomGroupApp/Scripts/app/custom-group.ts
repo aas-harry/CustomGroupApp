@@ -83,6 +83,20 @@ class SearchClassContext {
         public isLastClass: boolean) { }
 }
 
+class GroupingHelper {
+    calculateClassesSize = (totalStudents: number, classCount: number): Array<number> => {
+        var studentInClass = Math.floor(totalStudents / classCount);
+        var remainingStudents = totalStudents - (studentInClass * classCount);
+
+        var classes = new Array<number>();
+        for (let i = 0; i < classCount; i++) {
+            classes.push(studentInClass + (remainingStudents > 0 ? 1 : 0));
+            remainingStudents--;
+        }
+        return classes;
+    };
+}
+
 class ClassDefinition {
     constructor(public parent: BandDefinition, public index: number, public count: number) {
         this.uid = createUuid();
@@ -114,6 +128,7 @@ class BandDefinition {
 
         this.initClasses(classCount);
     }
+
     uid: string;
     classes: Array<ClassDefinition> = [];
 
@@ -344,32 +359,36 @@ class BandDefinition {
     };
 }
 class BandSet {
-    constructor(public parent: ClassesDefinition, public name: string) {
+    constructor(public parent: ClassesDefinition, public name: string,
+        public students: Array<StudentClass> = [],
+        public bandCount: number = 1) {
         this.students = parent.students;
         this.bandStreamType = BandStreamType.Streaming;
         this.mixBoysGirls = false;
-    }
 
-    get students(): Array<StudentClass> {
-        return this.parent && this.parent.students ? this.parent.students : new Array<StudentClass>();
+        if (!this.students || this.students.length === 0) {
+            this.students = parent.students;
+        } 
+
+        this.createBands(name, bandCount);
     }
 
     bandStreamType: BandStreamType;
     mixBoysGirls: boolean;
-
     bands: Array<BandDefinition>;
     get count(): number {
         return this.bands ? this.bands.length : 0;
     }
 
+    private groupingHelper = new GroupingHelper();
+
     createBands = (name: string, bandCount: number) => {
         this.bands = [];
 
-        // Create a temporary banddefinition to calculate the band sizes
-        var tempBand = new BandDefinition(this.parent, 1, "Custom", bandCount, null, BandType.Custom);
-
+        var bands = this.groupingHelper.calculateClassesSize(this.students.length, bandCount);
+        
         for (let i = 0; i < bandCount; i++) {
-            this.bands.push(this.convertFromClasses(tempBand.classes[i], i +1));
+            this.bands.push(new BandDefinition(this.parent, i+1, "Band " + (i+1), bands[0]));
         }
     };
 
@@ -397,7 +416,7 @@ class BandSet {
     }
 
     private convertToClasses = (bandSet: BandSet): BandDefinition => {
-        var band = new BandDefinition(this.parent, 1, "Band", bandSet.bands.length);
+        var band = new BandDefinition(this.parent, 1, "Band", bandSet.bands.length, this.students);
         for (let i = 0; i < bandSet.bands.length; i++) {
             band.classes[i].count = bandSet.bands[i].studentCount;
         }
@@ -448,7 +467,7 @@ class ClassesDefinition {
         return new BandDefinition(this, 1, name, 1, students,  BandType.None, streamType);
     }
 
-    createBandSet = (name: string): BandSet => {
+    createBandSet = (name: string, bandCount: number  = 1): BandSet => {
         return new BandSet(this, name);
     }
 

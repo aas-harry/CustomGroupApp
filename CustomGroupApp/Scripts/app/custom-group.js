@@ -81,6 +81,21 @@ var SearchClassContext = (function () {
     }
     return SearchClassContext;
 }());
+var GroupingHelper = (function () {
+    function GroupingHelper() {
+        this.calculateClassesSize = function (totalStudents, classCount) {
+            var studentInClass = Math.floor(totalStudents / classCount);
+            var remainingStudents = totalStudents - (studentInClass * classCount);
+            var classes = new Array();
+            for (var i = 0; i < classCount; i++) {
+                classes.push(studentInClass + (remainingStudents > 0 ? 1 : 0));
+                remainingStudents--;
+            }
+            return classes;
+        };
+    }
+    return GroupingHelper;
+}());
 var ClassDefinition = (function () {
     function ClassDefinition(parent, index, count) {
         this.parent = parent;
@@ -328,16 +343,20 @@ var BandDefinition = (function () {
     return BandDefinition;
 }());
 var BandSet = (function () {
-    function BandSet(parent, name) {
+    function BandSet(parent, name, students, bandCount) {
         var _this = this;
+        if (students === void 0) { students = []; }
+        if (bandCount === void 0) { bandCount = 1; }
         this.parent = parent;
         this.name = name;
+        this.students = students;
+        this.bandCount = bandCount;
+        this.groupingHelper = new GroupingHelper();
         this.createBands = function (name, bandCount) {
             _this.bands = [];
-            // Create a temporary banddefinition to calculate the band sizes
-            var tempBand = new BandDefinition(_this.parent, 1, "Custom", bandCount, null, BandType.Custom);
+            var bands = _this.groupingHelper.calculateClassesSize(_this.students.length, bandCount);
             for (var i = 0; i < bandCount; i++) {
-                _this.bands.push(_this.convertFromClasses(tempBand.classes[i], i + 1));
+                _this.bands.push(new BandDefinition(_this.parent, i + 1, "Band " + (i + 1), bands[0]));
             }
         };
         this.createBandClasses = function (bandStreamType, mixBoysGirls) {
@@ -360,7 +379,7 @@ var BandSet = (function () {
             }
         };
         this.convertToClasses = function (bandSet) {
-            var band = new BandDefinition(_this.parent, 1, "Band", bandSet.bands.length);
+            var band = new BandDefinition(_this.parent, 1, "Band", bandSet.bands.length, _this.students);
             for (var i = 0; i < bandSet.bands.length; i++) {
                 band.classes[i].count = bandSet.bands[i].studentCount;
             }
@@ -372,14 +391,11 @@ var BandSet = (function () {
         this.students = parent.students;
         this.bandStreamType = BandStreamType.Streaming;
         this.mixBoysGirls = false;
+        if (!this.students || this.students.length === 0) {
+            this.students = parent.students;
+        }
+        this.createBands(name, bandCount);
     }
-    Object.defineProperty(BandSet.prototype, "students", {
-        get: function () {
-            return this.parent && this.parent.students ? this.parent.students : new Array();
-        },
-        enumerable: true,
-        configurable: true
-    });
     Object.defineProperty(BandSet.prototype, "count", {
         get: function () {
             return this.bands ? this.bands.length : 0;
@@ -411,7 +427,8 @@ var ClassesDefinition = (function () {
             if (students === void 0) { students = []; }
             return new BandDefinition(_this, 1, name, 1, students, BandType.None, streamType);
         };
-        this.createBandSet = function (name) {
+        this.createBandSet = function (name, bandCount) {
+            if (bandCount === void 0) { bandCount = 1; }
             return new BandSet(_this, name);
         };
         this.createTopMiddleBottomBandSet = function () {
@@ -427,4 +444,3 @@ var ClassesDefinition = (function () {
     }
     return ClassesDefinition;
 }());
-//# sourceMappingURL=custom-group.js.map

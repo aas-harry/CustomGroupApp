@@ -169,7 +169,7 @@
 
     function createBandingClasses() {
         var classes = new ClassesDefinition(testFile);
-        classes.customBands.createBands("band", 2);
+        classes.createBandSet("band", 2);
         classes.customBands.bands[0].setClassCount(3);
         classes.customBands.bands[1].setClassCount(3);
         classes.customBands.createBandClasses(null, false);
