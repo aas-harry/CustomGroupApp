@@ -83,6 +83,7 @@ var SearchClassContext = (function () {
 }());
 var GroupingHelper = (function () {
     function GroupingHelper() {
+        var _this = this;
         this.calculateClassesSize = function (totalStudents, classCount) {
             var studentInClass = Math.floor(totalStudents / classCount);
             var remainingStudents = totalStudents - (studentInClass * classCount);
@@ -90,6 +91,64 @@ var GroupingHelper = (function () {
             for (var i = 0; i < classCount; i++) {
                 classes.push(studentInClass + (remainingStudents > 0 ? 1 : 0));
                 remainingStudents--;
+            }
+            return classes;
+        };
+        this.setOveralAbilityScore = function (students) {
+            for (var i = 0; i < students.length; i++) {
+                students[i].score = students[i].source.overallAbilityScore();
+            }
+        };
+        this.setEnglishScore = function (students) {
+            for (var i = 0; i < students.length; i++) {
+                students[i].score = students[i].source.englishScore();
+            }
+        };
+        this.setMathAchievementScore = function (students) {
+            for (var i = 0; i < students.length; i++) {
+                students[i].score = students[i].source.mathsAchievementScore();
+            }
+        };
+        this.calculateTotalScore = function (students, streamType) {
+            if (streamType === StreamType.OverallAbilty) {
+                _this.setOveralAbilityScore(students);
+            }
+            if (streamType === StreamType.English) {
+                _this.setEnglishScore(students);
+            }
+            if (streamType === StreamType.MathsAchievement) {
+                _this.setMathAchievementScore(students);
+            }
+        };
+        this.groupByStreaming = function (classes, students, streamType, mixBoysGirls) {
+            _this.calculateTotalScore(students, streamType);
+            if (!mixBoysGirls) {
+                _this.groupByStreamingInternal(classes, students);
+            }
+            var femaleStudents = Enumerable.From(students).Where(function (s) { return (s.gender === "F"); }).Select(function (s) { return s; }).ToArray();
+            var maleStudents = Enumerable.From(students).Where(function (s) { return (s.gender === "F"); }).Select(function (s) { return s; }).ToArray();
+            if (femaleStudents.length < maleStudents.length) {
+                _this.groupByStreamingInternal(classes, femaleStudents);
+                _this.groupByStreamingInternal(classes, maleStudents);
+            }
+            else {
+                _this.groupByStreamingInternal(classes, maleStudents);
+                _this.groupByStreamingInternal(classes, femaleStudents);
+            }
+        };
+        this.groupByStreamingInternal = function (classes, students) {
+            var sortedStudents = Enumerable.From(students).OrderByDescending(function (s) { return s.score; }).Select(function (s) { return s; }).ToArray();
+            var classNo = 0;
+            var numberStudentsInClass = 0;
+            for (var i = 0; i < sortedStudents.length; i++) {
+                var student = sortedStudents[i];
+                student.classNo = classNo + 1;
+                classes[classNo].students.push(student);
+                numberStudentsInClass++;
+                if (classes[classNo].count <= numberStudentsInClass) {
+                    classNo++;
+                    numberStudentsInClass = 0;
+                }
             }
             return classes;
         };
@@ -103,7 +162,6 @@ var ClassDefinition = (function () {
         this.count = count;
         this.students = [];
         this.uid = createUuid();
-        this.students = new Array();
     }
     Object.defineProperty(ClassDefinition.prototype, "moreStudents", {
         get: function () {
@@ -115,9 +173,9 @@ var ClassDefinition = (function () {
     return ClassDefinition;
 }());
 var BandDefinition = (function () {
-    function BandDefinition(parent, bandNo, bandName, classCount, students, bandType, streamType, groupType, mixBoysGirls) {
+    function BandDefinition(parent, bandNo, bandName, studentCount, classCount, bandType, streamType, groupType, mixBoysGirls) {
         var _this = this;
-        if (students === void 0) { students = []; }
+        if (classCount === void 0) { classCount = 1; }
         if (bandType === void 0) { bandType = BandType.None; }
         if (streamType === void 0) { streamType = StreamType.OverallAbilty; }
         if (groupType === void 0) { groupType = GroupingMethod.Streaming; }
@@ -125,25 +183,18 @@ var BandDefinition = (function () {
         this.parent = parent;
         this.bandNo = bandNo;
         this.bandName = bandName;
-        this.students = students;
+        this.studentCount = studentCount;
+        this.classCount = classCount;
         this.bandType = bandType;
         this.streamType = streamType;
         this.groupType = groupType;
         this.mixBoysGirls = mixBoysGirls;
+        this.students = [];
         this.classes = [];
-        this.initClasses = function (classCount) {
-            _this.classes = _this.calculateClassesSize(_this, _this.studentCount, classCount);
-        };
-        this.calculateTotalScore = function (students) {
-            if (_this.streamType === StreamType.OverallAbilty) {
-                _this.setOveralAbilityScore(students);
-            }
-            if (_this.streamType === StreamType.English) {
-                _this.setEnglishScore(students);
-            }
-            if (_this.streamType === StreamType.MathsAchievement) {
-                _this.setMathAchievementScore(students);
-            }
+        this.groupHelper = new GroupingHelper();
+        this.setClassCount = function (classCount) {
+            _this.classCount = classCount;
+            _this.calculateClassesSize(classCount);
         };
         this.distributeStudents = function (groupType, streamType, mixBoysGirls) {
             switch (groupType) {
@@ -168,15 +219,19 @@ var BandDefinition = (function () {
         };
         this.groupByMixAbility = function (mixBoysGirls) {
             var students = _this.students;
-            _this.calculateTotalScore(students);
+            _this.groupHelper.calculateTotalScore(_this.students, _this.streamType);
             if (!mixBoysGirls) {
-                _this.classes = _this.groupByMixAbilityInternal(students, true);
+                _this.classes = _this.groupByMixAbilityInternal(students);
                 return;
             }
             var femaleClasses = _this.groupByMixAbilityInternal(Enumerable.From(students)
-                .Where(function (s) { return (s.gender === "F"); }).Select(function (s) { return s; }).ToArray(), false);
+                .Where(function (s) { return (s.gender === "F"); })
+                .Select(function (s) { return s; })
+                .ToArray());
             var maleClasses = _this.groupByMixAbilityInternal(Enumerable.From(students)
-                .Where(function (s) { return (s.gender === "M"); }).Select(function (s) { return s; }).ToArray(), false);
+                .Where(function (s) { return (s.gender === "M"); })
+                .Select(function (s) { return s; })
+                .ToArray());
             var index = _this.classCount - 1;
             for (var i = 0; i < _this.classCount; i++) {
                 if (i < femaleClasses.length) {
@@ -191,56 +246,8 @@ var BandDefinition = (function () {
                 index--;
             }
         };
-        this.groupByStreaming = function (mixBoysGirls) {
-            var students = _this.students;
-            _this.calculateTotalScore(_this.students);
-            if (!mixBoysGirls) {
-                _this.classes = _this.groupByStreamingInternal(students, true);
-                return;
-            }
-            var femaleStudents = Enumerable.From(students).Where(function (s) { return (s.gender === "F"); }).Select(function (s) { return s; }).ToArray();
-            var maleStudents = Enumerable.From(students).Where(function (s) { return (s.gender === "F"); }).Select(function (s) { return s; }).ToArray();
-            var maleClasses = _this.groupByStreamingInternal(maleStudents, false);
-            var femaleClasses = _this.groupByStreamingInternal(femaleStudents, false);
-            if (femaleStudents.length < maleStudents.length) {
-                for (var i = 0; i < _this.classCount; i++) {
-                    if (i < femaleClasses.length) {
-                        for (var j = 0; j < femaleClasses[i].students.length; j++) {
-                            if (_this.classes[i].count <= _this.classes[i].students.length) {
-                                break;
-                            }
-                            femaleClasses[i].students[j].flag = 1;
-                            _this.classes[i].students.push(femaleClasses[i].students[j]);
-                        }
-                    }
-                }
-            }
-            for (var i = 0; i < _this.classCount; i++) {
-                if (i < femaleClasses.length) {
-                    _this.classes[i].students = (_this.classes[i].students.concat(femaleClasses[i].students));
-                }
-                if (i < maleClasses.length) {
-                    _this.classes[i].students = (_this.classes[i].students.concat(maleClasses[i].students));
-                }
-            }
-        };
-        this.setOveralAbilityScore = function (students) {
-            for (var i = 0; i < students.length; i++) {
-                students[i].score = students[i].source.overallAbilityScore();
-            }
-        };
-        this.setEnglishScore = function (students) {
-            for (var i = 0; i < students.length; i++) {
-                students[i].score = students[i].source.englishScore();
-            }
-        };
-        this.setMathAchievementScore = function (students) {
-            for (var i = 0; i < students.length; i++) {
-                students[i].score = students[i].source.mathsAchievementScore();
-            }
-        };
-        this.groupByMixAbilityInternal = function (students, allStudents) {
-            var classes = allStudents ? _this.classes : _this.calculateClassesSize(_this, students.length, _this.classCount);
+        this.groupByMixAbilityInternal = function (students) {
+            var classes = _this.classes;
             var sortedStudents = Enumerable.From(students).OrderByDescending(function (s) { return s.score; }).Select(function (s) { return s; }).ToArray();
             var nextClass = new SearchClassContext(0, 0, _this.classCount - 1, false);
             for (var i = 0; i < sortedStudents.length; i++) {
@@ -292,8 +299,41 @@ var BandDefinition = (function () {
             }
             return result;
         };
-        this.groupByStreamingInternal = function (students, allStudents) {
-            var classes = allStudents ? _this.classes : _this.calculateClassesSize(_this, students.length, _this.classCount);
+        this.groupByStreaming = function (mixBoysGirls) {
+            var students = _this.students;
+            _this.groupHelper.calculateTotalScore(_this.students, _this.streamType);
+            if (!mixBoysGirls) {
+                _this.classes = _this.groupByStreamingInternal(students);
+                return;
+            }
+            var femaleStudents = Enumerable.From(students).Where(function (s) { return (s.gender === "F"); }).Select(function (s) { return s; }).ToArray();
+            var maleStudents = Enumerable.From(students).Where(function (s) { return (s.gender === "F"); }).Select(function (s) { return s; }).ToArray();
+            var maleClasses = _this.groupByStreamingInternal(maleStudents);
+            var femaleClasses = _this.groupByStreamingInternal(femaleStudents);
+            if (femaleStudents.length < maleStudents.length) {
+                for (var i = 0; i < _this.classCount; i++) {
+                    if (i < femaleClasses.length) {
+                        for (var j = 0; j < femaleClasses[i].students.length; j++) {
+                            if (_this.classes[i].count <= _this.classes[i].students.length) {
+                                break;
+                            }
+                            femaleClasses[i].students[j].flag = 1;
+                            _this.classes[i].students.push(femaleClasses[i].students[j]);
+                        }
+                    }
+                }
+            }
+            for (var i = 0; i < _this.classCount; i++) {
+                if (i < femaleClasses.length) {
+                    _this.classes[i].students = (_this.classes[i].students.concat(femaleClasses[i].students));
+                }
+                if (i < maleClasses.length) {
+                    _this.classes[i].students = (_this.classes[i].students.concat(maleClasses[i].students));
+                }
+            }
+        };
+        this.groupByStreamingInternal = function (students) {
+            var classes = _this.classes;
             var sortedStudents = Enumerable.From(students).OrderByDescending(function (s) { return s.score; }).Select(function (s) { return s; }).ToArray();
             var classNo = 0;
             var numberStudentsInClass = 0;
@@ -310,55 +350,33 @@ var BandDefinition = (function () {
             }
             return classes;
         };
-        this.calculateClassesSize = function (bandDefnition, totalStudents, classCount) {
-            var studentInClass = Math.floor(totalStudents / classCount);
-            var remainingStudents = totalStudents - (studentInClass * classCount);
-            var classes = new Array();
+        this.calculateClassesSize = function (classCount) {
+            var studentInClass = Math.floor(_this.studentCount / classCount);
+            var remainingStudents = _this.studentCount - (studentInClass * classCount);
+            _this.classes = [];
             for (var i = 0; i < classCount; i++) {
-                classes.push(new ClassDefinition(bandDefnition, i + 1, studentInClass + (remainingStudents > 0 ? 1 : 0)));
+                _this.classes.push(new ClassDefinition(_this, i + 1, studentInClass + (remainingStudents > 0 ? 1 : 0)));
                 remainingStudents--;
             }
-            return classes;
         };
         this.uid = createUuid();
-        if (!this.students || this.students.length === 0) {
-            this.students = parent.students;
-        }
-        this.initClasses(classCount);
+        this.setClassCount(classCount);
     }
-    Object.defineProperty(BandDefinition.prototype, "studentCount", {
-        get: function () {
-            return this.students.length;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(BandDefinition.prototype, "classCount", {
-        get: function () {
-            return this.classes ? this.classes.length : 0;
-        },
-        enumerable: true,
-        configurable: true
-    });
     return BandDefinition;
 }());
 var BandSet = (function () {
-    function BandSet(parent, name, students, bandCount) {
+    function BandSet(parent, name, studentCount, bandCount, bandStreamType, mixBoysGirls) {
         var _this = this;
-        if (students === void 0) { students = []; }
         if (bandCount === void 0) { bandCount = 1; }
+        if (bandStreamType === void 0) { bandStreamType = BandStreamType.Streaming; }
+        if (mixBoysGirls === void 0) { mixBoysGirls = false; }
         this.parent = parent;
         this.name = name;
-        this.students = students;
-        this.bandCount = bandCount;
+        this.studentCount = studentCount;
+        this.bandStreamType = bandStreamType;
+        this.mixBoysGirls = mixBoysGirls;
+        this.students = [];
         this.groupingHelper = new GroupingHelper();
-        this.createBands = function (name, bandCount) {
-            _this.bands = [];
-            var bands = _this.groupingHelper.calculateClassesSize(_this.students.length, bandCount);
-            for (var i = 0; i < bandCount; i++) {
-                _this.bands.push(new BandDefinition(_this.parent, i + 1, "Band " + (i + 1), bands[0]));
-            }
-        };
         this.createBandClasses = function (bandStreamType, mixBoysGirls) {
             if (!bandStreamType) {
                 bandStreamType = _this.bandStreamType;
@@ -378,8 +396,22 @@ var BandSet = (function () {
                 _this.bands[i].groupByMixAbility(_this.mixBoysGirls);
             }
         };
+        this.prepare = function () {
+        };
+        this.createBands = function (name, studentCount, bandCount, bandType, streamType, groupType, mixBoysGirls) {
+            if (bandType === void 0) { bandType = BandType.None; }
+            if (streamType === void 0) { streamType = StreamType.OverallAbilty; }
+            if (groupType === void 0) { groupType = GroupingMethod.Streaming; }
+            if (mixBoysGirls === void 0) { mixBoysGirls = false; }
+            var tmpBands = _this.groupingHelper.calculateClassesSize(studentCount, bandCount);
+            _this.bands = [];
+            for (var i = 0; i < bandCount; i++) {
+                var band = new BandDefinition(_this.parent, i + 1, "Band " + (i + 1), tmpBands[0], 1, bandType, streamType, groupType, mixBoysGirls);
+                _this.bands.push(band);
+            }
+        };
         this.convertToClasses = function (bandSet) {
-            var band = new BandDefinition(_this.parent, 1, "Band", bandSet.bands.length, _this.students);
+            var band = new BandDefinition(_this.parent, 1, "Band", bandSet.bands.length, _this.students.length);
             for (var i = 0; i < bandSet.bands.length; i++) {
                 band.classes[i].count = bandSet.bands[i].studentCount;
             }
@@ -388,15 +420,10 @@ var BandSet = (function () {
         this.convertFromClasses = function (classDefinition, bandNo) {
             return new BandDefinition(_this.parent, bandNo, "Band " + bandNo, classDefinition.count);
         };
-        this.students = parent.students;
-        this.bandStreamType = BandStreamType.Streaming;
-        this.mixBoysGirls = false;
-        if (!this.students || this.students.length === 0) {
-            this.students = parent.students;
-        }
-        this.createBands(name, bandCount);
+        this.uid = createUuid();
+        this.createBands(name, studentCount, bandCount);
     }
-    Object.defineProperty(BandSet.prototype, "count", {
+    Object.defineProperty(BandSet.prototype, "bandCount", {
         get: function () {
             return this.bands ? this.bands.length : 0;
         },
@@ -407,13 +434,10 @@ var BandSet = (function () {
 }());
 var TopMiddleLowestBandSet = (function (_super) {
     __extends(TopMiddleLowestBandSet, _super);
-    function TopMiddleLowestBandSet(parent) {
-        _super.call(this, parent, "TopMiddleLowest");
+    function TopMiddleLowestBandSet(parent, studentCount) {
+        _super.call(this, parent, "TopMiddleLowest", studentCount, 3);
         this.parent = parent;
-        this.createBands("Custom", 3);
-        //this.bands.push(new BandDefinition(this.parent, 1, "Top", 0, 1, BandType.Top));
-        //this.bands.push(new BandDefinition(this.parent, 2, "Middle", 0, 1, BandType.Middle));
-        //this.bands.push(new BandDefinition(this.parent, 3, "Lowest", 0, 1, BandType.Lowest));
+        this.studentCount = studentCount;
     }
     return TopMiddleLowestBandSet;
 }(BandSet));
@@ -423,16 +447,14 @@ var ClassesDefinition = (function () {
         this.testFile = testFile;
         this.spreadBoysGirlsEqually = false;
         this.excludeLeavingStudent = false;
-        this.createBand = function (name, streamType, students) {
-            if (students === void 0) { students = []; }
-            return new BandDefinition(_this, 1, name, 1, students, BandType.None, streamType);
-        };
-        this.createBandSet = function (name, bandCount) {
+        this.createBandSet = function (name, studentCount, bandCount, bandStreamType, mixBoysGirls) {
             if (bandCount === void 0) { bandCount = 1; }
-            return new BandSet(_this, name);
+            if (bandStreamType === void 0) { bandStreamType = BandStreamType.Streaming; }
+            if (mixBoysGirls === void 0) { mixBoysGirls = false; }
+            return new BandSet(_this, name, studentCount, bandCount, bandStreamType, mixBoysGirls);
         };
-        this.createTopMiddleBottomBandSet = function () {
-            return new TopMiddleLowestBandSet(_this);
+        this.createTopMiddleBottomBandSet = function (studentCount) {
+            return new TopMiddleLowestBandSet(_this, studentCount);
         };
         this.uid = createUuid();
         this.groupGender = testFile.isUnisex ? Gender.All : (testFile.hasBoys ? Gender.Boys : Gender.Girls);
@@ -442,5 +464,13 @@ var ClassesDefinition = (function () {
             this.students.push(new StudentClass(testFile.students[i]));
         }
     }
+    Object.defineProperty(ClassesDefinition.prototype, "studentCount", {
+        get: function () {
+            return this.students.length;
+        },
+        enumerable: true,
+        configurable: true
+    });
     return ClassesDefinition;
 }());
+//# sourceMappingURL=custom-group.js.map

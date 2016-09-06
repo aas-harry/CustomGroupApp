@@ -122,8 +122,12 @@
 
     function createStreamingClasses() {
         var classesDefn = new ClassesDefinition(testFile);
-        var band = classesDefn.createBand("Class", StreamType.OverallAbilty);
-        band.initClasses(5);
+        debugger;
+        var bandSet = classesDefn.createBandSet("Custom", classesDefn.studentCount, 1, StreamType.OverallAbilty);
+        var band = bandSet.bands[0];
+        band.streamType = StreamType.OverallAbilty;
+        
+        band.setClassCount(5);
         band.classes[0].count += 5;
         band.classes[1].count -= 3;
         band.classes[2].count -= 2;
@@ -169,12 +173,13 @@
 
     function createBandingClasses() {
         var classes = new ClassesDefinition(testFile);
-        classes.createBandSet("band", 2);
-        classes.customBands.bands[0].setClassCount(3);
-        classes.customBands.bands[1].setClassCount(3);
-        classes.customBands.createBandClasses(null, false);
+        // Create two bands
+        var bandSet = classes.createBandSet("band", classes.students, 2);
+        bandSet.bands[0].setClassCount(3);
+        bandSet.bands[1].setClassCount(3);
+        bandSet.createBandClasses(BandStreamType.Streaming, false);
         var tmpClasses = [];
-        tmpClasses = classes.customBands.bands[0].classes.concat(classes.customBands.bands[1].classes);
+        tmpClasses = bandSet.bands[0].classes.concat(bandSet.bands[1].classes);
         for (var i = 1; i <= tmpClasses.length; i++) {
 
             $("#jqGrid" + i)
@@ -221,8 +226,8 @@
         bandSet.bands[2].setClassCount(2);
         bandSet.createBandClasses(BandStreamType.Streaming, false);
         var tmpClasses = [];
-        tmpClasses = classes.customBands.bands[0].classes.concat(classes.customBands.bands[1].classes)
-        .concat(classes.customBands.bands[2].classes);
+        tmpClasses = bandSet.bands[0].classes.concat(bandSet.bands[1].classes)
+        .concat(bandSet.bands[2].classes);
         for (var i = 1; i <= tmpClasses.length; i++) {
 
             $("#jqGrid" + i)
