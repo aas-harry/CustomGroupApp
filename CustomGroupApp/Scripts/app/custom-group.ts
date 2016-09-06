@@ -54,6 +54,7 @@ function createUuid() {
     return uuid;
 }
 
+
 class SummaryClass {
     classNo: number;
     average: number;
@@ -137,6 +138,7 @@ class GroupingHelper {
 
         if (!mixBoysGirls) {
             this.groupByStreamingInternal(classes, students);
+            return;
         }
 
         var femaleStudents = Enumerable.From(students).Where(s => (s.gender === "F")).Select(s => s).ToArray();
@@ -149,6 +151,94 @@ class GroupingHelper {
             this.groupByStreamingInternal(classes, maleStudents);
             this.groupByStreamingInternal(classes, femaleStudents);
         }
+    };
+
+    groupByMixAbility = (classes: Array<ClassDefinition>,
+        students: Array<StudentClass>,
+        streamType: StreamType,
+        mixBoysGirls: boolean) => {
+
+        this.calculateTotalScore(students, streamType);
+
+        if (!mixBoysGirls) {
+            this.groupByMixAbilityInternal(classes, students);
+            return;
+        }
+
+        var femaleStudents = Enumerable.From(students).Where(s => (s.gender === "F")).Select(s => s).ToArray();
+        var maleStudents = Enumerable.From(students).Where(s => (s.gender === "F")).Select(s => s).ToArray();
+
+        if (femaleStudents.length < maleStudents.length) {
+            this.groupByMixAbilityInternal(classes, femaleStudents);
+            this.groupByMixAbilityInternal(classes, maleStudents, true);
+        } else {
+            this.groupByMixAbilityInternal(classes, maleStudents);
+            this.groupByMixAbilityInternal(classes, femaleStudents, true);
+        }
+    };
+
+
+    private groupByMixAbilityInternal = (classes: Array<ClassDefinition>, students: Array<StudentClass>,
+        orderReversed: boolean = false) => {
+        var sortedStudents = orderReversed === false ?
+            Enumerable.From(students).OrderByDescending(s => s.score).Select(s => s).ToArray() :
+            Enumerable.From(students).OrderBy(s => s.score).Select(s => s).ToArray();
+
+        var classCount = classes.length;
+        var nextClass = new SearchClassContext(0, 0, classCount - 1, false);
+        for (let i = 0; i < sortedStudents.length; i++) {
+            const student = sortedStudents[i];
+            student.classNo = nextClass.classNo + 1;
+            classes[nextClass.classNo].students.push(student);
+            nextClass = this.getNextClassToAddNewStudent(classes, nextClass);
+        }
+        return classes;
+    };
+
+    private getNextClassToAddNewStudent = (classes: Array<ClassDefinition>, context: SearchClassContext):
+        SearchClassContext => {
+        // this is the logic to get the next class
+        // 1. Get the next available class 
+        // 2. If the next class is the last class and then we need to ctart again from the last initial class no + 1
+        //    This is will distribute the smarter students evently across all classes.
+
+        var result = new SearchClassContext(-1, context.firstClassNo, context.lastClassNo, false);
+        var nextClassNo: number;
+        if (context.isLastClass) {
+            nextClassNo = context.firstClassNo;
+            result.lastClassNo = nextClassNo < classes.length ? context.firstClassNo : (classes.length - 1);
+            result.firstClassNo = nextClassNo < classes.length ? (nextClassNo + 1) : 0;
+        } else {
+            nextClassNo = context.classNo;
+        }
+
+        // get the class in the right order to pick up
+        var classQueue = [];
+        for (let i = nextClassNo + 1; i < classes.length; i++) {
+            classQueue.push(classes[i]);
+        }
+        for (let i = 0; i <= nextClassNo; i++) {
+            classQueue.push(classes[i]);
+        }
+
+        for (let i = 0; i < classQueue.length; i++) {
+            if (classQueue[i].students.length >= classQueue[i].count) {
+                continue;
+            }
+            result.classNo = classQueue[i].index - 1;
+
+            // we have reach the last class
+            if (result.lastClassNo === (classQueue[i].index - 1)) {
+                result.isLastClass = true;
+            }
+            break;
+        }
+
+        // If all groups have been completed, add the rest of the students into first group
+        if (result.classNo === -1) {
+            result.classNo = 0;
+        }
+        return result;
     };
 
     private groupByStreamingInternal = (classes: Array<ClassDefinition>, students: Array<StudentClass>) => {
@@ -167,7 +257,6 @@ class GroupingHelper {
         }
         return classes;
     };
-
 }
 
 class ClassDefinition {
@@ -190,9 +279,8 @@ class BandDefinition {
         public bandName: string,
         public studentCount,
         public classCount: number = 1,
-        public bandType: BandType = BandType.None,
-        public streamType: StreamType = StreamType.OverallAbilty,
-        public groupType: GroupingMethod = GroupingMethod.Streaming,
+        public streamType = StreamType.OverallAbilty,
+        public groupType = GroupingMethod.Streaming,
         public mixBoysGirls: boolean = false) {
 
         this.uid = createUuid();
@@ -225,167 +313,32 @@ class BandDefinition {
             break;
         }
     };
-
+     
     calculateClassesAverage = (classes: Array<ClassDefinition>) => {
         for (let i = 0; i < classes.length; i++) {
             classes[i].average = Enumerable.From(classes[i].students).Average(x => x.score);
         }
     };
 
-    groupByMixAbility = (mixBoysGirls: boolean) => {
-        var students = this.students;
-
-        this.groupHelper.calculateTotalScore(this.students, this.streamType);
-
-        if (!mixBoysGirls) {
-            this.classes = this.groupByMixAbilityInternal(students);
-            return;
-        }
-
-        var femaleClasses = this.groupByMixAbilityInternal(Enumerable.From(students)
-            .Where(s => (s.gender === "F"))
-            .Select(s => s)
-            .ToArray());
-        var maleClasses = this.groupByMixAbilityInternal(Enumerable.From(students)
-            .Where(s => (s.gender === "M"))
-            .Select(s => s)
-            .ToArray());
-
-        var index = this.classCount - 1;
-
-        for (let i = 0; i < this.classCount; i++) {
-            if (i < femaleClasses.length) {
-                this.classes[i].students = (this.classes[i].students.concat(femaleClasses[i].students));
-            }
-            if (index < maleClasses.length) {
-                for (let j = 0; j < maleClasses[index].students.length; j++) {
-                    maleClasses[index].students[j].classNo = i + 1;
-                }
-                this.classes[i].students = (this.classes[i].students.concat(maleClasses[index].students));
-            }
-            index--;
-        }
-
-    };
-
-
-    private groupByMixAbilityInternal = (students: Array<StudentClass>): Array<ClassDefinition> => {
-            var classes = this.classes;
-            var sortedStudents = Enumerable.From(students).OrderByDescending(s => s.score).Select(s => s).ToArray();
-            var nextClass = new SearchClassContext(0, 0, this.classCount - 1, false);
-            for (let i = 0; i < sortedStudents.length; i++) {
-                const student = sortedStudents[i];
-                student.classNo = nextClass.classNo + 1;
-                student.bandNo = this.bandNo;
-                classes[nextClass.classNo].students.push(student);
-                nextClass = this.getNextClassToAddNewStudent(classes, nextClass);
-            }
-            return classes;
-        };
-
-    private getNextClassToAddNewStudent = (classes: Array<ClassDefinition>, context: SearchClassContext):
-        SearchClassContext => {
-            // this is the logic to get the next class
-            // 1. Get the next available class 
-            // 2. If the next class is the last class and then we need to ctart again from the last initial class no + 1
-            //    This is will distribute the smarter students evently across all classes.
-
-            var result = new SearchClassContext(-1, context.firstClassNo, context.lastClassNo, false);
-            var nextClassNo: number;
-            if (context.isLastClass) {
-                nextClassNo = context.firstClassNo;
-                result.lastClassNo = nextClassNo < classes.length ? context.firstClassNo : (classes.length - 1);
-                result.firstClassNo = nextClassNo < classes.length ? (nextClassNo + 1) : 0;
-            } else {
-                nextClassNo = context.classNo;
-            }
-
-            // get the class in the right order to pick up
-            var classQueue = [];
-            for (let i = nextClassNo + 1; i < classes.length; i++) {
-                classQueue.push(classes[i]);
-            }
-            for (let i = 0; i <= nextClassNo; i++) {
-                classQueue.push(classes[i]);
-            }
-
-            for (let i = 0; i < classQueue.length; i++) {
-                if (classQueue[i].students.length >= classQueue[i].count) {
-                    continue;
-                }
-                result.classNo = classQueue[i].index - 1;
-
-                // we have reach the last class
-                if (result.lastClassNo === (classQueue[i].index - 1)) {
-                    result.isLastClass = true;
-                }
+    prepare = (students: Array<StudentClass>) => {
+        this.students = students;
+        switch (this.groupType) {
+            case GroupingMethod.MixedAbility:
+                this.groupHelper.groupByMixAbility(this.classes, this.students, this.streamType, this.mixBoysGirls);
                 break;
-            }
-
-            // If all groups have been completed, add the rest of the students into first group
-            if (result.classNo === -1) {
-                result.classNo = 0;
-            }
-            return result;
-        };
-
-    groupByStreaming = (mixBoysGirls: boolean) => {
-        var students = this.students;
-        this.groupHelper.calculateTotalScore(this.students, this.streamType);
-
-        if (!mixBoysGirls) {
-            this.classes = this.groupByStreamingInternal(students);
-            return;
-        }
-
-        var femaleStudents = Enumerable.From(students).Where(s => (s.gender === "F")).Select(s => s).ToArray();
-        var maleStudents = Enumerable.From(students).Where(s => (s.gender === "F")).Select(s => s).ToArray();
-
-        var maleClasses = this.groupByStreamingInternal(maleStudents);
-        var femaleClasses = this.groupByStreamingInternal(femaleStudents);
-
-        if (femaleStudents.length < maleStudents.length) {
-            for (let i = 0; i < this.classCount; i++) {
-                if (i < femaleClasses.length) {
-                    for (let j = 0; j < femaleClasses[i].students.length; j++) {
-                        if (this.classes[i].count <= this.classes[i].students.length) {
-                            break;
-                        }
-                        femaleClasses[i].students[j].flag = 1;
-                        this.classes[i].students.push(femaleClasses[i].students[j]);
-                    }
-                }
-            }
-        }
-
-        for (let i = 0; i < this.classCount; i++) {
-            if (i < femaleClasses.length) {
-                this.classes[i].students = (this.classes[i].students.concat(femaleClasses[i].students));
-            }
-            if (i < maleClasses.length) {
-                this.classes[i].students = (this.classes[i].students.concat(maleClasses[i].students));
-            }
+            case GroupingMethod.Streaming:
+                this.groupHelper.groupByStreaming(this.classes, this.students, this.streamType, this.mixBoysGirls);
+                break;
+            case GroupingMethod.Banding:
+                break;
+            case GroupingMethod.TopMiddleLowest:
+                break;
+            case GroupingMethod.Language:
+                break;
+            case GroupingMethod.CustomGroup:
+                break;
         }
     };
-
-    private groupByStreamingInternal = (students: Array<StudentClass>): Array<ClassDefinition> => {
-            var classes = this.classes;
-            var sortedStudents = Enumerable.From(students).OrderByDescending(s => s.score).Select(s => s).ToArray();
-            var classNo = 0;
-            var numberStudentsInClass = 0;
-            for (let i = 0; i < sortedStudents.length; i++) {
-                const student = sortedStudents[i];
-                student.classNo = classNo + 1;
-                student.bandNo = this.bandNo;
-                classes[classNo].students.push(student);
-                numberStudentsInClass++;
-                if (classes[classNo].count <= numberStudentsInClass) {
-                    classNo++;
-                    numberStudentsInClass = 0;
-                }
-            }
-            return classes;
-        };
 
     private calculateClassesSize = (classCount: number) => {
         var studentInClass = Math.floor(this.studentCount / classCount);
@@ -399,16 +352,19 @@ class BandDefinition {
     };
 }
 
+
 class BandSet {
     constructor(public parent: ClassesDefinition,
         public name: string,
         public studentCount: number,
         bandCount: number = 1,
         public bandStreamType = BandStreamType.Streaming,
+        public streamType = StreamType.OverallAbilty,
+        public groupType = GroupingMethod.Streaming,
         public mixBoysGirls = false) {
 
         this.uid = createUuid();
-        this.createBands(name, studentCount, bandCount);
+        this.createBands(name, studentCount, bandCount, streamType, groupType, mixBoysGirls);
     }
 
     uid: string;
@@ -417,58 +373,36 @@ class BandSet {
 
     // ReSharper disable once InconsistentNaming
     private _bankCount: number;
-
     get bandCount(): number {
         return this.bands ? this.bands.length : 0;
     }
 
-    private groupingHelper = new GroupingHelper();
+    protected groupingHelper = new GroupingHelper();
 
+    prepare = (students: Array<StudentClass>) => {
+        this.students = students;
+        this.bands[0].students = this.students;
+        this.bands[0].prepare(this.students);
+    }
+ 
 
-    createBandClasses = (bandStreamType: BandStreamType, mixBoysGirls: boolean) => {
-        if (!bandStreamType) {
-            bandStreamType = this.bandStreamType;
-        }
-        if (!mixBoysGirls) {
-            mixBoysGirls = this.mixBoysGirls;
-        }
-
-        this.bandStreamType = bandStreamType;
-        this.mixBoysGirls = mixBoysGirls;
-
-        // Create a temporary banddefinition to calculate the band sizes
-        var band = this.convertToClasses(this);
-        band.groupByStreaming(this.mixBoysGirls);
-        for (let i = 0; i < band.classes.length; i++) {
-            this.bands[i].students = band.classes[i].students;
-        }
-
-        for (let i = 0; i < this.bands.length; i++) {
-            this.bands[i].groupByMixAbility(this.mixBoysGirls);
-        }
-    };
-
-    prepare = () => {
-
-    };
     private createBands = (name: string,
         studentCount: number,
         bandCount: number,
-        bandType: BandType = BandType.None,
-        streamType: StreamType = StreamType.OverallAbilty,
-        groupType: GroupingMethod = GroupingMethod.Streaming,
+        streamType = StreamType.OverallAbilty,
+        groupType = GroupingMethod.Streaming,
         mixBoysGirls: boolean = false) => {
 
         var tmpBands = this.groupingHelper.calculateClassesSize(studentCount, bandCount);
 
         this.bands = [];
         for (let i = 0; i < bandCount; i++) {
+            const bandNo = i + 1;
             const band = new BandDefinition(this.parent,
-                i + 1,
-                `Band ${i + 1}`,
+                bandNo,
+                `Band ${bandNo}`,
                 tmpBands[0],
                 1,
-                bandType,
                 streamType,
                 groupType,
                 mixBoysGirls);
@@ -477,23 +411,55 @@ class BandSet {
         }
     };
 
-    private convertToClasses = (bandSet: BandSet): BandDefinition => {
-        var band = new BandDefinition(this.parent, 1, "Band", bandSet.bands.length, this.students.length);
+    protected convertToClasses = (bandSet: BandSet): Array<ClassDefinition> => {
+        var classes = new Array<ClassDefinition>();
         for (let i = 0; i < bandSet.bands.length; i++) {
-            band.classes[i].count = bandSet.bands[i].studentCount;
+            classes.push(new ClassDefinition(null, i + 1, bandSet.bands[i].studentCount));
         }
-
-        return band;
-    };
-    private convertFromClasses = (classDefinition: ClassDefinition, bandNo: number): BandDefinition => {
-        return new BandDefinition(this.parent, bandNo, `Band ${bandNo}`, classDefinition.count);
+        return classes;
     };
 }
 
-class TopMiddleLowestBandSet extends BandSet {
-    constructor(public parent: ClassesDefinition, public studentCount: number) {
-        super(parent, "TopMiddleLowest", studentCount, 3);
+class CustomBandSet extends BandSet {
+    constructor(public parent: ClassesDefinition,
+        public studentCount: number,
+        public bandCount: number = 1,
+        bandStreamType = BandStreamType.Streaming,
+        streamType = StreamType.OverallAbilty,
+        groupType = GroupingMethod.Streaming,
+        mixBoysGirls: boolean = false) {
+        super(parent, "Custom", studentCount, bandCount, bandStreamType, streamType, groupType, mixBoysGirls);
     }
+
+    prepare = (students: Array<StudentClass>) => {
+        this.students = students;
+        this.bands[0].students = this.students;
+        for (let i = 0; i < this.bands.length; i++) {
+            this.bands[i].prepare(this.students);
+        }
+    }
+}
+
+class TopMiddleLowestBandSet extends BandSet {
+    constructor(public parent: ClassesDefinition, public studentCount: number, public bandStreamType: BandStreamType = BandStreamType.Streaming) {
+        super(parent, "TopMiddleLowest", studentCount, 3, bandStreamType);
+    }
+
+    prepare = (students: Array<StudentClass>) => {
+        this.students = students;
+        var classes = this.convertToClasses(this);
+        if (this.bandStreamType === BandStreamType.Streaming) {
+            this.groupingHelper.groupByStreaming(classes,
+                this.students,
+                this.streamType,
+                this.mixBoysGirls);
+        } else {
+            this.groupingHelper.groupByMixAbility(classes,
+                this.students,
+                this.streamType,
+                this.mixBoysGirls);
+        }
+    };
 }
 
 class ClassesDefinition {
@@ -525,10 +491,16 @@ class ClassesDefinition {
         studentCount: number,
         bandCount: number = 1,
         bandStreamType = BandStreamType.Streaming,
+        streamType = StreamType.OverallAbilty,
+        groupType = GroupingMethod.Streaming,
         mixBoysGirls = false): BandSet => {
 
-        return new BandSet(this, name, studentCount, bandCount, bandStreamType, mixBoysGirls);
+        return new BandSet(this, name, studentCount, bandCount, bandStreamType, streamType, groupType, mixBoysGirls);
     };
+
+    createCustomBandSet = (name: string, studentCount: number, bandCount: number): CustomBandSet => {
+        return new CustomBandSet(this, studentCount, bandCount);
+    }
 
     createTopMiddleBottomBandSet = (studentCount: number): TopMiddleLowestBandSet => {
         return new TopMiddleLowestBandSet(this, studentCount);

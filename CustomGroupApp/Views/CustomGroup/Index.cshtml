@@ -74,15 +74,19 @@
     }
 
     function createMixClasses() {
+        debugger;
+    
+
         var classesDefn = new ClassesDefinition(testFile);
-        var band = classesDefn.createBand("Class", StreamType.OverallAbilty);
-        band.initClasses(5);
+        var bandSet = classesDefn.createCustomBandSet("Class", classesDefn.studentCount);
+        var band = bandSet.bands[0];
+        band.setClassCount(5);
         //band.classes[0].count += 5;
         //band.classes[1].count -= 3;
         //band.classes[2].count -= 2;
 
-        band.groupByMixAbility(false);
-        
+        bandSet.prepare(classesDefn.students);
+
         for (var i = 1; i <= band.classes.length; i++) {
 
             $("#jqGrid" + i)
@@ -121,24 +125,28 @@
     }
 
     function createStreamingClasses() {
-        var classesDefn = new ClassesDefinition(testFile);
         debugger;
-        var bandSet = classesDefn.createBandSet("Custom", classesDefn.studentCount, 1, StreamType.OverallAbilty);
+        var classesDefn = new ClassesDefinition(testFile);
+        var bandSet = classesDefn.createCustomBandSet("Class", classesDefn.studentCount);
         var band = bandSet.bands[0];
         band.streamType = StreamType.OverallAbilty;
         
+        bandSet.prepare(classesDefn.students);
+
         band.setClassCount(5);
         band.classes[0].count += 5;
         band.classes[1].count -= 3;
         band.classes[2].count -= 2;
 
-        band.groupByStreaming(false);
-        for (var i = 1; i <= band.classes.length; i++) {
+        bandSet.prepare(classesDefn.students);
+        var classes = band.classes;
+        
+        for (var i = 1; i <= classes.length; i++) {
 
             $("#jqGrid" + i)
                 .jqGrid({
                     datatype: "local",
-                    data: band.classes[i - 1].students,
+                    data: classes[i - 1].students,
                     height: 350,
                     colModel: [
                         { label: 'Name', name: 'name', width: 150 },
@@ -150,12 +158,12 @@
                     caption: "Streaming Group " + i
                 });
         }
-        for (var j = band.classes.length + 1; j <= 6; j++) {
+        for (var j = classes.length + 1; j <= 6; j++) {
 
             $("#jqGrid" + j).replaceWith("");
         }
 
-        band.calculateClassesAverage(band.classes);
+        band.calculateClassesAverage(classes);
 
         $("#summary-grid")
             .jqGrid({
@@ -174,10 +182,11 @@
     function createBandingClasses() {
         var classes = new ClassesDefinition(testFile);
         // Create two bands
-        var bandSet = classes.createBandSet("band", classes.students, 2);
+        var bandSet = classes.createCustomBandSet("band", classes.students, 2);
         bandSet.bands[0].setClassCount(3);
         bandSet.bands[1].setClassCount(3);
-        bandSet.createBandClasses(BandStreamType.Streaming, false);
+        debugger;
+        bandSet.prepare(classes.students);
         var tmpClasses = [];
         tmpClasses = bandSet.bands[0].classes.concat(bandSet.bands[1].classes);
         for (var i = 1; i <= tmpClasses.length; i++) {
@@ -202,7 +211,7 @@
         //    $("#jqGrid" + j).replaceWith("");
         //}
 
-        classes.singleBand.calculateClassesAverage(tmpClasses);
+        bandSet.bands[0].calculateClassesAverage(tmpClasses);
 
         $("#summary-grid")
             .jqGrid({
