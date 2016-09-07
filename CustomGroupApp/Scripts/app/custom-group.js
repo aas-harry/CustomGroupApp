@@ -294,6 +294,9 @@ var BandDefinition = (function () {
         this.calculateClassesAverage = function (classes) {
             for (var i = 0; i < classes.length; i++) {
                 classes[i].average = Enumerable.From(classes[i].students).Average(function (x) { return x.score; });
+                classes[i].average = Enumerable.From(classes[i].students).Average(function (x) { return x.score; });
+                classes[i].average = Enumerable.From(classes[i].students).Average(function (x) { return x.score; });
+                classes[i].average = Enumerable.From(classes[i].students).Average(function (x) { return x.score; });
             }
         };
         this.prepare = function (name, students) {

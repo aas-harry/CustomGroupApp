@@ -266,6 +266,10 @@ class ClassDefinition {
     name: string;
     students: Array<StudentClass> = [];
     average: number;
+    boysCount: number;
+    girlsCount: number;
+    boysAverage: number;
+    girlsAverage: number;
 
     get moreStudents(): number {
         return this.count - (this.students ? this.students.length : 0);
@@ -323,6 +327,9 @@ class BandDefinition {
   
     calculateClassesAverage = (classes: Array<ClassDefinition>) => {
         for (let i = 0; i < classes.length; i++) {
+            classes[i].average = Enumerable.From(classes[i].students).Average(x => x.score);
+            classes[i].average = Enumerable.From(classes[i].students).Average(x => x.score);
+            classes[i].average = Enumerable.From(classes[i].students).Average(x => x.score);
             classes[i].average = Enumerable.From(classes[i].students).Average(x => x.score);
         }
     };
