@@ -54,7 +54,6 @@ function createUuid() {
     return uuid;
 }
 
-
 class SummaryClass {
     classNo: number;
     average: number;
@@ -66,7 +65,6 @@ class StudentClass {
         this.source = s;
         this.name = s.name;
         this.gender = s.sex;
-        this.score = s.genab.raw + s.mathPerformance.raw + s.reading.raw + s.spelling.raw;
     }
 
     source: Student;
@@ -274,16 +272,24 @@ class ClassDefinition {
     }
 
     prepare = (name: string) => {
-        debugger;
         switch (this.parent.bandType) {
             case BandType.None:
-                this.name = name + this.index;
+                this.name = name + " " + this.index;
                 break;
             case BandType.Custom:
-                this.name = name + "$this.index/$this.parent.bandNo";
+                this.name = name + " " + this.index +"/" + this.parent.bandNo;
                 break;
             case BandType.Top:
-                this.name = name + "(Top $this.index/$this.parent.bandNo)";
+                this.name = name + " " + "Top " + this.index;
+                break;
+            case BandType.Middle:
+                this.name = name + " " + "Middle " + this.index;
+                break;
+            case BandType.Lowest:
+                this.name = name + " " + "Lowest " + this.index;
+                break;
+            default: 
+                this.name = name + " " + this.index;
                 break;
         }
     }
@@ -345,6 +351,7 @@ class BandDefinition {
         for (let i = 0; i < this.classes.length; i++) {
             this.classes[i].prepare(name);
         }
+        this.calculateClassesAverage(this.classes);
     };
 
     private calculateClassesSize = (classCount: number) => {
@@ -488,8 +495,13 @@ class CustomBandSet extends BandSet {
 class TopMiddleLowestBandSet extends BandSet {
     constructor(public parent: ClassesDefinition,
         public studentCount: number,
-        public bandStreamType = BandStreamType.Streaming) {
-        super(parent, "TopMiddleLowest", studentCount, 3, BandType.Custom, bandStreamType);
+        public bandStreamType = BandStreamType.Streaming,
+        bandType = BandType.None,
+        streamType = StreamType.OverallAbilty,
+        groupType = GroupingMethod.Streaming,
+        mixBoysGirls: boolean = false) {
+        super(parent, "TopMiddleLowest", studentCount, 3, BandType.Custom,
+            bandStreamType, streamType, groupType, mixBoysGirls);
 
         this.bands[0].bandType = BandType.Top;
         this.bands[1].bandType = BandType.Middle;
@@ -539,7 +551,15 @@ class ClassesDefinition {
         return new CustomBandSet(this, studentCount, bandCount);
     }
 
-    createTopMiddleBottomBandSet = (studentCount: number): TopMiddleLowestBandSet => {
-        return new TopMiddleLowestBandSet(this, studentCount);
+    createTopMiddleBottomBandSet = (name: string,
+        studentCount: number,
+        bandCount: number = 1,
+        bandStreamType = BandStreamType.Streaming,
+        bandType = BandType.None,
+        streamType = StreamType.OverallAbilty,
+        groupType = GroupingMethod.Streaming,
+        mixBoysGirls = false): TopMiddleLowestBandSet => {
+        return new TopMiddleLowestBandSet(this, studentCount, bandStreamType, bandType
+        , streamType, groupType, mixBoysGirls);
     };
 }

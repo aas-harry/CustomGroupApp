@@ -86,12 +86,13 @@
 
         bandSet.prepare("Mix", classesDefn.students);
 
-        for (var i = 1; i <= band.classes.length; i++) {
+        var classes = band.classes;
+        for (var i = 1; i <= classes.length; i++) {
 
             $("#jqGrid" + i)
                 .jqGrid({
                     datatype: "local",
-                    data: band.classes[i - 1].students,
+                    data: classes[i - 1].students,
                     height: 350,
                     colModel: [
                         { label: 'Name', name: 'name', width: 150 },
@@ -100,15 +101,14 @@
                         { label: 'Class', name: 'classNo', width: 80 }
                     ],
                     viewrecords: true, // show the current page, data rang and total records on the toolbar
-                    caption: "Mixability Group " + i
+                    caption: classes[i - 1].name
                 });
         }
-        for (var j = band.classes.length + 1; j <= 6; j++) {
+        for (var j = classes.length + 1; j <= 6; j++) {
 
             $("#jqGrid" + j).replaceWith("");
         }
 
-        band.calculateClassesAverage(band.classes);
 
         $("#summary-grid")
             .jqGrid({
@@ -130,14 +130,12 @@
         var band = bandSet.bands[0];
         band.streamType = StreamType.OverallAbilty;
         
-        bandSet.prepare("Maths", classesDefn.students);
-
         band.setClassCount(5);
         band.classes[0].count += 5;
         band.classes[1].count -= 3;
         band.classes[2].count -= 2;
 
-        bandSet.prepare(classesDefn.students);
+        bandSet.prepare("Maths", classesDefn.students);
         var classes = band.classes;
         
         for (var i = 1; i <= classes.length; i++) {
@@ -154,20 +152,18 @@
                         { label: 'Class', name: 'classNo', width: 80 }
                     ],
                     viewrecords: true, // show the current page, data rang and total records on the toolbar
-                    caption: "Streaming Group " + i
-                });
+                    caption: classes[i - 1].name
+        });
         }
         for (var j = classes.length + 1; j <= 6; j++) {
 
             $("#jqGrid" + j).replaceWith("");
         }
 
-        band.calculateClassesAverage(classes);
-
         $("#summary-grid")
             .jqGrid({
                 datatype: "local",
-                data: band.classes,
+                data: classes,
                 colModel: [
                     { label: 'Class', name: 'index', width: 150 },
                     { label: 'Count', name: 'count', width: 50 },
@@ -185,9 +181,8 @@
              BandStreamType.Streaming, StreamType.OverallAbilty, GroupingMethod.MixedAbility);
         bandSet.bands[0].setClassCount(3);
         bandSet.bands[1].setClassCount(3);
-        bandSet.prepare(classes.students);
-        var tmpClasses = [];
-        tmpClasses = bandSet.bands[0].classes.concat(bandSet.bands[1].classes);
+        bandSet.prepare("Band", classes.students);
+        var tmpClasses = bandSet.bands[0].classes.concat(bandSet.bands[1].classes);
         for (var i = 1; i <= tmpClasses.length; i++) {
 
             $("#jqGrid" + i)
@@ -202,15 +197,13 @@
                         { label: 'Class', name: 'classNo', width: 80 }
                     ],
                     viewrecords: true, // show the current page, data rang and total records on the toolbar
-                    caption: "Group " + i + " of " + tmpClasses[i-1].parent.bandNo
+                    caption: tmpClasses[i-1].name
                 });
         }
 
         //for (var j = classes.singleBand.classes.length + 1; j <= 6; j++) {
         //    $("#jqGrid" + j).replaceWith("");
         //}
-
-        bandSet.bands[0].calculateClassesAverage(tmpClasses);
 
         $("#summary-grid")
             .jqGrid({
@@ -226,16 +219,16 @@
     }
 
     function createTopMidBottomClasses() {
-        debugger;
         var classes = new ClassesDefinition(testFile);
-        var bandSet = classes.createTopMiddleBottomBandSet("abc");
-        bandSet.bands[0].setClassCount(2);
+        // Create two bands
+        debugger;
+        var bandSet = classes.createTopMiddleBottomBandSet("band", classes.studentCount, BandType.Custom,
+             BandStreamType.Streaming, StreamType.OverallAbilty, GroupingMethod.MixedAbility);
+        bandSet.bands[0].setClassCount(3);
         bandSet.bands[1].setClassCount(2);
-        bandSet.bands[2].setClassCount(2);
-        bandSet.createBandClasses(BandStreamType.Streaming, false);
-        var tmpClasses = [];
-        tmpClasses = bandSet.bands[0].classes.concat(bandSet.bands[1].classes)
-        .concat(bandSet.bands[2].classes);
+        bandSet.bands[2].setClassCount(1);
+        bandSet.prepare("Band", classes.students);
+        var tmpClasses = bandSet.bands[0].classes.concat(bandSet.bands[1].classes).concat(bandSet.bands[2].classes);
         for (var i = 1; i <= tmpClasses.length; i++) {
 
             $("#jqGrid" + i)
@@ -250,7 +243,7 @@
                         { label: 'Class', name: 'classNo', width: 80 }
                     ],
                     viewrecords: true, // show the current page, data rang and total records on the toolbar
-                    caption: "Group " + i + " of " + tmpClasses[i - 1].parent.bandNo
+                    caption: tmpClasses[i - 1].name
                 });
         }
 
@@ -258,7 +251,6 @@
         //    $("#jqGrid" + j).replaceWith("");
         //}
 
-        classes.singleBand.calculateClassesAverage(tmpClasses);
 
         $("#summary-grid")
             .jqGrid({

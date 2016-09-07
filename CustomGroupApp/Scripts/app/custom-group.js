@@ -68,7 +68,6 @@ var StudentClass = (function () {
         this.source = s;
         this.name = s.name;
         this.gender = s.sex;
-        this.score = s.genab.raw + s.mathPerformance.raw + s.reading.raw + s.spelling.raw;
     }
     return StudentClass;
 }());
@@ -236,16 +235,24 @@ var ClassDefinition = (function () {
         this.count = count;
         this.students = [];
         this.prepare = function (name) {
-            debugger;
             switch (_this.parent.bandType) {
                 case BandType.None:
-                    _this.name = name + _this.index;
+                    _this.name = name + " " + _this.index;
                     break;
                 case BandType.Custom:
-                    _this.name = name + "$this.index/$this.parent.bandNo";
+                    _this.name = name + " " + _this.index + "/" + _this.parent.bandNo;
                     break;
                 case BandType.Top:
-                    _this.name = name + "(Top $this.index/$this.parent.bandNo)";
+                    _this.name = name + " " + "Top " + _this.index;
+                    break;
+                case BandType.Middle:
+                    _this.name = name + " " + "Middle " + _this.index;
+                    break;
+                case BandType.Lowest:
+                    _this.name = name + " " + "Lowest " + _this.index;
+                    break;
+                default:
+                    _this.name = name + " " + _this.index;
                     break;
             }
         };
@@ -313,6 +320,7 @@ var BandDefinition = (function () {
             for (var i = 0; i < _this.classes.length; i++) {
                 _this.classes[i].prepare(name);
             }
+            _this.calculateClassesAverage(_this.classes);
         };
         this.calculateClassesSize = function (classCount) {
             var studentInClass = Math.floor(_this.studentCount / classCount);
@@ -431,9 +439,13 @@ var CustomBandSet = (function (_super) {
 }(BandSet));
 var TopMiddleLowestBandSet = (function (_super) {
     __extends(TopMiddleLowestBandSet, _super);
-    function TopMiddleLowestBandSet(parent, studentCount, bandStreamType) {
+    function TopMiddleLowestBandSet(parent, studentCount, bandStreamType, bandType, streamType, groupType, mixBoysGirls) {
         if (bandStreamType === void 0) { bandStreamType = BandStreamType.Streaming; }
-        _super.call(this, parent, "TopMiddleLowest", studentCount, 3, BandType.Custom, bandStreamType);
+        if (bandType === void 0) { bandType = BandType.None; }
+        if (streamType === void 0) { streamType = StreamType.OverallAbilty; }
+        if (groupType === void 0) { groupType = GroupingMethod.Streaming; }
+        if (mixBoysGirls === void 0) { mixBoysGirls = false; }
+        _super.call(this, parent, "TopMiddleLowest", studentCount, 3, BandType.Custom, bandStreamType, streamType, groupType, mixBoysGirls);
         this.parent = parent;
         this.studentCount = studentCount;
         this.bandStreamType = bandStreamType;
@@ -461,8 +473,14 @@ var ClassesDefinition = (function () {
         this.createCustomBandSet = function (name, studentCount, bandCount) {
             return new CustomBandSet(_this, studentCount, bandCount);
         };
-        this.createTopMiddleBottomBandSet = function (studentCount) {
-            return new TopMiddleLowestBandSet(_this, studentCount);
+        this.createTopMiddleBottomBandSet = function (name, studentCount, bandCount, bandStreamType, bandType, streamType, groupType, mixBoysGirls) {
+            if (bandCount === void 0) { bandCount = 1; }
+            if (bandStreamType === void 0) { bandStreamType = BandStreamType.Streaming; }
+            if (bandType === void 0) { bandType = BandType.None; }
+            if (streamType === void 0) { streamType = StreamType.OverallAbilty; }
+            if (groupType === void 0) { groupType = GroupingMethod.Streaming; }
+            if (mixBoysGirls === void 0) { mixBoysGirls = false; }
+            return new TopMiddleLowestBandSet(_this, studentCount, bandStreamType, bandType, streamType, groupType, mixBoysGirls);
         };
         this.uid = createUuid();
         this.groupGender = testFile.isUnisex ? Gender.All : (testFile.hasBoys ? Gender.Boys : Gender.Girls);
@@ -481,4 +499,3 @@ var ClassesDefinition = (function () {
     });
     return ClassesDefinition;
 }());
-//# sourceMappingURL=custom-group.js.map
