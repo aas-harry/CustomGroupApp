@@ -182,7 +182,7 @@
     function createBandingClasses() {
         var classes = new ClassesDefinition(testFile);
         // Create two bands
-        var bandSet = classes.createCustomBandSet("band", classes.students, 2);
+        var bandSet = classes.createBandSet("band", classes.studentCount, 2, BandStreamType.Streaming, StreamType.OverallAbilty, GroupingMethod.MixedAbility);
         bandSet.bands[0].setClassCount(3);
         bandSet.bands[1].setClassCount(3);
         debugger;

@@ -320,8 +320,10 @@ class BandDefinition {
         }
     };
 
-    prepare = (students: Array<StudentClass>) => {
-        this.students = students;
+    prepare = (students: Array<StudentClass> = null) => {
+        if (students) {
+            this.students = students;
+        }
         switch (this.groupType) {
             case GroupingMethod.MixedAbility:
                 this.groupHelper.groupByMixAbility(this.classes, this.students, this.streamType, this.mixBoysGirls);
@@ -433,9 +435,23 @@ class CustomBandSet extends BandSet {
 
     prepare = (students: Array<StudentClass>) => {
         this.students = students;
+        var classes = this.convertToClasses(this);
+        if (this.bandStreamType === BandStreamType.Streaming) {
+            this.groupingHelper.groupByStreaming(classes,
+                this.students,
+                this.streamType,
+                this.mixBoysGirls);
+        } else {
+            this.groupingHelper.groupByMixAbility(classes,
+                this.students,
+                this.streamType,
+                this.mixBoysGirls);
+        }
+
         this.bands[0].students = this.students;
         for (let i = 0; i < this.bands.length; i++) {
-            this.bands[i].prepare(this.students);
+            this.bands[i].students = classes[i].students;
+            this.bands[i].prepare();
         }
     }
 }
@@ -498,7 +514,8 @@ class ClassesDefinition {
         return new BandSet(this, name, studentCount, bandCount, bandStreamType, streamType, groupType, mixBoysGirls);
     };
 
-    createCustomBandSet = (name: string, studentCount: number, bandCount: number): CustomBandSet => {
+    createCustomBandSet = (
+        name: string, studentCount: number, bandCount: number): CustomBandSet => {
         return new CustomBandSet(this, studentCount, bandCount);
     }
 

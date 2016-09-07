@@ -289,7 +289,10 @@ var BandDefinition = (function () {
             }
         };
         this.prepare = function (students) {
-            _this.students = students;
+            if (students === void 0) { students = null; }
+            if (students) {
+                _this.students = students;
+            }
             switch (_this.groupType) {
                 case GroupingMethod.MixedAbility:
                     _this.groupHelper.groupByMixAbility(_this.classes, _this.students, _this.streamType, _this.mixBoysGirls);
@@ -389,9 +392,17 @@ var CustomBandSet = (function (_super) {
         this.bandCount = bandCount;
         this.prepare = function (students) {
             _this.students = students;
+            var classes = _this.convertToClasses(_this);
+            if (_this.bandStreamType === BandStreamType.Streaming) {
+                _this.groupingHelper.groupByStreaming(classes, _this.students, _this.streamType, _this.mixBoysGirls);
+            }
+            else {
+                _this.groupingHelper.groupByMixAbility(classes, _this.students, _this.streamType, _this.mixBoysGirls);
+            }
             _this.bands[0].students = _this.students;
             for (var i = 0; i < _this.bands.length; i++) {
-                _this.bands[i].prepare(_this.students);
+                _this.bands[i].students = classes[i].students;
+                _this.bands[i].prepare();
             }
         };
     }
@@ -456,4 +467,3 @@ var ClassesDefinition = (function () {
     });
     return ClassesDefinition;
 }());
-//# sourceMappingURL=custom-group.js.map
