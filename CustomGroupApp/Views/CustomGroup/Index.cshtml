@@ -74,11 +74,10 @@
     }
 
     function createMixClasses() {
-        debugger;
-    
-
         var classesDefn = new ClassesDefinition(testFile);
-        var bandSet = classesDefn.createCustomBandSet("Class", classesDefn.studentCount);
+        var bandSet = classesDefn.createBandSet("class", classesDefn.studentCount, 1,
+             BandStreamType.Streaming, BandType.None, StreamType.OverallAbilty, GroupingMethod.MixedAbility);
+        
         var band = bandSet.bands[0];
         band.setClassCount(5);
         //band.classes[0].count += 5;
@@ -125,9 +124,9 @@
     }
 
     function createStreamingClasses() {
-        debugger;
         var classesDefn = new ClassesDefinition(testFile);
-        var bandSet = classesDefn.createCustomBandSet("Class", classesDefn.studentCount);
+        var bandSet = classesDefn.createBandSet("class", classesDefn.studentCount, 1, 
+            BandStreamType.Streaming, BandType.None, StreamType.OverallAbilty, GroupingMethod.Streaming);
         var band = bandSet.bands[0];
         band.streamType = StreamType.OverallAbilty;
         
@@ -182,10 +181,10 @@
     function createBandingClasses() {
         var classes = new ClassesDefinition(testFile);
         // Create two bands
-        var bandSet = classes.createBandSet("band", classes.studentCount, 2, BandStreamType.Streaming, StreamType.OverallAbilty, GroupingMethod.MixedAbility);
+        var bandSet = classes.createBandSet("band", classes.studentCount, 2, BandType.Custom,
+             BandStreamType.Streaming, StreamType.OverallAbilty, GroupingMethod.MixedAbility);
         bandSet.bands[0].setClassCount(3);
         bandSet.bands[1].setClassCount(3);
-        debugger;
         bandSet.prepare(classes.students);
         var tmpClasses = [];
         tmpClasses = bandSet.bands[0].classes.concat(bandSet.bands[1].classes);

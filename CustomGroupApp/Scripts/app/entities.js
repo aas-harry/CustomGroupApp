@@ -18,7 +18,7 @@ var Subject = (function () {
         this.isAbility = false;
     }
     return Subject;
-}());
+})();
 var User = (function () {
     function User() {
         var _this = this;
@@ -27,13 +27,13 @@ var User = (function () {
         };
     }
     return User;
-}());
+})();
 var School = (function () {
     function School() {
         this.isMainSchool = false;
     }
     return School;
-}());
+})();
 var TestFile = (function () {
     function TestFile() {
         var _this = this;
@@ -75,7 +75,7 @@ var TestFile = (function () {
         };
     }
     return TestFile;
-}());
+})();
 var RangeScore = (function () {
     function RangeScore(low, high) {
         var _this = this;
@@ -86,7 +86,7 @@ var RangeScore = (function () {
         };
     }
     return RangeScore;
-}());
+})();
 var Score = (function () {
     function Score(raw, stanine, scaledScore, score, range, naplan) {
         this.raw = raw;
@@ -97,7 +97,7 @@ var Score = (function () {
         this.naplan = naplan;
     }
     return Score;
-}());
+})();
 var Student = (function () {
     function Student(r) {
         var _this = this;
@@ -138,4 +138,5 @@ var Student = (function () {
         this.serialno = r.snow;
     }
     return Student;
-}());
+})();
+//# sourceMappingURL=entities.js.map
