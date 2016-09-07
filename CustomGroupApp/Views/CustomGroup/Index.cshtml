@@ -84,7 +84,7 @@
         //band.classes[1].count -= 3;
         //band.classes[2].count -= 2;
 
-        bandSet.prepare(classesDefn.students);
+        bandSet.prepare("Mix", classesDefn.students);
 
         for (var i = 1; i <= band.classes.length; i++) {
 
@@ -130,7 +130,7 @@
         var band = bandSet.bands[0];
         band.streamType = StreamType.OverallAbilty;
         
-        bandSet.prepare(classesDefn.students);
+        bandSet.prepare("Maths", classesDefn.students);
 
         band.setClassCount(5);
         band.classes[0].count += 5;

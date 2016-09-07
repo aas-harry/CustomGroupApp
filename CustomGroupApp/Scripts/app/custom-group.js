@@ -61,7 +61,7 @@ var SummaryClass = (function () {
     function SummaryClass() {
     }
     return SummaryClass;
-})();
+}());
 var StudentClass = (function () {
     function StudentClass(s) {
         this.s = s;
@@ -71,7 +71,7 @@ var StudentClass = (function () {
         this.score = s.genab.raw + s.mathPerformance.raw + s.reading.raw + s.spelling.raw;
     }
     return StudentClass;
-})();
+}());
 var SearchClassContext = (function () {
     function SearchClassContext(classNo, firstClassNo, lastClassNo, isLastClass) {
         this.classNo = classNo;
@@ -80,7 +80,7 @@ var SearchClassContext = (function () {
         this.isLastClass = isLastClass;
     }
     return SearchClassContext;
-})();
+}());
 var GroupingHelper = (function () {
     function GroupingHelper() {
         var _this = this;
@@ -227,7 +227,7 @@ var GroupingHelper = (function () {
         };
     }
     return GroupingHelper;
-})();
+}());
 var ClassDefinition = (function () {
     function ClassDefinition(parent, index, count) {
         var _this = this;
@@ -259,7 +259,7 @@ var ClassDefinition = (function () {
         configurable: true
     });
     return ClassDefinition;
-})();
+}());
 var BandDefinition = (function () {
     function BandDefinition(parent, bandNo, bandName, studentCount, classCount, bandType, streamType, groupType, mixBoysGirls) {
         var _this = this;
@@ -327,7 +327,7 @@ var BandDefinition = (function () {
         this.setClassCount(classCount);
     }
     return BandDefinition;
-})();
+}());
 var BandSet = (function () {
     function BandSet(parent, name, studentCount, bandCount, bandType, bandStreamType, streamType, groupType, mixBoysGirls) {
         var _this = this;
@@ -396,7 +396,7 @@ var BandSet = (function () {
         configurable: true
     });
     return BandSet;
-})();
+}());
 var CustomBandSet = (function (_super) {
     __extends(CustomBandSet, _super);
     function CustomBandSet(parent, studentCount, bandCount, bandStreamType, bandType, streamType, groupType, mixBoysGirls) {
@@ -428,7 +428,7 @@ var CustomBandSet = (function (_super) {
         };
     }
     return CustomBandSet;
-})(BandSet);
+}(BandSet));
 var TopMiddleLowestBandSet = (function (_super) {
     __extends(TopMiddleLowestBandSet, _super);
     function TopMiddleLowestBandSet(parent, studentCount, bandStreamType) {
@@ -442,7 +442,7 @@ var TopMiddleLowestBandSet = (function (_super) {
         this.bands[2].bandType = BandType.Lowest;
     }
     return TopMiddleLowestBandSet;
-})(BandSet);
+}(BandSet));
 var ClassesDefinition = (function () {
     function ClassesDefinition(testFile) {
         var _this = this;
@@ -480,5 +480,5 @@ var ClassesDefinition = (function () {
         configurable: true
     });
     return ClassesDefinition;
-})();
+}());
 //# sourceMappingURL=custom-group.js.map
