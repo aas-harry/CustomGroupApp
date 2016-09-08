@@ -130,18 +130,35 @@ class GroupingHelper {
 
     handleSeparatedStudents = (classes: Array<ClassDefinition>, separatedStudents: Array<StudentSet>) => {
         for (let i = 0; i < separatedStudents.length; i++) {
-            if (Enumerable.From(separatedStudents[i].students).GroupBy(x => x.classNo).Count() ===
-                separatedStudents[i].students.length) {
-                continue;
-            }
 
-            var flattenedStudentList = Enumerable.From(classes).SelectMany(c => c.students).ToArray();
-            var allocatedClasses = Enumerable.From(separatedStudents[i].students).Select(x => x.canMoveToOtherClass === false).ToArray();
-            for (let s of separatedStudents[i].students) {
-                if (s.canMoveToOtherClass === false) {
+            // Check if all students are already in different classes
+            var allocatedClasses = new Array<number>();
+            var groupedStudents = Enumerable.From(separatedStudents[i].students)
+                .GroupBy(x => x.classNo, x => x)
+                .ToArray();
+            for (let g of groupedStudents) {
+                if (g.source.length > 1) {
                     continue;
                 }
-                var replacement = this.findStudentReplacement()
+                g.source[0].canMoveToOtherClass = false;
+                allocatedClasses.push(g.source[0].classNo);
+            }
+
+            const flattenedStudentList = Enumerable.From(classes).SelectMany(c => c.students).ToArray();
+            for (let g of groupedStudents) {
+                if (g.source.length === 1) {
+                    continue;
+                }
+
+                allocatedClasses.push(g.source[0].classNo);
+                for (let j = 1; j < g.source.length; j++) {
+                    var s = g.source[j];
+                    var replacement = this.findStudentReplacement(s, flattenedStudentList, allocatedClasses);
+                    if (replacement != null) {
+                        allocatedClasses.push(replacement.classNo);
+                        return replacement;
+                    }
+                }
             }
         }
     };
@@ -152,13 +169,24 @@ class GroupingHelper {
 
     private findStudentReplacement = (student: StudentClass
         , students: Array<StudentClass>
-        , allocatedClasses: Array<number>
-        , diff: number): StudentClass => {
+        , allocatedClasses: Array<number>): StudentClass => {
 
-        var replacement = Enumerable.From(students)
-            .FirstOrDefault(null, x => x.canMoveToOtherClass && Math.abs(x.score - student.score) <= diff);
-       
-        return replacement;
+        var tmpClasses = Enumerable.From(allocatedClasses);
+        var tmpStudents = Enumerable.From(students)
+            .Where(s =>!  Enumerable.From(allocatedClasses).Contains(s.classNo))
+            .Select(s => s)
+            .ToArray();
+
+         // Try to find students with 10, 20, 30, 40, 50 score difference first before pick any students
+        for (let diff of [10, 20, 30, 40, 50, 300]) {
+            var replacement = Enumerable.From(tmpStudents)
+                .FirstOrDefault(null, x => x.canMoveToOtherClass && Math.abs(x.score - student.score) <= diff);
+            if (replacement != null) {
+                return replacement;
+            }
+        }
+
+        return null;
     };
 
     groupByStreaming = (classes: Array<ClassDefinition>,
@@ -372,7 +400,9 @@ class BandDefinition {
         }
     };
 
-    prepare = (name: string, students: Array<StudentClass> = null) => {
+    prepare = (name: string, students: Array<StudentClass> = null,
+        joinedStudents : Array<StudentSet> = [],
+        separatedStudents: Array<StudentSet> = []) => {
         if (students) {
             this.students = students;
         }
@@ -392,6 +422,9 @@ class BandDefinition {
             case GroupingMethod.CustomGroup:
                 break;
         }
+
+        this.groupHelper.handleJoinedStudents(this.classes, joinedStudents);
+        this.groupHelper.handleSeparatedStudents(this.classes, separatedStudents);
 
         for (let i = 0; i < this.classes.length; i++) {
             this.classes[i].prepare(name);
@@ -468,7 +501,7 @@ class BandSet {
         
         for (let i = 0; i < this.bands.length; i++) {
             this.bands[i].students = classes[i].students;
-            this.bands[i].prepare(name);
+            this.bands[i].prepare(name, null, joinedStudents, separatedStudents);
         }
     }
  

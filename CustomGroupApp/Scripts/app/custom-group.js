@@ -122,27 +122,60 @@ var GroupingHelper = (function () {
         };
         this.handleSeparatedStudents = function (classes, separatedStudents) {
             for (var i = 0; i < separatedStudents.length; i++) {
-                if (Enumerable.From(separatedStudents[i].students).GroupBy(function (x) { return x.classNo; }).Count() ===
-                    separatedStudents[i].students.length) {
-                    continue;
-                }
-                var flattenedStudentList = Enumerable.From(classes).SelectMany(function (c) { return c.students; }).ToArray();
-                var allocatedClasses = Enumerable.From(separatedStudents[i].students).Select(function (x) { return x.canMoveToOtherClass === false; }).ToArray();
-                for (var _i = 0, _a = separatedStudents[i].students; _i < _a.length; _i++) {
-                    var s = _a[_i];
-                    if (s.canMoveToOtherClass === false) {
+                // Check if all students are already in different classes
+                var allocatedClasses = new Array();
+                var groupedStudents = Enumerable.From(separatedStudents[i].students)
+                    .GroupBy(function (x) { return x.classNo; }, function (x) { return x; })
+                    .ToArray();
+                for (var _i = 0, groupedStudents_1 = groupedStudents; _i < groupedStudents_1.length; _i++) {
+                    var g = groupedStudents_1[_i];
+                    if (g.source.length > 1) {
                         continue;
                     }
-                    var replacement = _this.findStudentReplacement();
+                    g.source[0].canMoveToOtherClass = false;
+                    allocatedClasses.push(g.source[0].classNo);
+                }
+                var flattenedStudentList = Enumerable.From(classes).SelectMany(function (c) { return c.students; }).ToArray();
+                for (var _a = 0, groupedStudents_2 = groupedStudents; _a < groupedStudents_2.length; _a++) {
+                    var g = groupedStudents_2[_a];
+                    if (g.source.length === 1) {
+                        continue;
+                    }
+                    allocatedClasses.push(g.source[0].classNo);
+                    for (var j = 1; j < g.source.length; j++) {
+                        var s = g.source[j];
+                        var replacement = _this.findStudentReplacement(s, flattenedStudentList, allocatedClasses);
+                        if (replacement != null) {
+                            allocatedClasses.push(replacement.classNo);
+                            return replacement;
+                        }
+                    }
                 }
             }
         };
         this.handleJoinedStudents = function (classes, joinedStudents) {
         };
-        this.findStudentReplacement = function (student, students, allocatedClasses, diff) {
-            var replacement = Enumerable.From(students)
-                .FirstOrDefault(null, function (x) { return x.canMoveToOtherClass && Math.abs(x.score - student.score) <= diff; });
-            return replacement;
+        this.findStudentReplacement = function (student, students, allocatedClasses) {
+            var tmpClasses = Enumerable.From(allocatedClasses);
+            var tmpStudents = Enumerable.From(students)
+                .Where(function (s) { return !Enumerable.From(allocatedClasses).Contains(s.classNo); })
+                .Select(function (s) { return s; })
+                .ToArray();
+            // Try to find students with 10, 20, 30, 40, 50 score difference first before pick any students
+            var _loop_1 = function(diff) {
+                replacement = Enumerable.From(tmpStudents)
+                    .FirstOrDefault(null, function (x) { return x.canMoveToOtherClass && Math.abs(x.score - student.score) <= diff; });
+                if (replacement != null) {
+                    return { value: replacement };
+                }
+            };
+            var replacement;
+            for (var _i = 0, _a = [10, 20, 30, 40, 50, 300]; _i < _a.length; _i++) {
+                var diff = _a[_i];
+                var state_1 = _loop_1(diff);
+                if (typeof state_1 === "object") return state_1.value;
+            }
+            return null;
         };
         this.groupByStreaming = function (classes, students, streamType, mixBoysGirls) {
             _this.calculateTotalScore(students, streamType);
@@ -330,8 +363,10 @@ var BandDefinition = (function () {
                 classes[i].average = Enumerable.From(classes[i].students).Average(function (x) { return x.score; });
             }
         };
-        this.prepare = function (name, students) {
+        this.prepare = function (name, students, joinedStudents, separatedStudents) {
             if (students === void 0) { students = null; }
+            if (joinedStudents === void 0) { joinedStudents = []; }
+            if (separatedStudents === void 0) { separatedStudents = []; }
             if (students) {
                 _this.students = students;
             }
@@ -351,6 +386,8 @@ var BandDefinition = (function () {
                 case GroupingMethod.CustomGroup:
                     break;
             }
+            _this.groupHelper.handleJoinedStudents(_this.classes, joinedStudents);
+            _this.groupHelper.handleSeparatedStudents(_this.classes, separatedStudents);
             for (var i = 0; i < _this.classes.length; i++) {
                 _this.classes[i].prepare(name);
             }
@@ -411,7 +448,7 @@ var BandSet = (function () {
             _this.groupingHelper.handleSeparatedStudents(classes, separatedStudents);
             for (var i = 0; i < _this.bands.length; i++) {
                 _this.bands[i].students = classes[i].students;
-                _this.bands[i].prepare(name);
+                _this.bands[i].prepare(name, null, joinedStudents, separatedStudents);
             }
         };
         this.createBands = function (name, studentCount, bandCount, bandType, streamType, groupType, mixBoysGirls) {
@@ -539,3 +576,4 @@ var ClassesDefinition = (function () {
     });
     return ClassesDefinition;
 }());
+//# sourceMappingURL=custom-group.js.map
