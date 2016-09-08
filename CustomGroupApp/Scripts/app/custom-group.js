@@ -124,11 +124,11 @@ var GroupingHelper = (function () {
             for (var i = 0; i < separatedStudents.length; i++) {
                 // Check if all students are already in different classes
                 var allocatedClasses = new Array();
-                var groupedStudents = Enumerable.From(separatedStudents[i].students)
+                var studentSets = Enumerable.From(separatedStudents[i].students)
                     .GroupBy(function (x) { return x.classNo; }, function (x) { return x; })
                     .ToArray();
-                for (var _i = 0, groupedStudents_1 = groupedStudents; _i < groupedStudents_1.length; _i++) {
-                    var g = groupedStudents_1[_i];
+                for (var _i = 0, studentSets_1 = studentSets; _i < studentSets_1.length; _i++) {
+                    var g = studentSets_1[_i];
                     if (g.source.length > 1) {
                         continue;
                     }
@@ -136,8 +136,8 @@ var GroupingHelper = (function () {
                     allocatedClasses.push(g.source[0].classNo);
                 }
                 var flattenedStudentList = Enumerable.From(classes).SelectMany(function (c) { return c.students; }).ToArray();
-                for (var _a = 0, groupedStudents_2 = groupedStudents; _a < groupedStudents_2.length; _a++) {
-                    var g = groupedStudents_2[_a];
+                for (var _a = 0, studentSets_2 = studentSets; _a < studentSets_2.length; _a++) {
+                    var g = studentSets_2[_a];
                     if (g.source.length === 1) {
                         continue;
                     }
@@ -146,6 +146,9 @@ var GroupingHelper = (function () {
                         var s = g.source[j];
                         var replacement = _this.findStudentReplacement(s, flattenedStudentList, allocatedClasses);
                         if (replacement != null) {
+                            var tmpClassNo = replacement.classNo;
+                            replacement.classNo = s.classNo;
+                            s.classNo = tmpClassNo;
                             allocatedClasses.push(replacement.classNo);
                             return replacement;
                         }
@@ -156,7 +159,6 @@ var GroupingHelper = (function () {
         this.handleJoinedStudents = function (classes, joinedStudents) {
         };
         this.findStudentReplacement = function (student, students, allocatedClasses) {
-            var tmpClasses = Enumerable.From(allocatedClasses);
             var tmpStudents = Enumerable.From(students)
                 .Where(function (s) { return !Enumerable.From(allocatedClasses).Contains(s.classNo); })
                 .Select(function (s) { return s; })
@@ -194,22 +196,27 @@ var GroupingHelper = (function () {
                 _this.groupByStreamingInternal(classes, femaleStudents);
             }
         };
-        this.groupByMixAbility = function (classes, students, streamType, mixBoysGirls) {
+        this.groupByMixAbility = function (classes, students, streamType, mixBoysGirls, joinedStudents, separatedStudents) {
+            if (joinedStudents === void 0) { joinedStudents = []; }
+            if (separatedStudents === void 0) { separatedStudents = []; }
             _this.calculateTotalScore(students, streamType);
             if (!mixBoysGirls) {
                 _this.groupByMixAbilityInternal(classes, students);
-                return;
-            }
-            var femaleStudents = Enumerable.From(students).Where(function (s) { return (s.gender === "F"); }).Select(function (s) { return s; }).ToArray();
-            var maleStudents = Enumerable.From(students).Where(function (s) { return (s.gender === "F"); }).Select(function (s) { return s; }).ToArray();
-            if (femaleStudents.length < maleStudents.length) {
-                _this.groupByMixAbilityInternal(classes, femaleStudents);
-                _this.groupByMixAbilityInternal(classes, maleStudents, true);
             }
             else {
-                _this.groupByMixAbilityInternal(classes, maleStudents);
-                _this.groupByMixAbilityInternal(classes, femaleStudents, true);
+                var femaleStudents = Enumerable.From(students).Where(function (s) { return (s.gender === "F"); }).Select(function (s) { return s; }).ToArray();
+                var maleStudents = Enumerable.From(students).Where(function (s) { return (s.gender === "F"); }).Select(function (s) { return s; }).ToArray();
+                if (femaleStudents.length < maleStudents.length) {
+                    _this.groupByMixAbilityInternal(classes, femaleStudents);
+                    _this.groupByMixAbilityInternal(classes, maleStudents, true);
+                }
+                else {
+                    _this.groupByMixAbilityInternal(classes, maleStudents);
+                    _this.groupByMixAbilityInternal(classes, femaleStudents, true);
+                }
             }
+            _this.handleJoinedStudents(classes, joinedStudents);
+            _this.handleSeparatedStudents(classes, separatedStudents);
         };
         this.groupByMixAbilityInternal = function (classes, students, orderReversed) {
             if (orderReversed === void 0) { orderReversed = false; }
@@ -372,7 +379,7 @@ var BandDefinition = (function () {
             }
             switch (_this.groupType) {
                 case GroupingMethod.MixedAbility:
-                    _this.groupHelper.groupByMixAbility(_this.classes, _this.students, _this.streamType, _this.mixBoysGirls);
+                    _this.groupHelper.groupByMixAbility(_this.classes, _this.students, _this.streamType, _this.mixBoysGirls, joinedStudents, separatedStudents);
                     break;
                 case GroupingMethod.Streaming:
                     _this.groupHelper.groupByStreaming(_this.classes, _this.students, _this.streamType, _this.mixBoysGirls);
@@ -434,7 +441,7 @@ var BandSet = (function () {
             _this.students = students;
             if (_this.bandCount === 1) {
                 _this.bands[0].students = _this.students;
-                _this.bands[0].prepare(name, _this.students);
+                _this.bands[0].prepare(name, _this.students, separatedStudents, joinedStudents);
                 return;
             }
             var classes = _this.convertToClasses(_this);
@@ -576,4 +583,3 @@ var ClassesDefinition = (function () {
     });
     return ClassesDefinition;
 }());
-//# sourceMappingURL=custom-group.js.map

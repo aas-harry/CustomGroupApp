@@ -82,7 +82,9 @@
         //band.classes[1].count -= 3;
         //band.classes[2].count -= 2;
 
-        bandSet.prepare("Mix", classesDefn.students);
+        var separatedStudents = getSepaatedStudents(classesDefn);
+        debugger;
+        bandSet.prepare("Mix", classesDefn.students, separatedStudents);
 
         var classes = band.classes;
         for (var i = 1; i <= classes.length; i++) {
@@ -178,6 +180,20 @@
             });
     }
 
+    function getSepaatedStudents(classes) {
+        var studentSet1 = new StudentSet();
+        studentSet1.students.push(classes.students[0]);
+        studentSet1.students.push(classes.students[5]);
+        studentSet1.students.push(classes.students[8]);
+
+        var studentSet2 = new StudentSet();
+        studentSet2.students.push(classes.students[9]);
+        studentSet2.students.push(classes.students[15]);
+        studentSet2.students.push(classes.students[18]);
+
+        return [studentSet1, studentSet2];
+    }
+
     function createBandingClasses() {
         var classes = new ClassesDefinition(testFile);
         // Create two bands
@@ -191,17 +207,7 @@
         bandSet.bands[0].setClassCount(3);
         bandSet.bands[1].setClassCount(3);
 
-        var studentSet1 = new StudentSet();
-        studentSet1.students.push(classes.students[0]);
-        studentSet1.students.push(classes.students[5]);
-        studentSet1.students.push(classes.students[8]);
-
-        var studentSet2 = new StudentSet();
-        studentSet2.students.push(classes.students[9]);
-        studentSet2.students.push(classes.students[15]);
-        studentSet2.students.push(classes.students[18]);
-
-        var separatedStudents = [studentSet1, studentSet2];
+        var separatedStudents = getSepaatedStudents(classes);
         bandSet.prepare("Band", classes.students, separatedStudents);
         var tmpClasses = bandSet.bands[0].classes.concat(bandSet.bands[1].classes);
         for (var i = 1; i <= tmpClasses.length; i++) {

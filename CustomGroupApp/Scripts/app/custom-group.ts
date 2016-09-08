@@ -133,10 +133,10 @@ class GroupingHelper {
 
             // Check if all students are already in different classes
             var allocatedClasses = new Array<number>();
-            var groupedStudents = Enumerable.From(separatedStudents[i].students)
+            var studentSets = Enumerable.From(separatedStudents[i].students)
                 .GroupBy(x => x.classNo, x => x)
                 .ToArray();
-            for (let g of groupedStudents) {
+            for (let g of studentSets) {
                 if (g.source.length > 1) {
                     continue;
                 }
@@ -145,7 +145,7 @@ class GroupingHelper {
             }
 
             const flattenedStudentList = Enumerable.From(classes).SelectMany(c => c.students).ToArray();
-            for (let g of groupedStudents) {
+            for (let g of studentSets) {
                 if (g.source.length === 1) {
                     continue;
                 }
@@ -155,6 +155,9 @@ class GroupingHelper {
                     var s = g.source[j];
                     var replacement = this.findStudentReplacement(s, flattenedStudentList, allocatedClasses);
                     if (replacement != null) {
+                        let tmpClassNo = replacement.classNo;
+                        replacement.classNo = s.classNo;
+                        s.classNo = tmpClassNo;
                         allocatedClasses.push(replacement.classNo);
                         return replacement;
                     }
@@ -171,7 +174,6 @@ class GroupingHelper {
         , students: Array<StudentClass>
         , allocatedClasses: Array<number>): StudentClass => {
 
-        var tmpClasses = Enumerable.From(allocatedClasses);
         var tmpStudents = Enumerable.From(students)
             .Where(s =>!  Enumerable.From(allocatedClasses).Contains(s.classNo))
             .Select(s => s)
@@ -216,25 +218,29 @@ class GroupingHelper {
     groupByMixAbility = (classes: Array<ClassDefinition>,
         students: Array<StudentClass>,
         streamType: StreamType,
-        mixBoysGirls: boolean) => {
+        mixBoysGirls: boolean,
+        joinedStudents: Array<StudentSet> = [],
+        separatedStudents: Array<StudentSet> = []) => {
 
         this.calculateTotalScore(students, streamType);
 
         if (!mixBoysGirls) {
             this.groupByMixAbilityInternal(classes, students);
-            return;
-        }
-
-        var femaleStudents = Enumerable.From(students).Where(s => (s.gender === "F")).Select(s => s).ToArray();
-        var maleStudents = Enumerable.From(students).Where(s => (s.gender === "F")).Select(s => s).ToArray();
-
-        if (femaleStudents.length < maleStudents.length) {
-            this.groupByMixAbilityInternal(classes, femaleStudents);
-            this.groupByMixAbilityInternal(classes, maleStudents, true);
         } else {
-            this.groupByMixAbilityInternal(classes, maleStudents);
-            this.groupByMixAbilityInternal(classes, femaleStudents, true);
+            var femaleStudents = Enumerable.From(students).Where(s => (s.gender === "F")).Select(s => s).ToArray();
+            var maleStudents = Enumerable.From(students).Where(s => (s.gender === "F")).Select(s => s).ToArray();
+
+            if (femaleStudents.length < maleStudents.length) {
+                this.groupByMixAbilityInternal(classes, femaleStudents);
+                this.groupByMixAbilityInternal(classes, maleStudents, true);
+            } else {
+                this.groupByMixAbilityInternal(classes, maleStudents);
+                this.groupByMixAbilityInternal(classes, femaleStudents, true);
+            }
         }
+        this.handleJoinedStudents(classes, joinedStudents);
+        this.handleSeparatedStudents(classes, separatedStudents);
+
     };
 
 
@@ -408,7 +414,7 @@ class BandDefinition {
         }
         switch (this.groupType) {
             case GroupingMethod.MixedAbility:
-                this.groupHelper.groupByMixAbility(this.classes, this.students, this.streamType, this.mixBoysGirls);
+                this.groupHelper.groupByMixAbility(this.classes, this.students, this.streamType, this.mixBoysGirls, joinedStudents, separatedStudents);
                 break;
             case GroupingMethod.Streaming:
                 this.groupHelper.groupByStreaming(this.classes, this.students, this.streamType, this.mixBoysGirls);
@@ -480,7 +486,7 @@ class BandSet {
         this.students = students;
         if (this.bandCount === 1) {
             this.bands[0].students = this.students;
-            this.bands[0].prepare(name, this.students);
+            this.bands[0].prepare(name, this.students, separatedStudents, joinedStudents);
             return;
         }
         var classes = this.convertToClasses(this);
