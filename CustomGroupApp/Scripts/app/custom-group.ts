@@ -74,6 +74,7 @@ class StudentClass {
     classNo: number;
     bandNo: number;
     flag: number;
+    canMoveToOtherClass = true;
 }
 
 class SearchClassContext {
@@ -125,6 +126,39 @@ class GroupingHelper {
         if (streamType === StreamType.MathsAchievement) {
             this.setMathAchievementScore(students);
         }
+    };
+
+    handleSeparatedStudents = (classes: Array<ClassDefinition>, separatedStudents: Array<StudentSet>) => {
+        for (let i = 0; i < separatedStudents.length; i++) {
+            if (Enumerable.From(separatedStudents[i].students).GroupBy(x => x.classNo).Count() ===
+                separatedStudents[i].students.length) {
+                continue;
+            }
+
+            var flattenedStudentList = Enumerable.From(classes).SelectMany(c => c.students).ToArray();
+            var allocatedClasses = Enumerable.From(separatedStudents[i].students).Select(x => x.canMoveToOtherClass === false).ToArray();
+            for (let s of separatedStudents[i].students) {
+                if (s.canMoveToOtherClass === false) {
+                    continue;
+                }
+                var replacement = this.findStudentReplacement()
+            }
+        }
+    };
+
+    handleJoinedStudents = (classes: Array<ClassDefinition>, joinedStudents: Array<StudentSet>) => {
+
+    };
+
+    private findStudentReplacement = (student: StudentClass
+        , students: Array<StudentClass>
+        , allocatedClasses: Array<number>
+        , diff: number): StudentClass => {
+
+        var replacement = Enumerable.From(students)
+            .FirstOrDefault(null, x => x.canMoveToOtherClass && Math.abs(x.score - student.score) <= diff);
+       
+        return replacement;
     };
 
     groupByStreaming = (classes: Array<ClassDefinition>,
@@ -255,6 +289,10 @@ class GroupingHelper {
         }
         return classes;
     };
+}
+
+class StudentSet {
+    students: Array<StudentClass> = [];
 }
 
 class ClassDefinition {
@@ -392,6 +430,8 @@ class BandSet {
     uid: string;
     students: Array<StudentClass> = [];
     bands: Array<BandDefinition>;
+    separatedStudents: Array<StudentSet> = [];
+    joineddStudents: Array<StudentSet> = [];
 
     // ReSharper disable once InconsistentNaming
     private _bankCount: number;
@@ -401,7 +441,9 @@ class BandSet {
 
     protected groupingHelper = new GroupingHelper();
 
-    prepare = (name: string, students: Array<StudentClass>) => {
+    prepare = (name: string, students: Array<StudentClass>,
+        separatedStudents: Array<StudentSet> = [],
+        joinedStudents: Array<StudentSet> = []) => {
         this.students = students;
         if (this.bandCount === 1) {
             this.bands[0].students = this.students;
@@ -421,6 +463,9 @@ class BandSet {
                 this.mixBoysGirls);
         }
 
+        this.groupingHelper.handleJoinedStudents(classes, joinedStudents);
+        this.groupingHelper.handleSeparatedStudents(classes, separatedStudents);
+        
         for (let i = 0; i < this.bands.length; i++) {
             this.bands[i].students = classes[i].students;
             this.bands[i].prepare(name);

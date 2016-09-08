@@ -1,11 +1,10 @@
-﻿<div class="container-fluid" style="margin: 20px">
-    <h1>Create Custom Groups</h1>
+﻿<div class="container-fluid">
     <div class="row">
-        <button onClick="getResults()">Get Results</button>
-        <button onClick="createMixClasses()">Create Mix</button>
-        <button onClick="createStreamingClasses()">Create streaming</button>
-        <button onClick="createBandingClasses()">Create Banding</button>
-        <button onclick="createTopMidBottomClasses()">Create TMB</button>
+        <button class="btn-default" onClick="getResults()">Get Results</button>
+        <button class="btn-default" onClick="createMixClasses()">Create Mix</button>
+        <button class="btn-default" onClick="createStreamingClasses()">Create streaming</button>
+        <button class="btn-default" onClick="createBandingClasses()">Create Banding</button>
+        <button class="btn-default" onclick="createTopMidBottomClasses()">Create TMB</button>
         <div id="message-text"></div>
     </div>
 
@@ -40,12 +39,6 @@
 </div>
 <script>
     var testFile = new TestFile();
-    var data1 = [];
-    var data2 = [];
-    var data3 = [];
-    var data4 = [];
-    var data5 = [];
-    var data6 = [];
     $(document)
         .ready(function() {
 
@@ -75,9 +68,14 @@
 
     function createMixClasses() {
         var classesDefn = new ClassesDefinition(testFile);
-        var bandSet = classesDefn.createBandSet("class", classesDefn.studentCount, 1,
-             BandStreamType.Streaming, BandType.None, StreamType.OverallAbilty, GroupingMethod.MixedAbility);
-        
+        var bandSet = classesDefn.createBandSet("class",
+            classesDefn.studentCount,
+            1,
+            BandStreamType.Streaming,
+            BandType.None,
+            StreamType.OverallAbilty,
+            GroupingMethod.MixedAbility);
+
         var band = bandSet.bands[0];
         band.setClassCount(5);
         //band.classes[0].count += 5;
@@ -95,7 +93,7 @@
                     data: classes[i - 1].students,
                     height: 350,
                     colModel: [
-                        { label: 'Name', name: 'name', width: 150 },
+                        { label: 'Name', name: 'name', width: 200 },
                         { label: 'Sex', name: 'gender', width: 50 },
                         { label: 'Score', name: 'score', width: 80 },
                         { label: 'Class', name: 'classNo', width: 80 }
@@ -116,6 +114,7 @@
                 data: band.classes,
                 colModel: [
                     { label: 'Class', name: 'index', width: 150 },
+                    { label: 'Count', name: 'count', width: 50 },
                     { label: 'Average', name: 'average', width: 50 }
                 ],
                 viewrecords: true, // show the current page, data rang and total records on the toolbar
@@ -125,11 +124,16 @@
 
     function createStreamingClasses() {
         var classesDefn = new ClassesDefinition(testFile);
-        var bandSet = classesDefn.createBandSet("class", classesDefn.studentCount, 1, 
-            BandStreamType.Streaming, BandType.None, StreamType.OverallAbilty, GroupingMethod.Streaming);
+        var bandSet = classesDefn.createBandSet("class",
+            classesDefn.studentCount,
+            1,
+            BandStreamType.Streaming,
+            BandType.None,
+            StreamType.OverallAbilty,
+            GroupingMethod.Streaming);
         var band = bandSet.bands[0];
         band.streamType = StreamType.OverallAbilty;
-        
+
         band.setClassCount(5);
         band.classes[0].count += 5;
         band.classes[1].count -= 3;
@@ -137,7 +141,7 @@
 
         bandSet.prepare("Maths", classesDefn.students);
         var classes = band.classes;
-        
+
         for (var i = 1; i <= classes.length; i++) {
 
             $("#jqGrid" + i)
@@ -146,14 +150,14 @@
                     data: classes[i - 1].students,
                     height: 350,
                     colModel: [
-                        { label: 'Name', name: 'name', width: 150 },
+                        { label: 'Name', name: 'name', width: 200 },
                         { label: 'Sex', name: 'gender', width: 50 },
                         { label: 'Score', name: 'score', width: 80 },
                         { label: 'Class', name: 'classNo', width: 80 }
                     ],
                     viewrecords: true, // show the current page, data rang and total records on the toolbar
                     caption: classes[i - 1].name
-        });
+                });
         }
         for (var j = classes.length + 1; j <= 6; j++) {
 
@@ -167,7 +171,7 @@
                 colModel: [
                     { label: 'Class', name: 'index', width: 150 },
                     { label: 'Count', name: 'count', width: 50 },
-                { label: 'Average', name: 'average', width: 50 }
+                    { label: 'Average', name: 'average', width: 50 }
                 ],
                 viewrecords: true, // show the current page, data rang and total records on the toolbar
                 caption: "Group Summary"
@@ -177,27 +181,44 @@
     function createBandingClasses() {
         var classes = new ClassesDefinition(testFile);
         // Create two bands
-        var bandSet = classes.createBandSet("band", classes.studentCount, 2, BandType.Custom,
-             BandStreamType.Streaming, StreamType.OverallAbilty, GroupingMethod.MixedAbility);
+        var bandSet = classes.createBandSet("band",
+            classes.studentCount,
+            2,
+            BandType.Custom,
+            BandStreamType.Streaming,
+            StreamType.OverallAbilty,
+            GroupingMethod.MixedAbility);
         bandSet.bands[0].setClassCount(3);
         bandSet.bands[1].setClassCount(3);
-        bandSet.prepare("Band", classes.students);
+
+        var studentSet1 = new StudentSet();
+        studentSet1.students.push(classes.students[0]);
+        studentSet1.students.push(classes.students[5]);
+        studentSet1.students.push(classes.students[8]);
+
+        var studentSet2 = new StudentSet();
+        studentSet2.students.push(classes.students[9]);
+        studentSet2.students.push(classes.students[15]);
+        studentSet2.students.push(classes.students[18]);
+
+        var separatedStudents = [studentSet1, studentSet2];
+        bandSet.prepare("Band", classes.students, separatedStudents);
         var tmpClasses = bandSet.bands[0].classes.concat(bandSet.bands[1].classes);
         for (var i = 1; i <= tmpClasses.length; i++) {
 
             $("#jqGrid" + i)
                 .jqGrid({
                     datatype: "local",
-                    data: tmpClasses[i-1].students,
+                    data: tmpClasses[i - 1].students,
                     height: 350,
                     colModel: [
-                        { label: 'Name', name: 'name', width: 150 },
+                        { label: 'Name', name: 'name', width: 200 },
                         { label: 'Sex', name: 'gender', width: 50 },
                         { label: 'Score', name: 'score', width: 80 },
                         { label: 'Class', name: 'classNo', width: 80 }
                     ],
                     viewrecords: true, // show the current page, data rang and total records on the toolbar
-                    caption: tmpClasses[i-1].name
+                    caption: tmpClasses[i - 1].name
                 });
         }
 
@@ -211,6 +232,7 @@
                 data: tmpClasses,
                 colModel: [
                     { label: 'Class', name: 'index', width: 150 },
+                    { label: 'Count', name: 'count', width: 50 },
                     { label: 'Average', name: 'average', width: 50 }
                 ],
                 viewrecords: true, // show the current page, data rang and total records on the toolbar
@@ -222,8 +244,12 @@
         var classes = new ClassesDefinition(testFile);
         // Create two bands
         debugger;
-        var bandSet = classes.createTopMiddleBottomBandSet("band", classes.studentCount, BandType.Custom,
-             BandStreamType.Streaming, StreamType.OverallAbilty, GroupingMethod.MixedAbility);
+        var bandSet = classes.createTopMiddleBottomBandSet("band",
+            classes.studentCount,
+            BandType.Custom,
+            BandStreamType.Streaming,
+            StreamType.OverallAbilty,
+            GroupingMethod.MixedAbility);
         bandSet.bands[0].setClassCount(3);
         bandSet.bands[1].setClassCount(2);
         bandSet.bands[2].setClassCount(1);
@@ -237,7 +263,7 @@
                     data: tmpClasses[i - 1].students,
                     height: 350,
                     colModel: [
-                        { label: 'Name', name: 'name', width: 150 },
+                        { label: 'Name', name: 'name', width: 200 },
                         { label: 'Sex', name: 'gender', width: 50 },
                         { label: 'Score', name: 'score', width: 80 },
                         { label: 'Class', name: 'classNo', width: 80 }
@@ -258,6 +284,7 @@
                 data: tmpClasses,
                 colModel: [
                     { label: 'Class', name: 'index', width: 150 },
+                    { label: 'Count', name: 'count', width: 50 },
                     { label: 'Average', name: 'average', width: 50 }
                 ],
                 viewrecords: true, // show the current page, data rang and total records on the toolbar

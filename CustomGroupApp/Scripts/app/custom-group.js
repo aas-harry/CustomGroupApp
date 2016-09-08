@@ -65,6 +65,7 @@ var SummaryClass = (function () {
 var StudentClass = (function () {
     function StudentClass(s) {
         this.s = s;
+        this.canMoveToOtherClass = true;
         this.source = s;
         this.name = s.name;
         this.gender = s.sex;
@@ -118,6 +119,30 @@ var GroupingHelper = (function () {
             if (streamType === StreamType.MathsAchievement) {
                 _this.setMathAchievementScore(students);
             }
+        };
+        this.handleSeparatedStudents = function (classes, separatedStudents) {
+            for (var i = 0; i < separatedStudents.length; i++) {
+                if (Enumerable.From(separatedStudents[i].students).GroupBy(function (x) { return x.classNo; }).Count() ===
+                    separatedStudents[i].students.length) {
+                    continue;
+                }
+                var flattenedStudentList = Enumerable.From(classes).SelectMany(function (c) { return c.students; }).ToArray();
+                var allocatedClasses = Enumerable.From(separatedStudents[i].students).Select(function (x) { return x.canMoveToOtherClass === false; }).ToArray();
+                for (var _i = 0, _a = separatedStudents[i].students; _i < _a.length; _i++) {
+                    var s = _a[_i];
+                    if (s.canMoveToOtherClass === false) {
+                        continue;
+                    }
+                    var replacement = _this.findStudentReplacement();
+                }
+            }
+        };
+        this.handleJoinedStudents = function (classes, joinedStudents) {
+        };
+        this.findStudentReplacement = function (student, students, allocatedClasses, diff) {
+            var replacement = Enumerable.From(students)
+                .FirstOrDefault(null, function (x) { return x.canMoveToOtherClass && Math.abs(x.score - student.score) <= diff; });
+            return replacement;
         };
         this.groupByStreaming = function (classes, students, streamType, mixBoysGirls) {
             _this.calculateTotalScore(students, streamType);
@@ -226,6 +251,12 @@ var GroupingHelper = (function () {
         };
     }
     return GroupingHelper;
+}());
+var StudentSet = (function () {
+    function StudentSet() {
+        this.students = [];
+    }
+    return StudentSet;
 }());
 var ClassDefinition = (function () {
     function ClassDefinition(parent, index, count) {
@@ -357,8 +388,12 @@ var BandSet = (function () {
         this.groupType = groupType;
         this.mixBoysGirls = mixBoysGirls;
         this.students = [];
+        this.separatedStudents = [];
+        this.joineddStudents = [];
         this.groupingHelper = new GroupingHelper();
-        this.prepare = function (name, students) {
+        this.prepare = function (name, students, separatedStudents, joinedStudents) {
+            if (separatedStudents === void 0) { separatedStudents = []; }
+            if (joinedStudents === void 0) { joinedStudents = []; }
             _this.students = students;
             if (_this.bandCount === 1) {
                 _this.bands[0].students = _this.students;
@@ -372,6 +407,8 @@ var BandSet = (function () {
             else {
                 _this.groupingHelper.groupByMixAbility(classes, _this.students, _this.streamType, _this.mixBoysGirls);
             }
+            _this.groupingHelper.handleJoinedStudents(classes, joinedStudents);
+            _this.groupingHelper.handleSeparatedStudents(classes, separatedStudents);
             for (var i = 0; i < _this.bands.length; i++) {
                 _this.bands[i].students = classes[i].students;
                 _this.bands[i].prepare(name);
