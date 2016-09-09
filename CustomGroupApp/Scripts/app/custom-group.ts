@@ -68,6 +68,7 @@ class StudentClass {
     }
 
     source: Student;
+    class: ClassDefinition;
     gender: string;
     score: number;
     name: string;
@@ -143,6 +144,8 @@ class GroupingHelper {
                 g.source[0].canMoveToOtherClass = false;
                 allocatedClasses.push(g.source[0].classNo);
             }
+            const isCoed = Enumerable.From(classes).SelectMany(c => c.students).Any(x => x.gender === "M") &&
+                Enumerable.From(classes).SelectMany(c => c.students).Any(x => x.gender === "F");
 
             const flattenedStudentList = Enumerable.From(classes).SelectMany(c => c.students).ToArray();
             for (let g of studentSets) {
@@ -153,12 +156,17 @@ class GroupingHelper {
                 allocatedClasses.push(g.source[0].classNo);
                 for (let j = 1; j < g.source.length; j++) {
                     var s = g.source[j];
-                    var replacement = this.findStudentReplacement(s, flattenedStudentList, allocatedClasses);
+                    var replacement = this.findStudentReplacement(s, flattenedStudentList, allocatedClasses, true);
+                    replacement = replacement != null || isCoed === false ? replacement :
+                        this.findStudentReplacement(s, flattenedStudentList, allocatedClasses, false);
                     if (replacement != null) {
                         let tmpClassNo = replacement.classNo;
+
                         replacement.classNo = s.classNo;
                         s.classNo = tmpClassNo;
                         allocatedClasses.push(replacement.classNo);
+
+
                         return replacement;
                     }
                 }
@@ -170,17 +178,29 @@ class GroupingHelper {
 
     };
 
+    private swapStudents = (student1: StudentClass, student2: StudentClass) => {
+    }
     private findStudentReplacement = (student: StudentClass
         , students: Array<StudentClass>
-        , allocatedClasses: Array<number>): StudentClass => {
+        , allocatedClasses: Array<number>
+        , sameGender = false): StudentClass => {
 
-        var tmpStudents = Enumerable.From(students)
-            .Where(s =>!  Enumerable.From(allocatedClasses).Contains(s.classNo))
+        var tmpStudents = new Array<StudentClass>();
+        if (sameGender)
+        {
+            tmpStudents = Enumerable.From(students)
+            .Where(s => s.gender === student.gender && ! Enumerable.From(allocatedClasses).Contains(s.classNo))
             .Select(s => s)
-            .ToArray();
+                .ToArray();
+        } else {
+            tmpStudents = Enumerable.From(students)
+                .Where(s => !Enumerable.From(allocatedClasses).Contains(s.classNo))
+                .Select(s => s)
+                .ToArray();
+        }
 
          // Try to find students with 10, 20, 30, 40, 50 score difference first before pick any students
-        for (let diff of [10, 20, 30, 40, 50, 300]) {
+        for (var diff of [10, 20, 30, 40, 50, 300]) {
             var replacement = Enumerable.From(tmpStudents)
                 .FirstOrDefault(null, x => x.canMoveToOtherClass && Math.abs(x.score - student.score) <= diff);
             if (replacement != null) {
@@ -194,25 +214,29 @@ class GroupingHelper {
     groupByStreaming = (classes: Array<ClassDefinition>,
         students: Array<StudentClass>,
         streamType: StreamType,
-        mixBoysGirls: boolean) => {
+        mixBoysGirls: boolean,
+        joinedStudents: Array<StudentSet> = [],
+        separatedStudents: Array<StudentSet> = []) => {
 
         this.calculateTotalScore(students, streamType);
 
         if (!mixBoysGirls) {
             this.groupByStreamingInternal(classes, students);
-            return;
-        }
-
-        var femaleStudents = Enumerable.From(students).Where(s => (s.gender === "F")).Select(s => s).ToArray();
-        var maleStudents = Enumerable.From(students).Where(s => (s.gender === "F")).Select(s => s).ToArray();
-
-        if (femaleStudents.length < maleStudents.length) {
-            this.groupByStreamingInternal(classes, femaleStudents);
-            this.groupByStreamingInternal(classes, maleStudents);
         } else {
-            this.groupByStreamingInternal(classes, maleStudents);
-            this.groupByStreamingInternal(classes, femaleStudents);
+            var femaleStudents = Enumerable.From(students).Where(s => (s.gender === "F")).Select(s => s).ToArray();
+            var maleStudents = Enumerable.From(students).Where(s => (s.gender === "F")).Select(s => s).ToArray();
+
+            if (femaleStudents.length < maleStudents.length) {
+                this.groupByStreamingInternal(classes, femaleStudents);
+                this.groupByStreamingInternal(classes, maleStudents);
+            } else {
+                this.groupByStreamingInternal(classes, maleStudents);
+                this.groupByStreamingInternal(classes, femaleStudents);
+            }
         }
+        this.handleJoinedStudents(classes, joinedStudents);
+        this.handleSeparatedStudents(classes, separatedStudents);
+
     };
 
     groupByMixAbility = (classes: Array<ClassDefinition>,
@@ -469,8 +493,6 @@ class BandSet {
     uid: string;
     students: Array<StudentClass> = [];
     bands: Array<BandDefinition>;
-    separatedStudents: Array<StudentSet> = [];
-    joineddStudents: Array<StudentSet> = [];
 
     // ReSharper disable once InconsistentNaming
     private _bankCount: number;

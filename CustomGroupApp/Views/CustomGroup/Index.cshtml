@@ -83,7 +83,6 @@
         //band.classes[2].count -= 2;
 
         var separatedStudents = getSeparatedStudents(classesDefn);
-        debugger;
         bandSet.prepare("Mix", classesDefn.students, null, separatedStudents);
 
         var classes = band.classes;
@@ -141,7 +140,9 @@
         band.classes[1].count -= 3;
         band.classes[2].count -= 2;
 
-        bandSet.prepare("Maths", classesDefn.students);
+        var separatedStudents = getSeparatedStudents(classesDefn);
+
+        bandSet.prepare("Maths", classesDefn.students, null, separatedStudents);
         var classes = band.classes;
 
         for (var i = 1; i <= classes.length; i++) {
@@ -195,10 +196,10 @@
     }
 
     function createBandingClasses() {
-        var classes = new ClassesDefinition(testFile);
+        var classDefn = new ClassesDefinition(testFile);
         // Create two bands
-        var bandSet = classes.createBandSet("band",
-            classes.studentCount,
+        var bandSet = classDefn.createBandSet("band",
+            classDefn.studentCount,
             2,
             BandType.Custom,
             BandStreamType.Streaming,
@@ -207,8 +208,8 @@
         bandSet.bands[0].setClassCount(3);
         bandSet.bands[1].setClassCount(3);
 
-        var separatedStudents = getSeparatedStudents(classes);
-        bandSet.prepare("Band", classes.students, null, separatedStudents);
+        var separatedStudents = getSeparatedStudents(classDefn);
+        bandSet.prepare("Band", classDefn.students, null, separatedStudents);
         var tmpClasses = bandSet.bands[0].classes.concat(bandSet.bands[1].classes);
         for (var i = 1; i <= tmpClasses.length; i++) {
 
