@@ -435,13 +435,13 @@ var BandSet = (function () {
         this.separatedStudents = [];
         this.joineddStudents = [];
         this.groupingHelper = new GroupingHelper();
-        this.prepare = function (name, students, separatedStudents, joinedStudents) {
-            if (separatedStudents === void 0) { separatedStudents = []; }
+        this.prepare = function (name, students, joinedStudents, separatedStudents) {
             if (joinedStudents === void 0) { joinedStudents = []; }
+            if (separatedStudents === void 0) { separatedStudents = []; }
             _this.students = students;
             if (_this.bandCount === 1) {
                 _this.bands[0].students = _this.students;
-                _this.bands[0].prepare(name, _this.students, separatedStudents, joinedStudents);
+                _this.bands[0].prepare(name, _this.students, joinedStudents, separatedStudents);
                 return;
             }
             var classes = _this.convertToClasses(_this);
@@ -583,3 +583,4 @@ var ClassesDefinition = (function () {
     });
     return ClassesDefinition;
 }());
+//# sourceMappingURL=custom-group.js.map

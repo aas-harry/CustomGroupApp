@@ -481,12 +481,12 @@ class BandSet {
     protected groupingHelper = new GroupingHelper();
 
     prepare = (name: string, students: Array<StudentClass>,
-        separatedStudents: Array<StudentSet> = [],
-        joinedStudents: Array<StudentSet> = []) => {
+        joinedStudents: Array<StudentSet> = [],
+        separatedStudents: Array<StudentSet> = []) => {
         this.students = students;
         if (this.bandCount === 1) {
             this.bands[0].students = this.students;
-            this.bands[0].prepare(name, this.students, separatedStudents, joinedStudents);
+            this.bands[0].prepare(name, this.students, joinedStudents, separatedStudents);
             return;
         }
         var classes = this.convertToClasses(this);
