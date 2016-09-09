@@ -136,12 +136,12 @@
         band.streamType = StreamType.OverallAbilty;
 
         band.setClassCount(5);
-        band.classes[0].count += 5;
-        band.classes[1].count -= 3;
-        band.classes[2].count -= 2;
+        //band.classes[0].count += 5;
+        //band.classes[1].count -= 3;
+        //band.classes[2].count -= 2;
 
-        var separatedStudents = getSeparatedStudents(classesDefn);
-
+        var separatedStudents = []; //getSeparatedStudents(classesDefn);
+        debugger;
         bandSet.prepare("Maths", classesDefn.students, null, separatedStudents);
         var classes = band.classes;
 

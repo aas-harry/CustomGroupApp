@@ -65,17 +65,33 @@ class StudentClass {
         this.source = s;
         this.name = s.name;
         this.gender = s.sex;
+        this.id = s.studentId;
     }
 
+    id: number;
     source: Student;
     class: ClassDefinition;
     gender: string;
     score: number;
     name: string;
-    classNo: number;
+
+    get classNo(): number {
+        return this.class ? this.class.index : 0;
+    }
+
     bandNo: number;
     flag: number;
     canMoveToOtherClass = true;
+
+    swapWith = (studentTo: StudentClass) => {
+        var fromClass = this.class;
+        var toClass = studentTo.class;
+        toClass.removeStudent(studentTo);
+        fromClass.removeStudent(this);
+
+        toClass.addStudent(this);
+        fromClass.addStudent(studentTo);
+    }
 }
 
 class SearchClassContext {
@@ -160,14 +176,8 @@ class GroupingHelper {
                     replacement = replacement != null || isCoed === false ? replacement :
                         this.findStudentReplacement(s, flattenedStudentList, allocatedClasses, false);
                     if (replacement != null) {
-                        let tmpClassNo = replacement.classNo;
-
-                        replacement.classNo = s.classNo;
-                        s.classNo = tmpClassNo;
-                        allocatedClasses.push(replacement.classNo);
-
-
-                        return replacement;
+                        s.swapWith(replacement);
+                        allocatedClasses.push(s.classNo);
                     }
                 }
             }
@@ -180,6 +190,7 @@ class GroupingHelper {
 
     private swapStudents = (student1: StudentClass, student2: StudentClass) => {
     }
+
     private findStudentReplacement = (student: StudentClass
         , students: Array<StudentClass>
         , allocatedClasses: Array<number>
@@ -277,9 +288,7 @@ class GroupingHelper {
         var classCount = classes.length;
         var nextClass = new SearchClassContext(0, 0, classCount - 1, false);
         for (let i = 0; i < sortedStudents.length; i++) {
-            const student = sortedStudents[i];
-            student.classNo = nextClass.classNo + 1;
-            classes[nextClass.classNo].students.push(student);
+            classes[nextClass.classNo].addStudent(sortedStudents[i]);
             nextClass = this.getNextClassToAddNewStudent(classes, nextClass);
         }
         return classes;
@@ -336,9 +345,7 @@ class GroupingHelper {
         var classNo = 0;
         var numberStudentsInClass = 0;
         for (let i = 0; i < sortedStudents.length; i++) {
-            const student = sortedStudents[i];
-            student.classNo = classNo + 1;
-            classes[classNo].students.push(student);
+            classes[classNo].addStudent(sortedStudents[i]);
             numberStudentsInClass++;
             if (classes[classNo].count <= numberStudentsInClass) {
                 classNo++;
@@ -369,6 +376,21 @@ class ClassDefinition {
 
     get moreStudents(): number {
         return this.count - (this.students ? this.students.length : 0);
+    }
+
+    addStudent = (student: StudentClass) => {
+        if (Enumerable.From(this.students).Any(x => x.id === student.id)) {
+            return;
+        }
+        student.class = this;
+        this.students.push(student);
+    }
+
+    removeStudent = (student: StudentClass) => {
+        if (Enumerable.From(this.students).All(x => x.id !== student.id)) {
+            return;
+        }
+        student.class = null;
     }
 
     prepare = (name: string) => {

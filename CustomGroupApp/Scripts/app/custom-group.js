@@ -61,17 +61,34 @@ var SummaryClass = (function () {
     function SummaryClass() {
     }
     return SummaryClass;
-})();
+}());
 var StudentClass = (function () {
     function StudentClass(s) {
+        var _this = this;
         this.s = s;
         this.canMoveToOtherClass = true;
+        this.swapWith = function (studentTo) {
+            var fromClass = _this.class;
+            var toClass = studentTo.class;
+            toClass.removeStudent(studentTo);
+            fromClass.removeStudent(_this);
+            toClass.addStudent(_this);
+            fromClass.addStudent(studentTo);
+        };
         this.source = s;
         this.name = s.name;
         this.gender = s.sex;
+        this.id = s.studentId;
     }
+    Object.defineProperty(StudentClass.prototype, "classNo", {
+        get: function () {
+            return this.class ? this.class.index : 0;
+        },
+        enumerable: true,
+        configurable: true
+    });
     return StudentClass;
-})();
+}());
 var SearchClassContext = (function () {
     function SearchClassContext(classNo, firstClassNo, lastClassNo, isLastClass) {
         this.classNo = classNo;
@@ -80,7 +97,7 @@ var SearchClassContext = (function () {
         this.isLastClass = isLastClass;
     }
     return SearchClassContext;
-})();
+}());
 var GroupingHelper = (function () {
     function GroupingHelper() {
         var _this = this;
@@ -127,8 +144,8 @@ var GroupingHelper = (function () {
                 var studentSets = Enumerable.From(separatedStudents[i].students)
                     .GroupBy(function (x) { return x.classNo; }, function (x) { return x; })
                     .ToArray();
-                for (var _i = 0; _i < studentSets.length; _i++) {
-                    var g = studentSets[_i];
+                for (var _i = 0, studentSets_1 = studentSets; _i < studentSets_1.length; _i++) {
+                    var g = studentSets_1[_i];
                     if (g.source.length > 1) {
                         continue;
                     }
@@ -138,8 +155,8 @@ var GroupingHelper = (function () {
                 var isCoed = Enumerable.From(classes).SelectMany(function (c) { return c.students; }).Any(function (x) { return x.gender === "M"; }) &&
                     Enumerable.From(classes).SelectMany(function (c) { return c.students; }).Any(function (x) { return x.gender === "F"; });
                 var flattenedStudentList = Enumerable.From(classes).SelectMany(function (c) { return c.students; }).ToArray();
-                for (var _a = 0; _a < studentSets.length; _a++) {
-                    var g = studentSets[_a];
+                for (var _a = 0, studentSets_2 = studentSets; _a < studentSets_2.length; _a++) {
+                    var g = studentSets_2[_a];
                     if (g.source.length === 1) {
                         continue;
                     }
@@ -150,11 +167,8 @@ var GroupingHelper = (function () {
                         replacement = replacement != null || isCoed === false ? replacement :
                             _this.findStudentReplacement(s, flattenedStudentList, allocatedClasses, false);
                         if (replacement != null) {
-                            var tmpClassNo = replacement.classNo;
-                            replacement.classNo = s.classNo;
-                            s.classNo = tmpClassNo;
-                            allocatedClasses.push(replacement.classNo);
-                            return replacement;
+                            s.swapWith(replacement);
+                            allocatedClasses.push(s.classNo);
                         }
                     }
                 }
@@ -242,9 +256,7 @@ var GroupingHelper = (function () {
             var classCount = classes.length;
             var nextClass = new SearchClassContext(0, 0, classCount - 1, false);
             for (var i = 0; i < sortedStudents.length; i++) {
-                var student = sortedStudents[i];
-                student.classNo = nextClass.classNo + 1;
-                classes[nextClass.classNo].students.push(student);
+                classes[nextClass.classNo].addStudent(sortedStudents[i]);
                 nextClass = _this.getNextClassToAddNewStudent(classes, nextClass);
             }
             return classes;
@@ -294,9 +306,7 @@ var GroupingHelper = (function () {
             var classNo = 0;
             var numberStudentsInClass = 0;
             for (var i = 0; i < sortedStudents.length; i++) {
-                var student = sortedStudents[i];
-                student.classNo = classNo + 1;
-                classes[classNo].students.push(student);
+                classes[classNo].addStudent(sortedStudents[i]);
                 numberStudentsInClass++;
                 if (classes[classNo].count <= numberStudentsInClass) {
                     classNo++;
@@ -307,13 +317,13 @@ var GroupingHelper = (function () {
         };
     }
     return GroupingHelper;
-})();
+}());
 var StudentSet = (function () {
     function StudentSet() {
         this.students = [];
     }
     return StudentSet;
-})();
+}());
 var ClassDefinition = (function () {
     function ClassDefinition(parent, index, count) {
         var _this = this;
@@ -321,6 +331,19 @@ var ClassDefinition = (function () {
         this.index = index;
         this.count = count;
         this.students = [];
+        this.addStudent = function (student) {
+            if (Enumerable.From(_this.students).Any(function (x) { return x.id === student.id; })) {
+                return;
+            }
+            student.class = _this;
+            _this.students.push(student);
+        };
+        this.removeStudent = function (student) {
+            if (Enumerable.From(_this.students).All(function (x) { return x.id !== student.id; })) {
+                return;
+            }
+            student.class = null;
+        };
         this.prepare = function (name) {
             switch (_this.parent.bandType) {
                 case BandType.None:
@@ -353,7 +376,7 @@ var ClassDefinition = (function () {
         configurable: true
     });
     return ClassDefinition;
-})();
+}());
 var BandDefinition = (function () {
     function BandDefinition(parent, bandNo, bandName, studentCount, classCount, bandType, streamType, groupType, mixBoysGirls) {
         var _this = this;
@@ -429,7 +452,7 @@ var BandDefinition = (function () {
         this.setClassCount(classCount);
     }
     return BandDefinition;
-})();
+}());
 var BandSet = (function () {
     function BandSet(parent, name, studentCount, bandCount, bandType, bandStreamType, streamType, groupType, mixBoysGirls) {
         var _this = this;
@@ -502,7 +525,7 @@ var BandSet = (function () {
         configurable: true
     });
     return BandSet;
-})();
+}());
 var CustomBandSet = (function (_super) {
     __extends(CustomBandSet, _super);
     function CustomBandSet(parent, studentCount, bandCount, bandStreamType, bandType, streamType, groupType, mixBoysGirls) {
@@ -534,7 +557,7 @@ var CustomBandSet = (function (_super) {
         };
     }
     return CustomBandSet;
-})(BandSet);
+}(BandSet));
 var TopMiddleLowestBandSet = (function (_super) {
     __extends(TopMiddleLowestBandSet, _super);
     function TopMiddleLowestBandSet(parent, studentCount, bandStreamType, bandType, streamType, groupType, mixBoysGirls) {
@@ -552,7 +575,7 @@ var TopMiddleLowestBandSet = (function (_super) {
         this.bands[2].bandType = BandType.Lowest;
     }
     return TopMiddleLowestBandSet;
-})(BandSet);
+}(BandSet));
 var ClassesDefinition = (function () {
     function ClassesDefinition(testFile) {
         var _this = this;
@@ -596,4 +619,5 @@ var ClassesDefinition = (function () {
         configurable: true
     });
     return ClassesDefinition;
-})();
+}());
+//# sourceMappingURL=custom-group.js.map
