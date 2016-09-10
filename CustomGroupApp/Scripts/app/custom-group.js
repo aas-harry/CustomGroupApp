@@ -89,6 +89,14 @@ var StudentClass = (function () {
     });
     return StudentClass;
 }());
+var GroupContext = (function () {
+    function GroupContext() {
+        this.mixBoysGirls = false;
+        this.separatedStudents = [];
+        this.joinedStudents = [];
+    }
+    return GroupContext;
+}());
 var SearchClassContext = (function () {
     function SearchClassContext(classNo, firstClassNo, lastClassNo, isLastClass) {
         this.classNo = classNo;
@@ -171,7 +179,7 @@ var GroupingHelper = (function () {
                             Enumerable.From(classes).SelectMany(function (c) { return c.students; }).Any(function (x) { return x.gender === "F"; })) {
                             replacement = _this.findStudentReplacement(s, flattenedStudentList, allocatedClasses, false);
                         }
-                        console.log("Student: " + s.name, s.classNo, replacement.name, replacement.classNo);
+                        //                    console.log("Student: " + s.name, s.classNo, replacement.name, replacement.classNo);
                         if (replacement != null) {
                             s.swapWith(replacement);
                             s.canMoveToOtherClass = false;
@@ -421,6 +429,25 @@ var ClassDefinition = (function () {
                     break;
             }
         };
+        this.calculateClassesAverage = function () {
+            _this.average = Enumerable.From(_this.students).Average(function (x) { return x.score; });
+            var boys = Enumerable.From(_this.students).Where(function (x) { return x.gender === "M"; }).ToArray();
+            var girls = Enumerable.From(_this.students).Where(function (x) { return x.gender === "M"; }).ToArray();
+            _this.boysCount = boys.length;
+            if (_this.boysCount === 0) {
+                _this.boysAverage = 0;
+            }
+            else {
+                _this.boysAverage = Enumerable.From(boys).Average(function (x) { return x.score; });
+            }
+            _this.girlsCount = boys.length;
+            if (_this.girlsCount === 0) {
+                _this.girlsAverage = 0;
+            }
+            else {
+                _this.girlsAverage = Enumerable.From(girls).Average(function (x) { return x.score; });
+            }
+        };
         this.uid = createUuid();
     }
     Object.defineProperty(ClassDefinition.prototype, "freeStudentCount", {
@@ -463,12 +490,10 @@ var BandDefinition = (function () {
             _this.classCount = classCount;
             _this.calculateClassesSize(classCount);
         };
-        this.calculateClassesAverage = function (classes) {
-            for (var i = 0; i < classes.length; i++) {
-                classes[i].average = Enumerable.From(classes[i].students).Average(function (x) { return x.score; });
-                classes[i].average = Enumerable.From(classes[i].students).Average(function (x) { return x.score; });
-                classes[i].average = Enumerable.From(classes[i].students).Average(function (x) { return x.score; });
-                classes[i].average = Enumerable.From(classes[i].students).Average(function (x) { return x.score; });
+        this.calculateClassesAverage = function () {
+            for (var _i = 0, _a = _this.classes; _i < _a.length; _i++) {
+                var classDefn = _a[_i];
+                classDefn.calculateClassesAverage();
             }
         };
         this.prepare = function (name, students, joinedStudents, separatedStudents) {
@@ -498,8 +523,8 @@ var BandDefinition = (function () {
             _this.groupHelper.handleSeparatedStudents(_this.classes, separatedStudents);
             for (var i = 0; i < _this.classes.length; i++) {
                 _this.classes[i].prepare(name);
+                _this.classes[i].calculateClassesAverage();
             }
-            _this.calculateClassesAverage(_this.classes);
         };
         this.calculateClassesSize = function (classCount) {
             var studentInClass = Math.floor(_this.studentCount / classCount);

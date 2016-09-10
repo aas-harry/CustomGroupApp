@@ -94,6 +94,12 @@ class StudentClass {
     }
 }
 
+class GroupContext {
+    mixBoysGirls = false;
+    separatedStudents: Array<StudentSet> = [];
+    joinedStudents: Array<StudentSet> = [];
+}
+
 class SearchClassContext {
     constructor(public classNo: number,
         public firstClassNo: number,
@@ -179,7 +185,7 @@ class GroupingHelper {
                         Enumerable.From(classes).SelectMany(c => c.students).Any(x => x.gender === "F")) {
                         replacement = this.findStudentReplacement(s, flattenedStudentList, allocatedClasses, false);
                     }
-                    console.log("Student: " + s.name, s.classNo, replacement.name, replacement.classNo);
+//                    console.log("Student: " + s.name, s.classNo, replacement.name, replacement.classNo);
                     if (replacement != null) {
                         s.swapWith(replacement);
                         s.canMoveToOtherClass = false;
@@ -469,6 +475,26 @@ class ClassDefinition {
                 break;
         }
     }
+
+    calculateClassesAverage = () => {
+        this.average = Enumerable.From(this.students).Average(x => x.score);
+        const boys = Enumerable.From(this.students).Where(x => x.gender === "M").ToArray();
+        const girls = Enumerable.From(this.students).Where(x => x.gender === "M").ToArray();
+
+        this.boysCount = boys.length;
+        if (this.boysCount === 0) {
+            this.boysAverage = 0;
+        } else {
+            this.boysAverage = Enumerable.From(boys).Average(x => x.score);
+        }
+
+        this.girlsCount = boys.length;
+        if (this.girlsCount === 0) {
+            this.girlsAverage = 0;
+        } else {
+            this.girlsAverage = Enumerable.From(girls).Average(x => x.score);
+        }
+    };
 }
 
 class BandDefinition {
@@ -497,12 +523,9 @@ class BandDefinition {
         this.calculateClassesSize(classCount);
     };
   
-    calculateClassesAverage = (classes: Array<ClassDefinition>) => {
-        for (let i = 0; i < classes.length; i++) {
-            classes[i].average = Enumerable.From(classes[i].students).Average(x => x.score);
-            classes[i].average = Enumerable.From(classes[i].students).Average(x => x.score);
-            classes[i].average = Enumerable.From(classes[i].students).Average(x => x.score);
-            classes[i].average = Enumerable.From(classes[i].students).Average(x => x.score);
+    calculateClassesAverage = () => {
+        for (let classDefn of this.classes){
+            classDefn.calculateClassesAverage();
         }
     };
 
@@ -534,8 +557,8 @@ class BandDefinition {
 
         for (let i = 0; i < this.classes.length; i++) {
             this.classes[i].prepare(name);
+            this.classes[i].calculateClassesAverage();
         }
-        this.calculateClassesAverage(this.classes);
     };
 
     private calculateClassesSize = (classCount: number) => {

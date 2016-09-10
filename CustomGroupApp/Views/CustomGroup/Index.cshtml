@@ -5,6 +5,7 @@
         <button class="btn-default" onClick="createStreamingClasses()">Create streaming</button>
         <button class="btn-default" onClick="createBandingClasses()">Create Banding</button>
         <button class="btn-default" onclick="createTopMidBottomClasses()">Create TMB</button>
+        <input type="checkbox" id="mixBoysGirls" value="true" style="margin-right: 10px; margin-left: 10px"/>Mix Boys and Girls
         <div id="message-text"></div>
     </div>
 
@@ -74,14 +75,16 @@
     }
 
     function createMixClasses() {
+        debugger;
         var classesDefn = new ClassesDefinition(testFile);
+        var flag = $("#mixBoysGirls").value;
         var bandSet = classesDefn.createBandSet("class",
             classesDefn.studentCount,
             1,
             BandStreamType.Streaming,
             BandType.None,
             StreamType.OverallAbilty,
-            GroupingMethod.MixedAbility);
+            GroupingMethod.MixedAbility,$("#mixBoysGirls").checked);
 
         var band = bandSet.bands[0];
         band.setClassCount(5);
