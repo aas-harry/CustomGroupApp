@@ -138,36 +138,43 @@ var GroupingHelper = (function () {
             }
         };
         this.handleSeparatedStudents = function (classes, separatedStudents) {
-            for (var i = 0; i < separatedStudents.length; i++) {
-                // Check if all students are already in different classes
+            for (var _i = 0, separatedStudents_1 = separatedStudents; _i < separatedStudents_1.length; _i++) {
+                var studentSet = separatedStudents_1[_i];
                 var allocatedClasses = new Array();
-                var studentSets = Enumerable.From(separatedStudents[i].students)
+                var studentClasses = Enumerable.From(studentSet.students)
                     .GroupBy(function (x) { return x.classNo; }, function (x) { return x; })
                     .ToArray();
-                for (var _i = 0, studentSets_1 = studentSets; _i < studentSets_1.length; _i++) {
-                    var g = studentSets_1[_i];
-                    if (g.source.length > 1) {
-                        continue;
+                // Check if all the students are in different class already
+                if (Enumerable.From(studentClasses).All(function (x) { return x.source.length === 1; })) {
+                    for (var _a = 0, studentClasses_1 = studentClasses; _a < studentClasses_1.length; _a++) {
+                        var s = studentClasses_1[_a];
+                        s.source[0].canMoveToOtherClass = false;
                     }
-                    g.source[0].canMoveToOtherClass = false;
-                    allocatedClasses.push(g.source[0].classNo);
+                    continue;
                 }
-                var isCoed = Enumerable.From(classes).SelectMany(function (c) { return c.students; }).Any(function (x) { return x.gender === "M"; }) &&
-                    Enumerable.From(classes).SelectMany(function (c) { return c.students; }).Any(function (x) { return x.gender === "F"; });
                 var flattenedStudentList = Enumerable.From(classes).SelectMany(function (c) { return c.students; }).ToArray();
-                for (var _a = 0, studentSets_2 = studentSets; _a < studentSets_2.length; _a++) {
-                    var g = studentSets_2[_a];
-                    if (g.source.length === 1) {
+                for (var _b = 0, studentClasses_2 = studentClasses; _b < studentClasses_2.length; _b++) {
+                    var classGroup = studentClasses_2[_b];
+                    if (classGroup.source.length === 1) {
+                        // he/she is already in separate class
+                        classGroup.source[0].canMoveToOtherClass = false;
+                        allocatedClasses.push(classGroup.Key());
                         continue;
                     }
-                    allocatedClasses.push(g.source[0].classNo);
-                    for (var j = 1; j < g.source.length; j++) {
-                        var s = g.source[j];
+                    allocatedClasses.push(classGroup.Key());
+                    for (var j = 1; j < classGroup.source.length; j++) {
+                        var s = classGroup.source[j];
                         var replacement = _this.findStudentReplacement(s, flattenedStudentList, allocatedClasses, true);
-                        replacement = replacement != null || isCoed === false ? replacement :
-                            _this.findStudentReplacement(s, flattenedStudentList, allocatedClasses, false);
+                        // if cannot find the replacement student with the same gender, try again with any gender
+                        if (replacement == null &&
+                            Enumerable.From(classes).SelectMany(function (c) { return c.students; }).Any(function (x) { return x.gender === "M"; }) &&
+                            Enumerable.From(classes).SelectMany(function (c) { return c.students; }).Any(function (x) { return x.gender === "F"; })) {
+                            replacement = _this.findStudentReplacement(s, flattenedStudentList, allocatedClasses, false);
+                        }
+                        console.log("Student: " + s.name, s.classNo, replacement.name, replacement.classNo);
                         if (replacement != null) {
                             s.swapWith(replacement);
+                            s.canMoveToOtherClass = false;
                             allocatedClasses.push(s.classNo);
                         }
                     }
@@ -175,21 +182,66 @@ var GroupingHelper = (function () {
             }
         };
         this.handleJoinedStudents = function (classes, joinedStudents) {
-        };
-        this.swapStudents = function (student1, student2) {
+            for (var _i = 0, joinedStudents_1 = joinedStudents; _i < joinedStudents_1.length; _i++) {
+                var studentSet = joinedStudents_1[_i];
+                var allocatedClasses = new Array();
+                var studentClasses = Enumerable.From(studentSet.students)
+                    .GroupBy(function (x) { return x.classNo; }, function (x) { return x; }).ToArray();
+                // All students are already in the same class
+                if (studentClasses.length === 1) {
+                    for (var _a = 0, _b = studentClasses[0].source; _a < _b.length; _a++) {
+                        var s = _b[_a];
+                        s.canMoveToOtherClass = false;
+                    }
+                    continue;
+                }
+                // Find the class with most number of free students (can be moved students)
+                var classDest = -1;
+                var cnt = 0;
+                for (var _c = 0, studentClasses_3 = studentClasses; _c < studentClasses_3.length; _c++) {
+                    var classgroup = studentClasses_3[_c];
+                    var freeStudentCount = classes[classgroup.Key() - 1].freeStudentCount;
+                    if (cnt < freeStudentCount) {
+                        classDest = classgroup.Key();
+                        cnt = freeStudentCount;
+                    }
+                }
+                // Add all the students to the class which has most of the students already
+                for (var _d = 0, studentClasses_4 = studentClasses; _d < studentClasses_4.length; _d++) {
+                    var classgroup = studentClasses_4[_d];
+                    for (var _e = 0, _f = classgroup.source; _e < _f.length; _e++) {
+                        var s = _f[_e];
+                        if (s.classNo === classDest) {
+                            continue;
+                        }
+                        var replacement = _this.findStudentReplacement(s, classes[classDest - 1].students, allocatedClasses, true);
+                        // if cannot find the replacement student with the same gender, try again with any gender
+                        if (replacement == null &&
+                            Enumerable.From(classes).SelectMany(function (c) { return c.students; }).Any(function (x) { return x.gender === "M"; }) &&
+                            Enumerable.From(classes).SelectMany(function (c) { return c.students; }).Any(function (x) { return x.gender === "F"; })) {
+                            replacement = _this.findStudentReplacement(s, classes[classDest - 1].students, allocatedClasses, false);
+                        }
+                        console.log("Student: " + s.name, s.classNo, replacement.name, replacement.classNo);
+                        if (replacement != null) {
+                            s.swapWith(replacement);
+                            s.canMoveToOtherClass = false;
+                        }
+                    }
+                }
+            }
         };
         this.findStudentReplacement = function (student, students, allocatedClasses, sameGender) {
             if (sameGender === void 0) { sameGender = false; }
-            var tmpStudents = new Array();
+            var tmpStudents;
             if (sameGender) {
                 tmpStudents = Enumerable.From(students)
-                    .Where(function (s) { return s.gender === student.gender && !Enumerable.From(allocatedClasses).Contains(s.classNo); })
+                    .Where(function (s) { return s.canMoveToOtherClass && s.gender === student.gender && !Enumerable.From(allocatedClasses).Contains(s.classNo); })
                     .Select(function (s) { return s; })
                     .ToArray();
             }
             else {
                 tmpStudents = Enumerable.From(students)
-                    .Where(function (s) { return !Enumerable.From(allocatedClasses).Contains(s.classNo); })
+                    .Where(function (s) { return s.canMoveToOtherClass && !Enumerable.From(allocatedClasses).Contains(s.classNo); })
                     .Select(function (s) { return s; })
                     .ToArray();
             }
@@ -339,10 +391,13 @@ var ClassDefinition = (function () {
             _this.students.push(student);
         };
         this.removeStudent = function (student) {
-            if (Enumerable.From(_this.students).All(function (x) { return x.id !== student.id; })) {
-                return;
-            }
             student.class = null;
+            for (var i = 0; i < _this.students.length; i++) {
+                if (_this.students[i].id === student.id) {
+                    _this.students.splice(i, 1);
+                    return;
+                }
+            }
         };
         this.prepare = function (name) {
             switch (_this.parent.bandType) {
@@ -368,6 +423,13 @@ var ClassDefinition = (function () {
         };
         this.uid = createUuid();
     }
+    Object.defineProperty(ClassDefinition.prototype, "freeStudentCount", {
+        get: function () {
+            return Enumerable.From(this.students).Count(function (x) { return x.canMoveToOtherClass; });
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(ClassDefinition.prototype, "moreStudents", {
         get: function () {
             return this.count - (this.students ? this.students.length : 0);

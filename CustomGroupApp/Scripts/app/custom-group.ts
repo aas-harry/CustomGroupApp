@@ -146,37 +146,43 @@ class GroupingHelper {
     };
 
     handleSeparatedStudents = (classes: Array<ClassDefinition>, separatedStudents: Array<StudentSet>) => {
-        for (let i = 0; i < separatedStudents.length; i++) {
-
-            // Check if all students are already in different classes
-            var allocatedClasses = new Array<number>();
-            var studentSets = Enumerable.From(separatedStudents[i].students)
+        for (let studentSet of separatedStudents) {
+            const allocatedClasses = new Array<number>();
+            const studentClasses = Enumerable.From(studentSet.students)
                 .GroupBy(x => x.classNo, x => x)
                 .ToArray();
-            for (let g of studentSets) {
-                if (g.source.length > 1) {
-                    continue;
+
+            // Check if all the students are in different class already
+            if (Enumerable.From(studentClasses).All(x => x.source.length === 1)) {
+                for (let s of studentClasses) {
+                    s.source[0].canMoveToOtherClass = false;
                 }
-                g.source[0].canMoveToOtherClass = false;
-                allocatedClasses.push(g.source[0].classNo);
+                continue;
             }
-            const isCoed = Enumerable.From(classes).SelectMany(c => c.students).Any(x => x.gender === "M") &&
-                Enumerable.From(classes).SelectMany(c => c.students).Any(x => x.gender === "F");
-
+            
             const flattenedStudentList = Enumerable.From(classes).SelectMany(c => c.students).ToArray();
-            for (let g of studentSets) {
-                if (g.source.length === 1) {
+            for (let classGroup of studentClasses) {
+                if (classGroup.source.length === 1) {
+                    // he/she is already in separate class
+                    classGroup.source[0].canMoveToOtherClass = false;
+                    allocatedClasses.push(classGroup.Key());
                     continue;
                 }
-
-                allocatedClasses.push(g.source[0].classNo);
-                for (let j = 1; j < g.source.length; j++) {
-                    var s = g.source[j];
-                    var replacement = this.findStudentReplacement(s, flattenedStudentList, allocatedClasses, true);
-                    replacement = replacement != null || isCoed === false ? replacement :
-                        this.findStudentReplacement(s, flattenedStudentList, allocatedClasses, false);
+               
+                allocatedClasses.push(classGroup.Key());
+                for (let j = 1; j < classGroup.source.length; j++) {
+                    const s = classGroup.source[j];
+                    let replacement = this.findStudentReplacement(s, flattenedStudentList, allocatedClasses, true);
+                    // if cannot find the replacement student with the same gender, try again with any gender
+                    if (replacement == null &&
+                        Enumerable.From(classes).SelectMany(c => c.students).Any(x => x.gender === "M") &&
+                        Enumerable.From(classes).SelectMany(c => c.students).Any(x => x.gender === "F")) {
+                        replacement = this.findStudentReplacement(s, flattenedStudentList, allocatedClasses, false);
+                    }
+                    console.log("Student: " + s.name, s.classNo, replacement.name, replacement.classNo);
                     if (replacement != null) {
                         s.swapWith(replacement);
+                        s.canMoveToOtherClass = false;
                         allocatedClasses.push(s.classNo);
                     }
                 }
@@ -185,27 +191,68 @@ class GroupingHelper {
     };
 
     handleJoinedStudents = (classes: Array<ClassDefinition>, joinedStudents: Array<StudentSet>) => {
+        for (let studentSet of joinedStudents) {
+            const allocatedClasses = new Array<number>();
+            const studentClasses = Enumerable.From(studentSet.students)
+                .GroupBy(x => x.classNo, x => x).ToArray();
 
+            // All students are already in the same class
+            if (studentClasses.length === 1) {
+                for (let s of studentClasses[0].source) {
+                    s.canMoveToOtherClass = false;
+                }
+                continue;
+            }
+
+            // Find the class with most number of free students (can be moved students)
+            let classDest = -1;
+            let cnt = 0;
+            for (let classgroup of studentClasses) {
+                const freeStudentCount = classes[classgroup.Key()-1].freeStudentCount;
+                if (cnt < freeStudentCount) {
+                    classDest = classgroup.Key();
+                    cnt = freeStudentCount;
+                }
+            }
+            // Add all the students to the class which has most of the students already
+            for (let classgroup of studentClasses) {
+                for (let s of classgroup.source) {
+                    if (s.classNo === classDest) {
+                        continue;
+                    }
+
+                    let replacement = this.findStudentReplacement(s, classes[classDest-1].students, allocatedClasses, true);
+                    // if cannot find the replacement student with the same gender, try again with any gender
+                    if (replacement == null &&
+                        Enumerable.From(classes).SelectMany(c => c.students).Any(x => x.gender === "M") &&
+                        Enumerable.From(classes).SelectMany(c => c.students).Any(x => x.gender === "F")) {
+                        replacement = this.findStudentReplacement(s, classes[classDest - 1].students, allocatedClasses, false);
+                    }
+                    console.log("Student: " + s.name, s.classNo, replacement.name, replacement.classNo);
+                    if (replacement != null) {
+                        s.swapWith(replacement);
+                        s.canMoveToOtherClass = false;
+                    }
+                }
+            }
+        }
     };
-
-    private swapStudents = (student1: StudentClass, student2: StudentClass) => {
-    }
 
     private findStudentReplacement = (student: StudentClass
         , students: Array<StudentClass>
         , allocatedClasses: Array<number>
         , sameGender = false): StudentClass => {
 
-        var tmpStudents = new Array<StudentClass>();
+        var tmpStudents: Array<StudentClass>; 
         if (sameGender)
         {
             tmpStudents = Enumerable.From(students)
-            .Where(s => s.gender === student.gender && ! Enumerable.From(allocatedClasses).Contains(s.classNo))
+            .Where(s => s.canMoveToOtherClass && s.gender === student.gender && ! Enumerable.From(allocatedClasses).Contains(s.classNo))
             .Select(s => s)
                 .ToArray();
         } else {
             tmpStudents = Enumerable.From(students)
-                .Where(s => !Enumerable.From(allocatedClasses).Contains(s.classNo))
+                .Where(s => s.canMoveToOtherClass && !Enumerable.From(allocatedClasses).Contains(s.classNo))
                 .Select(s => s)
                 .ToArray();
         }
@@ -374,6 +421,10 @@ class ClassDefinition {
     boysAverage: number;
     girlsAverage: number;
 
+    get freeStudentCount(): number {
+        return Enumerable.From(this.students).Count(x => x.canMoveToOtherClass);
+    }
+
     get moreStudents(): number {
         return this.count - (this.students ? this.students.length : 0);
     }
@@ -387,10 +438,13 @@ class ClassDefinition {
     }
 
     removeStudent = (student: StudentClass) => {
-        if (Enumerable.From(this.students).All(x => x.id !== student.id)) {
-            return;
-        }
         student.class = null;
+        for (let i = 0; i < this.students.length; i++) {
+            if (this.students[i].id === student.id) {
+                this.students.splice(i, 1);
+                return;
+            }
+        }
     }
 
     prepare = (name: string) => {

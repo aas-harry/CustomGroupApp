@@ -66,6 +66,13 @@
         });
     }
 
+    function resetGrid() {
+        for (var j = 1; j <= 6; j++) {
+            $("#jqgrid" + j + "-container").html("<table id='jqGrid" + j + "'></table>");
+        }
+        $("#summary-container").html("<table id='summary-grid'></table>");
+    }
+
     function createMixClasses() {
         var classesDefn = new ClassesDefinition(testFile);
         var bandSet = classesDefn.createBandSet("class",
@@ -82,8 +89,20 @@
         //band.classes[1].count -= 3;
         //band.classes[2].count -= 2;
 
-        var separatedStudents = getSeparatedStudents(classesDefn);
-        bandSet.prepare("Mix", classesDefn.students, null, separatedStudents);
+        var separatedStudents = [
+            createStudentSet(classesDefn.students, ["CHELLIAH Aaron", "LOH Gareth"]),
+            createStudentSet(classesDefn.students, ["WRIGHT Andrew", "MURRAY Jye"]),
+            createStudentSet(classesDefn.students, ["DIXON Alexander", "ATTEYA Chloe"])
+        ];
+        var joinedStudents = [
+            createStudentSet(classesDefn.students, ["DANG Nathan", "NEWTON Sam"]),
+            createStudentSet(classesDefn.students, ["THOMAS Sarah", "BASTIAN Mia", "NOGAJSKI Nicholas"]), // class 3
+            createStudentSet(classesDefn.students, ["WILTON Simon", "DONA Elise", "MUNTER Hayden"])
+        ];
+
+        bandSet.prepare("Mix", classesDefn.students, joinedStudents, separatedStudents);
+
+        resetGrid();
 
         var classes = band.classes;
         for (var i = 1; i <= classes.length; i++) {
@@ -97,17 +116,19 @@
                         { label: 'Name', name: 'name', width: 200 },
                         { label: 'Sex', name: 'gender', width: 50 },
                         { label: 'Score', name: 'score', width: 80 },
-                        { label: 'Class', name: 'classNo', width: 80 }
+                        { label: 'Class', name: 'classNo', width: 80 },
+                        {
+                            label: 'Flag',
+                            name: 'canMoveToOtherClass',
+                            width: 80,
+                            formatter: formatColor
+                        }
                     ],
                     viewrecords: true, // show the current page, data rang and total records on the toolbar
                     caption: classes[i - 1].name
                 });
         }
-        for (var j = classes.length + 1; j <= 6; j++) {
-
-            $("#jqGrid" + j).replaceWith("");
-        }
-
+       
 
         $("#summary-grid")
             .jqGrid({
@@ -122,6 +143,7 @@
                 caption: "Group Summary"
             });
     }
+
 
     function createStreamingClasses() {
         var classesDefn = new ClassesDefinition(testFile);
@@ -140,10 +162,22 @@
         //band.classes[1].count -= 3;
         //band.classes[2].count -= 2;
 
-        var separatedStudents = []; //getSeparatedStudents(classesDefn);
-        debugger;
-        bandSet.prepare("Maths", classesDefn.students, null, separatedStudents);
+        var separatedStudents = [
+           createStudentSet(classesDefn.students, ["CHELLIAH Aaron", "LOH Gareth"]),
+           createStudentSet(classesDefn.students, ["WRIGHT Andrew", "MURRAY Jye"]),
+           createStudentSet(classesDefn.students, ["DIXON Alexander", "ATTEYA Chloe"])
+        ];
+        var joinedStudents = [
+            createStudentSet(classesDefn.students, ["DANG Nathan", "NEWTON Sam"]),
+            createStudentSet(classesDefn.students, ["THOMAS Sarah", "BASTIAN Mia", "NOGAJSKI Nicholas"]), // class 3
+            createStudentSet(classesDefn.students, ["WILTON Simon", "DONA Elise", "MUNTER Hayden"])
+        ];
+
+        bandSet.prepare("Maths", classesDefn.students, joinedStudents, separatedStudents);
         var classes = band.classes;
+
+        resetGrid();
+        
 
         for (var i = 1; i <= classes.length; i++) {
 
@@ -156,15 +190,17 @@
                         { label: 'Name', name: 'name', width: 200 },
                         { label: 'Sex', name: 'gender', width: 50 },
                         { label: 'Score', name: 'score', width: 80 },
-                        { label: 'Class', name: 'classNo', width: 80 }
+                        { label: 'Class', name: 'classNo', width: 80 },
+                        {
+                            label: 'Flag',
+                            name: 'canMoveToOtherClass',
+                            width: 80,
+                            formatter: formatColor
+                        }
                     ],
                     viewrecords: true, // show the current page, data rang and total records on the toolbar
                     caption: classes[i - 1].name
                 });
-        }
-        for (var j = classes.length + 1; j <= 6; j++) {
-
-            $("#jqGrid" + j).replaceWith("");
         }
 
         $("#summary-grid")
@@ -181,6 +217,20 @@
             });
     }
 
+    function formatColor(cellValue, options, rowObject) {
+        var color = (cellValue) ? "green" : "red";
+        var cellHtml = "<span style='color:" +
+            color +
+            "' originalValue='" +
+            cellValue +
+            "'>" +
+            cellValue +
+            "</span>";
+
+        return cellHtml;
+    }
+
+
     function getSeparatedStudents(classes) {
         var studentSet1 = new StudentSet();
         studentSet1.students.push(classes.students[0]);
@@ -195,11 +245,31 @@
         return [studentSet1, studentSet2];
     }
 
+    function findStudent(students, name) {
+        for (var i = 0; i < students.length; i++) {
+            if (students[i].name === name) {
+                return students[i];
+            }
+        }
+        return null;
+    }
+
+    function createStudentSet(students, names) {
+        var studentSet = new StudentSet();
+        for (var i = 0; i < names.length; i++) {
+            var student1 = findStudent(students, names[i]);
+            if (student1) {
+                studentSet.students.push(student1);
+            }
+        }
+        return studentSet;
+    }
+
     function createBandingClasses() {
-        var classDefn = new ClassesDefinition(testFile);
+        var classesDefn = new ClassesDefinition(testFile);
         // Create two bands
-        var bandSet = classDefn.createBandSet("band",
-            classDefn.studentCount,
+        var bandSet = classesDefn.createBandSet("band",
+            classesDefn.studentCount,
             2,
             BandType.Custom,
             BandStreamType.Streaming,
@@ -208,9 +278,22 @@
         bandSet.bands[0].setClassCount(3);
         bandSet.bands[1].setClassCount(3);
 
-        var separatedStudents = getSeparatedStudents(classDefn);
-        bandSet.prepare("Band", classDefn.students, null, separatedStudents);
+        var separatedStudents = [
+                 createStudentSet(classesDefn.students, ["CHELLIAH Aaron", "LOH Gareth"]),
+                 createStudentSet(classesDefn.students, ["WRIGHT Andrew", "MURRAY Jye"]),
+                 createStudentSet(classesDefn.students, ["DIXON Alexander", "ATTEYA Chloe"])
+        ];
+        var joinedStudents = [
+            createStudentSet(classesDefn.students, ["DANG Nathan", "NEWTON Sam"]),
+            createStudentSet(classesDefn.students, ["THOMAS Sarah", "BASTIAN Mia", "NOGAJSKI Nicholas"]), // class 3
+            createStudentSet(classesDefn.students, ["WILTON Simon", "DONA Elise", "MUNTER Hayden"])
+        ];
+
+        bandSet.prepare("Band", classesDefn.students, joinedStudents, separatedStudents);
         var tmpClasses = bandSet.bands[0].classes.concat(bandSet.bands[1].classes);
+
+        resetGrid();
+
         for (var i = 1; i <= tmpClasses.length; i++) {
 
             $("#jqGrid" + i)
@@ -222,16 +305,19 @@
                         { label: 'Name', name: 'name', width: 200 },
                         { label: 'Sex', name: 'gender', width: 50 },
                         { label: 'Score', name: 'score', width: 80 },
-                        { label: 'Class', name: 'classNo', width: 80 }
+                        { label: 'Class', name: 'classNo', width: 80 },
+                        {
+                            label: 'Flag',
+                            name: 'canMoveToOtherClass',
+                            width: 80,
+                            formatter: formatColor
+                        }
+
                     ],
                     viewrecords: true, // show the current page, data rang and total records on the toolbar
                     caption: tmpClasses[i - 1].name
                 });
         }
-
-        //for (var j = classes.singleBand.classes.length + 1; j <= 6; j++) {
-        //    $("#jqGrid" + j).replaceWith("");
-        //}
 
         $("#summary-grid")
             .jqGrid({
@@ -248,11 +334,10 @@
     }
 
     function createTopMidBottomClasses() {
-        var classes = new ClassesDefinition(testFile);
+        var classesDefn = new ClassesDefinition(testFile);
         // Create two bands
-        debugger;
-        var bandSet = classes.createTopMiddleBottomBandSet("band",
-            classes.studentCount,
+        var bandSet = classesDefn.createTopMiddleBottomBandSet("band",
+            classesDefn.studentCount,
             BandType.Custom,
             BandStreamType.Streaming,
             StreamType.OverallAbilty,
@@ -260,8 +345,23 @@
         bandSet.bands[0].setClassCount(3);
         bandSet.bands[1].setClassCount(2);
         bandSet.bands[2].setClassCount(1);
-        bandSet.prepare("Band", classes.students);
+
+        var separatedStudents = [
+              createStudentSet(classesDefn.students, ["CHELLIAH Aaron", "LOH Gareth"]),
+              createStudentSet(classesDefn.students, ["WRIGHT Andrew", "MURRAY Jye"]),
+              createStudentSet(classesDefn.students, ["DIXON Alexander", "ATTEYA Chloe"])
+        ];
+        var joinedStudents = [
+            createStudentSet(classesDefn.students, ["DANG Nathan", "NEWTON Sam"]),
+            createStudentSet(classesDefn.students, ["THOMAS Sarah", "BASTIAN Mia", "NOGAJSKI Nicholas"]), // class 3
+            createStudentSet(classesDefn.students, ["WILTON Simon", "DONA Elise", "MUNTER Hayden"])
+        ];
+
+        bandSet.prepare("Band", classesDefn.students, joinedStudents, separatedStudents);
         var tmpClasses = bandSet.bands[0].classes.concat(bandSet.bands[1].classes).concat(bandSet.bands[2].classes);
+        resetGrid();
+
+
         for (var i = 1; i <= tmpClasses.length; i++) {
 
             $("#jqGrid" + i)
@@ -273,7 +373,14 @@
                         { label: 'Name', name: 'name', width: 200 },
                         { label: 'Sex', name: 'gender', width: 50 },
                         { label: 'Score', name: 'score', width: 80 },
-                        { label: 'Class', name: 'classNo', width: 80 }
+                        { label: 'Class', name: 'classNo', width: 80 },
+                        {
+                            label: 'Flag',
+                            name: 'canMoveToOtherClass',
+                            width: 80,
+                            formatter: formatColor
+                        }
+
                     ],
                     viewrecords: true, // show the current page, data rang and total records on the toolbar
                     caption: tmpClasses[i - 1].name
@@ -281,7 +388,7 @@
         }
 
         //for (var j = classes.singleBand.classes.length + 1; j <= 6; j++) {
-        //    $("#jqGrid" + j).replaceWith("");
+        //    $("#jqGrid" + j).html("");
         //}
 
 
