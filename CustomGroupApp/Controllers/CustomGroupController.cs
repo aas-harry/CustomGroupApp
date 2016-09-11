@@ -30,5 +30,27 @@ namespace CustomGroupApp.Controllers
 
             return Json(new {Test = test, Results = results});
         }
+
+        public ActionResult CustomGroupWizard()
+        {
+            return View("CustomGroupWizard");
+        }
+
+        public ActionResult SelectGroupingTypeStep()
+        {
+            return View("SelectGroupingType");
+        }
+        public ActionResult EnterClassConfigurationsStep()
+        {
+            return View("EnterClassConfigurations");
+        }
+        public ActionResult SaveCustomGroupStep()
+        {
+            return View("SaveCustomGroup");
+        }
+        public ActionResult StudentGroupingOptionsStep()
+        {
+            return View("StudentGroupingOptions");
+        }
     }
 }

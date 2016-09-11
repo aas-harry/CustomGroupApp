@@ -109,6 +109,14 @@ var SearchClassContext = (function () {
 var GroupingHelper = (function () {
     function GroupingHelper() {
         var _this = this;
+        this.createBlankClasses = function (parent, totalStudents, classCount) {
+            var classSizes = _this.calculateClassesSize(totalStudents, classCount);
+            var classes = new Array();
+            for (var i = 0; i < classCount; i++) {
+                classes.push(new ClassDefinition(parent, i + 1, classSizes[i]));
+            }
+            return classes;
+        };
         this.calculateClassesSize = function (totalStudents, classCount) {
             var studentInClass = Math.floor(totalStudents / classCount);
             var remainingStudents = totalStudents - (studentInClass * classCount);
@@ -194,7 +202,8 @@ var GroupingHelper = (function () {
                 var studentSet = joinedStudents_1[_i];
                 var allocatedClasses = new Array();
                 var studentClasses = Enumerable.From(studentSet.students)
-                    .GroupBy(function (x) { return x.classNo; }, function (x) { return x; }).ToArray();
+                    .GroupBy(function (x) { return x.classNo; }, function (x) { return x; })
+                    .ToArray();
                 // All students are already in the same class
                 if (studentClasses.length === 1) {
                     for (var _a = 0, _b = studentClasses[0].source; _a < _b.length; _a++) {
@@ -222,12 +231,14 @@ var GroupingHelper = (function () {
                         if (s.classNo === classDest) {
                             continue;
                         }
-                        var replacement = _this.findStudentReplacement(s, classes[classDest - 1].students, allocatedClasses, true);
+                        var replacement = _this
+                            .findStudentReplacement(s, classes[classDest - 1].students, allocatedClasses, true);
                         // if cannot find the replacement student with the same gender, try again with any gender
                         if (replacement == null &&
                             Enumerable.From(classes).SelectMany(function (c) { return c.students; }).Any(function (x) { return x.gender === "M"; }) &&
                             Enumerable.From(classes).SelectMany(function (c) { return c.students; }).Any(function (x) { return x.gender === "F"; })) {
-                            replacement = _this.findStudentReplacement(s, classes[classDest - 1].students, allocatedClasses, false);
+                            replacement = _this
+                                .findStudentReplacement(s, classes[classDest - 1].students, allocatedClasses, false);
                         }
                         console.log("Student: " + s.name, s.classNo, replacement.name, replacement.classNo);
                         if (replacement != null) {
@@ -243,7 +254,9 @@ var GroupingHelper = (function () {
             var tmpStudents;
             if (sameGender) {
                 tmpStudents = Enumerable.From(students)
-                    .Where(function (s) { return s.canMoveToOtherClass && s.gender === student.gender && !Enumerable.From(allocatedClasses).Contains(s.classNo); })
+                    .Where(function (s) { return s.canMoveToOtherClass &&
+                    s.gender === student.gender &&
+                    !Enumerable.From(allocatedClasses).Contains(s.classNo); })
                     .Select(function (s) { return s; })
                     .ToArray();
             }
@@ -273,18 +286,29 @@ var GroupingHelper = (function () {
             }
             else {
                 var femaleStudents = Enumerable.From(students).Where(function (s) { return (s.gender === "F"); }).Select(function (s) { return s; }).ToArray();
-                var maleStudents = Enumerable.From(students).Where(function (s) { return (s.gender === "F"); }).Select(function (s) { return s; }).ToArray();
+                var maleStudents = Enumerable.From(students).Where(function (s) { return (s.gender === "M"); }).Select(function (s) { return s; }).ToArray();
+                var parentBand = classes[0].parent;
                 if (femaleStudents.length < maleStudents.length) {
-                    _this.groupByStreamingInternal(classes, femaleStudents);
+                    _this.genderSplitByStreaming(parentBand, femaleStudents, classes);
                     _this.groupByStreamingInternal(classes, maleStudents);
                 }
                 else {
-                    _this.groupByStreamingInternal(classes, maleStudents);
+                    _this.genderSplitByStreaming(parentBand, maleStudents, classes);
                     _this.groupByStreamingInternal(classes, femaleStudents);
                 }
             }
             _this.handleJoinedStudents(classes, joinedStudents);
             _this.handleSeparatedStudents(classes, separatedStudents);
+        };
+        this.genderSplitByStreaming = function (parentBand, students, classes) {
+            var tmpClasses = _this.createBlankClasses(parentBand, students.length, classes.length);
+            _this.groupByStreamingInternal(tmpClasses, students);
+            for (var i = 0; i < tmpClasses.length; i++) {
+                for (var _i = 0, _a = tmpClasses[i].students; _i < _a.length; _i++) {
+                    var s = _a[_i];
+                    classes[i].addStudent(s);
+                }
+            }
         };
         this.groupByMixAbility = function (classes, students, streamType, mixBoysGirls, joinedStudents, separatedStudents) {
             if (joinedStudents === void 0) { joinedStudents = []; }
@@ -295,7 +319,7 @@ var GroupingHelper = (function () {
             }
             else {
                 var femaleStudents = Enumerable.From(students).Where(function (s) { return (s.gender === "F"); }).Select(function (s) { return s; }).ToArray();
-                var maleStudents = Enumerable.From(students).Where(function (s) { return (s.gender === "F"); }).Select(function (s) { return s; }).ToArray();
+                var maleStudents = Enumerable.From(students).Where(function (s) { return (s.gender === "M"); }).Select(function (s) { return s; }).ToArray();
                 if (femaleStudents.length < maleStudents.length) {
                     _this.groupByMixAbilityInternal(classes, femaleStudents);
                     _this.groupByMixAbilityInternal(classes, maleStudents, true);
@@ -310,9 +334,9 @@ var GroupingHelper = (function () {
         };
         this.groupByMixAbilityInternal = function (classes, students, orderReversed) {
             if (orderReversed === void 0) { orderReversed = false; }
-            var sortedStudents = orderReversed === false ?
-                Enumerable.From(students).OrderByDescending(function (s) { return s.score; }).Select(function (s) { return s; }).ToArray() :
-                Enumerable.From(students).OrderBy(function (s) { return s.score; }).Select(function (s) { return s; }).ToArray();
+            var sortedStudents = orderReversed === false
+                ? Enumerable.From(students).OrderByDescending(function (s) { return s.score; }).Select(function (s) { return s; }).ToArray()
+                : Enumerable.From(students).OrderBy(function (s) { return s.score; }).Select(function (s) { return s; }).ToArray();
             var classCount = classes.length;
             var nextClass = new SearchClassContext(0, 0, classCount - 1, false);
             for (var i = 0; i < sortedStudents.length; i++) {
@@ -364,13 +388,10 @@ var GroupingHelper = (function () {
         this.groupByStreamingInternal = function (classes, students) {
             var sortedStudents = Enumerable.From(students).OrderByDescending(function (s) { return s.score; }).Select(function (s) { return s; }).ToArray();
             var classNo = 0;
-            var numberStudentsInClass = 0;
             for (var i = 0; i < sortedStudents.length; i++) {
                 classes[classNo].addStudent(sortedStudents[i]);
-                numberStudentsInClass++;
-                if (classes[classNo].count <= numberStudentsInClass) {
+                if (classes[classNo].moreStudents <= 0) {
                     classNo++;
-                    numberStudentsInClass = 0;
                 }
             }
             return classes;
@@ -432,7 +453,7 @@ var ClassDefinition = (function () {
         this.calculateClassesAverage = function () {
             _this.average = Enumerable.From(_this.students).Average(function (x) { return x.score; });
             var boys = Enumerable.From(_this.students).Where(function (x) { return x.gender === "M"; }).ToArray();
-            var girls = Enumerable.From(_this.students).Where(function (x) { return x.gender === "M"; }).ToArray();
+            var girls = Enumerable.From(_this.students).Where(function (x) { return x.gender === "F"; }).ToArray();
             _this.boysCount = boys.length;
             if (_this.boysCount === 0) {
                 _this.boysAverage = 0;
@@ -440,7 +461,7 @@ var ClassDefinition = (function () {
             else {
                 _this.boysAverage = Enumerable.From(boys).Average(function (x) { return x.score; });
             }
-            _this.girlsCount = boys.length;
+            _this.girlsCount = girls.length;
             if (_this.girlsCount === 0) {
                 _this.girlsAverage = 0;
             }
@@ -488,7 +509,7 @@ var BandDefinition = (function () {
         this.groupHelper = new GroupingHelper();
         this.setClassCount = function (classCount) {
             _this.classCount = classCount;
-            _this.calculateClassesSize(classCount);
+            _this.classes = _this.groupHelper.createBlankClasses(_this, _this.studentCount, classCount);
         };
         this.calculateClassesAverage = function () {
             for (var _i = 0, _a = _this.classes; _i < _a.length; _i++) {
@@ -707,4 +728,60 @@ var ClassesDefinition = (function () {
     });
     return ClassesDefinition;
 }());
+var CustomGroupViewModel = (function (_super) {
+    __extends(CustomGroupViewModel, _super);
+    function CustomGroupViewModel() {
+        _super.call(this);
+        this.customGroupSteps = [
+            "SelectGroupingType",
+            "EnterClassConfigurations",
+            "StudentGroupingOptions",
+            "SaveCustomGroup"
+        ];
+        this.groupingOptions = new kendo.data.ObservableArray([
+            { caption: "Mixed Ability", value: GroupingMethod.MixedAbility, id: "mixed-ability" },
+            { caption: "Streaming", value: GroupingMethod.Streaming, id: "streaming" },
+            { caption: "Banding", value: GroupingMethod.Banding, id: "banding" },
+            { caption: "Top, Mixed Middle, Lowest", value: GroupingMethod.TopMiddleLowest, id: "top-middle-lowest" },
+            { caption: "Language", value: GroupingMethod.Language, id: "languages" }
+        ]);
+        this.streamingOptions = new kendo.data.ObservableArray([
+            { caption: "Overall Ability", value: StreamType.OverallAbilty, id: "overall-ability" },
+            { caption: "English", value: StreamType.English, id: "english" },
+            { caption: "Maths Achievement", value: StreamType.MathsAchievement, id: "maths-Achievement" }
+        ]);
+        this.topMiddleLowestGroupingOptions = [
+            { caption: "Streaming", value: BandStreamType.Streaming, id: "streaming-tml" },
+            { caption: "Parallel", value: BandStreamType.Parallel, id: "parallel-tml" },
+        ];
+        this.selectedGroupingOption = 1;
+        this.selectedTopClassGroupingOption = 1;
+        this.selectedLowestClassGroupingOption = 1;
+        this.currentGroupStep = 0;
+        this.nextStep = function () {
+            $.ajax({
+                type: "POST",
+                url: 'EnterClassConfigurationsStep',
+                dataType: "html",
+                success: function (data) {
+                    $("#custom-group-content").html(data);
+                }
+            });
+        };
+        this.previousStep = function (e) {
+            $.ajax({
+                type: "POST",
+                url: 'SelectGroupingTypeStep',
+                dataType: "html",
+                success: function (data) {
+                    $("#custom-group-content").html(data);
+                }
+            });
+        };
+        this.cancelStep = function (e) {
+            console.log("cancelStep");
+        };
+    }
+    return CustomGroupViewModel;
+}(kendo.data.ObservableObject));
 //# sourceMappingURL=custom-group.js.map

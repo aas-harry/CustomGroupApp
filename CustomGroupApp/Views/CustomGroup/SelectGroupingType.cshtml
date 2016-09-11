@@ -1,0 +1,45 @@
+﻿
+<div>
+    <span style="margin-right: 10px">Step 1:</span>Choose a grouping option.
+</div>
+<div class="panel panel-primary" style="width: 600px">
+    <div class="panel-body">
+        Help text goes here
+    </div>
+</div>
+<div style="margin: 20px">
+    <div>
+        <input type="radio" value="0" data-bind="checked:selectedGroupingOption"/>
+        <span>Mixed Ability</span>
+    </div>
+    <div>
+        <input type="radio" value="1" data-bind="checked:selectedGroupingOption"/>
+        <span>Streaming</span>
+    </div>
+    <div>
+        <input type="radio" value="2" data-bind="checked:selectedGroupingOption"/>
+        <span>Banding</span>
+    </div>
+    <div>
+        <input type="radio" value="3" data-bind="checked:selectedGroupingOption"/>
+        <span>Top, Mixed Middle, Lowest</span>
+        <div style="margin: 10px">
+            <table id="top_mixed_lowest">
+                <tr>
+                    <td style="width: 200px; padding-left: 20px;">Top Classes:</td>
+                    <td style="width: 100px;"> <input type="radio" name="topClasses" value="0" data-bind="checked: selectedTopClassGroupingOption">Streaming</td>
+                    <td style="width: 100px;"> <input type="radio" name="topClasses" value="1" data-bind="checked: selectedTopClassGroupingOption">Parallel</td>
+                </tr>
+                <tr>
+                    <td style="width: 200px; padding-left: 20px;">Lowest Classes:</td>
+                    <td style="width: 100px;"> <input type="radio" name="lowestClasses" value="0" data-bind="checked: selectedLowestClassGroupingOption">Streaming</td>
+                    <td style="width: 100px;"> <input type="radio" name="lowestClasses" value="1" data-bind="checked: selectedLowestClassGroupingOption">Parallel</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div>
+        <input type="radio" value="5" data-bind="checked:selectedGroupingOption"/>
+        <span>Language Preferences</span>
+    </div>
+</div>

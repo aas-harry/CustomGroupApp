@@ -1,11 +1,12 @@
 ﻿<div class="container-fluid">
     <div class="row">
-        <button class="btn-default" onClick="getResults()">Get Results</button>
-        <button class="btn-default" onClick="createMixClasses()">Create Mix</button>
-        <button class="btn-default" onClick="createStreamingClasses()">Create streaming</button>
-        <button class="btn-default" onClick="createBandingClasses()">Create Banding</button>
-        <button class="btn-default" onclick="createTopMidBottomClasses()">Create TMB</button>
-        <input type="checkbox" id="mixBoysGirls" value="true" style="margin-right: 10px; margin-left: 10px"/>Mix Boys and Girls
+        <span>@Html.ActionLink("New Classes", "CustomGroupWizard", "CustomGroup")</span>
+        <button class="btn btn-default" onClick="getResults()">Get Results</button>
+        <button class="btn btn-default" onClick="createMixClasses()">Create Mix</button>
+        <button class="btn btn-default" onClick="createStreamingClasses()">Create streaming</button>
+        <button class="btn btn-default" onClick="createBandingClasses()">Create Banding</button>
+        <button class="btn btn-default" onclick="createTopMidBottomClasses()">Create TMB</button>
+        <input type="checkbox" id="mixBoysGirls" value="0" style="margin-right: 10px; margin-left: 10px" onclick="changeMixBoysGirls(this)"/>Mix Boys and Girls
         <div id="message-text"></div>
     </div>
 
@@ -40,6 +41,41 @@
 </div>
 <script>
     var testFile = new TestFile();
+    var mixBoysGirls = false;
+    var detailCols = [
+        { label: 'Name', name: 'name', width: 200 },
+        { label: 'Sex', name: 'gender', width: 50 },
+        { label: 'Score', name: 'score', width: 80 },
+        { label: 'Class', name: 'classNo', width: 80 },
+        {
+            label: 'Flag',
+            name: 'canMoveToOtherClass',
+            width: 80,
+            formatter: formatColor
+        }
+    ];
+    var summaryCols = [
+        { label: 'Class', name: 'index', width: 150 },
+        { label: 'Count', name: 'count', width: 50 },
+        { label: 'Average', name: 'average', width: 150, formatter: 'number', formatoptions: { decimalPlaces: 2 } },
+        { label: 'Boys', name: 'boysCount', width: 50 },
+        {
+            label: 'Boys Average',
+            name: 'boysAverage',
+            width: 150,
+            formatter: 'number',
+            formatoptions: { decimalPlaces: 2 }
+        },
+        { label: 'Girls', name: 'girlsCount', width: 50 },
+        {
+            label: 'Girls Average',
+            name: 'girlsAverage',
+            width: 150,
+            formatter: 'number',
+            formatoptions: { decimalPlaces: 2 }
+        }
+    ];
+
     $(document)
         .ready(function() {
 
@@ -67,6 +103,10 @@
         });
     }
 
+    function changeMixBoysGirls(e) {
+        mixBoysGirls = e.checked;
+    }
+
     function resetGrid() {
         for (var j = 1; j <= 6; j++) {
             $("#jqgrid" + j + "-container").html("<table id='jqGrid" + j + "'></table>");
@@ -75,16 +115,15 @@
     }
 
     function createMixClasses() {
-        debugger;
         var classesDefn = new ClassesDefinition(testFile);
-        var flag = $("#mixBoysGirls").value;
         var bandSet = classesDefn.createBandSet("class",
             classesDefn.studentCount,
             1,
             BandStreamType.Streaming,
             BandType.None,
             StreamType.OverallAbilty,
-            GroupingMethod.MixedAbility,$("#mixBoysGirls").checked);
+            GroupingMethod.MixedAbility,
+            mixBoysGirls);
 
         var band = bandSet.bands[0];
         band.setClassCount(5);
@@ -115,33 +154,17 @@
                     datatype: "local",
                     data: classes[i - 1].students,
                     height: 350,
-                    colModel: [
-                        { label: 'Name', name: 'name', width: 200 },
-                        { label: 'Sex', name: 'gender', width: 50 },
-                        { label: 'Score', name: 'score', width: 80 },
-                        { label: 'Class', name: 'classNo', width: 80 },
-                        {
-                            label: 'Flag',
-                            name: 'canMoveToOtherClass',
-                            width: 80,
-                            formatter: formatColor
-                        }
-                    ],
+                    colModel: detailCols,
                     viewrecords: true, // show the current page, data rang and total records on the toolbar
                     caption: classes[i - 1].name
                 });
         }
-       
 
-        $("#summary-grid")
+    $("#summary-grid")
             .jqGrid({
                 datatype: "local",
                 data: band.classes,
-                colModel: [
-                    { label: 'Class', name: 'index', width: 150 },
-                    { label: 'Count', name: 'count', width: 50 },
-                    { label: 'Average', name: 'average', width: 50 }
-                ],
+                colModel: summaryCols,
                 viewrecords: true, // show the current page, data rang and total records on the toolbar
                 caption: "Group Summary"
             });
@@ -156,7 +179,7 @@
             BandStreamType.Streaming,
             BandType.None,
             StreamType.OverallAbilty,
-            GroupingMethod.Streaming);
+            GroupingMethod.Streaming, mixBoysGirls);
         var band = bandSet.bands[0];
         band.streamType = StreamType.OverallAbilty;
 
@@ -166,9 +189,9 @@
         //band.classes[2].count -= 2;
 
         var separatedStudents = [
-           createStudentSet(classesDefn.students, ["CHELLIAH Aaron", "LOH Gareth"]),
-           createStudentSet(classesDefn.students, ["WRIGHT Andrew", "MURRAY Jye"]),
-           createStudentSet(classesDefn.students, ["DIXON Alexander", "ATTEYA Chloe"])
+            createStudentSet(classesDefn.students, ["CHELLIAH Aaron", "LOH Gareth"]),
+            createStudentSet(classesDefn.students, ["WRIGHT Andrew", "MURRAY Jye"]),
+            createStudentSet(classesDefn.students, ["DIXON Alexander", "ATTEYA Chloe"])
         ];
         var joinedStudents = [
             createStudentSet(classesDefn.students, ["DANG Nathan", "NEWTON Sam"]),
@@ -176,11 +199,13 @@
             createStudentSet(classesDefn.students, ["WILTON Simon", "DONA Elise", "MUNTER Hayden"])
         ];
 
+        //    bandSet.prepare("Maths", classesDefn.students, joinedStudents, separatedStudents); 
         bandSet.prepare("Maths", classesDefn.students, joinedStudents, separatedStudents);
+
         var classes = band.classes;
 
         resetGrid();
-        
+
 
         for (var i = 1; i <= classes.length; i++) {
 
@@ -189,18 +214,7 @@
                     datatype: "local",
                     data: classes[i - 1].students,
                     height: 350,
-                    colModel: [
-                        { label: 'Name', name: 'name', width: 200 },
-                        { label: 'Sex', name: 'gender', width: 50 },
-                        { label: 'Score', name: 'score', width: 80 },
-                        { label: 'Class', name: 'classNo', width: 80 },
-                        {
-                            label: 'Flag',
-                            name: 'canMoveToOtherClass',
-                            width: 80,
-                            formatter: formatColor
-                        }
-                    ],
+                    colModel: detailCols,
                     viewrecords: true, // show the current page, data rang and total records on the toolbar
                     caption: classes[i - 1].name
                 });
@@ -210,11 +224,7 @@
             .jqGrid({
                 datatype: "local",
                 data: classes,
-                colModel: [
-                    { label: 'Class', name: 'index', width: 150 },
-                    { label: 'Count', name: 'count', width: 50 },
-                    { label: 'Average', name: 'average', width: 50 }
-                ],
+                colModel: summaryCols,
                 viewrecords: true, // show the current page, data rang and total records on the toolbar
                 caption: "Group Summary"
             });
@@ -277,14 +287,14 @@
             BandType.Custom,
             BandStreamType.Streaming,
             StreamType.OverallAbilty,
-            GroupingMethod.MixedAbility);
+            GroupingMethod.MixedAbility, mixBoysGirls);
         bandSet.bands[0].setClassCount(3);
         bandSet.bands[1].setClassCount(3);
 
         var separatedStudents = [
-                 createStudentSet(classesDefn.students, ["CHELLIAH Aaron", "LOH Gareth"]),
-                 createStudentSet(classesDefn.students, ["WRIGHT Andrew", "MURRAY Jye"]),
-                 createStudentSet(classesDefn.students, ["DIXON Alexander", "ATTEYA Chloe"])
+            createStudentSet(classesDefn.students, ["CHELLIAH Aaron", "LOH Gareth"]),
+            createStudentSet(classesDefn.students, ["WRIGHT Andrew", "MURRAY Jye"]),
+            createStudentSet(classesDefn.students, ["DIXON Alexander", "ATTEYA Chloe"])
         ];
         var joinedStudents = [
             createStudentSet(classesDefn.students, ["DANG Nathan", "NEWTON Sam"]),
@@ -304,19 +314,7 @@
                     datatype: "local",
                     data: tmpClasses[i - 1].students,
                     height: 350,
-                    colModel: [
-                        { label: 'Name', name: 'name', width: 200 },
-                        { label: 'Sex', name: 'gender', width: 50 },
-                        { label: 'Score', name: 'score', width: 80 },
-                        { label: 'Class', name: 'classNo', width: 80 },
-                        {
-                            label: 'Flag',
-                            name: 'canMoveToOtherClass',
-                            width: 80,
-                            formatter: formatColor
-                        }
-
-                    ],
+                    colModel: detailCols,
                     viewrecords: true, // show the current page, data rang and total records on the toolbar
                     caption: tmpClasses[i - 1].name
                 });
@@ -326,11 +324,7 @@
             .jqGrid({
                 datatype: "local",
                 data: tmpClasses,
-                colModel: [
-                    { label: 'Class', name: 'index', width: 150 },
-                    { label: 'Count', name: 'count', width: 50 },
-                    { label: 'Average', name: 'average', width: 50 }
-                ],
+                colModel: summaryCols,
                 viewrecords: true, // show the current page, data rang and total records on the toolbar
                 caption: "Group Summary"
             });
@@ -344,15 +338,15 @@
             BandType.Custom,
             BandStreamType.Streaming,
             StreamType.OverallAbilty,
-            GroupingMethod.MixedAbility);
+            GroupingMethod.MixedAbility, mixBoysGirls);
         bandSet.bands[0].setClassCount(3);
         bandSet.bands[1].setClassCount(2);
         bandSet.bands[2].setClassCount(1);
 
         var separatedStudents = [
-              createStudentSet(classesDefn.students, ["CHELLIAH Aaron", "LOH Gareth"]),
-              createStudentSet(classesDefn.students, ["WRIGHT Andrew", "MURRAY Jye"]),
-              createStudentSet(classesDefn.students, ["DIXON Alexander", "ATTEYA Chloe"])
+            createStudentSet(classesDefn.students, ["CHELLIAH Aaron", "LOH Gareth"]),
+            createStudentSet(classesDefn.students, ["WRIGHT Andrew", "MURRAY Jye"]),
+            createStudentSet(classesDefn.students, ["DIXON Alexander", "ATTEYA Chloe"])
         ];
         var joinedStudents = [
             createStudentSet(classesDefn.students, ["DANG Nathan", "NEWTON Sam"]),
@@ -372,19 +366,7 @@
                     datatype: "local",
                     data: tmpClasses[i - 1].students,
                     height: 350,
-                    colModel: [
-                        { label: 'Name', name: 'name', width: 200 },
-                        { label: 'Sex', name: 'gender', width: 50 },
-                        { label: 'Score', name: 'score', width: 80 },
-                        { label: 'Class', name: 'classNo', width: 80 },
-                        {
-                            label: 'Flag',
-                            name: 'canMoveToOtherClass',
-                            width: 80,
-                            formatter: formatColor
-                        }
-
-                    ],
+                    colModel: detailCols,
                     viewrecords: true, // show the current page, data rang and total records on the toolbar
                     caption: tmpClasses[i - 1].name
                 });
@@ -399,11 +381,7 @@
             .jqGrid({
                 datatype: "local",
                 data: tmpClasses,
-                colModel: [
-                    { label: 'Class', name: 'index', width: 150 },
-                    { label: 'Count', name: 'count', width: 50 },
-                    { label: 'Average', name: 'average', width: 50 }
-                ],
+                colModel: summaryCols,
                 viewrecords: true, // show the current page, data rang and total records on the toolbar
                 caption: "Group Summary"
             });
