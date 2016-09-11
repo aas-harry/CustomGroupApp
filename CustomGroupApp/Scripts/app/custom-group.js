@@ -240,7 +240,7 @@ var GroupingHelper = (function () {
                             replacement = _this
                                 .findStudentReplacement(s, classes[classDest - 1].students, allocatedClasses, false);
                         }
-                        console.log("Student: " + s.name, s.classNo, replacement.name, replacement.classNo);
+                        // console.log("Student: " + s.name, s.classNo, replacement.name, replacement.classNo);
                         if (replacement != null) {
                             s.swapWith(replacement);
                             s.canMoveToOtherClass = false;
@@ -731,12 +731,13 @@ var ClassesDefinition = (function () {
 var CustomGroupViewModel = (function (_super) {
     __extends(CustomGroupViewModel, _super);
     function CustomGroupViewModel() {
+        var _this = this;
         _super.call(this);
         this.customGroupSteps = [
-            "SelectGroupingType",
-            "EnterClassConfigurations",
-            "StudentGroupingOptions",
-            "SaveCustomGroup"
+            "SelectGroupingTypeStep",
+            "enterClassConfigurationsStep",
+            "StudentGroupingOptionsStep",
+            "SaveCustomGroupStep"
         ];
         this.groupingOptions = new kendo.data.ObservableArray([
             { caption: "Mixed Ability", value: GroupingMethod.MixedAbility, id: "mixed-ability" },
@@ -752,33 +753,48 @@ var CustomGroupViewModel = (function (_super) {
         ]);
         this.topMiddleLowestGroupingOptions = [
             { caption: "Streaming", value: BandStreamType.Streaming, id: "streaming-tml" },
-            { caption: "Parallel", value: BandStreamType.Parallel, id: "parallel-tml" },
+            { caption: "Parallel", value: BandStreamType.Parallel, id: "parallel-tml" }
         ];
         this.selectedGroupingOption = 1;
         this.selectedTopClassGroupingOption = 1;
         this.selectedLowestClassGroupingOption = 1;
         this.currentGroupStep = 0;
+        this.isLastStep = false;
+        this.isFirstStep = true;
         this.nextStep = function () {
+            _super.prototype.set.call(_this, "isFirstStep", false);
+            _this.isFirstStep = false;
+            _this.currentGroupStep++;
+            if (_this.currentGroupStep >= _this.customGroupSteps.length) {
+                _super.prototype.set.call(_this, "isLastStep", true);
+            }
             $.ajax({
                 type: "POST",
-                url: 'EnterClassConfigurationsStep',
+                url: _this.customGroupSteps[_this.currentGroupStep],
                 dataType: "html",
                 success: function (data) {
                     $("#custom-group-content").html(data);
                 }
             });
         };
-        this.previousStep = function (e) {
+        this.previousStep = function () {
+            _super.prototype.set.call(_this, "isLastStep", false);
+            _this.isLastStep = false;
+            _this.currentGroupStep--;
+            if (_this.currentGroupStep <= 0) {
+                _this.isFirstStep = true;
+                _super.prototype.set.call(_this, "isFirstStep", true);
+            }
             $.ajax({
                 type: "POST",
-                url: 'SelectGroupingTypeStep',
+                url: _this.customGroupSteps[_this.currentGroupStep],
                 dataType: "html",
                 success: function (data) {
                     $("#custom-group-content").html(data);
                 }
             });
         };
-        this.cancelStep = function (e) {
+        this.cancelStep = function () {
             console.log("cancelStep");
         };
     }

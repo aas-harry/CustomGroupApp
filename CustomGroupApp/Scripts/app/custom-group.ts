@@ -248,7 +248,7 @@ class GroupingHelper {
                         replacement = this
                             .findStudentReplacement(s, classes[classDest - 1].students, allocatedClasses, false);
                     }
-                    console.log("Student: " + s.name, s.classNo, replacement.name, replacement.classNo);
+                    // console.log("Student: " + s.name, s.classNo, replacement.name, replacement.classNo);
                     if (replacement != null) {
                         s.swapWith(replacement);
                         s.canMoveToOtherClass = false;
@@ -836,11 +836,11 @@ class CustomGroupViewModel extends kendo.data.ObservableObject {
         super();
     }
 
-    customGroupSteps = [
-        "SelectGroupingType",
-        "EnterClassConfigurations",
-        "StudentGroupingOptions",
-        "SaveCustomGroup"
+    customGroupSteps : Array<string> =  [
+        "SelectGroupingTypeStep",
+        "enterClassConfigurationsStep",
+        "StudentGroupingOptionsStep",
+        "SaveCustomGroupStep"
     ];
 
     groupingOptions = new kendo.data.ObservableArray([
@@ -860,18 +860,27 @@ class CustomGroupViewModel extends kendo.data.ObservableObject {
 
     topMiddleLowestGroupingOptions = [
         { caption: "Streaming", value: BandStreamType.Streaming, id: "streaming-tml" },
-        { caption: "Parallel", value: BandStreamType.Parallel, id: "parallel-tml" },
+        { caption: "Parallel", value: BandStreamType.Parallel, id: "parallel-tml" }
     ];
 
     selectedGroupingOption = 1;
     selectedTopClassGroupingOption =  1;
     selectedLowestClassGroupingOption = 1;
     currentGroupStep = 0;
+    isLastStep = false;
+    isFirstStep = true;
 
     nextStep = () => {
+        super.set("isFirstStep", false);
+        this.isFirstStep = false;
+        this.currentGroupStep++;
+        if (this.currentGroupStep >= this.customGroupSteps.length) {
+            super.set("isLastStep", true);
+        }
+
         $.ajax({
             type: "POST",
-            url: 'EnterClassConfigurationsStep',
+            url: this.customGroupSteps[this.currentGroupStep],
             dataType: "html",
             success: data => {
                 $("#custom-group-content").html(data);
@@ -879,10 +888,18 @@ class CustomGroupViewModel extends kendo.data.ObservableObject {
 
         });
     };
-    previousStep = (e: any) => {
+    previousStep = () => {
+        super.set("isLastStep", false);
+        this.isLastStep = false;
+        this.currentGroupStep--;
+        if (this.currentGroupStep <= 0) {
+            this.isFirstStep = true;
+            super.set("isFirstStep", true);
+        }
+
         $.ajax({
             type: "POST",
-            url: 'SelectGroupingTypeStep',
+            url: this.customGroupSteps[this.currentGroupStep],
             dataType: "html",
             success: data => {
                 $("#custom-group-content").html(data);
@@ -890,7 +907,7 @@ class CustomGroupViewModel extends kendo.data.ObservableObject {
 
         });
     };
-    cancelStep = (e: any) => {
+    cancelStep = () => {
         console.log("cancelStep");  
     };
 }
