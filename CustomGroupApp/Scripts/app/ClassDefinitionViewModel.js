@@ -20,9 +20,15 @@ var ClassDefinitionViewModel = (function (_super) {
             _this.classes.splice(0, _this.classCount);
             for (var i = 1; i < _this.classCount; i++) {
                 _this.classes.push({ classNo: i, studentCount: 11 });
+                $("#classes-setting-container2").append("<span><input style='width: 80px; margin-right: 15px; margin-left: 10px; margin-bottom: 5px'" +
+                    "data-role='numerictextbox'" +
+                    "data-format='n0'" +
+                    "data-min='1'" +
+                    "data-max='30'></span");
             }
         };
         _super.prototype.init.call(this, this);
     }
     return ClassDefinitionViewModel;
 }(kendo.data.ObservableObject));
+//# sourceMappingURL=ClassDefinitionViewModel.js.map
