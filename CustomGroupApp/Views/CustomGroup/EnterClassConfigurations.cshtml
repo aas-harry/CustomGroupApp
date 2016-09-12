@@ -2,7 +2,47 @@
     <span style="margin-right: 10px">Step 2:</span>Enter number of classes
 </div>
 <div style="margin: 20px">
+    <div data-bind="visible: isCoedSchool">
+        <div>Choose students to include option:</div>
+        <div>
+            <input type="radio" value="0" data-bind="checked:selectedGenderOption"/>
+            <span>All Students</span>
+        </div>
+        <div>
+            <input type="radio" value="1" data-bind="checked:selectedGenderOption"/>
+            <span>Girls Only</span>
+        </div>
+        <div>
+            <input type="radio" value="2" data-bind="checked:selectedGenderOption"/>
+            <span>Boys Only</span>
+        </div>
+    </div>
+    <div data-bind="visible: isCoedSchool">
+        <input type="checkbox" name="mixGirlsBoys" value="0" data-bind="checked: checkboxMixChecked, events: { change: checkboxMixCheckedEvent }"> Mix girls and boys equally.
+    </div>
+
+    <div>
+        <input type="checkbox" value="0" data-bind="checked: checkboxChecked, events: { change: checkboxCheckedEvent }">
+        <span>Exclude students who are leaving school at the end of the year.</span>
+    </div>
+
+
+    <div>Number of students in this test: <span data-bind="text: studentCount"></span></div>
+
+    <div>
+        <span>Number of classes: </span>
+        <input data-role="numerictextbox"
+               data-format="n0"
+               data-min="1"
+               data-max="30"
+               data-bind="value: classCount,
+                              events: { change: onClassCountChange }"
+               style="width: 180px">
+        <span> (Max 30 Classes)</span>
+    </div>
+    @*<div>You can adjust the number of students in each classes below:</div>
+    <div id="standard-classes-settings"
+         style="width: 550px; min-height: 100px; border: 1px solid gray; padding-bottom: 8px">
+    </div>*@
 
 </div>
-
-

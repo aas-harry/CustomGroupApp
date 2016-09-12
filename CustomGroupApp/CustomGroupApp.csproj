@@ -995,6 +995,7 @@
     <Content Include="Views\CustomGroup\EnterClassConfigurations.cshtml" />
     <Content Include="Views\CustomGroup\StudentGroupingOptions.cshtml" />
     <Content Include="Views\CustomGroup\SaveCustomGroup.cshtml" />
+    <Content Include="Views\CustomGroup\ClassDefinitionView.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1019,8 +1020,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="Scripts\app\ClassDefinitionViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\common.ts" />
     <TypeScriptCompile Include="Scripts\app\custom-group.ts" />
+    <TypeScriptCompile Include="Scripts\app\CustomGroupViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\entities.ts" />
     <TypeScriptCompile Include="Scripts\app\IndividualStudentTestResult.ts" />
     <TypeScriptCompile Include="Scripts\app\repository.ts" />

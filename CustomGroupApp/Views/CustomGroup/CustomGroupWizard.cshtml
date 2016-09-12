@@ -11,7 +11,7 @@
         }
     </style>
 
-   <div class="container-fluid" id="custom-group-container">
+    <div class="container-fluid" id="custom-group-container">
         <div class="row">
             <div id="custom-group-content" style="margin: 20px 20px 40px 20px">
                 @Html.Partial("SelectGroupingType")
@@ -19,19 +19,20 @@
         </div>
         <div class="row">
             <hr/>
-            <div id="navigation-buttons">
+            <div id="navigation-buttons" style="margin-left: 20px">
                 <button class="btn btn-default" data-bind="click: nextStep, disabled: isLastStep ">Next</button>
                 <button class="btn btn-default" data-bind="click: previousStep, disabled: isFirstStep">Previous</button>
-                <button class="btn btn-default" onclick="checkViewModel()">Cancel</button>
+                <button class="btn btn-default" data-bind="click: cancelStep">Cancel</button>
             </div>
         </div>
     </div>
     <script>
 
         var customGroupViewModel = new CustomGroupViewModel();
+        customGroupViewModel.standardClassesSettingsElement = "standard-classes-settings";
+
         $(document)
-            .ready(function () {
-                
+            .ready(function() {
                 kendo.bind($("#custom-group-container"), customGroupViewModel);
             });
     </script>
