@@ -33,7 +33,7 @@ namespace CustomGroupApp.Controllers
 
         public ActionResult CustomGroupWizard()
         {
-            return View("ClassDefinitionView");
+            return View("CustomGroupWizard");
         }
 
         public ActionResult SelectGroupingTypeStep()
