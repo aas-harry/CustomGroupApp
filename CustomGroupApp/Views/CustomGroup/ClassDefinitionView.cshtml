@@ -15,11 +15,8 @@
                data-format="n0"
                data-min="1"
                data-max="30"
-               data-bind="value: classCount, events: { change: onClassCountChange }">
+               data-bind="value: classCount, events: { change: onClassCountChange, spin: onClassCountChange  }">
         <span>(Max 30 Classes)</span>
-    </div>
-    <div>
-        <button id="kendoIconButton">My Button</button>
     </div>
     <p>You can adjust the number of students in each classes below:</p>
     <div id="classes-settings-container" class="k-content wide">
@@ -51,10 +48,5 @@
     $(document)
         .ready(function () {
             kendo.bind($("#class-definition-container"), classDefinitionViewModel);
-
-            $("#kendoIconButton").kendoButton({
-                icon: "funnel"
-            });
-
         });
 </script>

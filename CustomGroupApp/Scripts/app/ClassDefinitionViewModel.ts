@@ -14,19 +14,33 @@
 
     classCount = 4;
 
+    onStudentCountChanged = (e) => {
+        
+    };
+
     onClassCountChange = () => {
         console.log("Class Cnt: ", this.classCount);
         this.classes.splice(0, this.classCount);
         for (let i = 1; i < this.classCount; i++) {
             this.classes.push({ classNo: i, studentCount: 11 });
-            $("#classes-setting-container2").append("<input id='class"+ i+ "' style='width: 80px; margin-right: 15px; margin-left: 10px; margin-bottom: 5px'" +
+            $("#classes-setting-container2").append("<input id='class"+ i+ "' style='width: 80px; margin-right: 10px; margin-left: 10px; margin-bottom: 5px'" +
               "></input");
 
-            $(`#class${i}`)
+            var foo = $(`#class${i}`)
                 .kendoNumericTextBox({
-                    options: { min: 1, max: 30, value: 11, format: "n0", bind: {value: this.classes[i]}}
+                    options: { format: "n0" },
+                    change: this.onStudentCountChanged,
+                    spin: this.onStudentCountChanged
+
                 } as kendo.ui.NumericTextBoxOptions);
+            var bar = <kendo.ui.NumericTextBox>$(`#class${i}`).data("kendoNumericTextBox");
+            bar.value(1);
+            bar.max(5);
+            bar.min(1);
+            bar.options.format = "n0";
+            bar.options.decimals = 0;
+            // widget.options.change(this.onStudentCountChanged as kendo.ui.NumericTextBoxChangeEvent);
         }
 
-    }
+    } 
 }

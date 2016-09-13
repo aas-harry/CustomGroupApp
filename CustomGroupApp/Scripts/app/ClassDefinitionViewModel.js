@@ -15,17 +15,27 @@ var ClassDefinitionViewModel = (function (_super) {
             { classNo: 4, studentCount: 14 }
         ]);
         this.classCount = 4;
+        this.onStudentCountChanged = function (e) {
+        };
         this.onClassCountChange = function () {
             console.log("Class Cnt: ", _this.classCount);
             _this.classes.splice(0, _this.classCount);
             for (var i = 1; i < _this.classCount; i++) {
                 _this.classes.push({ classNo: i, studentCount: 11 });
-                $("#classes-setting-container2").append("<input id='class" + i + "' style='width: 80px; margin-right: 15px; margin-left: 10px; margin-bottom: 5px'" +
+                $("#classes-setting-container2").append("<input id='class" + i + "' style='width: 80px; margin-right: 10px; margin-left: 10px; margin-bottom: 5px'" +
                     "></input");
-                $("#class" + i)
+                var foo = $("#class" + i)
                     .kendoNumericTextBox({
-                    options: { min: 1, max: 30, value: 11, format: "n0", bind: { value: _this.classes[i] } }
+                    options: { format: "n0" },
+                    change: _this.onStudentCountChanged,
+                    spin: _this.onStudentCountChanged
                 });
+                var bar = $("#class" + i).data("kendoNumericTextBox");
+                bar.value(1);
+                bar.max(5);
+                bar.min(1);
+                bar.options.format = "n0";
+                bar.options.decimals = 0;
             }
         };
         _super.prototype.init.call(this, this);
