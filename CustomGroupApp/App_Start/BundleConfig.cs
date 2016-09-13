@@ -41,11 +41,12 @@ namespace CustomGroupApp
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
-                      "~/Content/site.css",
-                      "~/Content/kendo/2016.1.226/kendo.common-fiori.min.css",
-                      "~/Content/kendo/2016.1.226/kendo.mobile.all.min.css",
-                      "~/Content/kendo/2016.1.226/kendo/2016.1.226/kendo.dataviz.min.css",
-                      "~/Content/kendo/2016.1.226/kendo.dataviz.fiori.min.css"
+                      "~/Content/site.css"
+                      //"~/Content/kendo/2016.1.226/kendo.common.min.css",
+                      //"~/Content/kendo/2016.1.226/kendo.common-fiori.min.css",
+                      //"~/Content/kendo/2016.1.226/kendo.mobile.all.min.css",
+                      //"~/Content/kendo/2016.1.226/kendo/2016.1.226/kendo.dataviz.min.css",
+                      //"~/Content/kendo/2016.1.226/kendo.dataviz.fiori.min.css"
                       ));
         }
     }
