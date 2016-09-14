@@ -12,7 +12,7 @@
         this.onBandCountChange();
     }
 
-    bandCount = 1;
+    bandCount = 6;
     classCount = 1;
 
     getClasses = (): Array<number> => {
@@ -49,13 +49,19 @@
                 colNo = 0;
             }
         }
-      //  $("#classes-settings-container").append(table.innerHTML);
+        kendo.init("#class-settings-container");
+        //  $("#classes-settings-container").append(table.innerHTML);
     }
 
     private createNumberInputField = () : HTMLElement => {
         var element = document.createElement("input") as HTMLInputElement;
         element.type = "text";
-        element.width = "200px";
+        
+        element.setAttribute('style', "width: 80px; margin-right: 15px; margin-left: 10px; margin-bottom: 5px");
+        element.setAttribute('data-max','10');
+        element.setAttribute('data-min', '1');
+        element.setAttribute('data-format', 'n0');
+        element.setAttribute('data-role', 'numerictextbox');
         return element;
     };
 

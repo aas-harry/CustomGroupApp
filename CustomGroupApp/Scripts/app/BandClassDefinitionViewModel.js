@@ -13,7 +13,7 @@ var BandClassDefinitionViewModel = (function (_super) {
         this.classes = new kendo.data.ObservableArray([
             { classNo: 1, studentCount: 1 }
         ]);
-        this.bandCount = 1;
+        this.bandCount = 6;
         this.classCount = 1;
         this.getClasses = function () {
             var classes = new Array();
@@ -45,12 +45,17 @@ var BandClassDefinitionViewModel = (function (_super) {
                     colNo = 0;
                 }
             }
+            kendo.init("#class-settings-container");
             //  $("#classes-settings-container").append(table.innerHTML);
         };
         this.createNumberInputField = function () {
             var element = document.createElement("input");
             element.type = "text";
-            element.width = "200px";
+            element.setAttribute('style', "width: 80px; margin-right: 15px; margin-left: 10px; margin-bottom: 5px");
+            element.setAttribute('data-max', '10');
+            element.setAttribute('data-min', '1');
+            element.setAttribute('data-format', 'n0');
+            element.setAttribute('data-role', 'numerictextbox');
             return element;
         };
         this.onClassCountChange = function () {
