@@ -1,18 +1,77 @@
-﻿class CustomGroupViewModel extends kendo.data.ObservableObject {
+﻿class StepDefinition {
+    constructor(public stepNo: number, public isCommon = true, public viewName: string) {
+        
+    }
+    views : Array<ViewDefinition> = [];
+}
+
+class ViewDefinition {
+    constructor(public groupType: GroupingMethod, public name: string) {
+    }
+}
+
+class StepCollection {
+    constructor() {
+        this.steps.push(new StepDefinition(1, true, "SelectGroupingTypeStep"));
+
+        const step2 = new StepDefinition(2, false, "ClassConfigurationStep");
+        step2.views.push(new ViewDefinition(GroupingMethod.Banding, "BandClassConfigurationStep"));
+        step2.views.push(new ViewDefinition(GroupingMethod.TopMiddleLowest, "TopMiddleLowestClassConfigurationStep"));
+        this.steps.push(step2);
+
+        this.steps.push(new StepDefinition(3, true, "StudentGroupingOptionsStep"));
+        this.steps.push(new StepDefinition(4, true, "SaveCustomGroupStep"));
+
+        this.stepCount = this.steps.length;
+        this.lastStep = this.steps[this.stepCount - 1];
+        this.firstStep = this.steps[0];
+    }
+
+    stepCount: number;
+    lastStep: StepDefinition;
+    firstStep: StepDefinition;
+
+    steps: Array<StepDefinition> = [];
+
+    getStepView = (groupType: any, stepNo: number): string => {
+        if (typeof groupType === "string") {
+            groupType = parseInt(groupType);
+        }
+        if (stepNo > this.steps.length || stepNo < 1) {
+            
+        }
+        var stepView = this.steps[stepNo - 1];
+        if (stepView.isCommon) {
+            return stepView.viewName;
+        }
+        var viewName = stepView.viewName;
+        for (let view of stepView.views) {
+            if (view.groupType === groupType) {
+                return view.name;
+            }
+        }
+        return viewName;
+    }
+
+    isLastStep = (stepNo: number): boolean => {
+        return this.lastStep.stepNo === stepNo;
+    }
+    isFirstStep = (stepNo: number): boolean => {
+        return this.firstStep.stepNo === stepNo;
+    }
+}
+
+
+class CustomGroupViewModel extends kendo.data.ObservableObject {
 
     constructor() {
         super();
     }
 
+    private stepCollection = new StepCollection();
+
     // Html elements
     standardClassesSettingsElement: HTMLElement;
-
-    customGroupSteps: Array<string> = [
-        "SelectGroupingTypeStep",
-        "enterClassConfigurationsStep",
-        "StudentGroupingOptionsStep",
-        "SaveCustomGroupStep"
-    ];
 
     groupingOptions = new kendo.data.ObservableArray([
         { caption: "Mixed Ability", value: GroupingMethod.MixedAbility, id: "mixed-ability" },
@@ -34,12 +93,12 @@
         { caption: "Parallel", value: BandStreamType.Parallel, id: "parallel-tml" }
     ];
 
-    selectedGroupingOption = 0;
+    selectedGroupingOption = 1;
     selectedStreamingOption = 0;
     selectedTopClassGroupingOption = 0;
     selectedLowestClassGroupingOption = 0;
     selectedGenderOption = 1;
-    currentGroupStep = 0;
+    currentGroupStep = 1;
     isLastStep = false;
     isFirstStep = true;
     isCoedSchool = true;
@@ -47,51 +106,42 @@
     classCount = 1;
 
     onClassCountChanged = () => {
-        
+
     }
 
     nextStep = () => {
-        super.set("isFirstStep", false);
         super.set("currentGroupStep", this.currentGroupStep + 1);
-
-        console.log("Step : ", this.currentGroupStep, this.customGroupSteps[this.currentGroupStep]);
-        if (this.currentGroupStep < this.customGroupSteps.length) {
-            $.ajax({
-                type: "POST",
-                url: this.customGroupSteps[this.currentGroupStep],
-                dataType: "html",
-                success: data => {
-                    $("#custom-group-content").html(data);
-                    kendo.unbind("#custom-group-container");
-                    kendo.bind($("#custom-group-container"), this);
-                }
-            });
-        } else {
-            super.set("isLastStep", true);
-        }
+        this.callGetViewStep(this.currentGroupStep);
     };
     previousStep = () => {
-        super.set("isLastStep", false);
         super.set("currentGroupStep", this.currentGroupStep - 1);
-
-        console.log("Step : ", this.currentGroupStep, this.customGroupSteps[this.currentGroupStep]);
-        if (this.currentGroupStep > 0) {
-            $.ajax({
-                type: "POST",
-                url: this.customGroupSteps[this.currentGroupStep],
-                dataType: "html",
-                success: data => {
-                    $("#custom-group-content").html(data);
-                    kendo.unbind("#custom-group-container");
-                    kendo.bind($("#custom-group-container"), this);
-                }
-            });
-        } else {
-            super.set("isFirstStep", true);
-        }
+        this.callGetViewStep(this.currentGroupStep);
     };
     cancelStep = () => {
         console.log("cancelStep");
     };
 
+    private callGetViewStep(stepNo: number) {
+        super.set("isFirstStep", this.stepCollection.isFirstStep(stepNo));
+        super.set("isLastStep", this.stepCollection.isLastStep(stepNo));
+
+        var viewName = this.stepCollection.getStepView(this.selectedGroupingOption, stepNo);
+        if (!viewName) {
+            return;
+        }
+        $.ajax({
+            type: "POST",
+            url: viewName,
+            dataType: "html",
+            success: data => {
+                this.showStep(data);
+            }
+        });
+    }
+
+    private showStep = (data) => {
+        $("#custom-group-content").html(data);
+        kendo.unbind("#custom-group-container");
+        kendo.bind($("#custom-group-container"), this);
+    }
 }

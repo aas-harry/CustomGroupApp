@@ -992,10 +992,11 @@
     <Content Include="Views\Shared\EditorTemplates\String.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\Time.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\Url.cshtml" />
-    <Content Include="Views\CustomGroup\EnterClassConfigurations.cshtml" />
+    <Content Include="Views\CustomGroup\ClassConfiguration.cshtml" />
     <Content Include="Views\CustomGroup\StudentGroupingOptions.cshtml" />
     <Content Include="Views\CustomGroup\SaveCustomGroup.cshtml" />
     <Content Include="Views\CustomGroup\ClassDefinitionView.cshtml" />
+    <Content Include="Views\CustomGroup\BandClassDefinitionView.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1020,6 +1021,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="Scripts\app\BandClassDefinitionViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\ClassDefinitionViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\common.ts" />
     <TypeScriptCompile Include="Scripts\app\custom-group.ts" />

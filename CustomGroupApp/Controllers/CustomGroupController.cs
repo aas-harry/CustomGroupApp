@@ -33,16 +33,16 @@ namespace CustomGroupApp.Controllers
 
         public ActionResult CustomGroupWizard()
         {
-            return View("CustomGroupWizard");
+            return View("BandClassDefinitionView");
         }
 
         public ActionResult SelectGroupingTypeStep()
         {
             return View("SelectGroupingType");
         }
-        public ActionResult EnterClassConfigurationsStep()
+        public ActionResult ClassConfigurationStep()
         {
-            return View("EnterClassConfigurations");
+            return View("ClassConfiguration");
         }
         public ActionResult SaveCustomGroupStep()
         {
