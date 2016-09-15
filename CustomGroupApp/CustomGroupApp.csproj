@@ -1028,6 +1028,7 @@
     <TypeScriptCompile Include="Scripts\app\CustomGroupViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\entities.ts" />
     <TypeScriptCompile Include="Scripts\app\IndividualStudentTestResult.ts" />
+    <TypeScriptCompile Include="Scripts\app\kendoHelper.ts" />
     <TypeScriptCompile Include="Scripts\app\repository.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\kendo-ui\kendo-ui.d.ts" />

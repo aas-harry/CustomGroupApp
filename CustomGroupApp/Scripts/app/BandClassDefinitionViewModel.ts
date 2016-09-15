@@ -14,7 +14,7 @@
 
     bandCount = 6;
     classCount = 1;
-
+    
     getClasses = (): Array<number> => {
         var classes = new Array<number>();
         this.classes.forEach((val: any) => {
@@ -24,7 +24,8 @@
         return classes;
     }
 
-    groupingHelper = new GroupingHelper();
+    private groupingHelper = new GroupingHelper();
+    private kendoHelper = new KendoHelper();
 
     onStudentCountChanged = () => {
     };
@@ -39,8 +40,7 @@
         var colNo = 0;
         var bandRow = header.insertRow();
         for (let i = 1; i <= this.bandCount; i++) {
-            const cell1 = bandRow.insertCell(colNo);
-            cell1.appendChild(this.createNumberInputField());
+            this.kendoHelper.createBandInputContainer(bandRow.insertCell(colNo), i);
             colNo++;
             cnt++;
             if (cnt === 3) {
@@ -49,19 +49,14 @@
                 colNo = 0;
             }
         }
-        kendo.init("#class-settings-container");
         //  $("#classes-settings-container").append(table.innerHTML);
     }
 
-    private createNumberInputField = () : HTMLElement => {
+    private createNumberInputField = (elementId: string, name: string): HTMLElement => {
         var element = document.createElement("input") as HTMLInputElement;
         element.type = "text";
-        
-        element.setAttribute('style', "width: 80px; margin-right: 15px; margin-left: 10px; margin-bottom: 5px");
-        element.setAttribute('data-max','10');
-        element.setAttribute('data-min', '1');
-        element.setAttribute('data-format', 'n0');
-        element.setAttribute('data-role', 'numerictextbox');
+        element.setAttribute("style","width: 100px");
+        element.id = elementId;
         return element;
     };
 

@@ -24,6 +24,7 @@ var BandClassDefinitionViewModel = (function (_super) {
             return classes;
         };
         this.groupingHelper = new GroupingHelper();
+        this.kendoHelper = new KendoHelper();
         this.onStudentCountChanged = function () {
         };
         this.onBandCountChange = function () {
@@ -35,8 +36,7 @@ var BandClassDefinitionViewModel = (function (_super) {
             var colNo = 0;
             var bandRow = header.insertRow();
             for (var i = 1; i <= _this.bandCount; i++) {
-                var cell1 = bandRow.insertCell(colNo);
-                cell1.appendChild(_this.createNumberInputField());
+                _this.kendoHelper.createBandInputContainer(bandRow.insertCell(colNo), i);
                 colNo++;
                 cnt++;
                 if (cnt === 3) {
@@ -45,17 +45,13 @@ var BandClassDefinitionViewModel = (function (_super) {
                     colNo = 0;
                 }
             }
-            kendo.init("#class-settings-container");
             //  $("#classes-settings-container").append(table.innerHTML);
         };
-        this.createNumberInputField = function () {
+        this.createNumberInputField = function (elementId, name) {
             var element = document.createElement("input");
             element.type = "text";
-            element.setAttribute('style', "width: 80px; margin-right: 15px; margin-left: 10px; margin-bottom: 5px");
-            element.setAttribute('data-max', '10');
-            element.setAttribute('data-min', '1');
-            element.setAttribute('data-format', 'n0');
-            element.setAttribute('data-role', 'numerictextbox');
+            element.setAttribute("style", "width: 100px");
+            element.id = elementId;
             return element;
         };
         this.onClassCountChange = function () {
