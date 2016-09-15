@@ -31,25 +31,23 @@
     };
 
     onBandCountChange = () => {
-        var tmpClasses = this.groupingHelper.calculateClassesSize(this.studentCount, this.bandCount);
         $("#classes-settings-container").html("<table id='band-definition-table'></table>");
         var table = document.getElementById("band-definition-table") as HTMLTableElement;
         var header = table.createTHead();
 
-        var cnt = 0;
         var colNo = 0;
         var columnHeader = header.insertRow();
         var bandRow = header.insertRow();
         var classCountRow = header.insertRow();
 
-        this.kendoHelper.createLabel(columnHeader.insertCell(), "");
-        this.kendoHelper.createLabel(bandRow.insertCell(), "Number of Classes");
-        this.kendoHelper.createLabel(classCountRow.insertCell(), "Class 1");
+        this.kendoHelper.createLabel(columnHeader.insertCell(0), "<span style='width: 100px'></span>");
+        this.kendoHelper.createLabel(bandRow.insertCell(0), "Number of Classes");
+        this.kendoHelper.createLabel(classCountRow.insertCell(0), "Class 1");
 
         for (let i = 1; i <= this.bandCount; i++) {
-            this.kendoHelper.createLabel(bandRow.insertCell(), "Band "+colNo);
-            this.kendoHelper.createBandInputContainer(bandRow.insertCell(), i);
-            this.kendoHelper.createBandInputContainer(classCountRow.insertCell(), i);
+            this.kendoHelper.createLabel(columnHeader.insertCell(i), "Band "+colNo);
+            this.kendoHelper.createBandInputContainer(bandRow.insertCell(i), i);
+            this.kendoHelper.createBandInputContainer(classCountRow.insertCell(i), i);
             colNo++;
           
         }

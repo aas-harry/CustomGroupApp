@@ -2,27 +2,30 @@
 {
     private integerFormat = "n0";
 
-    createBandInputContainer = (cell: HTMLTableCellElement, bandNo: number) => {
-        //var label = document.createElement("span");
-        //label.textContent = `Band ${bandNo}`;
-        //label.setAttribute("style", "margin-right: 5px");
-        //cell.appendChild(label);
+    createBandInputContainer = (cell: HTMLTableCellElement, bandNo: number, addLabel = false) => {
+        if (addLabel) {
+            const label = document.createElement("span");
+            label.textContent = `Band ${bandNo}`;
+            label.setAttribute("style", "margin-right: 5px");
+            cell.appendChild(label);
+        }
 
         var element = document.createElement("input") as HTMLInputElement;
         element.type = "text";
-        element.setAttribute("style", "width: 100px");
+        element.setAttribute("style", "margin-right: 15px; margin-left: 10px; margin-bottom: 5px");
         element.id = `Band${bandNo}`;
         cell.appendChild(element);
 
         this.createBandInputField(element.id, null);
     }
+
     createLabel = (cell: HTMLTableCellElement, description: string) => {
      var label = document.createElement("span");
         label.textContent = description;
         label.setAttribute("style", "margin-right: 5px");
         cell.appendChild(label);
-
     }
+
     createClassInputField = (
         element: string,
         callbackChangeEvent = null) => {

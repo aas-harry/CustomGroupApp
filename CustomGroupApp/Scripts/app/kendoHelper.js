@@ -2,14 +2,17 @@ var KendoHelper = (function () {
     function KendoHelper() {
         var _this = this;
         this.integerFormat = "n0";
-        this.createBandInputContainer = function (cell, bandNo) {
-            //var label = document.createElement("span");
-            //label.textContent = `Band ${bandNo}`;
-            //label.setAttribute("style", "margin-right: 5px");
-            //cell.appendChild(label);
+        this.createBandInputContainer = function (cell, bandNo, addLabel) {
+            if (addLabel === void 0) { addLabel = false; }
+            if (addLabel) {
+                var label = document.createElement("span");
+                label.textContent = "Band " + bandNo;
+                label.setAttribute("style", "margin-right: 5px");
+                cell.appendChild(label);
+            }
             var element = document.createElement("input");
             element.type = "text";
-            element.setAttribute("style", "width: 100px");
+            element.setAttribute("style", "margin-right: 15px; margin-left: 10px; margin-bottom: 5px");
             element.id = "Band" + bandNo;
             cell.appendChild(element);
             _this.createBandInputField(element.id, null);
@@ -49,4 +52,3 @@ var KendoHelper = (function () {
     }
     return KendoHelper;
 }());
-//# sourceMappingURL=kendoHelper.js.map
