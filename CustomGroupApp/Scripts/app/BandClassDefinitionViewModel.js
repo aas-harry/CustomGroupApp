@@ -23,32 +23,33 @@ var BandClassDefinitionViewModel = (function (_super) {
             });
             return classes;
         };
+        this.bandSet = new BandSet(null, "Custom", this.studentCount, 1);
         this.groupingHelper = new GroupingHelper();
         this.kendoHelper = new KendoHelper();
+        this.classRows = [];
         this.onStudentCountChanged = function () {
         };
         this.onBandCountChange = function () {
-            var tmpClasses = _this.groupingHelper.calculateClassesSize(_this.studentCount, _this.bandCount);
+            _this.bandSet.createBands("custom", _this.studentCount, _this.bandCount);
             $("#classes-settings-container").html("<table id='band-definition-table'></table>");
-            var table = document.getElementById("band-definition-table");
-            var header = table.createTHead();
-            var cnt = 0;
-            var colNo = 0;
-            var columnHeader = header.insertRow();
-            var bandRow = header.insertRow();
-            var classCountRow = header.insertRow();
-            _this.kendoHelper.createLabel(columnHeader.insertCell(), "");
-            _this.kendoHelper.createLabel(bandRow.insertCell(), "Number of Classes");
-            _this.kendoHelper.createLabel(classCountRow.insertCell(), "Class 1");
-            for (var i = 1; i <= _this.bandCount; i++) {
-                _this.kendoHelper.createLabel(bandRow.insertCell(), "Band " + colNo);
-                _this.kendoHelper.createBandInputContainer(bandRow.insertCell(), i);
-                _this.kendoHelper.createBandInputContainer(classCountRow.insertCell(), i);
-                colNo++;
+            _this.table = document.getElementById("band-definition-table");
+            _this.header = _this.table.createTHead();
+            _this.columnHeaderRow = _this.header.insertRow();
+            _this.studentsRow = _this.header.insertRow();
+            _this.bandRow = _this.header.insertRow();
+            _this.classRows.push(_this.header.insertRow());
+            _this.kendoHelper.createLabel(_this.columnHeaderRow.insertCell(), "");
+            _this.kendoHelper.createLabel(_this.studentsRow.insertCell(), "# Students");
+            _this.kendoHelper.createLabel(_this.bandRow.insertCell(), "# Classes");
+            _this.kendoHelper.createLabel(_this.classRows[0].insertCell(), "Class 1");
+            for (var bandNo = 1; bandNo <= _this.bandCount; bandNo++) {
+                _this.kendoHelper.createLabel(_this.columnHeaderRow.insertCell(), "Band " + bandNo);
+                _this.kendoHelper.createStudentsInputContainer(_this.studentsRow.insertCell(), _this.bandSet.bands[bandNo - 1].studentCount, 1, bandNo);
+                _this.kendoHelper.createBandInputContainer(_this.bandRow.insertCell(), bandNo);
+                _this.kendoHelper.createClassInputContainer(_this.classRows[0].insertCell(), _this.bandSet.bands[bandNo - 1].studentCount, 1, bandNo);
             }
-            //  $("#classes-settings-container").append(table.innerHTML);
         };
-        this.createNumberInputField = function (elementId, name) {
+        this.createNumberInputField = function (elementId) {
             var element = document.createElement("input");
             element.type = "text";
             element.setAttribute("style", "width: 100px");
@@ -76,9 +77,7 @@ var BandClassDefinitionViewModel = (function (_super) {
                 }
             }
         };
-        _super.prototype.init.call(this, this);
         this.onBandCountChange();
     }
     return BandClassDefinitionViewModel;
 }(kendo.data.ObservableObject));
-//# sourceMappingURL=BandClassDefinitionViewModel.js.map

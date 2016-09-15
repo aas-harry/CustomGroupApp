@@ -2,20 +2,57 @@
 {
     private integerFormat = "n0";
 
-    createBandInputContainer = (cell: HTMLTableCellElement, bandNo: number) => {
-        //var label = document.createElement("span");
-        //label.textContent = `Band ${bandNo}`;
-        //label.setAttribute("style", "margin-right: 5px");
-        //cell.appendChild(label);
+    createBandInputContainer = (cell: HTMLTableCellElement, bandNo: number, addLabel = false) => {
+        if (addLabel) {
+            const label = document.createElement("span");
+            label.textContent = `Band ${bandNo}`;
+            label.setAttribute("style", "margin-right: 5px");
+            cell.appendChild(label);
+        }
 
         var element = document.createElement("input") as HTMLInputElement;
         element.type = "text";
         element.setAttribute("style", "width: 100px");
-        element.id = `Band${bandNo}`;
+        element.id = `band-${bandNo}`;
         cell.appendChild(element);
 
         this.createBandInputField(element.id, null);
     }
+
+    createClassInputContainer = (cell: HTMLTableCellElement, studentCount = 1, classNo: number, bandNo: number = 1, addLabel = false) => {
+        if (addLabel) {
+            const label = document.createElement("span");
+            label.textContent = `Class ${classNo}`;
+            label.setAttribute("style", "margin-right: 5px");
+            cell.appendChild(label);
+        }
+
+        var element = document.createElement("input") as HTMLInputElement;
+        element.type = "text";
+        element.setAttribute("style", "width: 100px");
+        element.id = `class-${bandNo}-${classNo}`;
+        cell.appendChild(element);
+
+        this.createClassInputField(element.id, studentCount, null);
+    }
+
+    createStudentsInputContainer = (cell: HTMLTableCellElement, studentCount: number, classNo: number, bandNo: number = 1, addLabel = false) => {
+        if (addLabel) {
+            const label = document.createElement("span");
+            label.textContent = "No. Students";
+            label.setAttribute("style", "margin-right: 5px");
+            cell.appendChild(label);
+        }
+
+        var element = document.createElement("input") as HTMLInputElement;
+        element.type = "text";
+        element.setAttribute("style", "width: 100px");
+        element.id = `students-${bandNo}-${classNo}`;
+        cell.appendChild(element);
+
+        this.createStudentsInputField(element.id, studentCount, null);
+    }
+
     createLabel = (cell: HTMLTableCellElement, description: string) => {
      var label = document.createElement("span");
         label.textContent = description;
@@ -25,10 +62,11 @@
     }
     createClassInputField = (
         element: string,
+        studentCount = 1,
         callbackChangeEvent = null) => {
         return this.createNumericTextBox(
             element,
-            1,
+            studentCount,
             1,
             30,
             this.integerFormat,
@@ -43,6 +81,19 @@
             1,
             1,
             5,
+            this.integerFormat,
+            callbackChangeEvent);
+    }
+
+    createStudentsInputField = (
+        element: string,
+        studentCount: number = 1,
+        callbackChangeEvent = null) => {
+        return this.createNumericTextBox(
+            element,
+            studentCount,
+            1,
+            250,
             this.integerFormat,
             callbackChangeEvent);
     }

@@ -604,6 +604,7 @@ var BandSet = (function () {
             }
         };
         this.createBands = function (name, studentCount, bandCount, bandType, streamType, groupType, mixBoysGirls) {
+            if (bandType === void 0) { bandType = BandType.Custom; }
             if (streamType === void 0) { streamType = StreamType.OverallAbilty; }
             if (groupType === void 0) { groupType = GroupingMethod.Streaming; }
             if (mixBoysGirls === void 0) { mixBoysGirls = false; }
@@ -728,4 +729,3 @@ var ClassesDefinition = (function () {
     });
     return ClassesDefinition;
 }());
-//# sourceMappingURL=custom-group.js.map

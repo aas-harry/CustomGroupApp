@@ -665,10 +665,10 @@ class BandSet {
     }
 
 
-    private createBands = (name: string,
+    createBands = (name: string,
         studentCount: number,
         bandCount: number,
-        bandType: BandType,
+        bandType: BandType = BandType.Custom,
         streamType = StreamType.OverallAbilty,
         groupType = GroupingMethod.Streaming,
         mixBoysGirls: boolean = false) => {

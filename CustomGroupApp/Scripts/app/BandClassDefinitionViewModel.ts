@@ -7,10 +7,10 @@
         ]);
     constructor(public studentCount: number = 0) {
         super();
-        super.init(this);
 
         this.onBandCountChange();
     }
+
 
     bandCount = 3;
     classCount = 1;
@@ -24,39 +24,47 @@
         return classes;
     }
 
+
+    private bandSet = new BandSet(null, "Custom", this.studentCount, 1);
+
     private groupingHelper = new GroupingHelper();
     private kendoHelper = new KendoHelper();
 
+    private table: HTMLTableElement;
+    private header: HTMLTableSectionElement;
+    private columnHeaderRow: HTMLTableRowElement;
+    private studentsRow: HTMLTableRowElement;
+    private bandRow: HTMLTableRowElement;
+    private classRows: Array<HTMLTableRowElement> =[];
     onStudentCountChanged = () => {
     };
 
     onBandCountChange = () => {
-        var tmpClasses = this.groupingHelper.calculateClassesSize(this.studentCount, this.bandCount);
+        this.bandSet.createBands("custom", this.studentCount, this.bandCount);
+
         $("#classes-settings-container").html("<table id='band-definition-table'></table>");
-        var table = document.getElementById("band-definition-table") as HTMLTableElement;
-        var header = table.createTHead();
+        this.table = document.getElementById("band-definition-table") as HTMLTableElement;
+        this.header = this.table.createTHead();
 
-        var cnt = 0;
-        var colNo = 0;
-        var columnHeader = header.insertRow();
-        var bandRow = header.insertRow();
-        var classCountRow = header.insertRow();
+        this.columnHeaderRow = this.header.insertRow();
+        this.studentsRow = this.header.insertRow();
+        this.bandRow = this.header.insertRow();
+        this.classRows.push(this.header.insertRow());
 
-        this.kendoHelper.createLabel(columnHeader.insertCell(), "");
-        this.kendoHelper.createLabel(bandRow.insertCell(), "Number of Classes");
-        this.kendoHelper.createLabel(classCountRow.insertCell(), "Class 1");
+        this.kendoHelper.createLabel(this.columnHeaderRow.insertCell(), "");
+        this.kendoHelper.createLabel(this.studentsRow.insertCell(), "# Students");
+        this.kendoHelper.createLabel(this.bandRow.insertCell(), "# Classes");
+        this.kendoHelper.createLabel(this.classRows[0].insertCell(), "Class 1");
 
-        for (let i = 1; i <= this.bandCount; i++) {
-            this.kendoHelper.createLabel(bandRow.insertCell(), "Band "+colNo);
-            this.kendoHelper.createBandInputContainer(bandRow.insertCell(), i);
-            this.kendoHelper.createBandInputContainer(classCountRow.insertCell(), i);
-            colNo++;
-          
+        for (let bandNo = 1; bandNo <= this.bandCount; bandNo++) {
+            this.kendoHelper.createLabel(this.columnHeaderRow.insertCell(), "Band "+bandNo);
+            this.kendoHelper.createStudentsInputContainer(this.studentsRow.insertCell(), this.bandSet.bands[bandNo-1].studentCount, 1, bandNo);
+            this.kendoHelper.createBandInputContainer(this.bandRow.insertCell(), bandNo);
+            this.kendoHelper.createClassInputContainer(this.classRows[0].insertCell(), this.bandSet.bands[bandNo - 1].studentCount, 1, bandNo);
         }
-        //  $("#classes-settings-container").append(table.innerHTML);
     }
 
-    private createNumberInputField = (elementId: string, name: string): HTMLElement => {
+    private createNumberInputField = (elementId: string): HTMLElement => {
         var element = document.createElement("input") as HTMLInputElement;
         element.type = "text";
         element.setAttribute("style","width: 100px");
