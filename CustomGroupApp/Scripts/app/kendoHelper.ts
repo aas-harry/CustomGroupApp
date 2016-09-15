@@ -2,7 +2,11 @@
 {
     private integerFormat = "n0";
 
-    createBandInputContainer = (cell: HTMLTableCellElement, bandNo: number, addLabel = false) => {
+    createBandInputContainer = (
+        cell: HTMLTableCellElement,
+        bandNo: number,
+        callback,
+        addLabel = false): kendo.ui.NumericTextBox => {
         if (addLabel) {
             const label = document.createElement("span");
             label.textContent = `Band ${bandNo}`;
@@ -16,10 +20,15 @@
         element.id = `band-${bandNo}`;
         cell.appendChild(element);
 
-        this.createBandInputField(element.id, null);
+        return this.createBandInputField(element.id, callback);
     }
 
-    createClassInputContainer = (cell: HTMLTableCellElement, studentCount = 1, classNo: number, bandNo: number = 1, addLabel = false) => {
+    createClassInputContainer = (
+        cell: HTMLTableCellElement,
+        studentCount = 1,
+        classNo: number,
+        bandNo: number = 1,
+        addLabel = false): kendo.ui.NumericTextBox => {
         if (addLabel) {
             const label = document.createElement("span");
             label.textContent = `Class ${classNo}`;
@@ -30,13 +39,18 @@
         var element = document.createElement("input") as HTMLInputElement;
         element.type = "text";
         element.setAttribute("style", "width: 100px");
-        element.id = `class-${bandNo}-${classNo}`;
+        element.id = `class${bandNo}-${classNo}`;
         cell.appendChild(element);
 
-        this.createClassInputField(element.id, studentCount, null);
+        return this.createClassInputField(element.id, studentCount, null);
     }
 
-    createStudentsInputContainer = (cell: HTMLTableCellElement, studentCount: number, classNo: number, bandNo: number = 1, addLabel = false) => {
+    createStudentsInputContainer = (
+        cell: HTMLTableCellElement,
+        studentCount: number,
+        classNo: number,
+        bandNo: number = 1,
+        addLabel = false): kendo.ui.NumericTextBox => {
         if (addLabel) {
             const label = document.createElement("span");
             label.textContent = "No. Students";
@@ -50,7 +64,7 @@
         element.id = `students-${bandNo}-${classNo}`;
         cell.appendChild(element);
 
-        this.createStudentsInputField(element.id, studentCount, null);
+        return this.createStudentsInputField(element.id, studentCount, null);
     }
 
     createLabel = (cell: HTMLTableCellElement, description: string) => {
@@ -63,7 +77,7 @@
     createClassInputField = (
         element: string,
         studentCount = 1,
-        callbackChangeEvent = null) => {
+        callbackChangeEvent = null) : kendo.ui.NumericTextBox => {
         return this.createNumericTextBox(
             element,
             studentCount,
@@ -75,7 +89,7 @@
 
     createBandInputField = (
         element: string,
-        callbackChangeEvent = null) => {
+        callbackChangeEvent = null): kendo.ui.NumericTextBox => {
         return this.createNumericTextBox(
             element,
             1,
@@ -88,7 +102,7 @@
     createStudentsInputField = (
         element: string,
         studentCount: number = 1,
-        callbackChangeEvent = null) => {
+        callbackChangeEvent = null): kendo.ui.NumericTextBox => {
         return this.createNumericTextBox(
             element,
             studentCount,
@@ -104,13 +118,13 @@
         min = 0,
         max = 10,
         format = this.integerFormat,
-        callbackChangeEvent = null) => {
+        callbackChangeEvent = null) : kendo.ui.NumericTextBox => {
 
         $(`#${element}`)
             .kendoNumericTextBox({
                 options: {},
-                change: callbackChangeEvent,
-                spin: callbackChangeEvent
+                change: callbackChangeEvent
+                //spin: callbackChangeEvent
             } as kendo.ui.NumericTextBoxOptions);
 
         const numericTextBox = $(`#${element}`).data("kendoNumericTextBox");
@@ -118,5 +132,6 @@
         numericTextBox.value(defaultValue);
         numericTextBox.max(max);
         numericTextBox.min(min);
+        return numericTextBox;
     }
 }

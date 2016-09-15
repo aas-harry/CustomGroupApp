@@ -2,7 +2,7 @@ var KendoHelper = (function () {
     function KendoHelper() {
         var _this = this;
         this.integerFormat = "n0";
-        this.createBandInputContainer = function (cell, bandNo, addLabel) {
+        this.createBandInputContainer = function (cell, bandNo, callback, addLabel) {
             if (addLabel === void 0) { addLabel = false; }
             if (addLabel) {
                 var label = document.createElement("span");
@@ -15,7 +15,7 @@ var KendoHelper = (function () {
             element.setAttribute("style", "width: 100px");
             element.id = "band-" + bandNo;
             cell.appendChild(element);
-            _this.createBandInputField(element.id, null);
+            return _this.createBandInputField(element.id, callback);
         };
         this.createClassInputContainer = function (cell, studentCount, classNo, bandNo, addLabel) {
             if (studentCount === void 0) { studentCount = 1; }
@@ -30,9 +30,9 @@ var KendoHelper = (function () {
             var element = document.createElement("input");
             element.type = "text";
             element.setAttribute("style", "width: 100px");
-            element.id = "class-" + bandNo + "-" + classNo;
+            element.id = "class" + bandNo + "-" + classNo;
             cell.appendChild(element);
-            _this.createClassInputField(element.id, studentCount, null);
+            return _this.createClassInputField(element.id, studentCount, null);
         };
         this.createStudentsInputContainer = function (cell, studentCount, classNo, bandNo, addLabel) {
             if (bandNo === void 0) { bandNo = 1; }
@@ -48,7 +48,7 @@ var KendoHelper = (function () {
             element.setAttribute("style", "width: 100px");
             element.id = "students-" + bandNo + "-" + classNo;
             cell.appendChild(element);
-            _this.createStudentsInputField(element.id, studentCount, null);
+            return _this.createStudentsInputField(element.id, studentCount, null);
         };
         this.createLabel = function (cell, description) {
             var label = document.createElement("span");
@@ -79,15 +79,16 @@ var KendoHelper = (function () {
             $("#" + element)
                 .kendoNumericTextBox({
                 options: {},
-                change: callbackChangeEvent,
-                spin: callbackChangeEvent
+                change: callbackChangeEvent
             });
             var numericTextBox = $("#" + element).data("kendoNumericTextBox");
             numericTextBox.options.format = format;
             numericTextBox.value(defaultValue);
             numericTextBox.max(max);
             numericTextBox.min(min);
+            return numericTextBox;
         };
     }
     return KendoHelper;
 }());
+//# sourceMappingURL=kendoHelper.js.map
