@@ -3,10 +3,10 @@
     private integerFormat = "n0";
 
     createBandInputContainer = (cell: HTMLTableCellElement, bandNo: number) => {
-        var label = document.createElement("span");
-        label.textContent = `Band ${bandNo}`;
-        label.setAttribute("style", "margin-right: 5px");
-        cell.appendChild(label);
+        //var label = document.createElement("span");
+        //label.textContent = `Band ${bandNo}`;
+        //label.setAttribute("style", "margin-right: 5px");
+        //cell.appendChild(label);
 
         var element = document.createElement("input") as HTMLInputElement;
         element.type = "text";
@@ -16,7 +16,13 @@
 
         this.createBandInputField(element.id, null);
     }
+    createLabel = (cell: HTMLTableCellElement, description: string) => {
+     var label = document.createElement("span");
+        label.textContent = description;
+        label.setAttribute("style", "margin-right: 5px");
+        cell.appendChild(label);
 
+    }
     createClassInputField = (
         element: string,
         callbackChangeEvent = null) => {

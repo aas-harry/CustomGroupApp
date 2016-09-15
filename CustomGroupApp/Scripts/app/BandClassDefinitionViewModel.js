@@ -13,7 +13,7 @@ var BandClassDefinitionViewModel = (function (_super) {
         this.classes = new kendo.data.ObservableArray([
             { classNo: 1, studentCount: 1 }
         ]);
-        this.bandCount = 6;
+        this.bandCount = 3;
         this.classCount = 1;
         this.getClasses = function () {
             var classes = new Array();
@@ -34,16 +34,17 @@ var BandClassDefinitionViewModel = (function (_super) {
             var header = table.createTHead();
             var cnt = 0;
             var colNo = 0;
+            var columnHeader = header.insertRow();
             var bandRow = header.insertRow();
+            var classCountRow = header.insertRow();
+            _this.kendoHelper.createLabel(columnHeader.insertCell(), "");
+            _this.kendoHelper.createLabel(bandRow.insertCell(), "Number of Classes");
+            _this.kendoHelper.createLabel(classCountRow.insertCell(), "Class 1");
             for (var i = 1; i <= _this.bandCount; i++) {
-                _this.kendoHelper.createBandInputContainer(bandRow.insertCell(colNo), i);
+                _this.kendoHelper.createLabel(bandRow.insertCell(), "Band " + colNo);
+                _this.kendoHelper.createBandInputContainer(bandRow.insertCell(), i);
+                _this.kendoHelper.createBandInputContainer(classCountRow.insertCell(), i);
                 colNo++;
-                cnt++;
-                if (cnt === 3) {
-                    bandRow = header.insertRow();
-                    cnt = 0;
-                    colNo = 0;
-                }
             }
             //  $("#classes-settings-container").append(table.innerHTML);
         };

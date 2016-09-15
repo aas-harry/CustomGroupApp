@@ -3,16 +3,22 @@ var KendoHelper = (function () {
         var _this = this;
         this.integerFormat = "n0";
         this.createBandInputContainer = function (cell, bandNo) {
-            var label = document.createElement("span");
-            label.textContent = "Band " + bandNo;
-            label.setAttribute("style", "margin-right: 5px");
-            cell.appendChild(label);
+            //var label = document.createElement("span");
+            //label.textContent = `Band ${bandNo}`;
+            //label.setAttribute("style", "margin-right: 5px");
+            //cell.appendChild(label);
             var element = document.createElement("input");
             element.type = "text";
             element.setAttribute("style", "width: 100px");
             element.id = "Band" + bandNo;
             cell.appendChild(element);
             _this.createBandInputField(element.id, null);
+        };
+        this.createLabel = function (cell, description) {
+            var label = document.createElement("span");
+            label.textContent = description;
+            label.setAttribute("style", "margin-right: 5px");
+            cell.appendChild(label);
         };
         this.createClassInputField = function (element, callbackChangeEvent) {
             if (callbackChangeEvent === void 0) { callbackChangeEvent = null; }

@@ -12,7 +12,7 @@
         this.onBandCountChange();
     }
 
-    bandCount = 6;
+    bandCount = 3;
     classCount = 1;
     
     getClasses = (): Array<number> => {
@@ -38,16 +38,20 @@
 
         var cnt = 0;
         var colNo = 0;
+        var columnHeader = header.insertRow();
         var bandRow = header.insertRow();
+        var classCountRow = header.insertRow();
+
+        this.kendoHelper.createLabel(columnHeader.insertCell(), "");
+        this.kendoHelper.createLabel(bandRow.insertCell(), "Number of Classes");
+        this.kendoHelper.createLabel(classCountRow.insertCell(), "Class 1");
+
         for (let i = 1; i <= this.bandCount; i++) {
-            this.kendoHelper.createBandInputContainer(bandRow.insertCell(colNo), i);
+            this.kendoHelper.createLabel(bandRow.insertCell(), "Band "+colNo);
+            this.kendoHelper.createBandInputContainer(bandRow.insertCell(), i);
+            this.kendoHelper.createBandInputContainer(classCountRow.insertCell(), i);
             colNo++;
-            cnt++;
-            if (cnt === 3) {
-                bandRow = header.insertRow();
-                cnt = 0;
-                colNo = 0;
-            }
+          
         }
         //  $("#classes-settings-container").append(table.innerHTML);
     }
