@@ -17,9 +17,10 @@ var KendoHelper = (function () {
             cell.appendChild(element);
             return _this.createBandInputField(element.id, callback);
         };
-        this.createClassInputContainer = function (cell, studentCount, classNo, bandNo, addLabel) {
+        this.createClassInputContainer = function (cell, studentCount, classNo, bandNo, callbackChangeEvent, addLabel) {
             if (studentCount === void 0) { studentCount = 1; }
             if (bandNo === void 0) { bandNo = 1; }
+            if (callbackChangeEvent === void 0) { callbackChangeEvent = null; }
             if (addLabel === void 0) { addLabel = false; }
             if (addLabel) {
                 var label = document.createElement("span");
@@ -32,10 +33,11 @@ var KendoHelper = (function () {
             element.setAttribute("style", "width: 100px");
             element.id = "class" + bandNo + "-" + classNo;
             cell.appendChild(element);
-            return _this.createClassInputField(element.id, studentCount, null);
+            return _this.createClassInputField(element.id, studentCount, callbackChangeEvent);
         };
-        this.createStudentsInputContainer = function (cell, studentCount, classNo, bandNo, addLabel) {
+        this.createStudentsInputContainer = function (cell, studentCount, classNo, bandNo, callbackChangeEvent, addLabel) {
             if (bandNo === void 0) { bandNo = 1; }
+            if (callbackChangeEvent === void 0) { callbackChangeEvent = null; }
             if (addLabel === void 0) { addLabel = false; }
             if (addLabel) {
                 var label = document.createElement("span");
@@ -48,7 +50,7 @@ var KendoHelper = (function () {
             element.setAttribute("style", "width: 100px");
             element.id = "students-" + bandNo + "-" + classNo;
             cell.appendChild(element);
-            return _this.createStudentsInputField(element.id, studentCount, null);
+            return _this.createStudentsInputField(element.id, studentCount, callbackChangeEvent);
         };
         this.createLabel = function (cell, description) {
             var label = document.createElement("span");

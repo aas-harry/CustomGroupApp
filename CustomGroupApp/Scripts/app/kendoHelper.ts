@@ -28,6 +28,7 @@
         studentCount = 1,
         classNo: number,
         bandNo: number = 1,
+        callbackChangeEvent = null,
         addLabel = false): kendo.ui.NumericTextBox => {
         if (addLabel) {
             const label = document.createElement("span");
@@ -42,7 +43,7 @@
         element.id = `class${bandNo}-${classNo}`;
         cell.appendChild(element);
 
-        return this.createClassInputField(element.id, studentCount, null);
+        return this.createClassInputField(element.id, studentCount, callbackChangeEvent);
     }
 
     createStudentsInputContainer = (
@@ -50,6 +51,7 @@
         studentCount: number,
         classNo: number,
         bandNo: number = 1,
+        callbackChangeEvent = null,
         addLabel = false): kendo.ui.NumericTextBox => {
         if (addLabel) {
             const label = document.createElement("span");
@@ -64,7 +66,7 @@
         element.id = `students-${bandNo}-${classNo}`;
         cell.appendChild(element);
 
-        return this.createStudentsInputField(element.id, studentCount, null);
+        return this.createStudentsInputField(element.id, studentCount, callbackChangeEvent);
     }
 
     createLabel = (cell: HTMLTableCellElement, description: string) => {

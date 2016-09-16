@@ -5,6 +5,7 @@
 }
 
 class BandNumericTextBox {
+    studentCount = 0;
     oldValue: number = null;
 
     get value(): number {
@@ -31,20 +32,25 @@ class BandNumericTextBoxCollection {
     clear = () => {
         this.items.splice(0, this.items.length);
     }
-    updateClassSizes = () =>{
-        for (let bandItem of Enumerable.From(this.items)
-            .Where(x => x.usage === BandNUmericTextBoxUsage.BandSize && x.oldValue !== x.value)
-            .Select(x => x).ToArray()) {
 
-            const studentItem = Enumerable.From(this.items)
-                .First(x => x.usage === BandNUmericTextBoxUsage.StudentSize && x.bandNo === bandItem.bandNo);
-            var tmpClases = this.groupingHelper.calculateClassesSize(studentItem.value, bandItem.value);
-            for (let classItem of Enumerable.From(this.items)
-                .Where(x => x.usage === BandNUmericTextBoxUsage.ClassSize && x.bandNo === bandItem.bandNo)
-                .Select(x => x)
-                .ToArray()) {
-                classItem.setValue(tmpClases[classItem.classNo-1]);
-            }
+    updateClassSizes = (classItem: BandNumericTextBox) =>{
+        //classItem.setValue(studentCount);
+    }
+
+    updateStudentSize = (studentItem: BandNumericTextBox) => {
+        let bandItem = Enumerable.From(this.items)
+            .First(x => x.usage === BandNUmericTextBoxUsage.BandSize &&
+                x.bandNo === studentItem.bandNo);
+        this.updateBandSize(bandItem, studentItem.value);
+    }
+
+    updateBandSize = (bandItem: BandNumericTextBox, studentCount: number) => {
+        var tmpClases = this.groupingHelper.calculateClassesSize(bandItem.value, studentCount);
+        for (let classItem of Enumerable.From(this.items)
+            .Where(x => x.usage === BandNUmericTextBoxUsage.ClassSize && x.bandNo === bandItem.bandNo)
+            .Select(x => x)
+            .ToArray()) {
+            classItem.setValue(tmpClases[classItem.classNo - 1]);
         }
     }
 }
@@ -115,7 +121,7 @@ class BandClassDefinitionViewModel extends kendo.data.ObservableObject {
             this.kendoHelper.createLabel(this.columnHeaderRow.insertCell(), "Band " + bandNo);
             var studentCell = this.studentsRow.insertCell();
             this.bandNumerixTextBoxes.add(studentCell,
-                this.kendoHelper.createStudentsInputContainer(studentCell, studentCount, 1, bandNo),
+                this.kendoHelper.createStudentsInputContainer(studentCell, studentCount, 1, bandNo, this.onClassSettingsChange),
                 bandNo,
                 1,
                 BandNUmericTextBoxUsage.StudentSize);
@@ -129,7 +135,7 @@ class BandClassDefinitionViewModel extends kendo.data.ObservableObject {
 
             const classCell = this.classRows[0].insertCell();
             this.bandNumerixTextBoxes.add(classCell,
-                this.kendoHelper.createClassInputContainer(classCell, this.bandSet.bands[bandNo - 1].studentCount, 1, bandNo),
+                this.kendoHelper.createClassInputContainer(classCell, this.bandSet.bands[bandNo - 1].studentCount, 1, bandNo, this.oStudentSettingsChange),
                 bandNo,
                 1,
                 BandNUmericTextBoxUsage.ClassSize);
@@ -145,7 +151,32 @@ class BandClassDefinitionViewModel extends kendo.data.ObservableObject {
     };
 
     onBandSettingsChange = () => {
-        this.bandNumerixTextBoxes.updateClassSizes();
+        for (let bandItem of Enumerable.From(this.bandNumerixTextBoxes.items)
+            .Where(x => x.usage === BandNUmericTextBoxUsage.BandSize && x.oldValue !== x.value)
+            .Select(x => x).ToArray()) {
+
+            const studentItem = Enumerable.From(this.bandNumerixTextBoxes.items)
+                .First(x => x.usage === BandNUmericTextBoxUsage.BandSize &&
+                    x.bandNo === bandItem.bandNo);
+
+            this.bandNumerixTextBoxes.updateBandSize(bandItem, studentItem.studentCount);
+        }
+    }
+
+    oStudentSettingsChange = () => {
+        for (let studentItem of Enumerable.From(this.bandNumerixTextBoxes.items)
+            .Where(x => x.usage === BandNUmericTextBoxUsage.StudentSize && x.oldValue !== x.value)
+            .Select(x => x).ToArray()) {
+            this.bandNumerixTextBoxes.updateStudentSize(studentItem);
+        }
+    }
+
+    onClassSettingsChange = () => {
+        for (let classItem of Enumerable.From(this.bandNumerixTextBoxes.items)
+            .Where(x => x.usage === BandNUmericTextBoxUsage.ClassSize && x.oldValue !== x.value)
+            .Select(x => x).ToArray()) {
+            this.bandNumerixTextBoxes.updateClassSizes(classItem);
+        }
     }
 
     onClassCountChange = () => {
