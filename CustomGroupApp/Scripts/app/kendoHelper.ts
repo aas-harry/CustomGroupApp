@@ -84,7 +84,7 @@
             element,
             studentCount,
             1,
-            30,
+            250,
             this.integerFormat,
             callbackChangeEvent);
     }

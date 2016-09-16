@@ -5,7 +5,6 @@
 }
 
 class BandNumericTextBox {
-    studentCount = 0;
     oldValue: number = null;
 
     get value(): number {
@@ -13,10 +12,11 @@ class BandNumericTextBox {
     }
 
     setValue = (newValue: number) => {
+        this.oldValue = this.value;
         this.inputControl.value(newValue);
     }
 
-    constructor(public parent: HTMLTableCellElement, public inputControl: kendo.ui.NumericTextBox, public bandNo: number, public classNo: number, public usage: BandNUmericTextBoxUsage) {
+    constructor(public parent: HTMLTableCellElement, public studentCount: number, public inputControl: kendo.ui.NumericTextBox, public bandNo: number, public classNo: number, public usage: BandNUmericTextBoxUsage) {
         this.oldValue = inputControl.value();
     }
 }
@@ -26,8 +26,8 @@ class BandNumericTextBoxCollection {
 
     items: Array<BandNumericTextBox> = [];
 
-    add = (parent: HTMLTableCellElement, inputControl: kendo.ui.NumericTextBox, bandNo: number, classNo: number, usage: BandNUmericTextBoxUsage) => {
-        this.items.push(new BandNumericTextBox(parent, inputControl, bandNo, classNo, usage));
+    add = (parent: HTMLTableCellElement, studentCount: number, inputControl: kendo.ui.NumericTextBox, bandNo: number, classNo: number, usage: BandNUmericTextBoxUsage) => {
+        this.items.push(new BandNumericTextBox(parent, studentCount, inputControl, bandNo, classNo, usage));
     }
     clear = () => {
         this.items.splice(0, this.items.length);
@@ -38,6 +38,9 @@ class BandNumericTextBoxCollection {
     }
 
     updateStudentSize = (studentItem: BandNumericTextBox) => {
+        studentItem.oldValue = studentItem.value;
+        studentItem.studentCount = studentItem.value;
+
         let bandItem = Enumerable.From(this.items)
             .First(x => x.usage === BandNUmericTextBoxUsage.BandSize &&
                 x.bandNo === studentItem.bandNo);
@@ -45,7 +48,8 @@ class BandNumericTextBoxCollection {
     }
 
     updateBandSize = (bandItem: BandNumericTextBox, studentCount: number) => {
-        var tmpClases = this.groupingHelper.calculateClassesSize(bandItem.value, studentCount);
+        bandItem.oldValue = bandItem.value;
+        var tmpClases = this.groupingHelper.calculateClassesSize(studentCount, bandItem.value);
         for (let classItem of Enumerable.From(this.items)
             .Where(x => x.usage === BandNUmericTextBoxUsage.ClassSize && x.bandNo === bandItem.bandNo)
             .Select(x => x)
@@ -120,22 +124,22 @@ class BandClassDefinitionViewModel extends kendo.data.ObservableObject {
             const studentCount = this.bandSet.bands[bandNo - 1].studentCount;
             this.kendoHelper.createLabel(this.columnHeaderRow.insertCell(), "Band " + bandNo);
             var studentCell = this.studentsRow.insertCell();
-            this.bandNumerixTextBoxes.add(studentCell,
-                this.kendoHelper.createStudentsInputContainer(studentCell, studentCount, 1, bandNo, this.onClassSettingsChange),
+            this.bandNumerixTextBoxes.add(studentCell, studentCount,
+                this.kendoHelper.createStudentsInputContainer(studentCell, studentCount, 1, bandNo, this.oStudentSettingsChange),
                 bandNo,
                 1,
                 BandNUmericTextBoxUsage.StudentSize);
 
             const bandCell = this.bandRow.insertCell();
-            this.bandNumerixTextBoxes.add(bandCell,
+            this.bandNumerixTextBoxes.add(bandCell, studentCount,
                 this.kendoHelper.createBandInputContainer(bandCell, bandNo, this.onBandSettingsChange),
                 bandNo,
                 1,
                 BandNUmericTextBoxUsage.BandSize);
 
             const classCell = this.classRows[0].insertCell();
-            this.bandNumerixTextBoxes.add(classCell,
-                this.kendoHelper.createClassInputContainer(classCell, this.bandSet.bands[bandNo - 1].studentCount, 1, bandNo, this.oStudentSettingsChange),
+            this.bandNumerixTextBoxes.add(classCell, this.bandSet.bands[bandNo - 1].studentCount,
+                this.kendoHelper.createClassInputContainer(classCell, this.bandSet.bands[bandNo - 1].studentCount, 1, bandNo, this.onClassSettingsChange()),
                 bandNo,
                 1,
                 BandNUmericTextBoxUsage.ClassSize);
@@ -156,7 +160,7 @@ class BandClassDefinitionViewModel extends kendo.data.ObservableObject {
             .Select(x => x).ToArray()) {
 
             const studentItem = Enumerable.From(this.bandNumerixTextBoxes.items)
-                .First(x => x.usage === BandNUmericTextBoxUsage.BandSize &&
+                .First(x => x.usage === BandNUmericTextBoxUsage.StudentSize &&
                     x.bandNo === bandItem.bandNo);
 
             this.bandNumerixTextBoxes.updateBandSize(bandItem, studentItem.studentCount);

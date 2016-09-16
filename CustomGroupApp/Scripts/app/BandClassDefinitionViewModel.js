@@ -10,16 +10,17 @@ var BandNUmericTextBoxUsage;
     BandNUmericTextBoxUsage[BandNUmericTextBoxUsage["StudentSize"] = 2] = "StudentSize";
 })(BandNUmericTextBoxUsage || (BandNUmericTextBoxUsage = {}));
 var BandNumericTextBox = (function () {
-    function BandNumericTextBox(parent, inputControl, bandNo, classNo, usage) {
+    function BandNumericTextBox(parent, studentCount, inputControl, bandNo, classNo, usage) {
         var _this = this;
         this.parent = parent;
+        this.studentCount = studentCount;
         this.inputControl = inputControl;
         this.bandNo = bandNo;
         this.classNo = classNo;
         this.usage = usage;
-        this.studentCount = 0;
         this.oldValue = null;
         this.setValue = function (newValue) {
+            _this.oldValue = _this.value;
             _this.inputControl.value(newValue);
         };
         this.oldValue = inputControl.value();
@@ -38,8 +39,8 @@ var BandNumericTextBoxCollection = (function () {
         var _this = this;
         this.groupingHelper = new GroupingHelper();
         this.items = [];
-        this.add = function (parent, inputControl, bandNo, classNo, usage) {
-            _this.items.push(new BandNumericTextBox(parent, inputControl, bandNo, classNo, usage));
+        this.add = function (parent, studentCount, inputControl, bandNo, classNo, usage) {
+            _this.items.push(new BandNumericTextBox(parent, studentCount, inputControl, bandNo, classNo, usage));
         };
         this.clear = function () {
             _this.items.splice(0, _this.items.length);
@@ -48,13 +49,16 @@ var BandNumericTextBoxCollection = (function () {
             //classItem.setValue(studentCount);
         };
         this.updateStudentSize = function (studentItem) {
+            studentItem.oldValue = studentItem.value;
+            studentItem.studentCount = studentItem.value;
             var bandItem = Enumerable.From(_this.items)
                 .First(function (x) { return x.usage === BandNUmericTextBoxUsage.BandSize &&
                 x.bandNo === studentItem.bandNo; });
             _this.updateBandSize(bandItem, studentItem.value);
         };
         this.updateBandSize = function (bandItem, studentCount) {
-            var tmpClases = _this.groupingHelper.calculateClassesSize(bandItem.value, studentCount);
+            bandItem.oldValue = bandItem.value;
+            var tmpClases = _this.groupingHelper.calculateClassesSize(studentCount, bandItem.value);
             for (var _i = 0, _a = Enumerable.From(_this.items)
                 .Where(function (x) { return x.usage === BandNUmericTextBoxUsage.ClassSize && x.bandNo === bandItem.bandNo; })
                 .Select(function (x) { return x; })
@@ -112,11 +116,11 @@ var BandClassDefinitionViewModel = (function (_super) {
                 var studentCount = _this.bandSet.bands[bandNo - 1].studentCount;
                 _this.kendoHelper.createLabel(_this.columnHeaderRow.insertCell(), "Band " + bandNo);
                 var studentCell = _this.studentsRow.insertCell();
-                _this.bandNumerixTextBoxes.add(studentCell, _this.kendoHelper.createStudentsInputContainer(studentCell, studentCount, 1, bandNo, _this.onClassSettingsChange), bandNo, 1, BandNUmericTextBoxUsage.StudentSize);
+                _this.bandNumerixTextBoxes.add(studentCell, studentCount, _this.kendoHelper.createStudentsInputContainer(studentCell, studentCount, 1, bandNo, _this.oStudentSettingsChange), bandNo, 1, BandNUmericTextBoxUsage.StudentSize);
                 var bandCell = _this.bandRow.insertCell();
-                _this.bandNumerixTextBoxes.add(bandCell, _this.kendoHelper.createBandInputContainer(bandCell, bandNo, _this.onBandSettingsChange), bandNo, 1, BandNUmericTextBoxUsage.BandSize);
+                _this.bandNumerixTextBoxes.add(bandCell, studentCount, _this.kendoHelper.createBandInputContainer(bandCell, bandNo, _this.onBandSettingsChange), bandNo, 1, BandNUmericTextBoxUsage.BandSize);
                 var classCell = _this.classRows[0].insertCell();
-                _this.bandNumerixTextBoxes.add(classCell, _this.kendoHelper.createClassInputContainer(classCell, _this.bandSet.bands[bandNo - 1].studentCount, 1, bandNo, _this.oStudentSettingsChange), bandNo, 1, BandNUmericTextBoxUsage.ClassSize);
+                _this.bandNumerixTextBoxes.add(classCell, _this.bandSet.bands[bandNo - 1].studentCount, _this.kendoHelper.createClassInputContainer(classCell, _this.bandSet.bands[bandNo - 1].studentCount, 1, bandNo, _this.onClassSettingsChange()), bandNo, 1, BandNUmericTextBoxUsage.ClassSize);
             }
         };
         this.createNumberInputField = function (elementId) {
@@ -129,7 +133,7 @@ var BandClassDefinitionViewModel = (function (_super) {
         this.onBandSettingsChange = function () {
             var _loop_1 = function(bandItem) {
                 var studentItem = Enumerable.From(_this.bandNumerixTextBoxes.items)
-                    .First(function (x) { return x.usage === BandNUmericTextBoxUsage.BandSize &&
+                    .First(function (x) { return x.usage === BandNUmericTextBoxUsage.StudentSize &&
                     x.bandNo === bandItem.bandNo; });
                 _this.bandNumerixTextBoxes.updateBandSize(bandItem, studentItem.studentCount);
             };
