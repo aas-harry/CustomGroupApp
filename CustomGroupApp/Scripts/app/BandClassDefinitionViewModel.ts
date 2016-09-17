@@ -16,18 +16,66 @@ class BandNumericTextBox {
         this.inputControl.value(newValue);
     }
 
-    constructor(public parent: HTMLTableCellElement, public studentCount: number, public inputControl: kendo.ui.NumericTextBox, public bandNo: number, public classNo: number, public usage: BandNUmericTextBoxUsage) {
+    constructor(
+        public parent: HTMLTableCellElement,
+        public studentCount: number,
+        public inputControl: kendo.ui.NumericTextBox,
+        public bandNo: number,
+        public classNo: number,
+        public usage: BandNUmericTextBoxUsage,
+        public hidden= false) {
         this.oldValue = inputControl.value();
     }
 }
 
 class BandNumericTextBoxCollection {
     private groupingHelper = new GroupingHelper();
-
+    private kendoHelper = new KendoHelper();
+    private me = this;
     items: Array<BandNumericTextBox> = [];
+    table: HTMLTableElement;
+    header: HTMLTableSectionElement;
+    columnHeaderRow: HTMLTableRowElement;
+    studentsRow: HTMLTableRowElement;
+    bandRow: HTMLTableRowElement;
+    classRows: Array<HTMLTableRowElement> = [];
+    bandCount: number;
 
-    add = (parent: HTMLTableCellElement, studentCount: number, inputControl: kendo.ui.NumericTextBox, bandNo: number, classNo: number, usage: BandNUmericTextBoxUsage) => {
-        this.items.push(new BandNumericTextBox(parent, studentCount, inputControl, bandNo, classNo, usage));
+    get classCount(): number {
+        return this.classRows.length;
+    }
+
+    initTable(elementName: string, bands: Array<BandDefinition>) {
+        this.clear();
+
+        $("#classes-settings-container").html("<table id='band-definition-table'></table>");
+        this.table = document.getElementById("band-definition-table") as HTMLTableElement;
+        this.header = this.table.createTHead();
+        this.classRows.splice(0, this.classRows.length);
+        this.columnHeaderRow = this.header.insertRow();
+        this.studentsRow = this.header.insertRow();
+        this.bandRow = this.header.insertRow();
+      
+        this.kendoHelper.createLabel(this.columnHeaderRow.insertCell(), "");
+        this.kendoHelper.createLabel(this.studentsRow.insertCell(), "# Students");
+        this.kendoHelper.createLabel(this.bandRow.insertCell(), "# Classes");
+
+        this.bandCount = bands.length;
+        for (let band of bands) {
+            this.createBandColumnInTable(band.bandNo, band.studentCount);
+        }
+        this.createStudentCountInClassRow(1, bands, true);
+    }
+
+    add = (
+        parent: HTMLTableCellElement,
+        studentCount: number,
+        inputControl: kendo.ui.NumericTextBox,
+        bandNo: number,
+        classNo: number,
+        usage: BandNUmericTextBoxUsage,
+        hidden = false) => {
+        this.items.push(new BandNumericTextBox(parent, studentCount, inputControl, bandNo, classNo, usage, hidden));
     }
     clear = () => {
         this.items.splice(0, this.items.length);
@@ -44,24 +92,133 @@ class BandNumericTextBoxCollection {
         let bandItem = Enumerable.From(this.items)
             .First(x => x.usage === BandNUmericTextBoxUsage.BandSize &&
                 x.bandNo === studentItem.bandNo);
-        this.updateBandSize(bandItem, studentItem.value);
+        this.updateClassSizeInBand(bandItem, studentItem.value);
     }
 
-    updateBandSize = (bandItem: BandNumericTextBox, studentCount: number) => {
+
+    // This event is called when the number of classes in a band is changed
+    updateClassSizeInBand = (bandItem: BandNumericTextBox, studentCount: number) => {
+        const bandNo = bandItem.bandNo;
         bandItem.oldValue = bandItem.value;
+
         var tmpClases = this.groupingHelper.calculateClassesSize(studentCount, bandItem.value);
-        for (let classItem of Enumerable.From(this.items)
-            .Where(x => x.usage === BandNUmericTextBoxUsage.ClassSize && x.bandNo === bandItem.bandNo)
-            .Select(x => x)
-            .ToArray()) {
-            classItem.setValue(tmpClases[classItem.classNo - 1]);
+        let classCount = bandItem.value;
+        for (var i = 0; i < classCount; i++) {
+            const classNo = i + 1;
+            const studentCountInClass = tmpClases[i];
+
+            if (classNo > this.classRows.length) {
+                let tmpBands = new Array<BandDefinition>();
+                for (let j = 1; j < this.bandCount; j++) {
+                   tmpBands.push(new BandDefinition(null,
+                        j,
+                        `band${j}`,
+                        j === bandNo ? studentCountInClass : 0,
+                        classCount));
+                }
+                this.createStudentCountInClassRow(classNo, tmpBands, false);
+            }
+
+            // check if class cell has been created
+            const classCell = Enumerable.From(this.items)
+                .FirstOrDefault(null, x => x.usage === BandNUmericTextBoxUsage.ClassSize && x.bandNo === bandNo
+                    && x.classNo === classNo);
+            if (classCell != null) {
+                classCell.setValue(tmpClases[i]);
+                classCell.parent.hidden = false;
+            }
         }
     }
+
+    createBandColumnInTable = (bandNo: number, studentCount: number) => {
+        this.kendoHelper.createLabel(this.columnHeaderRow.insertCell(), "Band " + bandNo);
+
+        this.createStudentCountInBandCell(bandNo, studentCount);
+        this.createBandCountCell(bandNo, studentCount);
+
+    }
+
+    // Create student count cell for a band
+    createStudentCountInBandCell = (bandNo: number, studentCount: number) => {
+        const studentCell = this.studentsRow.insertCell();
+        this.add(studentCell, studentCount,
+            this.kendoHelper.createStudentsInputContainer(studentCell, studentCount, 1, bandNo, this.oStudentSettingsChange),
+            bandNo,
+            1,
+            BandNUmericTextBoxUsage.StudentSize);
+    }
+
+    // Create student count cell for a class in a band
+    createStudentCountInClassRow = (classNo: number, bands: Array<BandDefinition>, showClass = false) => {
+        var   classRow = this.header.insertRow();
+        this.kendoHelper.createLabel(classRow.insertCell(), `Class ${classNo}`);
+        this.classRows.push(classRow);
+
+        // Create student in class count cell for all the classes in a band
+        for (let band of bands) {
+            const bandNo = band.bandNo;
+            const classCell = classRow.insertCell();
+            this.add(classCell, band.studentCount,
+                this.kendoHelper.createClassInputContainer(classCell, band.studentCount, classNo, bandNo, this.onClassSettingsChange(), !showClass),
+                bandNo,
+                classNo,
+                BandNUmericTextBoxUsage.ClassSize, ! showClass);
+        }
+    }
+
+    // Create band count cell
+    createBandCountCell = (bandNo: number, studentCount: number) => {
+        const bandCell = this.bandRow.insertCell();
+        this.add(bandCell, studentCount,
+            this.kendoHelper.createBandInputContainer(bandCell, bandNo, this.onBandSettingsChange),
+            bandNo,
+            1,
+            BandNUmericTextBoxUsage.BandSize);
+    }
+
+    // This function is called when the number of students in a band is changed
+    oStudentSettingsChange = () => {
+        for (let studentItem of Enumerable.From(this.items)
+            .Where(x => x.usage === BandNUmericTextBoxUsage.StudentSize && x.oldValue !== x.value)
+            .Select(x => x).ToArray()) {
+            this.updateStudentSize(studentItem);
+        }
+    }
+    
+    // This function is called when the number of classes in a band is changed
+    onBandSettingsChange = () => {
+        for (let bandItem of Enumerable.From(this.items)
+            .Where(x => x.usage === BandNUmericTextBoxUsage.BandSize && x.oldValue !== x.value)
+            .Select(x => x).ToArray()) {
+
+            const studentItem = Enumerable.From(this.items)
+                .FirstOrDefault(null, x => x.usage === BandNUmericTextBoxUsage.StudentSize &&
+                    x.bandNo === bandItem.bandNo);
+
+            this.updateClassSizeInBand(bandItem, studentItem.studentCount);
+        }
+    }
+
+    // This function is called when the number of students in a class is changed
+    onClassSettingsChange = () => {
+        for (let classItem of Enumerable.From(this.items)
+            .Where(x => x.usage === BandNUmericTextBoxUsage.ClassSize && x.oldValue !== x.value)
+            .Select(x => x).ToArray()) {
+            this.updateClassSizes(classItem);
+        }
+    }
+
+    private convertToBands = (studentCounts: Array<number>): Array<BandDefinition> => {
+        var classes = new Array<BandDefinition>();
+        for (let i = 0; i < studentCounts.length; i++) {
+            const bandNo = i + 1;
+            classes.push(new BandDefinition(null, bandNo, "Band " + bandNo, studentCounts[i], 1));
+        }
+        return classes;
+    };
 }
 
 class BandClassDefinitionViewModel extends kendo.data.ObservableObject {
-
-   
     classes: kendo.data.ObservableArray = new kendo.data.ObservableArray(
         [
             { classNo: 1, studentCount: 1 }
@@ -71,7 +228,6 @@ class BandClassDefinitionViewModel extends kendo.data.ObservableObject {
 
         this.onBandCountChange();
     }
-
 
     bandCount = 3;
     classCount = 1;
@@ -85,9 +241,7 @@ class BandClassDefinitionViewModel extends kendo.data.ObservableObject {
         return classes;
     }
 
-
     private bandSet = new BandSet(null, "Custom", this.studentCount, 1);
-
     private groupingHelper = new GroupingHelper();
     private kendoHelper = new KendoHelper();
     private bandNumerixTextBoxes = new BandNumericTextBoxCollection();
@@ -103,47 +257,8 @@ class BandClassDefinitionViewModel extends kendo.data.ObservableObject {
     };
 
     onBandCountChange = () => {
-        this.bandNumerixTextBoxes.clear();
         this.bandSet.createBands("custom", this.studentCount, this.bandCount);
-
-        $("#classes-settings-container").html("<table id='band-definition-table'></table>");
-        this.table = document.getElementById("band-definition-table") as HTMLTableElement;
-        this.header = this.table.createTHead();
-        this.classRows.splice(0, this.classRows.length);
-        this.columnHeaderRow = this.header.insertRow();
-        this.studentsRow = this.header.insertRow();
-        this.bandRow = this.header.insertRow();
-        this.classRows.push(this.header.insertRow());
-
-        this.kendoHelper.createLabel(this.columnHeaderRow.insertCell(), "");
-        this.kendoHelper.createLabel(this.studentsRow.insertCell(), "# Students");
-        this.kendoHelper.createLabel(this.bandRow.insertCell(), "# Classes");
-        this.kendoHelper.createLabel(this.classRows[0].insertCell(), "Class 1");
-
-        for (let bandNo = 1; bandNo <= this.bandCount; bandNo++) {
-            const studentCount = this.bandSet.bands[bandNo - 1].studentCount;
-            this.kendoHelper.createLabel(this.columnHeaderRow.insertCell(), "Band " + bandNo);
-            var studentCell = this.studentsRow.insertCell();
-            this.bandNumerixTextBoxes.add(studentCell, studentCount,
-                this.kendoHelper.createStudentsInputContainer(studentCell, studentCount, 1, bandNo, this.oStudentSettingsChange),
-                bandNo,
-                1,
-                BandNUmericTextBoxUsage.StudentSize);
-
-            const bandCell = this.bandRow.insertCell();
-            this.bandNumerixTextBoxes.add(bandCell, studentCount,
-                this.kendoHelper.createBandInputContainer(bandCell, bandNo, this.onBandSettingsChange),
-                bandNo,
-                1,
-                BandNUmericTextBoxUsage.BandSize);
-
-            const classCell = this.classRows[0].insertCell();
-            this.bandNumerixTextBoxes.add(classCell, this.bandSet.bands[bandNo - 1].studentCount,
-                this.kendoHelper.createClassInputContainer(classCell, this.bandSet.bands[bandNo - 1].studentCount, 1, bandNo, this.onClassSettingsChange()),
-                bandNo,
-                1,
-                BandNUmericTextBoxUsage.ClassSize);
-        }
+        this.bandNumerixTextBoxes.initTable("#classes-settings-container", this.bandSet.bands);
     }
 
     private createNumberInputField = (elementId: string): HTMLElement => {
@@ -154,34 +269,6 @@ class BandClassDefinitionViewModel extends kendo.data.ObservableObject {
         return element;
     };
 
-    onBandSettingsChange = () => {
-        for (let bandItem of Enumerable.From(this.bandNumerixTextBoxes.items)
-            .Where(x => x.usage === BandNUmericTextBoxUsage.BandSize && x.oldValue !== x.value)
-            .Select(x => x).ToArray()) {
-
-            const studentItem = Enumerable.From(this.bandNumerixTextBoxes.items)
-                .First(x => x.usage === BandNUmericTextBoxUsage.StudentSize &&
-                    x.bandNo === bandItem.bandNo);
-
-            this.bandNumerixTextBoxes.updateBandSize(bandItem, studentItem.studentCount);
-        }
-    }
-
-    oStudentSettingsChange = () => {
-        for (let studentItem of Enumerable.From(this.bandNumerixTextBoxes.items)
-            .Where(x => x.usage === BandNUmericTextBoxUsage.StudentSize && x.oldValue !== x.value)
-            .Select(x => x).ToArray()) {
-            this.bandNumerixTextBoxes.updateStudentSize(studentItem);
-        }
-    }
-
-    onClassSettingsChange = () => {
-        for (let classItem of Enumerable.From(this.bandNumerixTextBoxes.items)
-            .Where(x => x.usage === BandNUmericTextBoxUsage.ClassSize && x.oldValue !== x.value)
-            .Select(x => x).ToArray()) {
-            this.bandNumerixTextBoxes.updateClassSizes(classItem);
-        }
-    }
 
     onClassCountChange = () => {
         var tmpClasses = this.groupingHelper.calculateClassesSize(this.studentCount, this.classCount);

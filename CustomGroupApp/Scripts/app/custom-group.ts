@@ -526,7 +526,7 @@ class BandDefinition {
     constructor(public parent: ClassesDefinition,
         public bandNo: number,
         public bandName: string,
-        public studentCount,
+        public studentCount: number,
         public classCount: number = 1,
         public bandType = BandType.None,
         public streamType = StreamType.OverallAbilty,

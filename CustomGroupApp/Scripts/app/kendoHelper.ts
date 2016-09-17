@@ -29,7 +29,7 @@
         classNo: number,
         bandNo: number = 1,
         callbackChangeEvent = null,
-        addLabel = false): kendo.ui.NumericTextBox => {
+        hideCell = false, addLabel = false): kendo.ui.NumericTextBox => {
         if (addLabel) {
             const label = document.createElement("span");
             label.textContent = `Class ${classNo}`;
