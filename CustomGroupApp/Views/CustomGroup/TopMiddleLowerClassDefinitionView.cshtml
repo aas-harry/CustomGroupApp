@@ -1,0 +1,24 @@
+﻿<div id="class-definition-container">
+    <style scoped>
+        .borderless table {
+            border-top-style: none;
+            border-left-style: none;
+            border-right-style: none;
+            border-bottom-style: none;
+        }
+    </style>
+   
+    <p>You can adjust the number of students in each classes below:</p>
+    <div id="classes-settings-container" style="width: 540px">
+        <table id="band-definition-table"></table>
+    </div>
+</div>
+<script>
+
+    var bandClassDefinitionViewModel = new BandClassDefinitionViewModel(250);
+
+    $(document)
+        .ready(function() {
+            kendo.bind($("#class-definition-container"), bandClassDefinitionViewModel);
+        });
+</script>

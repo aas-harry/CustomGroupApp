@@ -15,15 +15,19 @@ class BandNumericTextBox {
     setValue = (newValue: number) => {
         this.oldValue = this.value;
         this.inputControl.value(newValue);
+        this.inputControl.enable(true);
     }
 
     hideInput = () => {
         this.hidden = true;
-       
+        this.inputControl.value(this.inputControl.min());
+        this.inputControl.enable(false);
+        //this.inputControl.element.hide();
     }
 
     showInput =() => {
         this.hidden = false;
+        //this.inputControl.element.show();
     }
     constructor(
         public parent: HTMLTableCellElement,
@@ -148,14 +152,13 @@ class BandNumericTextBoxCollection {
         }
 
         // hide unused class in the selected band
-        for (let i = classCount; i < this.classRows.length; i++) {
-            const classNo = i + 1;
+        for (let i = classCount + 1; i <= this.classRows.length; i++) {
+            const classNo = i;
             const classCell = Enumerable.From(this.items)
                 .FirstOrDefault(null, x => x.usage === BandNUmericTextBoxUsage.ClassSize && x.bandNo === bandNo
                     && x.classNo === classNo);
 
             if (classCell != null) {
-                classCell.setValue(0);
                 classCell.hideInput();
             }
         }
@@ -250,18 +253,25 @@ class BandNumericTextBoxCollection {
     };
 }
 
+class TopMiddleLowest extends BandClassDefinitionViewModel {
+    constructor(public studentCount: number = 0) {
+        super(studentCount, 3);
+    }
+}
+
 class BandClassDefinitionViewModel extends kendo.data.ObservableObject {
     classes: kendo.data.ObservableArray = new kendo.data.ObservableArray(
         [
             { classNo: 1, studentCount: 1 }
         ]);
-    constructor(public studentCount: number = 0) {
+    constructor(public studentCount: number = 0, bandCount = 1) {
         super();
 
+        this.bandCount = 1;
         this.onBandCountChange();
     }
 
-    bandCount = 3;
+    bandCount = 1;
     classCount = 1;
     
     getClasses = (): Array<number> => {

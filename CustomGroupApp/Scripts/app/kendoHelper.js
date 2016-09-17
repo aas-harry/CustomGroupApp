@@ -62,7 +62,7 @@ var KendoHelper = (function () {
         this.createClassInputField = function (element, studentCount, callbackChangeEvent) {
             if (studentCount === void 0) { studentCount = 1; }
             if (callbackChangeEvent === void 0) { callbackChangeEvent = null; }
-            return _this.createNumericTextBox(element, studentCount, 1, 250, _this.integerFormat, callbackChangeEvent);
+            return _this.createNumericTextBox(element, studentCount, 0, 250, _this.integerFormat, callbackChangeEvent);
         };
         this.createBandInputField = function (element, callbackChangeEvent) {
             if (callbackChangeEvent === void 0) { callbackChangeEvent = null; }

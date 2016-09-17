@@ -83,7 +83,7 @@
         return this.createNumericTextBox(
             element,
             studentCount,
-            1,
+            0,
             250,
             this.integerFormat,
             callbackChangeEvent);

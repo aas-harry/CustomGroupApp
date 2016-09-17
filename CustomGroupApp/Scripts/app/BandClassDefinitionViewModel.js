@@ -24,12 +24,17 @@ var BandNumericTextBox = (function () {
         this.setValue = function (newValue) {
             _this.oldValue = _this.value;
             _this.inputControl.value(newValue);
+            _this.inputControl.enable(true);
         };
         this.hideInput = function () {
             _this.hidden = true;
+            _this.inputControl.value(_this.inputControl.min());
+            _this.inputControl.enable(false);
+            //this.inputControl.element.hide();
         };
         this.showInput = function () {
             _this.hidden = false;
+            //this.inputControl.element.show();
         };
         this.oldValue = inputControl.value();
         if (hidden) {
@@ -107,16 +112,15 @@ var BandNumericTextBoxCollection = (function () {
             }
             // hide unused class in the selected band
             var _loop_2 = function(i) {
-                var classNo = i + 1;
+                var classNo = i;
                 var classCell = Enumerable.From(_this.items)
                     .FirstOrDefault(null, function (x) { return x.usage === BandNUmericTextBoxUsage.ClassSize && x.bandNo === bandNo
                     && x.classNo === classNo; });
                 if (classCell != null) {
-                    classCell.setValue(0);
                     classCell.hideInput();
                 }
             };
-            for (var i = classCount; i < _this.classRows.length; i++) {
+            for (var i = classCount + 1; i <= _this.classRows.length; i++) {
                 _loop_2(i);
             }
         };
@@ -219,17 +223,27 @@ var BandNumericTextBoxCollection = (function () {
     };
     return BandNumericTextBoxCollection;
 }());
+var TopMiddleLowest = (function (_super) {
+    __extends(TopMiddleLowest, _super);
+    function TopMiddleLowest(studentCount) {
+        if (studentCount === void 0) { studentCount = 0; }
+        _super.call(this, studentCount, 3);
+        this.studentCount = studentCount;
+    }
+    return TopMiddleLowest;
+}(BandClassDefinitionViewModel));
 var BandClassDefinitionViewModel = (function (_super) {
     __extends(BandClassDefinitionViewModel, _super);
-    function BandClassDefinitionViewModel(studentCount) {
+    function BandClassDefinitionViewModel(studentCount, bandCount) {
         var _this = this;
         if (studentCount === void 0) { studentCount = 0; }
+        if (bandCount === void 0) { bandCount = 1; }
         _super.call(this);
         this.studentCount = studentCount;
         this.classes = new kendo.data.ObservableArray([
             { classNo: 1, studentCount: 1 }
         ]);
-        this.bandCount = 3;
+        this.bandCount = 1;
         this.classCount = 1;
         this.getClasses = function () {
             var classes = new Array();
@@ -278,6 +292,7 @@ var BandClassDefinitionViewModel = (function (_super) {
                 }
             }
         };
+        this.bandCount = 1;
         this.onBandCountChange();
     }
     return BandClassDefinitionViewModel;

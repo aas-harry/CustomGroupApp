@@ -997,6 +997,8 @@
     <Content Include="Views\CustomGroup\SaveCustomGroup.cshtml" />
     <Content Include="Views\CustomGroup\ClassDefinitionView.cshtml" />
     <Content Include="Views\CustomGroup\BandClassDefinitionView.cshtml" />
+    <Content Include="Views\CustomGroup\BandClassConfiguration.cshtml" />
+    <Content Include="Views\CustomGroup\TopMiddleLowerClassDefinitionView.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -33,7 +33,7 @@ namespace CustomGroupApp.Controllers
 
         public ActionResult CustomGroupWizard()
         {
-            return View("BandClassDefinitionView");
+            return View("TopMiddleLowerClassDefinitionView");
         }
 
         public ActionResult SelectGroupingTypeStep()
@@ -43,6 +43,11 @@ namespace CustomGroupApp.Controllers
         public ActionResult ClassConfigurationStep()
         {
             return View("ClassConfiguration");
+        }
+
+        public ActionResult BandClassConfigurationStep()
+        {
+            return View("BandClassDefinitionView");
         }
         public ActionResult SaveCustomGroupStep()
         {
