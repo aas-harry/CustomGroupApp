@@ -29,7 +29,7 @@
         classNo: number,
         bandNo: number = 1,
         callbackChangeEvent = null,
-        hideCell = false, addLabel = false): kendo.ui.NumericTextBox => {
+        addLabel = false): kendo.ui.NumericTextBox => {
         if (addLabel) {
             const label = document.createElement("span");
             label.textContent = `Class ${classNo}`;
@@ -43,7 +43,7 @@
         element.id = `class${bandNo}-${classNo}`;
         cell.appendChild(element);
 
-        return this.createClassInputField(element.id, studentCount, callbackChangeEvent);
+        return this.createClassInputField(element.id, studentCount, callbackChangeEvent);;
     }
 
     createStudentsInputContainer = (

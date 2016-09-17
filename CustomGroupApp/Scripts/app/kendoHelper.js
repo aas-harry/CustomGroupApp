@@ -17,11 +17,10 @@ var KendoHelper = (function () {
             cell.appendChild(element);
             return _this.createBandInputField(element.id, callback);
         };
-        this.createClassInputContainer = function (cell, studentCount, classNo, bandNo, callbackChangeEvent, hideCell, addLabel) {
+        this.createClassInputContainer = function (cell, studentCount, classNo, bandNo, callbackChangeEvent, addLabel) {
             if (studentCount === void 0) { studentCount = 1; }
             if (bandNo === void 0) { bandNo = 1; }
             if (callbackChangeEvent === void 0) { callbackChangeEvent = null; }
-            if (hideCell === void 0) { hideCell = false; }
             if (addLabel === void 0) { addLabel = false; }
             if (addLabel) {
                 var label = document.createElement("span");
@@ -35,6 +34,7 @@ var KendoHelper = (function () {
             element.id = "class" + bandNo + "-" + classNo;
             cell.appendChild(element);
             return _this.createClassInputField(element.id, studentCount, callbackChangeEvent);
+            ;
         };
         this.createStudentsInputContainer = function (cell, studentCount, classNo, bandNo, callbackChangeEvent, addLabel) {
             if (bandNo === void 0) { bandNo = 1; }

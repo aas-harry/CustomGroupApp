@@ -5,6 +5,7 @@
 }
 
 class BandNumericTextBox {
+    private hidden = false;
     oldValue: number = null;
 
     get value(): number {
@@ -16,6 +17,14 @@ class BandNumericTextBox {
         this.inputControl.value(newValue);
     }
 
+    hideInput = () => {
+        this.hidden = true;
+       
+    }
+
+    showInput =() => {
+        this.hidden = false;
+    }
     constructor(
         public parent: HTMLTableCellElement,
         public studentCount: number,
@@ -23,8 +32,16 @@ class BandNumericTextBox {
         public bandNo: number,
         public classNo: number,
         public usage: BandNUmericTextBoxUsage,
-        public hidden= false) {
+        hidden= false) {
         this.oldValue = inputControl.value();
+
+        if (hidden) {
+            this.hideInput();
+        } else {
+            this.showInput();
+        }
+        if (usage === BandNUmericTextBoxUsage.ClassSize)
+            console.log("New ", bandNo, classNo, hidden);
     }
 }
 
@@ -103,20 +120,21 @@ class BandNumericTextBoxCollection {
 
         var tmpClases = this.groupingHelper.calculateClassesSize(studentCount, bandItem.value);
         let classCount = bandItem.value;
-        for (var i = 0; i < classCount; i++) {
+        for (let i = 0; i < classCount; i++) {
             const classNo = i + 1;
             const studentCountInClass = tmpClases[i];
 
+            // Class row has not been created, add it now
             if (classNo > this.classRows.length) {
                 let tmpBands = new Array<BandDefinition>();
-                for (let j = 1; j < this.bandCount; j++) {
+                for (let j = 1; j <= this.bandCount; j++) {
                    tmpBands.push(new BandDefinition(null,
                         j,
                         `band${j}`,
                         j === bandNo ? studentCountInClass : 0,
                         classCount));
                 }
-                this.createStudentCountInClassRow(classNo, tmpBands, false);
+                this.createStudentCountInClassRow(classNo, tmpBands);
             }
 
             // check if class cell has been created
@@ -125,7 +143,20 @@ class BandNumericTextBoxCollection {
                     && x.classNo === classNo);
             if (classCell != null) {
                 classCell.setValue(tmpClases[i]);
-                classCell.parent.hidden = false;
+                classCell.showInput();
+            }
+        }
+
+        // hide unused class in the selected band
+        for (let i = classCount; i < this.classRows.length; i++) {
+            const classNo = i + 1;
+            const classCell = Enumerable.From(this.items)
+                .FirstOrDefault(null, x => x.usage === BandNUmericTextBoxUsage.ClassSize && x.bandNo === bandNo
+                    && x.classNo === classNo);
+
+            if (classCell != null) {
+                classCell.setValue(0);
+                classCell.hideInput();
             }
         }
     }
@@ -150,7 +181,7 @@ class BandNumericTextBoxCollection {
 
     // Create student count cell for a class in a band
     createStudentCountInClassRow = (classNo: number, bands: Array<BandDefinition>, showClass = false) => {
-        var   classRow = this.header.insertRow();
+        var classRow = this.header.insertRow();
         this.kendoHelper.createLabel(classRow.insertCell(), `Class ${classNo}`);
         this.classRows.push(classRow);
 
@@ -159,7 +190,8 @@ class BandNumericTextBoxCollection {
             const bandNo = band.bandNo;
             const classCell = classRow.insertCell();
             this.add(classCell, band.studentCount,
-                this.kendoHelper.createClassInputContainer(classCell, band.studentCount, classNo, bandNo, this.onClassSettingsChange(), !showClass),
+                this.kendoHelper.createClassInputContainer(classCell, band.studentCount, classNo, bandNo,
+                    this.onClassSettingsChange()),
                 bandNo,
                 classNo,
                 BandNUmericTextBoxUsage.ClassSize, ! showClass);
