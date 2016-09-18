@@ -10,58 +10,53 @@ var ClassDefinitionViewModel = (function (_super) {
         if (studentCount === void 0) { studentCount = 0; }
         _super.call(this);
         this.studentCount = studentCount;
-        this.classes = new kendo.data.ObservableArray([
-            { classNo: 1, studentCount: 1 }
-        ]);
         this.classCount = 1;
-        this.getClasses = function () {
-            var classes = new Array();
-            _this.classes.forEach(function (val) {
-                var classCnt = $("#class" + val.classNo).data("kendoNumericTextBox");
-                classes.push(classCnt.value());
-            });
-            return classes;
-        };
         this.groupingHelper = new GroupingHelper();
-        this.onStudentCountChanged = function () {
+        this.kendoHelper = new KendoHelper();
+        // This function is called when the student count in a class is changed
+        this.onStudentCountInClassChanged = function () {
         };
         this.onClassCountChange = function () {
             var tmpClasses = _this.groupingHelper.calculateClassesSize(_this.studentCount, _this.classCount);
-            _this.classes.splice(0, _this.classes.length);
-            $("#classes-settings-container").html("");
-            var cnt = 0;
-            for (var i = 1; i <= _this.classCount; i++) {
-                _this.classes.push({ classNo: i, studentCount: tmpClasses[i - 1] });
-                cnt++;
-                $("#classes-settings-container")
-                    .append("<span style='width: 100px;text-align: right'>Class " +
-                    i +
-                    "</span><input id='class" +
-                    i +
-                    "' style='width: 100px; margin-right: 10px; margin-left: 10px; margin-bottom: 5px'" +
-                    "></input");
-                if (cnt === 3) {
-                    $("#classes-settings-container")
-                        .append("<div></div>");
-                    cnt = 0;
-                }
-                $("#class" + i)
-                    .kendoNumericTextBox({
-                    options: {},
-                    change: _this.onStudentCountChanged,
-                    spin: _this.onStudentCountChanged
-                });
-                var spinnerInputField = $("#class" + i).data("kendoNumericTextBox");
-                spinnerInputField.options.format = "n0";
-                spinnerInputField.value(tmpClasses[i - 1]);
-                spinnerInputField.max(250);
-                spinnerInputField.min(1);
-                spinnerInputField.options.decimals = 0;
-            }
+            _this.createInputTextBox(Enumerable.From(tmpClasses).Select(function (val, classNo) {
+                return new ClassDefinition(null, classNo + 1, val);
+            }).ToArray());
         };
         _super.prototype.init.call(this, this);
-        this.classCount = 1;
     }
+    ClassDefinitionViewModel.prototype.createInputTextBox = function (classes) {
+        $("#classes-settings-container").html("");
+        var element = document.getElementById("classes-settings-container");
+        var cnt = 0;
+        for (var _i = 0, classes_1 = classes; _i < classes_1.length; _i++) {
+            var classItem = classes_1[_i];
+            var classNo = classItem.index;
+            cnt++;
+            var label = document.createElement("span");
+            label.textContent = "Class " + classNo;
+            label.setAttribute("style", "width: 100px;text-align: right");
+            element.appendChild(label);
+            var inputElement = document.createElement("input");
+            inputElement.type = "text";
+            inputElement.setAttribute("style", "width: 100px; margin-right: 10px; margin-left: 10px; margin-bottom: 5px'");
+            inputElement.id = "class" + classNo;
+            element.appendChild(inputElement);
+            this.kendoHelper.createStudentsInputField("class" + classNo, classItem.count, this.onStudentCountInClassChanged);
+            if (cnt === 3) {
+                $("#classes-settings-container")
+                    .append("<div style='margin-top: 5px></div>");
+                cnt = 0;
+            }
+        }
+    };
+    ClassDefinitionViewModel.prototype.saveOptions = function (source) {
+        return true;
+    };
+    ClassDefinitionViewModel.prototype.loadOptions = function (source) {
+        this.classCount = source.bands[0].classes.length;
+        this.createInputTextBox(source.bands[0].classes);
+        return true;
+    };
     return ClassDefinitionViewModel;
 }(kendo.data.ObservableObject));
 //# sourceMappingURL=ClassDefinitionViewModel.js.map

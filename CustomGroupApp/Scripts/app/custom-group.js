@@ -682,13 +682,18 @@ var TopMiddleLowestBandSet = (function (_super) {
         this.bands[0].bandType = BandType.Top;
         this.bands[1].bandType = BandType.Middle;
         this.bands[2].bandType = BandType.Lowest;
+        this.bands[0].bandName = "Top";
+        this.bands[1].bandName = "Middle";
+        this.bands[2].bandName = "Lowest";
     }
     return TopMiddleLowestBandSet;
 }(BandSet));
 var ClassesDefinition = (function () {
     function ClassesDefinition(testFile) {
         var _this = this;
+        if (testFile === void 0) { testFile = null; }
         this.testFile = testFile;
+        this.students = [];
         this.spreadBoysGirlsEqually = false;
         this.excludeLeavingStudent = false;
         this.createBandSet = function (name, studentCount, bandCount, bandStreamType, bandType, streamType, groupType, mixBoysGirls) {
@@ -703,8 +708,7 @@ var ClassesDefinition = (function () {
         this.createCustomBandSet = function (name, studentCount, bandCount) {
             return new CustomBandSet(_this, studentCount, bandCount);
         };
-        this.createTopMiddleBottomBandSet = function (name, studentCount, bandCount, bandStreamType, bandType, streamType, groupType, mixBoysGirls) {
-            if (bandCount === void 0) { bandCount = 1; }
+        this.createTopMiddleBottomBandSet = function (name, studentCount, bandStreamType, bandType, streamType, groupType, mixBoysGirls) {
             if (bandStreamType === void 0) { bandStreamType = BandStreamType.Streaming; }
             if (bandType === void 0) { bandType = BandType.None; }
             if (streamType === void 0) { streamType = StreamType.OverallAbilty; }
@@ -713,11 +717,12 @@ var ClassesDefinition = (function () {
             return new TopMiddleLowestBandSet(_this, studentCount, bandStreamType, bandType, streamType, groupType, mixBoysGirls);
         };
         this.uid = createUuid();
-        this.groupGender = testFile.isUnisex ? Gender.All : (testFile.hasBoys ? Gender.Boys : Gender.Girls);
-        this.testFile = testFile;
-        this.students = new Array();
-        for (var i = 0; i < testFile.students.length; i++) {
-            this.students.push(new StudentClass(testFile.students[i]));
+        if (testFile != null) {
+            this.groupGender = testFile.isUnisex ? Gender.All : (testFile.hasBoys ? Gender.Boys : Gender.Girls);
+            this.testFile = testFile;
+            for (var i = 0; i < testFile.students.length; i++) {
+                this.students.push(new StudentClass(testFile.students[i]));
+            }
         }
     }
     Object.defineProperty(ClassesDefinition.prototype, "studentCount", {

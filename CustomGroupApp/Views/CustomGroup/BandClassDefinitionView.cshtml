@@ -24,7 +24,21 @@
 </div>
 <script>
 
+    var testInfo = new TestFile();
+    var classesDefn = new ClassesDefinition(this.testInfo);
+    var studentCount = 250;
+    // Create two bands
+    var bandSet = classesDefn.createBandSet("band", studentCount, 2);
+    bandSet.bands[0].setClassCount(3);
+    bandSet.bands[0].classes[0].count = 45;
+    bandSet.bands[0].classes[1].count = 40;
+    bandSet.bands[0].classes[2].count = 40;
+    bandSet.bands[1].setClassCount(2);
+    bandSet.bands[1].classes[0].count = 85;
+    bandSet.bands[1].classes[1].count = 80;
+
     var bandClassDefinitionViewModel = new BandClassDefinitionViewModel(250);
+    bandClassDefinitionViewModel.loadOptions(bandSet);
 
     $(document)
         .ready(function() {

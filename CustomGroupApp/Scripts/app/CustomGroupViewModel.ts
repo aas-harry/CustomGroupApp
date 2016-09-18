@@ -34,6 +34,7 @@ class StepCollection {
     steps: Array<StepDefinition> = [];
 
     getStepView = (groupType: any, stepNo: number): string => {
+        console.log("GetStep: ", stepNo, groupType);
         if (typeof groupType === "string") {
             groupType = parseInt(groupType);
         }
@@ -64,14 +65,18 @@ class StepCollection {
 
 class CustomGroupViewModel extends kendo.data.ObservableObject {
 
-    constructor() {
+    constructor(studentCount: number) {
         super();
+
+        this.classDefinitionViewModel = new ClassDefinitionViewModel(studentCount);
+        this.bandClassDefinitionViewModel = new BandClassDefinitionViewModel(studentCount);
+        this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(studentCount);
     }
+
 
     private stepCollection = new StepCollection();
 
     // Html elements
-    standardClassesSettingsElement: HTMLElement;
 
     groupingOptions = new kendo.data.ObservableArray([
         { caption: "Mixed Ability", value: GroupingMethod.MixedAbility, id: "mixed-ability" },
@@ -93,7 +98,8 @@ class CustomGroupViewModel extends kendo.data.ObservableObject {
         { caption: "Parallel", value: BandStreamType.Parallel, id: "parallel-tml" }
     ];
 
-    selectedGroupingOption = 1;
+
+    selectedGroupingOption : any = 1;
     selectedStreamingOption = 0;
     selectedTopClassGroupingOption = 0;
     selectedLowestClassGroupingOption = 0;
@@ -104,11 +110,57 @@ class CustomGroupViewModel extends kendo.data.ObservableObject {
     isCoedSchool = true;
     studentCount = 200;
     classCount = 1;
+    selectedClassDefinitionViewModel: IBandClassSettings;
 
-    onClassCountChanged = () => {
+    private testInfo = new TestFile();
+    private customBandSet: BandSet;
+    private topMiddleLowestBandSet: TopMiddleLowestBandSet;
+    private bandSet: BandSet;
+    private classesDefn: ClassesDefinition;
 
+    private classDefinitionViewModel: ClassDefinitionViewModel;
+    private bandClassDefinitionViewModel: BandClassDefinitionViewModel;
+    private topMiddleLowestBandClassDefinitionViewModel: TopMiddleLowestBandClassDefinitionViewModel;
+
+    loadGroupingViewModel() {
+        switch (parseInt(this.selectedGroupingOption)) {
+            case GroupingMethod.Banding: 
+                this.set("selectedClassDefinitionViewModel", this.bandClassDefinitionViewModel);
+                this.selectedClassDefinitionViewModel.loadOptions(this.customBandSet);
+                break;
+
+            case GroupingMethod.TopMiddleLowest:
+                this.set("selectedClassDefinitionViewModel", this.topMiddleLowestBandSet);
+                this.selectedClassDefinitionViewModel.loadOptions(this.topMiddleLowestBandSet);
+                break;
+
+            default:
+                this.set("selectedClassDefinitionViewModel", this.classDefinitionViewModel);
+                this.selectedClassDefinitionViewModel.loadOptions(this.bandSet);
+                break;
+        }
     }
 
+    setDatasource = (studentCount: number) => {
+        var testInfo = new TestFile();
+        this.classesDefn = new ClassesDefinition(testInfo);
+
+        this.bandSet = this.classesDefn.createBandSet("class", studentCount);
+        this.bandSet.bands[0].setClassCount(3);
+        this.classDefinitionViewModel = new ClassDefinitionViewModel(studentCount);
+
+        this.customBandSet = this.classesDefn.createBandSet("Band",studentCount);
+        this.customBandSet.bands[0].setClassCount(2);
+        this.bandClassDefinitionViewModel = new BandClassDefinitionViewModel(studentCount);
+
+        this.topMiddleLowestBandSet = this.classesDefn.createTopMiddleBottomBandSet("class", studentCount);
+        this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(studentCount);
+
+        this.set("selectedClassDefinitionViewModel", this.classDefinitionViewModel);
+
+    };
+
+    
     nextStep = () => {
         super.set("currentGroupStep", this.currentGroupStep + 1);
         this.callGetViewStep(this.currentGroupStep);
@@ -126,22 +178,24 @@ class CustomGroupViewModel extends kendo.data.ObservableObject {
         super.set("isLastStep", this.stepCollection.isLastStep(stepNo));
 
         var viewName = this.stepCollection.getStepView(this.selectedGroupingOption, stepNo);
+        console.log("View: ", viewName);
+
+       
         if (!viewName) {
             return;
         }
         $.ajax({
             type: "POST",
-            url: viewName,
+            url: "Customgroup\\" + viewName,
             dataType: "html",
-            success: data => {
-                this.showStep(data);
+            success: function (data) {
+                $("#custom-group-content").html(data);
             }
         });
     }
 
     private showStep = (data) => {
-        $("#custom-group-content").html(data);
-        kendo.unbind("#custom-group-container");
-        kendo.bind($("#custom-group-container"), this);
+
+      
     }
 }

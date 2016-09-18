@@ -2,7 +2,8 @@ var KendoHelper = (function () {
     function KendoHelper() {
         var _this = this;
         this.integerFormat = "n0";
-        this.createBandInputContainer = function (cell, bandNo, callback, addLabel) {
+        this.createBandInputContainer = function (cell, bandNo, classCount, callback, addLabel) {
+            if (classCount === void 0) { classCount = 1; }
             if (addLabel === void 0) { addLabel = false; }
             if (addLabel) {
                 var label = document.createElement("span");
@@ -15,7 +16,7 @@ var KendoHelper = (function () {
             element.setAttribute("style", "width: 100px");
             element.id = "band-" + bandNo;
             cell.appendChild(element);
-            return _this.createBandInputField(element.id, callback);
+            return _this.createBandInputField(element.id, classCount, callback);
         };
         this.createClassInputContainer = function (cell, studentCount, classNo, bandNo, callbackChangeEvent, addLabel) {
             if (studentCount === void 0) { studentCount = 1; }
@@ -64,9 +65,10 @@ var KendoHelper = (function () {
             if (callbackChangeEvent === void 0) { callbackChangeEvent = null; }
             return _this.createNumericTextBox(element, studentCount, 0, 250, _this.integerFormat, callbackChangeEvent);
         };
-        this.createBandInputField = function (element, callbackChangeEvent) {
+        this.createBandInputField = function (element, classCount, callbackChangeEvent) {
+            if (classCount === void 0) { classCount = 1; }
             if (callbackChangeEvent === void 0) { callbackChangeEvent = null; }
-            return _this.createNumericTextBox(element, 1, 1, 5, _this.integerFormat, callbackChangeEvent);
+            return _this.createNumericTextBox(element, classCount, 1, 5, _this.integerFormat, callbackChangeEvent);
         };
         this.createStudentsInputField = function (element, studentCount, callbackChangeEvent) {
             if (studentCount === void 0) { studentCount = 1; }

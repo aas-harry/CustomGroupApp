@@ -48,8 +48,8 @@ class TestFile {
     testYear: number;
     studentCount: number;
     published: Date;
-    subjectTypes: Array<Subject>[];
-    students: Array<Student>;
+    subjectTypes: Array<Subject> = [];
+    students: Array<Student> = [];
     isUnisex: boolean;
     hasBoys: boolean = false;
     hasGirls: boolean = false;
@@ -62,6 +62,14 @@ class TestFile {
         }
         return this.fileNumber + " " + this.category;
     };
+
+    set = (test: any, results: any) => {
+        this.fileNumber = test.Testnum;
+        this.grade = test.Grade;
+        this.category = test.Category;
+        this.testDate = test.Testdate;
+        this.setStudents(results);    
+    }
 
     clear = () => {
         this.fileNumber = undefined;

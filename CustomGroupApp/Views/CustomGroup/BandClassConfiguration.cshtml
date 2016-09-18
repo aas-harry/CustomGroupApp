@@ -28,7 +28,7 @@
                    data-format="n0"
                    data-min="1"
                    data-max="30"
-                   data-bind="value: bandCount, events: { change: onBandCountChange  }">
+                   data-bind="value: selectedClassDefinitionViewModel.bandCount, events: { change: selectedClassDefinitionViewModel.onBandCountChange  }">
             <span>(Max 30 Classes)</span>
         </div>
         <p>You can adjust the number of students in each classes below:</p>
@@ -48,11 +48,9 @@
 </div>
 
 <script>
-    var bandClassDefinitionViewModel = new BandClassDefinitionViewModel(250);
     $(document)
         .ready(function () {
-            kendo.bind($("#class-definition-container"), bandClassDefinitionViewModel);
-
-            bandClassDefinitionViewModel.onBandCountChange();
+            kendo.bind($("#custom-group-container"), customGroupViewModel);
+            customGroupViewModel.loadGroupingViewModel();
         });
 </script>

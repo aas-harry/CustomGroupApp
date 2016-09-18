@@ -25,6 +25,7 @@ var StepCollection = (function () {
         var _this = this;
         this.steps = [];
         this.getStepView = function (groupType, stepNo) {
+            console.log("GetStep: ", stepNo, groupType);
             if (typeof groupType === "string") {
                 groupType = parseInt(groupType);
             }
@@ -64,10 +65,11 @@ var StepCollection = (function () {
 }());
 var CustomGroupViewModel = (function (_super) {
     __extends(CustomGroupViewModel, _super);
-    function CustomGroupViewModel() {
+    function CustomGroupViewModel(studentCount) {
         var _this = this;
         _super.call(this);
         this.stepCollection = new StepCollection();
+        // Html elements
         this.groupingOptions = new kendo.data.ObservableArray([
             { caption: "Mixed Ability", value: GroupingMethod.MixedAbility, id: "mixed-ability" },
             { caption: "Streaming", value: GroupingMethod.Streaming, id: "streaming" },
@@ -95,7 +97,19 @@ var CustomGroupViewModel = (function (_super) {
         this.isCoedSchool = true;
         this.studentCount = 200;
         this.classCount = 1;
-        this.onClassCountChanged = function () {
+        this.testInfo = new TestFile();
+        this.setDatasource = function (studentCount) {
+            var testInfo = new TestFile();
+            _this.classesDefn = new ClassesDefinition(testInfo);
+            _this.bandSet = _this.classesDefn.createBandSet("class", studentCount);
+            _this.bandSet.bands[0].setClassCount(3);
+            _this.classDefinitionViewModel = new ClassDefinitionViewModel(studentCount);
+            _this.customBandSet = _this.classesDefn.createBandSet("Band", studentCount);
+            _this.customBandSet.bands[0].setClassCount(2);
+            _this.bandClassDefinitionViewModel = new BandClassDefinitionViewModel(studentCount);
+            _this.topMiddleLowestBandSet = _this.classesDefn.createTopMiddleBottomBandSet("class", studentCount);
+            _this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(studentCount);
+            _this.set("selectedClassDefinitionViewModel", _this.classDefinitionViewModel);
         };
         this.nextStep = function () {
             _super.prototype.set.call(_this, "currentGroupStep", _this.currentGroupStep + 1);
@@ -109,25 +123,41 @@ var CustomGroupViewModel = (function (_super) {
             console.log("cancelStep");
         };
         this.showStep = function (data) {
-            $("#custom-group-content").html(data);
-            kendo.unbind("#custom-group-container");
-            kendo.bind($("#custom-group-container"), _this);
         };
+        this.classDefinitionViewModel = new ClassDefinitionViewModel(studentCount);
+        this.bandClassDefinitionViewModel = new BandClassDefinitionViewModel(studentCount);
+        this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(studentCount);
     }
+    CustomGroupViewModel.prototype.loadGroupingViewModel = function () {
+        switch (parseInt(this.selectedGroupingOption)) {
+            case GroupingMethod.Banding:
+                this.set("selectedClassDefinitionViewModel", this.bandClassDefinitionViewModel);
+                this.selectedClassDefinitionViewModel.loadOptions(this.customBandSet);
+                break;
+            case GroupingMethod.TopMiddleLowest:
+                this.set("selectedClassDefinitionViewModel", this.topMiddleLowestBandSet);
+                this.selectedClassDefinitionViewModel.loadOptions(this.topMiddleLowestBandSet);
+                break;
+            default:
+                this.set("selectedClassDefinitionViewModel", this.classDefinitionViewModel);
+                this.selectedClassDefinitionViewModel.loadOptions(this.bandSet);
+                break;
+        }
+    };
     CustomGroupViewModel.prototype.callGetViewStep = function (stepNo) {
-        var _this = this;
         _super.prototype.set.call(this, "isFirstStep", this.stepCollection.isFirstStep(stepNo));
         _super.prototype.set.call(this, "isLastStep", this.stepCollection.isLastStep(stepNo));
         var viewName = this.stepCollection.getStepView(this.selectedGroupingOption, stepNo);
+        console.log("View: ", viewName);
         if (!viewName) {
             return;
         }
         $.ajax({
             type: "POST",
-            url: viewName,
+            url: "Customgroup\\" + viewName,
             dataType: "html",
             success: function (data) {
-                _this.showStep(data);
+                $("#custom-group-content").html(data);
             }
         });
     };

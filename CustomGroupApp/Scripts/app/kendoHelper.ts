@@ -5,6 +5,7 @@
     createBandInputContainer = (
         cell: HTMLTableCellElement,
         bandNo: number,
+        classCount = 1,
         callback,
         addLabel = false): kendo.ui.NumericTextBox => {
         if (addLabel) {
@@ -20,7 +21,7 @@
         element.id = `band-${bandNo}`;
         cell.appendChild(element);
 
-        return this.createBandInputField(element.id, callback);
+        return this.createBandInputField(element.id, classCount, callback);
     }
 
     createClassInputContainer = (
@@ -91,10 +92,11 @@
 
     createBandInputField = (
         element: string,
+        classCount = 1,
         callbackChangeEvent = null): kendo.ui.NumericTextBox => {
         return this.createNumericTextBox(
             element,
-            1,
+            classCount,
             1,
             5,
             this.integerFormat,

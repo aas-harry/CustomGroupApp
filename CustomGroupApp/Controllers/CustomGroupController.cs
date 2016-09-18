@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Linq;
 using System.Web.Mvc;
+using CustomGroupApp.Models;
 
 namespace CustomGroupApp.Controllers
 {
@@ -31,31 +29,41 @@ namespace CustomGroupApp.Controllers
             return Json(new {Test = test, Results = results});
         }
 
-        public ActionResult CustomGroupWizard()
+        public ActionResult CustomGroupWizard(int testnum)
         {
-            return View("TopMiddleLowerClassDefinitionView");
+            //// var testnum = 10000040;
+            //var results = _dataService.GetResults(testnum).ToList();
+            //var test = _dataService.GetTest(testnum);
+
+            return View("CustomGroupWizard");
         }
 
         public ActionResult SelectGroupingTypeStep()
         {
-            return View("SelectGroupingType");
+            return PartialView("SelectGroupingType");
         }
         public ActionResult ClassConfigurationStep()
         {
-            return View("ClassConfiguration");
+            return PartialView("ClassConfiguration");
+        }
+        
+        public ActionResult TopMiddleLowestClassConfigurationStep()
+        {
+            return PartialView("TopMiddleLowestBandClassConfiguration");
         }
 
         public ActionResult BandClassConfigurationStep()
         {
-            return View("BandClassDefinitionView");
+            return PartialView("BandClassConfiguration");
         }
+
         public ActionResult SaveCustomGroupStep()
         {
-            return View("SaveCustomGroup");
+            return PartialView("SaveCustomGroup");
         }
         public ActionResult StudentGroupingOptionsStep()
         {
-            return View("StudentGroupingOptions");
+            return PartialView("StudentGroupingOptions");
         }
     }
 }
