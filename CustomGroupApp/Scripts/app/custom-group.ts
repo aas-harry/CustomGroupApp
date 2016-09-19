@@ -54,6 +54,11 @@ function createUuid() {
     return uuid;
 }
 
+interface IBandClassSettings {
+    saveOptions(source: BandSet) : boolean;
+    loadOptions(source: BandSet): boolean;
+}
+
 class SummaryClass {
     classNo: number;
     average: number;
@@ -526,7 +531,7 @@ class BandDefinition {
     constructor(public parent: ClassesDefinition,
         public bandNo: number,
         public bandName: string,
-        public studentCount,
+        public studentCount: number,
         public classCount: number = 1,
         public bandType = BandType.None,
         public streamType = StreamType.OverallAbilty,
@@ -665,10 +670,10 @@ class BandSet {
     }
 
 
-    private createBands = (name: string,
+    createBands = (name: string,
         studentCount: number,
         bandCount: number,
-        bandType: BandType,
+        bandType: BandType = BandType.Custom,
         streamType = StreamType.OverallAbilty,
         groupType = GroupingMethod.Streaming,
         mixBoysGirls: boolean = false) => {
@@ -757,23 +762,28 @@ class TopMiddleLowestBandSet extends BandSet {
         this.bands[0].bandType = BandType.Top;
         this.bands[1].bandType = BandType.Middle;
         this.bands[2].bandType = BandType.Lowest;
+        this.bands[0].bandName = "Top";
+        this.bands[1].bandName = "Middle";
+        this.bands[2].bandName = "Lowest";
     }
 }
 
 class ClassesDefinition {
-    constructor(public testFile: TestFile) {
+    constructor(public testFile: TestFile = null) {
         this.uid = createUuid();
-        this.groupGender = testFile.isUnisex ? Gender.All : (testFile.hasBoys ? Gender.Boys : Gender.Girls);
-        this.testFile = testFile;
+        if (testFile != null) {
+            this.groupGender = testFile.isUnisex ? Gender.All : (testFile.hasBoys ? Gender.Boys : Gender.Girls);
+            this.testFile = testFile;
 
-        this.students = new Array<StudentClass>();
-        for (let i = 0; i < testFile.students.length; i++) {
-            this.students.push(new StudentClass(testFile.students[i]));
+            for (let i = 0; i < testFile.students.length; i++) {
+                this.students.push(new StudentClass(testFile.students[i]));
+            }
         }
     }
+   
 
     uid: string;
-    students: Array<StudentClass>;
+    students: Array<StudentClass> = [];
     groupName: string;
     groupGender: Gender;
     streamType: StreamType;
@@ -814,7 +824,6 @@ class ClassesDefinition {
 
     createTopMiddleBottomBandSet = (name: string,
         studentCount: number,
-        bandCount: number = 1,
         bandStreamType = BandStreamType.Streaming,
         bandType = BandType.None,
         streamType = StreamType.OverallAbilty,

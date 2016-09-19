@@ -7,16 +7,7 @@
             border-bottom-style: none;
         }
     </style>
-    <div>
-        <span>Number of bands: </span>
-        <input style="width: 80px; margin-right: 15px; margin-left: 10px; margin-bottom: 5px"
-               data-role="numerictextbox"
-               data-format="n0"
-               data-min="1"
-               data-max="30"
-               data-bind="value: bandCount, events: { change: onBandCountChange  }">
-        <span>(Max 30 Classes)</span>
-    </div>
+   
     <p>You can adjust the number of students in each classes below:</p>
     <div id="classes-settings-container" style="width: 540px">
         <table id="band-definition-table"></table>
@@ -27,17 +18,18 @@
     var testInfo = new TestFile();
     var classesDefn = new ClassesDefinition(this.testInfo);
     var studentCount = 250;
-    // Create two bands
-    var bandSet = classesDefn.createBandSet("band", studentCount, 2);
+
+    var bandSet = classesDefn.createTopMiddleBottomBandSet("band", studentCount);
     bandSet.bands[0].setClassCount(3);
-    bandSet.bands[0].classes[0].count = 45;
-    bandSet.bands[0].classes[1].count = 40;
-    bandSet.bands[0].classes[2].count = 40;
+    bandSet.bands[0].classes[0].count = 35;
+    bandSet.bands[0].classes[1].count = 30;
+    bandSet.bands[0].classes[2].count = 30;
     bandSet.bands[1].setClassCount(2);
     bandSet.bands[1].classes[0].count = 85;
     bandSet.bands[1].classes[1].count = 80;
+    bandSet.bands[2].classes[0].count = 85;
 
-    var bandClassDefinitionViewModel = new BandClassDefinitionViewModel(250);
+    var bandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(250);
     bandClassDefinitionViewModel.loadOptions(bandSet);
 
     $(document)

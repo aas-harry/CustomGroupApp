@@ -38,6 +38,8 @@ var TestFile = (function () {
     function TestFile() {
         var _this = this;
         this.school = new School();
+        this.subjectTypes = [];
+        this.students = [];
         this.hasBoys = false;
         this.hasGirls = false;
         this.description = function () {
@@ -45,6 +47,13 @@ var TestFile = (function () {
                 return _this.fileNumber + " " + _this.category + " Ravens";
             }
             return _this.fileNumber + " " + _this.category;
+        };
+        this.set = function (test, results) {
+            _this.fileNumber = test.Testnum;
+            _this.grade = test.Grade;
+            _this.category = test.Category;
+            _this.testDate = test.Testdate;
+            _this.setStudents(results);
         };
         this.clear = function () {
             _this.fileNumber = undefined;

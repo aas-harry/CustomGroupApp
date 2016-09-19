@@ -3,9 +3,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var BandClassDefinitionViewModel = (function (_super) {
-    __extends(BandClassDefinitionViewModel, _super);
-    function BandClassDefinitionViewModel(studentCount) {
+var TopMiddleLowestBandClassDefinitionViewModel = (function (_super) {
+    __extends(TopMiddleLowestBandClassDefinitionViewModel, _super);
+    function TopMiddleLowestBandClassDefinitionViewModel(studentCount) {
         var _this = this;
         if (studentCount === void 0) { studentCount = 0; }
         _super.call(this);
@@ -23,59 +23,66 @@ var BandClassDefinitionViewModel = (function (_super) {
             });
             return classes;
         };
+        this.bandSet = new TopMiddleLowestBandSet(null, this.studentCount);
         this.groupingHelper = new GroupingHelper();
         this.kendoHelper = new KendoHelper();
-        this.onStudentCountChanged = function () {
+        this.bandNumericTextBoxes = new BandNumericTextBoxCollection();
+    }
+    TopMiddleLowestBandClassDefinitionViewModel.prototype.saveOptions = function (source) {
+        return true;
+    };
+    TopMiddleLowestBandClassDefinitionViewModel.prototype.loadOptions = function (source) {
+        this.bandSet = source;
+        this.bandCount = source.bands.length;
+        this.bandNumericTextBoxes.initTable("#classes-settings-container", source.bands);
+        return true;
+    };
+    return TopMiddleLowestBandClassDefinitionViewModel;
+}(kendo.data.ObservableObject));
+var BandClassDefinitionViewModel = (function (_super) {
+    __extends(BandClassDefinitionViewModel, _super);
+    function BandClassDefinitionViewModel(studentCount) {
+        var _this = this;
+        if (studentCount === void 0) { studentCount = 0; }
+        _super.call(this);
+        this.studentCount = studentCount;
+        this.classes = new kendo.data.ObservableArray([
+            { classNo: 1, studentCount: 1 }
+        ]);
+        this.bandCount = 1;
+        this.classCount = 1;
+        this.getClasses = function () {
+            var classes = new Array();
+            _this.classes.forEach(function (val) {
+                var classCnt = $("#class" + val.classNo).data("kendoNumericTextBox");
+                classes.push(classCnt.value());
+            });
+            return classes;
         };
+        this.groupingHelper = new GroupingHelper();
+        this.kendoHelper = new KendoHelper();
+        this.bandNumericTextBoxes = new BandNumericTextBoxCollection();
         this.onBandCountChange = function () {
-            $("#classes-settings-container").html("<table id='band-definition-table'></table>");
-            var table = document.getElementById("band-definition-table");
-            var header = table.createTHead();
-            var colNo = 0;
-            var columnHeader = header.insertRow();
-            var bandRow = header.insertRow();
-            var classCountRow = header.insertRow();
-            _this.kendoHelper.createLabel(columnHeader.insertCell(0), "<span style='width: 100px'></span>");
-            _this.kendoHelper.createLabel(bandRow.insertCell(0), "Number of Classes");
-            _this.kendoHelper.createLabel(classCountRow.insertCell(0), "Class 1");
-            for (var i = 1; i <= _this.bandCount; i++) {
-                _this.kendoHelper.createLabel(columnHeader.insertCell(i), "Band " + colNo);
-                _this.kendoHelper.createBandInputContainer(bandRow.insertCell(i), i);
-                _this.kendoHelper.createBandInputContainer(classCountRow.insertCell(i), i);
-                colNo++;
-            }
-            //  $("#classes-settings-container").append(table.innerHTML);
+            _this.bandSet.createBands("custom", _this.studentCount, _this.bandCount);
+            _this.bandNumericTextBoxes.initTable("#classes-settings-container", _this.bandSet.bands);
         };
-        this.createNumberInputField = function (elementId, name) {
+        this.createNumberInputField = function (elementId) {
             var element = document.createElement("input");
             element.type = "text";
             element.setAttribute("style", "width: 100px");
             element.id = elementId;
             return element;
         };
-        this.onClassCountChange = function () {
-            var tmpClasses = _this.groupingHelper.calculateClassesSize(_this.studentCount, _this.classCount);
-            _this.classes.splice(0, _this.classes.length);
-            var cnt = 0;
-            for (var i = 1; i <= _this.classCount; i++) {
-                _this.classes.push({ classNo: i, studentCount: tmpClasses[i - 1] });
-                cnt++;
-                $("#classes-settings-container")
-                    .append("<span style='width: 100px;text-align: right'>Class " +
-                    i +
-                    "</span><input id='class" +
-                    i +
-                    "' style='width: 100px; margin-right: 10px; margin-left: 10px; margin-bottom: 5px'" +
-                    "></input");
-                if (cnt === 3) {
-                    $("#classes-settings-container")
-                        .append("<div></div>");
-                    cnt = 0;
-                }
-            }
-        };
-        _super.prototype.init.call(this, this);
-        this.onBandCountChange();
     }
+    BandClassDefinitionViewModel.prototype.saveOptions = function (source) {
+        return true;
+    };
+    BandClassDefinitionViewModel.prototype.loadOptions = function (source) {
+        this.bandSet = source;
+        this.bandCount = source.bands.length;
+        this.bandNumericTextBoxes.initTable("#classes-settings-container", source.bands);
+        return true;
+    };
     return BandClassDefinitionViewModel;
 }(kendo.data.ObservableObject));
+//# sourceMappingURL=BandClassDefinitionViewModel.js.map

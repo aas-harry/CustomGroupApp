@@ -1,10 +1,5 @@
 ﻿<div>
     <style scoped>
-        h1 {
-            color: black;
-            font-size: 12px;
-        }
-
         input[type="radio"] {
             margin-right: 5px;
             margin-bottom: 5px;
@@ -18,7 +13,7 @@
             </div>
         </div>
         <div class="row">
-            <hr/>
+            <hr />
             <div id="navigation-buttons" style="margin-left: 20px">
                 <button class="btn btn-default" data-bind="click: nextStep, disabled: isLastStep ">Next</button>
                 <button class="btn btn-default" data-bind="click: previousStep, disabled: isFirstStep">Previous</button>
@@ -28,13 +23,30 @@
     </div>
     <script>
 
-        var customGroupViewModel = new CustomGroupViewModel();
-
-        customGroupViewModel.standardClassesSettingsElement = "standard-classes-settings";
+        var customGroupViewModel = new CustomGroupViewModel(250);
+        customGroupViewModel.setDatasource(250);
 
         $(document)
-            .ready(function() {
+            .ready(function () {
+
                 kendo.bind($("#custom-group-container"), customGroupViewModel);
+
+                // getTestResult(1014405);
+
+                function getTestResult(testnum) {
+                    $.ajax({
+                        url: '@Url.Action("GetResults", "CustomGroup")',
+                        data: { 'testnum': testnum },
+                        type: 'POST',
+                        cache: false,
+                        success: function (data) {
+                            customGroupViewModel.setDataSource(data);
+                        },
+                        fail: function () {
+
+                        }
+                    });
+                }
             });
     </script>
 </div>

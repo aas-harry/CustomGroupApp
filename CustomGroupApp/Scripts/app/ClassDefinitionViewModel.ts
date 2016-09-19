@@ -1,66 +1,67 @@
-﻿class ClassDefinitionViewModel extends kendo.data.ObservableObject {
+﻿class ClassDefinitionViewModel extends kendo.data.ObservableObject
+    implements IBandClassSettings {
 
-    classes: kendo.data.ObservableArray = new kendo.data.ObservableArray(
-        [
-            { classNo: 1, studentCount: 1 }
-        ]);
     constructor(public studentCount: number = 0) {
         super();
         super.init(this);
-
-        this.classCount = 1;
     }
 
     classCount = 1;
 
-    getClasses = (): Array<number> => {
-        var classes = new Array<number>();
-        this.classes.forEach((val : any) => {
-            var classCnt = $(`#class${val.classNo}`).data("kendoNumericTextBox");
-            classes.push(classCnt.value());
-        });
-        return classes;
-    }
-
     groupingHelper = new GroupingHelper();
+    kendoHelper = new KendoHelper();
 
-    onStudentCountChanged = () => {
+    // This function is called when the student count in a class is changed
+    onStudentCountInClassChanged = () => {
     };
 
     onClassCountChange = () => {
         var tmpClasses = this.groupingHelper.calculateClassesSize(this.studentCount, this.classCount);
 
-        this.classes.splice(0, this.classes.length);
+        this.createInputTextBox(Enumerable.From(tmpClasses).Select((val, classNo) => 
+            new ClassDefinition(null, classNo+1, val)).ToArray());
+    }
+
+    createInputTextBox(classes: Array<ClassDefinition>) {
         $("#classes-settings-container").html("");
+        const element = document.getElementById("classes-settings-container") as HTMLTableElement;
+
         var cnt = 0;
-        for (let i = 1; i <= this.classCount; i++) {
-            this.classes.push({ classNo: i, studentCount: tmpClasses[i-1] });
+        for (let classItem of classes) {
+            const classNo = classItem.index;
             cnt++;
-            $("#classes-settings-container")
-                .append("<span style='width: 100px;text-align: right'>Class " +
-                    i +
-                    "</span><input id='class" +
-                    i +
-                    "' style='width: 100px; margin-right: 10px; margin-left: 10px; margin-bottom: 5px'" +
-                    "></input");
+            const label = document.createElement("span");
+            label.textContent = "Class " + classNo;
+            label.setAttribute("style", "width: 100px;text-align: right");
+            element.appendChild(label);
+
+            const inputElement = document.createElement("input") as HTMLInputElement;
+            inputElement.type = "text";
+            inputElement.setAttribute("style", "width: 100px; margin-right: 10px; margin-left: 10px; margin-bottom: 5px'");
+            inputElement.id = `class${classNo}`;
+            element.appendChild(inputElement);
+
+            this.kendoHelper.createStudentsInputField(`class${classNo}`,
+                classItem.count,
+                this.onStudentCountInClassChanged);
+
             if (cnt === 3) {
                 $("#classes-settings-container")
-                    .append("<div></div>");
+                    .append("<div style='margin-top: 5px></div>");
                 cnt = 0;
             }
-            $(`#class${i}`)
-                .kendoNumericTextBox({
-                    options: {  },
-                    change: this.onStudentCountChanged,
-                    spin: this.onStudentCountChanged
 
-                } as kendo.ui.NumericTextBoxOptions);
-            const spinnerInputField = $(`#class${i}`).data("kendoNumericTextBox");
-            spinnerInputField.options.format = "n0";
-            spinnerInputField.value(tmpClasses[i - 1]);
-            spinnerInputField.max(250);
-            spinnerInputField.min(1);
-            spinnerInputField.options.decimals = 0;
+          
         }
-    } 
+    }
+
+    saveOptions(source: BandSet): boolean {
+        return true;
+    }
+
+    loadOptions(source: BandSet): boolean {
+        this.classCount = source.bands[0].classes.length;
+        this.createInputTextBox(source.bands[0].classes);
+        return true;
+    }
 }

@@ -142,6 +142,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\TestViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -997,10 +998,12 @@
     <Content Include="Views\CustomGroup\SaveCustomGroup.cshtml" />
     <Content Include="Views\CustomGroup\ClassDefinitionView.cshtml" />
     <Content Include="Views\CustomGroup\BandClassDefinitionView.cshtml" />
+    <Content Include="Views\CustomGroup\BandClassConfiguration.cshtml" />
+    <Content Include="Views\CustomGroup\TopMiddleLowerClassDefinitionView.cshtml" />
+    <Content Include="Views\CustomGroup\TopMiddleLowestBandClassConfiguration.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
@@ -1022,6 +1025,8 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\app\BandClassDefinitionViewModel.ts" />
+    <TypeScriptCompile Include="Scripts\app\BandNumericTextBox.ts" />
+    <TypeScriptCompile Include="Scripts\app\GroupingTypeViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\ClassDefinitionViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\common.ts" />
     <TypeScriptCompile Include="Scripts\app\custom-group.ts" />
