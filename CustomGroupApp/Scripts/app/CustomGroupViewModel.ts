@@ -141,8 +141,11 @@ class CustomGroupViewModel extends kendo.data.ObservableObject {
         }
     }
 
-    setDatasource = (studentCount: number) => {
+    setDatasource = (test, results) => {
         var testInfo = new TestFile();
+        testInfo.set(test, results);
+        debugger;
+        const studentCount = testInfo.studentCount;
         this.classesDefn = new ClassesDefinition(testInfo);
 
         this.bandSet = this.classesDefn.createBandSet("class", studentCount);
@@ -187,7 +190,7 @@ class CustomGroupViewModel extends kendo.data.ObservableObject {
             type: "POST",
             url: "Customgroup\\" + viewName,
             dataType: "html",
-            success: function (data) {
+            success(data) {
                 $("#custom-group-content").html(data);
             }
         });

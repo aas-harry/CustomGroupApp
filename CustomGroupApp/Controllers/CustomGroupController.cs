@@ -31,11 +31,11 @@ namespace CustomGroupApp.Controllers
 
         public ActionResult CustomGroupWizard(int testnum)
         {
-            //// var testnum = 10000040;
-            //var results = _dataService.GetResults(testnum).ToList();
-            //var test = _dataService.GetTest(testnum);
+            // var testnum = 10000040;
+            var results = _dataService.GetResults(testnum).ToList();
+            var test = _dataService.GetTest(testnum);
 
-            return View("CustomGroupWizard");
+            return View("CustomGroupWizard", new TestViewModel {Test=test, Results = results});
         }
 
         public ActionResult SelectGroupingTypeStep()

@@ -98,8 +98,11 @@ var CustomGroupViewModel = (function (_super) {
         this.studentCount = 200;
         this.classCount = 1;
         this.testInfo = new TestFile();
-        this.setDatasource = function (studentCount) {
+        this.setDatasource = function (test, results) {
             var testInfo = new TestFile();
+            testInfo.set(test, results);
+            debugger;
+            var studentCount = testInfo.studentCount;
             _this.classesDefn = new ClassesDefinition(testInfo);
             _this.bandSet = _this.classesDefn.createBandSet("class", studentCount);
             _this.bandSet.bands[0].setClassCount(3);

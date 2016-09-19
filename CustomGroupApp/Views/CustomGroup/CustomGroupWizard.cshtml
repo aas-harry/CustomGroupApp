@@ -1,4 +1,6 @@
-﻿<div>
+﻿@model CustomGroupApp.Models.TestViewModel
+
+<div>
     <style scoped>
         input[type="radio"] {
             margin-right: 5px;
@@ -23,11 +25,12 @@
     </div>
     <script>
 
-        var customGroupViewModel = new CustomGroupViewModel(250);
-        customGroupViewModel.setDatasource(250);
-
+        var customGroupViewModel = new CustomGroupViewModel(@Html.Raw(Json.Encode(Model.Results.Count())));
+       
         $(document)
             .ready(function () {
+                
+                customGroupViewModel.setDatasource(test, studentResults);
 
                 kendo.bind($("#custom-group-container"), customGroupViewModel);
 
@@ -48,5 +51,8 @@
                     });
                 }
             });
+
+        var studentResults =  @Html.Raw(Json.Encode(Model.Results.ToArray()));
+        var test =  @Html.Raw(Json.Encode(Model.Test));
     </script>
 </div>
