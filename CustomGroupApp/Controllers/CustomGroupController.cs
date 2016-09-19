@@ -1,5 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Web.Mvc;
+using CsvHelper;
 using CustomGroupApp.Models;
 
 namespace CustomGroupApp.Controllers
@@ -54,8 +58,53 @@ namespace CustomGroupApp.Controllers
 
         public ActionResult LanguageClassConfigurationStep()
         {
+            var results = _dataService.GetResults(1015238).Select(x => new {x.Name, x.Id}).ToList();
+            using (var sr = new StreamReader(@"c:\temp\Year 6.csv"))
+            {
+                var csvReader = new CsvReader(sr);
+           //     csvReader.Read();
+         //       var s1 = csvReader.GetField(typeof(string), 0);
+          var ss = csvReader.GetRecords<StudentLanguage>().ToList();
+                var list = new List<StudentLanguagePref>();
+                foreach (var s in results)
+                {
+                    var lpn = ss.FirstOrDefault(x => x.Name.Equals(s.Name, StringComparison.InvariantCultureIgnoreCase));
+                    if (lpn != null)
+                    {
+                        if (!string.IsNullOrEmpty(lpn.Pref1))
+                        {
+                            list.Add(new StudentLanguagePref
+                            {
+                                StudentId = s.Id,
+                                Language = lpn.Pref1
+                            });
+
+                        }
+                        if (!string.IsNullOrEmpty(lpn.Pref2))
+                        {
+                            list.Add(new StudentLanguagePref
+                            {
+                                StudentId = s.Id,
+                                Language = lpn.Pref2
+                            });
+
+                        }
+                        if (!string.IsNullOrEmpty(lpn.Pref3))
+                        {
+                            list.Add(new StudentLanguagePref
+                            {
+                                StudentId = s.Id,
+                                Language = lpn.Pref3
+                            });
+
+                        }
+                    }
+                }
+            }
+
             return PartialView("LanguageBandClassConfiguration");
         }
+
 
         public ActionResult BandClassConfigurationStep()
         {

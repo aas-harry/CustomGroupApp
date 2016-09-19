@@ -14,3 +14,4 @@ var load = function (x, y) {
     var h = 19;
     return x * y + h;
 };
+//# sourceMappingURL=common.js.map

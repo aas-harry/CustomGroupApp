@@ -36,6 +36,9 @@ namespace CustomGroupApp
     partial void InsertTest(Test instance);
     partial void UpdateTest(Test instance);
     partial void DeleteTest(Test instance);
+    partial void InsertStudentLanguagePref(StudentLanguagePref instance);
+    partial void UpdateStudentLanguagePref(StudentLanguagePref instance);
+    partial void DeleteStudentLanguagePref(StudentLanguagePref instance);
     #endregion
 		
 		public AllwellDataAccessDataContext() : 
@@ -81,6 +84,14 @@ namespace CustomGroupApp
 			get
 			{
 				return this.GetTable<Test>();
+			}
+		}
+		
+		public System.Data.Linq.Table<StudentLanguagePref> StudentLanguagePrefs
+		{
+			get
+			{
+				return this.GetTable<StudentLanguagePref>();
 			}
 		}
 	}
@@ -3928,6 +3939,140 @@ namespace CustomGroupApp
 					this._Hidden = value;
 					this.SendPropertyChanged("Hidden");
 					this.OnHiddenChanged();
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.StudentLanguagePrefs")]
+	public partial class StudentLanguagePref : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _Id;
+		
+		private int _StudentId;
+		
+		private string _Language;
+		
+		private System.DateTime _ModifiedOn;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnIdChanging(int value);
+    partial void OnIdChanged();
+    partial void OnStudentIdChanging(int value);
+    partial void OnStudentIdChanged();
+    partial void OnLanguageChanging(string value);
+    partial void OnLanguageChanged();
+    partial void OnModifiedOnChanging(System.DateTime value);
+    partial void OnModifiedOnChanged();
+    #endregion
+		
+		public StudentLanguagePref()
+		{
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int Id
+		{
+			get
+			{
+				return this._Id;
+			}
+			set
+			{
+				if ((this._Id != value))
+				{
+					this.OnIdChanging(value);
+					this.SendPropertyChanging();
+					this._Id = value;
+					this.SendPropertyChanged("Id");
+					this.OnIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_StudentId", DbType="Int NOT NULL")]
+		public int StudentId
+		{
+			get
+			{
+				return this._StudentId;
+			}
+			set
+			{
+				if ((this._StudentId != value))
+				{
+					this.OnStudentIdChanging(value);
+					this.SendPropertyChanging();
+					this._StudentId = value;
+					this.SendPropertyChanged("StudentId");
+					this.OnStudentIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Language", DbType="VarChar(50) NOT NULL", CanBeNull=false)]
+		public string Language
+		{
+			get
+			{
+				return this._Language;
+			}
+			set
+			{
+				if ((this._Language != value))
+				{
+					this.OnLanguageChanging(value);
+					this.SendPropertyChanging();
+					this._Language = value;
+					this.SendPropertyChanged("Language");
+					this.OnLanguageChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ModifiedOn", DbType="DateTime NOT NULL")]
+		public System.DateTime ModifiedOn
+		{
+			get
+			{
+				return this._ModifiedOn;
+			}
+			set
+			{
+				if ((this._ModifiedOn != value))
+				{
+					this.OnModifiedOnChanging(value);
+					this.SendPropertyChanging();
+					this._ModifiedOn = value;
+					this.SendPropertyChanged("ModifiedOn");
+					this.OnModifiedOnChanged();
 				}
 			}
 		}

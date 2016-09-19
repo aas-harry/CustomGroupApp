@@ -39,3 +39,4 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
     };
     return LanguageBandClassDefinitionViewModel;
 }(kendo.data.ObservableObject));
+//# sourceMappingURL=LanguageBandClassDefinitionViewModel.js.map

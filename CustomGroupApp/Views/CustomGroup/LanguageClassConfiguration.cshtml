@@ -2,11 +2,6 @@
     <span style="margin-right: 10px">Step 2:</span>Enter number of classes
 </div>
 <div style="margin: 20px">
-    <div style="margin-top: 20px; margin-bottom: 5px">
-        <span>Student Language Preferences</span>
-        <button class="btn btn-default" onClick="getResults()">Get Results</button>
-    </div>
-
     <div data-bind="visible: isCoedSchool">
         <div>Choose students to include option:</div>
         <div>
@@ -22,10 +17,21 @@
             <span>Boys Only</span>
         </div>
     </div>
-    
+
+    <div>Student Language Preferences</div>
     <div style="margin-top: 20px; margin-bottom: 5px">Number of students in this test: <span data-bind="text: studentCount"></span></div>
 
     <div id="class-definition-container">
+        <div>
+            <span>Number of bands: </span>
+            <input style="width: 80px; margin-right: 15px; margin-left: 10px; margin-bottom: 5px"
+                   data-role="numerictextbox"
+                   data-format="n0"
+                   data-min="1"
+                   data-max="30"
+                   data-bind="value: selectedClassDefinitionViewModel.bandCount, events: { change: selectedClassDefinitionViewModel.onBandCountChange  }">
+            <span>(Max 30 Classes)</span>
+        </div>
         <p>You can adjust the number of students in each classes below:</p>
         <div id="classes-settings-container" style="width: 540px">
             <table id="band-definition-table"></table>

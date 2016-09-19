@@ -169,7 +169,6 @@ class CustomGroupViewModel extends kendo.data.ObservableObject {
         this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(studentCount);
 
         this.set("selectedClassDefinitionViewModel", this.classDefinitionViewModel);
-
     };
 
     

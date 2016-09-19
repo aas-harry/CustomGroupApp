@@ -230,3 +230,4 @@ var BandNumericTextBoxCollection = (function () {
     };
     return BandNumericTextBoxCollection;
 }());
+//# sourceMappingURL=BandNumericTextBox.js.map
