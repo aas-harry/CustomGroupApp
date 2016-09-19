@@ -1001,6 +1001,7 @@
     <Content Include="Views\CustomGroup\BandClassConfiguration.cshtml" />
     <Content Include="Views\CustomGroup\TopMiddleLowerClassDefinitionView.cshtml" />
     <Content Include="Views\CustomGroup\TopMiddleLowestBandClassConfiguration.cshtml" />
+    <Content Include="Views\CustomGroup\LanguageBandClassConfiguration.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1035,6 +1036,8 @@
     <TypeScriptCompile Include="Scripts\app\IndividualStudentTestResult.ts" />
     <TypeScriptCompile Include="Scripts\app\kendoHelper.ts" />
     <TypeScriptCompile Include="Scripts\app\repository.ts" />
+    <TypeScriptCompile Include="Scripts\app\LanguageBandClassDefinitionViewModel.ts" />
+    <TypeScriptCompile Include="Scripts\app\TopMiddleLowestBandClassDefinitionViewModel.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\kendo-ui\kendo-ui.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\linq\linq.d.ts" />

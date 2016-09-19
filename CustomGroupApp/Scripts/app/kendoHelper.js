@@ -96,4 +96,3 @@ var KendoHelper = (function () {
     }
     return KendoHelper;
 }());
-//# sourceMappingURL=kendoHelper.js.map

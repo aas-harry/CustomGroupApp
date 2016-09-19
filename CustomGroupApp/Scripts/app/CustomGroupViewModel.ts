@@ -17,6 +17,7 @@ class StepCollection {
         const step2 = new StepDefinition(2, false, "ClassConfigurationStep");
         step2.views.push(new ViewDefinition(GroupingMethod.Banding, "BandClassConfigurationStep"));
         step2.views.push(new ViewDefinition(GroupingMethod.TopMiddleLowest, "TopMiddleLowestClassConfigurationStep"));
+        step2.views.push(new ViewDefinition(GroupingMethod.Language, "LanguageClassConfigurationStep"));
         this.steps.push(step2);
 
         this.steps.push(new StepDefinition(3, true, "StudentGroupingOptionsStep"));
@@ -115,12 +116,14 @@ class CustomGroupViewModel extends kendo.data.ObservableObject {
     private testInfo = new TestFile();
     private customBandSet: BandSet;
     private topMiddleLowestBandSet: TopMiddleLowestBandSet;
+    private languageBandSet: BandSet;
     private bandSet: BandSet;
     private classesDefn: ClassesDefinition;
 
     private classDefinitionViewModel: ClassDefinitionViewModel;
     private bandClassDefinitionViewModel: BandClassDefinitionViewModel;
     private topMiddleLowestBandClassDefinitionViewModel: TopMiddleLowestBandClassDefinitionViewModel;
+    private languageBandClassDefinitionViewModel: LanguageBandClassDefinitionViewModel;
 
     loadGroupingViewModel() {
         switch (parseInt(this.selectedGroupingOption)) {
@@ -134,6 +137,11 @@ class CustomGroupViewModel extends kendo.data.ObservableObject {
                 this.selectedClassDefinitionViewModel.loadOptions(this.topMiddleLowestBandSet);
                 break;
 
+            case GroupingMethod.Language:
+                this.set("selectedClassDefinitionViewModel", this.languageBandClassDefinitionViewModel);
+                this.selectedClassDefinitionViewModel.loadOptions(this.languageBandSet);
+                break;
+
             default:
                 this.set("selectedClassDefinitionViewModel", this.classDefinitionViewModel);
                 this.selectedClassDefinitionViewModel.loadOptions(this.bandSet);
@@ -144,7 +152,6 @@ class CustomGroupViewModel extends kendo.data.ObservableObject {
     setDatasource = (test, results) => {
         var testInfo = new TestFile();
         testInfo.set(test, results);
-        debugger;
         const studentCount = testInfo.studentCount;
         this.classesDefn = new ClassesDefinition(testInfo);
 
@@ -154,6 +161,9 @@ class CustomGroupViewModel extends kendo.data.ObservableObject {
 
         this.customBandSet = this.classesDefn.createBandSet("Band",studentCount, 2);
         this.bandClassDefinitionViewModel = new BandClassDefinitionViewModel(studentCount);
+
+        this.languageBandSet = this.classesDefn.createBandSet("Band", studentCount, 2);
+        this.languageBandClassDefinitionViewModel = new LanguageBandClassDefinitionViewModel(studentCount);
 
         this.topMiddleLowestBandSet = this.classesDefn.createTopMiddleBottomBandSet("class", studentCount);
         this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(studentCount);

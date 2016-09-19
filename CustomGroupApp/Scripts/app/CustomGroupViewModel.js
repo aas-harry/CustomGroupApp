@@ -54,6 +54,7 @@ var StepCollection = (function () {
         var step2 = new StepDefinition(2, false, "ClassConfigurationStep");
         step2.views.push(new ViewDefinition(GroupingMethod.Banding, "BandClassConfigurationStep"));
         step2.views.push(new ViewDefinition(GroupingMethod.TopMiddleLowest, "TopMiddleLowestClassConfigurationStep"));
+        step2.views.push(new ViewDefinition(GroupingMethod.Language, "LanguageClassConfigurationStep"));
         this.steps.push(step2);
         this.steps.push(new StepDefinition(3, true, "StudentGroupingOptionsStep"));
         this.steps.push(new StepDefinition(4, true, "SaveCustomGroupStep"));
@@ -101,7 +102,6 @@ var CustomGroupViewModel = (function (_super) {
         this.setDatasource = function (test, results) {
             var testInfo = new TestFile();
             testInfo.set(test, results);
-            debugger;
             var studentCount = testInfo.studentCount;
             _this.classesDefn = new ClassesDefinition(testInfo);
             _this.bandSet = _this.classesDefn.createBandSet("class", studentCount);
@@ -109,6 +109,8 @@ var CustomGroupViewModel = (function (_super) {
             _this.classDefinitionViewModel = new ClassDefinitionViewModel(studentCount);
             _this.customBandSet = _this.classesDefn.createBandSet("Band", studentCount, 2);
             _this.bandClassDefinitionViewModel = new BandClassDefinitionViewModel(studentCount);
+            _this.languageBandSet = _this.classesDefn.createBandSet("Band", studentCount, 2);
+            _this.languageBandClassDefinitionViewModel = new LanguageBandClassDefinitionViewModel(studentCount);
             _this.topMiddleLowestBandSet = _this.classesDefn.createTopMiddleBottomBandSet("class", studentCount);
             _this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(studentCount);
             _this.set("selectedClassDefinitionViewModel", _this.classDefinitionViewModel);
@@ -140,6 +142,10 @@ var CustomGroupViewModel = (function (_super) {
                 this.set("selectedClassDefinitionViewModel", this.topMiddleLowestBandClassDefinitionViewModel);
                 this.selectedClassDefinitionViewModel.loadOptions(this.topMiddleLowestBandSet);
                 break;
+            case GroupingMethod.Language:
+                this.set("selectedClassDefinitionViewModel", this.languageBandClassDefinitionViewModel);
+                this.selectedClassDefinitionViewModel.loadOptions(this.languageBandSet);
+                break;
             default:
                 this.set("selectedClassDefinitionViewModel", this.classDefinitionViewModel);
                 this.selectedClassDefinitionViewModel.loadOptions(this.bandSet);
@@ -165,4 +171,3 @@ var CustomGroupViewModel = (function (_super) {
     };
     return CustomGroupViewModel;
 }(kendo.data.ObservableObject));
-//# sourceMappingURL=CustomGroupViewModel.js.map

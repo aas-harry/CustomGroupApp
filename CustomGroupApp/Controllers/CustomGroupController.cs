@@ -52,6 +52,11 @@ namespace CustomGroupApp.Controllers
             return PartialView("TopMiddleLowestBandClassConfiguration");
         }
 
+        public ActionResult LanguageClassConfigurationStep()
+        {
+            return PartialView("LanguageBandClassConfiguration");
+        }
+
         public ActionResult BandClassConfigurationStep()
         {
             return PartialView("BandClassConfiguration");
