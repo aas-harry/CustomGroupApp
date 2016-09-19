@@ -31,7 +31,7 @@
             const classNo = classItem.index;
             cnt++;
             const label = document.createElement("span");
-            label.textContent = "Class " + classNo;
+            label.textContent = `Class ${classNo}`;
             label.setAttribute("style", "width: 100px;text-align: right");
             element.appendChild(label);
 
@@ -60,7 +60,7 @@
     }
 
     loadOptions(source: BandSet): boolean {
-        this.classCount = source.bands[0].classes.length;
+        super.set("classCount", source.bands[0].classes.length);
         this.createInputTextBox(source.bands[0].classes);
         return true;
     }

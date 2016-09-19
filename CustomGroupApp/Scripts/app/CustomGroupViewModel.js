@@ -104,8 +104,7 @@ var CustomGroupViewModel = (function (_super) {
             _this.bandSet = _this.classesDefn.createBandSet("class", studentCount);
             _this.bandSet.bands[0].setClassCount(3);
             _this.classDefinitionViewModel = new ClassDefinitionViewModel(studentCount);
-            _this.customBandSet = _this.classesDefn.createBandSet("Band", studentCount);
-            _this.customBandSet.bands[0].setClassCount(2);
+            _this.customBandSet = _this.classesDefn.createBandSet("Band", studentCount, 2);
             _this.bandClassDefinitionViewModel = new BandClassDefinitionViewModel(studentCount);
             _this.topMiddleLowestBandSet = _this.classesDefn.createTopMiddleBottomBandSet("class", studentCount);
             _this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(studentCount);
@@ -135,7 +134,7 @@ var CustomGroupViewModel = (function (_super) {
                 this.selectedClassDefinitionViewModel.loadOptions(this.customBandSet);
                 break;
             case GroupingMethod.TopMiddleLowest:
-                this.set("selectedClassDefinitionViewModel", this.topMiddleLowestBandSet);
+                this.set("selectedClassDefinitionViewModel", this.topMiddleLowestBandClassDefinitionViewModel);
                 this.selectedClassDefinitionViewModel.loadOptions(this.topMiddleLowestBandSet);
                 break;
             default:
@@ -163,3 +162,4 @@ var CustomGroupViewModel = (function (_super) {
     };
     return CustomGroupViewModel;
 }(kendo.data.ObservableObject));
+//# sourceMappingURL=CustomGroupViewModel.js.map

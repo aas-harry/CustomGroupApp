@@ -40,6 +40,8 @@
 <script>
     $(document)
         .ready(function () {
+            kendo.bind($("#custom-group-container"), customGroupViewModel);
             customGroupViewModel.loadGroupingViewModel();
+
         });
 </script>

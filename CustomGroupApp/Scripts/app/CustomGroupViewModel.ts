@@ -130,7 +130,7 @@ class CustomGroupViewModel extends kendo.data.ObservableObject {
                 break;
 
             case GroupingMethod.TopMiddleLowest:
-                this.set("selectedClassDefinitionViewModel", this.topMiddleLowestBandSet);
+                this.set("selectedClassDefinitionViewModel", this.topMiddleLowestBandClassDefinitionViewModel);
                 this.selectedClassDefinitionViewModel.loadOptions(this.topMiddleLowestBandSet);
                 break;
 
@@ -149,8 +149,7 @@ class CustomGroupViewModel extends kendo.data.ObservableObject {
         this.bandSet.bands[0].setClassCount(3);
         this.classDefinitionViewModel = new ClassDefinitionViewModel(studentCount);
 
-        this.customBandSet = this.classesDefn.createBandSet("Band",studentCount);
-        this.customBandSet.bands[0].setClassCount(2);
+        this.customBandSet = this.classesDefn.createBandSet("Band",studentCount, 2);
         this.bandClassDefinitionViewModel = new BandClassDefinitionViewModel(studentCount);
 
         this.topMiddleLowestBandSet = this.classesDefn.createTopMiddleBottomBandSet("class", studentCount);

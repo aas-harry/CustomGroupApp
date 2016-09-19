@@ -66,7 +66,7 @@ class BandClassDefinitionViewModel extends kendo.data.ObservableObject implement
 
 
     onBandCountChange = () => {
-        this.bandSet.createBands("custom", this.studentCount, this.bandCount);
+        this.bandSet.createBands("Band", this.studentCount, this.bandCount);
         this.bandNumericTextBoxes.initTable("#classes-settings-container", this.bandSet.bands);
     }
 
@@ -84,7 +84,7 @@ class BandClassDefinitionViewModel extends kendo.data.ObservableObject implement
 
     loadOptions(source: BandSet): boolean {
         this.bandSet = source;
-        this.bandCount = source.bands.length;
+        super.set("bandCount", source.bands.length);
         this.bandNumericTextBoxes.initTable("#classes-settings-container", source.bands);
         return true;
     }

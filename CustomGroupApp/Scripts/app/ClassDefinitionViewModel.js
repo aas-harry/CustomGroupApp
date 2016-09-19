@@ -53,9 +53,10 @@ var ClassDefinitionViewModel = (function (_super) {
         return true;
     };
     ClassDefinitionViewModel.prototype.loadOptions = function (source) {
-        this.classCount = source.bands[0].classes.length;
+        _super.prototype.set.call(this, "classCount", source.bands[0].classes.length);
         this.createInputTextBox(source.bands[0].classes);
         return true;
     };
     return ClassDefinitionViewModel;
 }(kendo.data.ObservableObject));
+//# sourceMappingURL=ClassDefinitionViewModel.js.map
