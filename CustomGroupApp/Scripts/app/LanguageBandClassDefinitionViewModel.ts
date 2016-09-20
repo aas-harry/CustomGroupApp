@@ -45,7 +45,6 @@
 
         this.languageSets = [];
         for (let s of this._students) {
-
             let matched = Enumerable.From(this.languageSets)
                 .FirstOrDefault(null, x => x.isEqual(s.langPref1, s.langPref2));
 
@@ -54,10 +53,15 @@
                 this.languageSets.push(matched);
             }
             matched.addStudent(s);
-            console.log(matched.language1, matched.language2, matched.count);
         }
 
-        debugger;
+        this.bandSet.createBands("language", this.studentCount, this.languageSets.length);
+        let i = 0;
+        for (let item of this.languageSets) {
+            this.bandSet.bands[i].bandName = item.language1 + "/" + item.language2;
+            this.bandSet.bands[i].studentCount = item.count;
+            i++;
+        }
     }
 
     studentWithLanguagePrefCount = 0;

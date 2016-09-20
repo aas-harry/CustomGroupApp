@@ -54,14 +54,20 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
                     this_1.languageSets.push(matched);
                 }
                 matched.addStudent(s);
-                console.log(matched.language1, matched.language2, matched.count);
             };
             var this_1 = this;
             for (var _i = 0, _a = this._students; _i < _a.length; _i++) {
                 var s = _a[_i];
                 _loop_1(s);
             }
-            debugger;
+            this.bandSet.createBands("language", this.studentCount, this.languageSets.length);
+            var i = 0;
+            for (var _b = 0, _c = this.languageSets; _b < _c.length; _b++) {
+                var item = _c[_b];
+                this.bandSet.bands[i].bandName = item.language1 + "/" + item.language2;
+                this.bandSet.bands[i].studentCount = item.count;
+                i++;
+            }
         },
         enumerable: true,
         configurable: true
