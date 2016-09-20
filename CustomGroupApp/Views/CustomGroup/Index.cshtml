@@ -10,7 +10,7 @@
             <input type="checkbox" id="mixBoysGirls" value="0" style="margin-right: 10px; margin-left: 10px" onclick="changeMixBoysGirls(this)" />Mix Boys and Girls
             <div id="message-text"></div>
         </div>
-
+        <div id="class-container"></div>
         <div class="row" style="margin-bottom: 30px">
             <div class="col-md-4" id="jqgrid1-container">
                 <table id="jqGrid1"></table>
@@ -157,30 +157,33 @@
 
         bandSet.prepare("Mix", classesDefn.students, joinedStudents, separatedStudents);
 
-        resetGrid();
+        var classlist = new CustomClassGridCollection();
+        debugger;
+        classlist.initTable("#class-container", bandSet.bands);
+        //resetGrid();
 
-        var classes = band.classes;
-        for (var i = 1; i <= classes.length; i++) {
+        //var classes = band.classes;
+        //for (var i = 1; i <= classes.length; i++) {
 
-            $("#jqGrid" + i)
-                .jqGrid({
-                    datatype: "local",
-                    data: classes[i - 1].students,
-                    height: 350,
-                    colModel: detailCols,
-                    viewrecords: true, // show the current page, data rang and total records on the toolbar
-                    caption: classes[i - 1].name
-                });
-        }
+        //    $("#jqGrid" + i)
+        //        .jqGrid({
+        //            datatype: "local",
+        //            data: classes[i - 1].students,
+        //            height: 350,
+        //            colModel: detailCols,
+        //            viewrecords: true, // show the current page, data rang and total records on the toolbar
+        //            caption: classes[i - 1].name
+        //        });
+        //}
 
-    $("#summary-grid")
-            .jqGrid({
-                datatype: "local",
-                data: band.classes,
-                colModel: summaryCols,
-                viewrecords: true, // show the current page, data rang and total records on the toolbar
-                caption: "Group Summary"
-            });
+    //$("#summary-grid")
+    //        .jqGrid({
+    //            datatype: "local",
+    //            data: band.classes,
+    //            colModel: summaryCols,
+    //            viewrecords: true, // show the current page, data rang and total records on the toolbar
+    //            caption: "Group Summary"
+    //        });
     }
 
 

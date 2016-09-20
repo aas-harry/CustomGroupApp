@@ -13,7 +13,6 @@ var CustomClassGridCollection = (function () {
         this.classes = [];
         this.classCount = 0;
         this.initTable = function (elementName, bands) {
-            debugger;
             $(elementName).html("<table id='custom-classes-table'></table>");
             _this.table = document.getElementById("custom-classes-table");
             _this.header = _this.table.createTHead();
@@ -25,6 +24,7 @@ var CustomClassGridCollection = (function () {
             for (var _i = 0, _a = _this.classes; _i < _a.length; _i++) {
                 var classItem = _a[_i];
                 _this.createClassHeader(classItem);
+                _this.kendoHelper.createStudentClassInputContainer(_this.classRow.insertCell(), classItem);
             }
         };
         this.clear = function () {

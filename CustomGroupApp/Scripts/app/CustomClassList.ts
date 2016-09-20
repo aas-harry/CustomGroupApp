@@ -17,7 +17,7 @@ class CustomClassGridCollection {
     classCount = 0;
 
     initTable = (elementName: string, bands: Array<BandDefinition>) => {
-        debugger;
+        
         $(elementName).html("<table id='custom-classes-table'></table>");
         this.table = document.getElementById("custom-classes-table") as HTMLTableElement;
         this.header = this.table.createTHead();
@@ -31,6 +31,7 @@ class CustomClassGridCollection {
 
         for (let classItem of this.classes) {
             this.createClassHeader(classItem);
+            this.kendoHelper.createStudentClassInputContainer(this.classRow.insertCell(), classItem);
         }
     };
 
@@ -40,5 +41,6 @@ class CustomClassGridCollection {
 
     createClassHeader = (classItem: ClassDefinition) => {
         this.kendoHelper.createLabel(this.headerRow.insertCell(), classItem.name);
+
     }
 }

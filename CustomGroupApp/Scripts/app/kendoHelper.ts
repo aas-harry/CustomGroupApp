@@ -24,6 +24,18 @@
         return this.createBandInputField(element.id, classCount, callback);
     }
 
+    createStudentClassInputContainer = (
+        cell: HTMLTableCellElement,
+        classItem: ClassDefinition
+    ) => {
+        var element = document.createElement("div") as HTMLDivElement;
+        element.setAttribute("style", "width: 200px");
+        element.id = `class${classItem.parent.bandNo}-${classItem.index}`;
+        cell.appendChild(element);
+
+        return this.createStudentClassGrid(element.id, classItem);;
+    };
+
     createClassInputContainer = (
         cell: HTMLTableCellElement,
         studentCount = 1,
@@ -84,6 +96,16 @@
         cell.appendChild(label);
 
     }
+
+    createStudentClassGrid = (
+        element: string,
+        classItem: ClassDefinition) : kendo.ui.Grid=> {
+        var grid = this.createGrid(element);
+        grid.columns.push({ field: "name", title: "name" });
+        grid.dataSource.data(classItem.students);
+        return grid;
+    }
+
     createClassInputField = (
         element: string,
         studentCount = 1,
@@ -121,6 +143,16 @@
             250,
             this.integerFormat,
             callbackChangeEvent);
+    }
+
+    createGrid = (element: string): kendo.ui.Grid => {
+        $(`#${element}`)
+            .kendoGrid({
+                options: {},
+            } as kendo.ui.Grid);
+
+        const grid = $(`#${element}`).data("kendoGrid");
+        return grid;
     }
 
     createNumericTextBox = (

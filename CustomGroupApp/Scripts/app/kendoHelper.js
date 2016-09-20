@@ -18,6 +18,14 @@ var KendoHelper = (function () {
             cell.appendChild(element);
             return _this.createBandInputField(element.id, classCount, callback);
         };
+        this.createStudentClassInputContainer = function (cell, classItem) {
+            var element = document.createElement("div");
+            element.setAttribute("style", "width: 200px");
+            element.id = "class" + classItem.parent.bandNo + "-" + classItem.index;
+            cell.appendChild(element);
+            return _this.createStudentClassGrid(element.id, classItem);
+            ;
+        };
         this.createClassInputContainer = function (cell, studentCount, classNo, bandNo, callbackChangeEvent, addLabel) {
             if (studentCount === void 0) { studentCount = 1; }
             if (bandNo === void 0) { bandNo = 1; }
@@ -67,6 +75,12 @@ var KendoHelper = (function () {
             label.setAttribute("style", "margin-right: 5px");
             cell.appendChild(label);
         };
+        this.createStudentClassGrid = function (element, classItem) {
+            var grid = _this.createGrid(element);
+            grid.columns.push({ field: "name", title: "name" });
+            grid.dataSource.data(classItem.students);
+            return grid;
+        };
         this.createClassInputField = function (element, studentCount, callbackChangeEvent) {
             if (studentCount === void 0) { studentCount = 1; }
             if (callbackChangeEvent === void 0) { callbackChangeEvent = null; }
@@ -81,6 +95,14 @@ var KendoHelper = (function () {
             if (studentCount === void 0) { studentCount = 1; }
             if (callbackChangeEvent === void 0) { callbackChangeEvent = null; }
             return _this.createNumericTextBox(element, studentCount, 1, 250, _this.integerFormat, callbackChangeEvent);
+        };
+        this.createGrid = function (element) {
+            $("#" + element)
+                .kendoGrid({
+                options: {},
+            });
+            var grid = $("#" + element).data("kendoGrid");
+            return grid;
         };
         this.createNumericTextBox = function (element, defaultValue, min, max, format, callbackChangeEvent) {
             if (defaultValue === void 0) { defaultValue = 0; }
