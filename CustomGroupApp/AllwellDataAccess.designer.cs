@@ -3972,11 +3972,15 @@ namespace CustomGroupApp
 		
 		private int _Id;
 		
+		private int _Testnum;
+		
 		private int _StudentId;
 		
-		private string _Language;
+		private string _Pref1;
 		
-		private System.DateTime _ModifiedOn;
+		private string _Pref2;
+		
+		private string _Pref3;
 		
     #region Extensibility Method Definitions
     partial void OnLoaded();
@@ -3984,12 +3988,16 @@ namespace CustomGroupApp
     partial void OnCreated();
     partial void OnIdChanging(int value);
     partial void OnIdChanged();
+    partial void OnTestnumChanging(int value);
+    partial void OnTestnumChanged();
     partial void OnStudentIdChanging(int value);
     partial void OnStudentIdChanged();
-    partial void OnLanguageChanging(string value);
-    partial void OnLanguageChanged();
-    partial void OnModifiedOnChanging(System.DateTime value);
-    partial void OnModifiedOnChanged();
+    partial void OnPref1Changing(string value);
+    partial void OnPref1Changed();
+    partial void OnPref2Changing(string value);
+    partial void OnPref2Changed();
+    partial void OnPref3Changing(string value);
+    partial void OnPref3Changed();
     #endregion
 		
 		public StudentLanguagePref()
@@ -4017,6 +4025,26 @@ namespace CustomGroupApp
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Testnum", DbType="Int NOT NULL")]
+		public int Testnum
+		{
+			get
+			{
+				return this._Testnum;
+			}
+			set
+			{
+				if ((this._Testnum != value))
+				{
+					this.OnTestnumChanging(value);
+					this.SendPropertyChanging();
+					this._Testnum = value;
+					this.SendPropertyChanged("Testnum");
+					this.OnTestnumChanged();
+				}
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_StudentId", DbType="Int NOT NULL")]
 		public int StudentId
 		{
@@ -4037,42 +4065,62 @@ namespace CustomGroupApp
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Language", DbType="VarChar(50) NOT NULL", CanBeNull=false)]
-		public string Language
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Pref1", DbType="VarChar(50)")]
+		public string Pref1
 		{
 			get
 			{
-				return this._Language;
+				return this._Pref1;
 			}
 			set
 			{
-				if ((this._Language != value))
+				if ((this._Pref1 != value))
 				{
-					this.OnLanguageChanging(value);
+					this.OnPref1Changing(value);
 					this.SendPropertyChanging();
-					this._Language = value;
-					this.SendPropertyChanged("Language");
-					this.OnLanguageChanged();
+					this._Pref1 = value;
+					this.SendPropertyChanged("Pref1");
+					this.OnPref1Changed();
 				}
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ModifiedOn", DbType="DateTime NOT NULL")]
-		public System.DateTime ModifiedOn
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Pref2", DbType="VarChar(50)")]
+		public string Pref2
 		{
 			get
 			{
-				return this._ModifiedOn;
+				return this._Pref2;
 			}
 			set
 			{
-				if ((this._ModifiedOn != value))
+				if ((this._Pref2 != value))
 				{
-					this.OnModifiedOnChanging(value);
+					this.OnPref2Changing(value);
 					this.SendPropertyChanging();
-					this._ModifiedOn = value;
-					this.SendPropertyChanged("ModifiedOn");
-					this.OnModifiedOnChanged();
+					this._Pref2 = value;
+					this.SendPropertyChanged("Pref2");
+					this.OnPref2Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Pref3", DbType="VarChar(50)")]
+		public string Pref3
+		{
+			get
+			{
+				return this._Pref3;
+			}
+			set
+			{
+				if ((this._Pref3 != value))
+				{
+					this.OnPref3Changing(value);
+					this.SendPropertyChanging();
+					this._Pref3 = value;
+					this.SendPropertyChanged("Pref3");
+					this.OnPref3Changed();
 				}
 			}
 		}

@@ -8,16 +8,16 @@
         <elementListCompartment Id="918c739c-7bc2-4250-bc74-8208748076d0" absoluteBounds="0.51499999999999968, 0.96, 1.9700000000000002, 24.287068684895832" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
-    <classShape Id="c7132012-0a55-4686-b250-2739ed80ca1d" absoluteBounds="3.5, 1.625, 2, 7.1553369140625">
+    <classShape Id="c7132012-0a55-4686-b250-2739ed80ca1d" absoluteBounds="3.125, 0.5, 2, 7.1553369140625">
       <DataClassMoniker Name="/AllwellDataAccessDataContext/Test" />
       <nestedChildShapes>
-        <elementListCompartment Id="81ee3af6-7108-4bfe-b53a-0172de6fc16c" absoluteBounds="3.515, 2.085, 1.9700000000000002, 6.5953369140625" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+        <elementListCompartment Id="81ee3af6-7108-4bfe-b53a-0172de6fc16c" absoluteBounds="3.14, 0.96, 1.9700000000000002, 6.5953369140625" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
-    <classShape Id="d64f38f8-bb1c-4dab-8a94-a33f8933fd10" absoluteBounds="7.625, 2.375, 2, 1.5785953776041666">
+    <classShape Id="55033d9e-5a9d-4322-8a65-34487787a5c7" absoluteBounds="3.25, 8, 2, 1.9631982421875005">
       <DataClassMoniker Name="/AllwellDataAccessDataContext/StudentLanguagePref" />
       <nestedChildShapes>
-        <elementListCompartment Id="33e05633-5ca3-4335-8ebf-69dd77ddde29" absoluteBounds="7.64, 2.835, 1.9700000000000002, 1.0185953776041665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+        <elementListCompartment Id="cf5bc168-2ceb-41bb-adea-bed3198170bc" absoluteBounds="3.265, 8.46, 1.9700000000000002, 1.4031982421875" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
   </nestedChildShapes>

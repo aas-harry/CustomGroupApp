@@ -33,6 +33,12 @@ namespace CustomGroupApp.Controllers
             return Json(new {Test = test, Results = results});
         }
 
+        [HttpPost]
+        public JsonResult GetStudentLanguagePrefs(int testnum)
+        {
+            return Json(_dataService.GetStudentLanguagePrefs(testnum).ToList());
+        }
+
         public ActionResult CustomGroupWizard(int testnum)
         {
             // var testnum = 10000040;
@@ -58,48 +64,32 @@ namespace CustomGroupApp.Controllers
 
         public ActionResult LanguageClassConfigurationStep()
         {
-            var results = _dataService.GetResults(1015238).Select(x => new {x.Name, x.Id}).ToList();
+            var testnumber = 1014181;
+            var results = _dataService.GetResults(testnumber).Select(x => new {x.Name, x.Id}).OrderBy(x=> x.Name).ToList();
             using (var sr = new StreamReader(@"c:\temp\Year 6.csv"))
             {
                 var csvReader = new CsvReader(sr);
-           //     csvReader.Read();
-         //       var s1 = csvReader.GetField(typeof(string), 0);
-          var ss = csvReader.GetRecords<StudentLanguage>().ToList();
-                var list = new List<StudentLanguagePref>();
+                csvReader.Configuration.SkipEmptyRecords = true;
+                csvReader.Configuration.IgnoreBlankLines = true;
+                csvReader.Configuration.TrimFields = true;
+                csvReader.Configuration.TrimHeaders = true;
+
+                var rows = csvReader.GetRecords<StudentLanguage>().OrderBy(x=> x.Name).ToList();
+                var studentLanguages = new List<StudentLanguagePref>();
                 foreach (var s in results)
                 {
-                    var lpn = ss.FirstOrDefault(x => x.Name.Equals(s.Name, StringComparison.InvariantCultureIgnoreCase));
-                    if (lpn != null)
+                    var lpn = rows.FirstOrDefault(x => x.Name.Equals(s.Name, StringComparison.InvariantCultureIgnoreCase));
+                    if (lpn == null) continue;
+                    studentLanguages.Add(new StudentLanguagePref
                     {
-                        if (!string.IsNullOrEmpty(lpn.Pref1))
-                        {
-                            list.Add(new StudentLanguagePref
-                            {
-                                StudentId = s.Id,
-                                Language = lpn.Pref1
-                            });
-
-                        }
-                        if (!string.IsNullOrEmpty(lpn.Pref2))
-                        {
-                            list.Add(new StudentLanguagePref
-                            {
-                                StudentId = s.Id,
-                                Language = lpn.Pref2
-                            });
-
-                        }
-                        if (!string.IsNullOrEmpty(lpn.Pref3))
-                        {
-                            list.Add(new StudentLanguagePref
-                            {
-                                StudentId = s.Id,
-                                Language = lpn.Pref3
-                            });
-
-                        }
-                    }
+                        Testnum = testnumber,
+                        StudentId = s.Id,
+                        Pref1 = lpn.Pref1,
+                        Pref2 = lpn.Pref2,
+                        Pref3 = lpn.Pref3
+                    });
                 }
+                _dataService.UpdateStudentLanguagePrefs(testnumber, studentLanguages);
             }
 
             return PartialView("LanguageBandClassConfiguration");
