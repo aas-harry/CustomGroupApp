@@ -41,11 +41,12 @@ namespace CustomGroupApp.Controllers
 
         public ActionResult CustomGroupWizard(int testnum)
         {
-            // var testnum = 10000040;
-            var results = _dataService.GetResults(testnum).ToList();
-            var test = _dataService.GetTest(testnum);
-
-            return View("CustomGroupWizard", new TestViewModel {Test=test, Results = results});
+            return View("CustomGroupWizard", new CustomGroupViewModel
+            {
+                Test= _dataService.GetTest(testnum),
+                Results = _dataService.GetResults(testnum).ToList(),
+                StudentLanguages = _dataService.GetStudentLanguagePrefs(testnum).ToList()
+            });
         }
 
         public ActionResult SelectGroupingTypeStep()
@@ -64,33 +65,33 @@ namespace CustomGroupApp.Controllers
 
         public ActionResult LanguageClassConfigurationStep()
         {
-            var testnumber = 1014181;
-            var results = _dataService.GetResults(testnumber).Select(x => new {x.Name, x.Id}).OrderBy(x=> x.Name).ToList();
-            using (var sr = new StreamReader(@"c:\temp\Year 6.csv"))
-            {
-                var csvReader = new CsvReader(sr);
-                csvReader.Configuration.SkipEmptyRecords = true;
-                csvReader.Configuration.IgnoreBlankLines = true;
-                csvReader.Configuration.TrimFields = true;
-                csvReader.Configuration.TrimHeaders = true;
+            //var testnumber = 1014181;
+            //var results = _dataService.GetResults(testnumber).Select(x => new {x.Name, x.Id}).OrderBy(x=> x.Name).ToList();
+            //using (var sr = new StreamReader(@"c:\temp\Year 6.csv"))
+            //{
+            //    var csvReader = new CsvReader(sr);
+            //    csvReader.Configuration.SkipEmptyRecords = true;
+            //    csvReader.Configuration.IgnoreBlankLines = true;
+            //    csvReader.Configuration.TrimFields = true;
+            //    csvReader.Configuration.TrimHeaders = true;
 
-                var rows = csvReader.GetRecords<StudentLanguage>().OrderBy(x=> x.Name).ToList();
-                var studentLanguages = new List<StudentLanguagePref>();
-                foreach (var s in results)
-                {
-                    var lpn = rows.FirstOrDefault(x => x.Name.Equals(s.Name, StringComparison.InvariantCultureIgnoreCase));
-                    if (lpn == null) continue;
-                    studentLanguages.Add(new StudentLanguagePref
-                    {
-                        Testnum = testnumber,
-                        StudentId = s.Id,
-                        Pref1 = lpn.Pref1,
-                        Pref2 = lpn.Pref2,
-                        Pref3 = lpn.Pref3
-                    });
-                }
-                _dataService.UpdateStudentLanguagePrefs(testnumber, studentLanguages);
-            }
+            //    var rows = csvReader.GetRecords<StudentLanguage>().OrderBy(x=> x.Name).ToList();
+            //    var studentLanguages = new List<StudentLanguagePref>();
+            //    foreach (var s in results)
+            //    {
+            //        var lpn = rows.FirstOrDefault(x => x.Name.Equals(s.Name, StringComparison.InvariantCultureIgnoreCase));
+            //        if (lpn == null) continue;
+            //        studentLanguages.Add(new StudentLanguagePref
+            //        {
+            //            Testnum = testnumber,
+            //            StudentId = s.Id,
+            //            Pref1 = lpn.Pref1,
+            //            Pref2 = lpn.Pref2,
+            //            Pref3 = lpn.Pref3
+            //        });
+            //    }
+            //    _dataService.UpdateStudentLanguagePrefs(testnumber, studentLanguages);
+            //}
 
             return PartialView("LanguageBandClassConfiguration");
         }

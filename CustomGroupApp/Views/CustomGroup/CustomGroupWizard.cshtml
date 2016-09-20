@@ -1,4 +1,4 @@
-﻿@model CustomGroupApp.Models.TestViewModel
+﻿@model CustomGroupApp.Models.CustomGroupViewModel
 
 <div>
     <style scoped>
@@ -26,11 +26,11 @@
     <script>
 
         var customGroupViewModel = new CustomGroupViewModel(@Html.Raw(Json.Encode(Model.Results.Count())));
-       
+
         $(document)
             .ready(function () {
-                
-                customGroupViewModel.setDatasource(test, studentResults);
+
+                customGroupViewModel.setDatasource(test, studentResults, studentLanguages);
 
                 kendo.bind($("#custom-group-container"), customGroupViewModel);
 
@@ -54,5 +54,6 @@
 
         var studentResults =  @Html.Raw(Json.Encode(Model.Results.ToArray()));
         var test =  @Html.Raw(Json.Encode(Model.Test));
+        var studentLanguages =  @Html.Raw(Json.Encode(Model.StudentLanguages.ToArray()));
     </script>
 </div>

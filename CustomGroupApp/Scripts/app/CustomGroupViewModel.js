@@ -96,23 +96,24 @@ var CustomGroupViewModel = (function (_super) {
         this.isLastStep = false;
         this.isFirstStep = true;
         this.isCoedSchool = true;
-        this.studentCount = 200;
+        this.studentCount = 0;
         this.classCount = 1;
         this.testInfo = new TestFile();
-        this.setDatasource = function (test, results) {
+        this.setDatasource = function (test, results, languages) {
             var testInfo = new TestFile();
-            testInfo.set(test, results);
-            var studentCount = testInfo.studentCount;
+            testInfo.set(test, results, languages);
+            _this.studentCount = testInfo.studentCount;
             _this.classesDefn = new ClassesDefinition(testInfo);
-            _this.bandSet = _this.classesDefn.createBandSet("class", studentCount);
+            _this.bandSet = _this.classesDefn.createBandSet("class", _this.studentCount);
             _this.bandSet.bands[0].setClassCount(3);
-            _this.classDefinitionViewModel = new ClassDefinitionViewModel(studentCount);
-            _this.customBandSet = _this.classesDefn.createBandSet("Band", studentCount, 2);
-            _this.bandClassDefinitionViewModel = new BandClassDefinitionViewModel(studentCount);
-            _this.languageBandSet = _this.classesDefn.createBandSet("Band", studentCount, 2);
-            _this.languageBandClassDefinitionViewModel = new LanguageBandClassDefinitionViewModel(studentCount);
-            _this.topMiddleLowestBandSet = _this.classesDefn.createTopMiddleBottomBandSet("class", studentCount);
-            _this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(studentCount);
+            _this.classDefinitionViewModel = new ClassDefinitionViewModel(_this.studentCount);
+            _this.customBandSet = _this.classesDefn.createBandSet("Band", _this.studentCount, 2);
+            _this.bandClassDefinitionViewModel = new BandClassDefinitionViewModel(_this.studentCount);
+            _this.languageBandSet = _this.classesDefn.createBandSet("Band", _this.studentCount, 2);
+            _this.languageBandClassDefinitionViewModel = new LanguageBandClassDefinitionViewModel(_this.studentCount);
+            _this.languageBandClassDefinitionViewModel.students = _this.classesDefn.students;
+            _this.topMiddleLowestBandSet = _this.classesDefn.createTopMiddleBottomBandSet("class", _this.studentCount);
+            _this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(_this.studentCount);
             _this.set("selectedClassDefinitionViewModel", _this.classDefinitionViewModel);
         };
         this.nextStep = function () {
@@ -128,6 +129,7 @@ var CustomGroupViewModel = (function (_super) {
         };
         this.showStep = function (data) {
         };
+        this.studentCount = studentCount;
         this.classDefinitionViewModel = new ClassDefinitionViewModel(studentCount);
         this.bandClassDefinitionViewModel = new BandClassDefinitionViewModel(studentCount);
         this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(studentCount);

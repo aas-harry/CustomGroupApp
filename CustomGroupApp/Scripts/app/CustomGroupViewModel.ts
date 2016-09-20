@@ -69,6 +69,7 @@ class CustomGroupViewModel extends kendo.data.ObservableObject {
     constructor(studentCount: number) {
         super();
 
+        this.studentCount = studentCount;
         this.classDefinitionViewModel = new ClassDefinitionViewModel(studentCount);
         this.bandClassDefinitionViewModel = new BandClassDefinitionViewModel(studentCount);
         this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(studentCount);
@@ -109,7 +110,7 @@ class CustomGroupViewModel extends kendo.data.ObservableObject {
     isLastStep = false;
     isFirstStep = true;
     isCoedSchool = true;
-    studentCount = 200;
+    studentCount = 0;
     classCount = 1;
     selectedClassDefinitionViewModel: IBandClassSettings;
 
@@ -149,24 +150,25 @@ class CustomGroupViewModel extends kendo.data.ObservableObject {
         }
     }
 
-    setDatasource = (test, results) => {
+    setDatasource = (test, results, languages) => {
         var testInfo = new TestFile();
-        testInfo.set(test, results);
-        const studentCount = testInfo.studentCount;
+        testInfo.set(test, results, languages);
+        this.studentCount = testInfo.studentCount;
         this.classesDefn = new ClassesDefinition(testInfo);
 
-        this.bandSet = this.classesDefn.createBandSet("class", studentCount);
+        this.bandSet = this.classesDefn.createBandSet("class", this.studentCount);
         this.bandSet.bands[0].setClassCount(3);
-        this.classDefinitionViewModel = new ClassDefinitionViewModel(studentCount);
+        this.classDefinitionViewModel = new ClassDefinitionViewModel(this.studentCount);
 
-        this.customBandSet = this.classesDefn.createBandSet("Band",studentCount, 2);
-        this.bandClassDefinitionViewModel = new BandClassDefinitionViewModel(studentCount);
+        this.customBandSet = this.classesDefn.createBandSet("Band", this.studentCount, 2);
+        this.bandClassDefinitionViewModel = new BandClassDefinitionViewModel(this.studentCount);
 
-        this.languageBandSet = this.classesDefn.createBandSet("Band", studentCount, 2);
-        this.languageBandClassDefinitionViewModel = new LanguageBandClassDefinitionViewModel(studentCount);
+        this.languageBandSet = this.classesDefn.createBandSet("Band", this.studentCount, 2);
+        this.languageBandClassDefinitionViewModel = new LanguageBandClassDefinitionViewModel(this.studentCount);
+        this.languageBandClassDefinitionViewModel.students = this.classesDefn.students;
 
-        this.topMiddleLowestBandSet = this.classesDefn.createTopMiddleBottomBandSet("class", studentCount);
-        this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(studentCount);
+        this.topMiddleLowestBandSet = this.classesDefn.createTopMiddleBottomBandSet("class", this.studentCount);
+        this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(this.studentCount);
 
         this.set("selectedClassDefinitionViewModel", this.classDefinitionViewModel);
     };

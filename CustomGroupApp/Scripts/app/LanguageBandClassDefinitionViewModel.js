@@ -27,6 +27,9 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
         this.groupingHelper = new GroupingHelper();
         this.kendoHelper = new KendoHelper();
         this.bandNumericTextBoxes = new BandNumericTextBoxCollection();
+        this.studentWithLanguagePrefCount = 0;
+        // ReSharper disable once InconsistentNaming
+        this._students = [];
     }
     LanguageBandClassDefinitionViewModel.prototype.saveOptions = function (source) {
         return true;
@@ -37,6 +40,15 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
         this.bandNumericTextBoxes.initTable("#classes-settings-container", source.bands);
         return true;
     };
+    Object.defineProperty(LanguageBandClassDefinitionViewModel.prototype, "students", {
+        set: function (value) {
+            this._students = value;
+            debugger;
+            this.studentWithLanguagePrefCount = Enumerable.From(value).Count(function (x) { return x.hasLanguagePreferences; });
+        },
+        enumerable: true,
+        configurable: true
+    });
     return LanguageBandClassDefinitionViewModel;
 }(kendo.data.ObservableObject));
 //# sourceMappingURL=LanguageBandClassDefinitionViewModel.js.map

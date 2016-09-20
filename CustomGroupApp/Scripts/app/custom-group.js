@@ -66,6 +66,7 @@ var StudentClass = (function () {
     function StudentClass(s) {
         var _this = this;
         this.s = s;
+        this.languagePrefs = [];
         this.canMoveToOtherClass = true;
         this.swapWith = function (studentTo) {
             var fromClass = _this.class;
@@ -79,7 +80,15 @@ var StudentClass = (function () {
         this.name = s.name;
         this.gender = s.sex;
         this.id = s.studentId;
+        this.languagePrefs = s.languagePrefs;
     }
+    Object.defineProperty(StudentClass.prototype, "hasLanguagePreferences", {
+        get: function () {
+            return this.languagePrefs && this.languagePrefs.length > 0;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(StudentClass.prototype, "classNo", {
         get: function () {
             return this.class ? this.class.index : 0;

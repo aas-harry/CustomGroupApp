@@ -36,4 +36,14 @@
         this.bandNumericTextBoxes.initTable("#classes-settings-container", source.bands);
         return true;
     }
+
+    set students(value: Array<StudentClass>) {
+        this._students = value;
+        debugger;
+        this.studentWithLanguagePrefCount = Enumerable.From(value).Count(x => x.hasLanguagePreferences);
+    }
+
+    studentWithLanguagePrefCount = 0;
+    // ReSharper disable once InconsistentNaming
+    _students: Array<StudentClass> = [];
 }

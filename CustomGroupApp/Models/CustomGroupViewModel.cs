@@ -2,9 +2,10 @@
 
 namespace CustomGroupApp.Models
 {
-    public class TestViewModel
+    public class CustomGroupViewModel
     {
         public Test Test { get; set; }
         public IEnumerable<Result> Results { get; set; }
+        public IEnumerable<StudentLanguagePref> StudentLanguages { get; set; }
     }
 }

@@ -71,6 +71,7 @@ class StudentClass {
         this.name = s.name;
         this.gender = s.sex;
         this.id = s.studentId;
+        this.languagePrefs = s.languagePrefs;
     }
 
     id: number;
@@ -79,7 +80,10 @@ class StudentClass {
     gender: string;
     score: number;
     name: string;
-
+    languagePrefs: Array<String> = [];
+    get hasLanguagePreferences(): boolean {
+        return this.languagePrefs && this.languagePrefs.length > 0;
+    }
     get classNo(): number {
         return this.class ? this.class.index : 0;
     }

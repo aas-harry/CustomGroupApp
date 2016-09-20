@@ -63,12 +63,12 @@ class TestFile {
         return this.fileNumber + " " + this.category;
     };
 
-    set = (test: any, results: any) => {
+    set = (test: any, results: any, languages: any) => {
         this.fileNumber = test.Testnum;
         this.grade = test.Grade;
         this.category = test.Category;
         this.testDate = test.Testdate;
-        this.setStudents(results);    
+        this.setStudents(results, languages);    
     }
 
     clear = () => {
@@ -83,18 +83,35 @@ class TestFile {
         this.students = [];
     };
 
-    setStudents = (data: Array<any>) => {
+    setStudents = (data: Array<any>, langPrefs: Array<any> = []) => {
         this.students = [];
         this.hasGirls = false;
         this.hasBoys = false;
-
+        var hasStudentLangPrefs = langPrefs && langPrefs.length > 0;
+        var enumerable = Enumerable.From(langPrefs);
+        debugger;
         data.forEach((s: any) => {
-            this.students.push(new Student(s));
+            let student = new Student(s);
+            this.students.push(student);
             if (! this.hasBoys && s.Sex === "M") {
                 this.hasBoys = true;
             }
             if (!this.hasGirls && s.Sex === "F") {
                 this.hasGirls = true;
+            }
+            if (hasStudentLangPrefs) {
+                var languagePrefs = enumerable.FirstOrDefault(null, s => s.StudentId === student.studentId);
+                if (languagePrefs != null) {
+                    if (languagePrefs.Pref1) {
+                        student.languagePrefs.push(languagePrefs.Pref1);
+                    }
+                    if (languagePrefs.Pref2) {
+                        student.languagePrefs.push(languagePrefs.Pref2);
+                    }
+                    if (languagePrefs.Pref3) {
+                        student.languagePrefs.push(languagePrefs.Pref3);
+                    }
+                }
             }
         });
 
@@ -136,6 +153,11 @@ class Student {
     writing: Score;
     spelling: Score;
     raven: Score;
+
+    languagePrefs: Array<string> = [];
+    get hasLanguagePrefs(): boolean {
+        return this.hasLanguagePrefs && this.languagePrefs.length > 0;
+    }
 
     constructor(r: any) {
         this.studentId = r.Id;

@@ -48,12 +48,12 @@ var TestFile = (function () {
             }
             return _this.fileNumber + " " + _this.category;
         };
-        this.set = function (test, results) {
+        this.set = function (test, results, languages) {
             _this.fileNumber = test.Testnum;
             _this.grade = test.Grade;
             _this.category = test.Category;
             _this.testDate = test.Testdate;
-            _this.setStudents(results);
+            _this.setStudents(results, languages);
         };
         this.clear = function () {
             _this.fileNumber = undefined;
@@ -66,17 +66,36 @@ var TestFile = (function () {
             _this.subjectTypes = [];
             _this.students = [];
         };
-        this.setStudents = function (data) {
+        this.setStudents = function (data, langPrefs) {
+            if (langPrefs === void 0) { langPrefs = []; }
             _this.students = [];
             _this.hasGirls = false;
             _this.hasBoys = false;
+            var hasStudentLangPrefs = langPrefs && langPrefs.length > 0;
+            var enumerable = Enumerable.From(langPrefs);
+            debugger;
             data.forEach(function (s) {
-                _this.students.push(new Student(s));
+                var student = new Student(s);
+                _this.students.push(student);
                 if (!_this.hasBoys && s.Sex === "M") {
                     _this.hasBoys = true;
                 }
                 if (!_this.hasGirls && s.Sex === "F") {
                     _this.hasGirls = true;
+                }
+                if (hasStudentLangPrefs) {
+                    var languagePrefs = enumerable.FirstOrDefault(null, function (s) { return s.StudentId === student.studentId; });
+                    if (languagePrefs != null) {
+                        if (languagePrefs.Pref1) {
+                            student.languagePrefs.push(languagePrefs.Pref1);
+                        }
+                        if (languagePrefs.Pref2) {
+                            student.languagePrefs.push(languagePrefs.Pref2);
+                        }
+                        if (languagePrefs.Pref3) {
+                            student.languagePrefs.push(languagePrefs.Pref3);
+                        }
+                    }
                 }
             });
             _this.studentCount = _this.students.length;
@@ -110,6 +129,7 @@ var Score = (function () {
 var Student = (function () {
     function Student(r) {
         var _this = this;
+        this.languagePrefs = [];
         this.overallAbilityScore = function () {
             var total = 0;
             total += _this.genab.scaledScore ? _this.genab.scaledScore : 0;
@@ -146,6 +166,13 @@ var Student = (function () {
         this.raven = new Score(r.Raven, r.Iqs2, r.Tmst, null, new RangeScore(r.Iq12, r.Iq22), null);
         this.serialno = r.snow;
     }
+    Object.defineProperty(Student.prototype, "hasLanguagePrefs", {
+        get: function () {
+            return this.hasLanguagePrefs && this.languagePrefs.length > 0;
+        },
+        enumerable: true,
+        configurable: true
+    });
     return Student;
 }());
 //# sourceMappingURL=entities.js.map
