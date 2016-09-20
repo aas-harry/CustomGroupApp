@@ -1,4 +1,5 @@
 ﻿/// <autosync enabled="true" />
+/// <reference path="app/entities.js" />
 /// <reference path="bootstrap.js" />
 /// <reference path="jquery.jqGrid.js" />
 /// <reference path="jquery-2.2.4.js" />

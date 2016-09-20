@@ -3,67 +3,6 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var StepDefinition = (function () {
-    function StepDefinition(stepNo, isCommon, viewName) {
-        if (isCommon === void 0) { isCommon = true; }
-        this.stepNo = stepNo;
-        this.isCommon = isCommon;
-        this.viewName = viewName;
-        this.views = [];
-    }
-    return StepDefinition;
-}());
-var ViewDefinition = (function () {
-    function ViewDefinition(groupType, name) {
-        this.groupType = groupType;
-        this.name = name;
-    }
-    return ViewDefinition;
-}());
-var StepCollection = (function () {
-    function StepCollection() {
-        var _this = this;
-        this.steps = [];
-        this.getStepView = function (groupType, stepNo) {
-            console.log("GetStep: ", stepNo, groupType);
-            if (typeof groupType === "string") {
-                groupType = parseInt(groupType);
-            }
-            if (stepNo > _this.steps.length || stepNo < 1) {
-            }
-            var stepView = _this.steps[stepNo - 1];
-            if (stepView.isCommon) {
-                return stepView.viewName;
-            }
-            var viewName = stepView.viewName;
-            for (var _i = 0, _a = stepView.views; _i < _a.length; _i++) {
-                var view = _a[_i];
-                if (view.groupType === groupType) {
-                    return view.name;
-                }
-            }
-            return viewName;
-        };
-        this.isLastStep = function (stepNo) {
-            return _this.lastStep.stepNo === stepNo;
-        };
-        this.isFirstStep = function (stepNo) {
-            return _this.firstStep.stepNo === stepNo;
-        };
-        this.steps.push(new StepDefinition(1, true, "SelectGroupingTypeStep"));
-        var step2 = new StepDefinition(2, false, "ClassConfigurationStep");
-        step2.views.push(new ViewDefinition(GroupingMethod.Banding, "BandClassConfigurationStep"));
-        step2.views.push(new ViewDefinition(GroupingMethod.TopMiddleLowest, "TopMiddleLowestClassConfigurationStep"));
-        step2.views.push(new ViewDefinition(GroupingMethod.Language, "LanguageClassConfigurationStep"));
-        this.steps.push(step2);
-        this.steps.push(new StepDefinition(3, true, "StudentGroupingOptionsStep"));
-        this.steps.push(new StepDefinition(4, true, "SaveCustomGroupStep"));
-        this.stepCount = this.steps.length;
-        this.lastStep = this.steps[this.stepCount - 1];
-        this.firstStep = this.steps[0];
-    }
-    return StepCollection;
-}());
 var CustomGroupViewModel = (function (_super) {
     __extends(CustomGroupViewModel, _super);
     function CustomGroupViewModel(studentCount) {
@@ -109,11 +48,12 @@ var CustomGroupViewModel = (function (_super) {
             _this.classDefinitionViewModel = new ClassDefinitionViewModel(_this.studentCount);
             _this.customBandSet = _this.classesDefn.createBandSet("Band", _this.studentCount, 2);
             _this.bandClassDefinitionViewModel = new BandClassDefinitionViewModel(_this.studentCount);
-            _this.languageBandSet = _this.classesDefn.createBandSet("Band", _this.studentCount, 2);
             _this.languageBandClassDefinitionViewModel = new LanguageBandClassDefinitionViewModel(_this.studentCount);
             _this.languageBandClassDefinitionViewModel.students = _this.classesDefn.students;
+            _this.languageBandSet = _this.languageBandClassDefinitionViewModel.bandSet;
             _this.topMiddleLowestBandSet = _this.classesDefn.createTopMiddleBottomBandSet("class", _this.studentCount);
             _this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(_this.studentCount);
+            _this.generateCustomGroupViewModel = new GenerateCustomGroupViewModel();
             _this.set("selectedClassDefinitionViewModel", _this.classDefinitionViewModel);
         };
         this.nextStep = function () {
@@ -153,6 +93,10 @@ var CustomGroupViewModel = (function (_super) {
                 this.selectedClassDefinitionViewModel.loadOptions(this.bandSet);
                 break;
         }
+    };
+    CustomGroupViewModel.prototype.loadGenerateCustomGroupViewModel = function () {
+        this.set("selectedClassDefinitionViewModel", this.generateCustomGroupViewModel);
+        this.selectedClassDefinitionViewModel.loadOptions(this.bandSet);
     };
     CustomGroupViewModel.prototype.callGetViewStep = function (stepNo) {
         _super.prototype.set.call(this, "isFirstStep", this.stepCollection.isFirstStep(stepNo));

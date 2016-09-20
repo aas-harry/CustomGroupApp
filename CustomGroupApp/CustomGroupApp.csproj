@@ -557,6 +557,7 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="Scripts\app\entities.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="AllwellDataAccess.dbml">
@@ -1007,6 +1008,7 @@
     <Content Include="Views\CustomGroup\TopMiddleLowerClassDefinitionView.cshtml" />
     <Content Include="Views\CustomGroup\TopMiddleLowestBandClassConfiguration.cshtml" />
     <Content Include="Views\CustomGroup\LanguageBandClassConfiguration.cshtml" />
+    <Content Include="Views\CustomGroup\GenerateCustomGroup.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1032,6 +1034,8 @@
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\app\BandClassDefinitionViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\BandNumericTextBox.ts" />
+    <TypeScriptCompile Include="Scripts\app\CustomClassList.ts" />
+    <TypeScriptCompile Include="Scripts\app\GenerateCustomGroupViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\GroupingTypeViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\ClassDefinitionViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\common.ts" />
@@ -1042,6 +1046,7 @@
     <TypeScriptCompile Include="Scripts\app\kendoHelper.ts" />
     <TypeScriptCompile Include="Scripts\app\repository.ts" />
     <TypeScriptCompile Include="Scripts\app\LanguageBandClassDefinitionViewModel.ts" />
+    <TypeScriptCompile Include="Scripts\app\StepDefinition.ts" />
     <TypeScriptCompile Include="Scripts\app\TopMiddleLowestBandClassDefinitionViewModel.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\kendo-ui\kendo-ui.d.ts" />

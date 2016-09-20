@@ -60,6 +60,13 @@ var KendoHelper = (function () {
             label.setAttribute("style", "margin-right: 5px");
             cell.appendChild(label);
         };
+        this.createMultiLineLabel = function (cell, line1, line2, separator) {
+            if (separator === void 0) { separator = "/"; }
+            var label = document.createElement("span");
+            label.textContent = line1;
+            label.setAttribute("style", "margin-right: 5px");
+            cell.appendChild(label);
+        };
         this.createClassInputField = function (element, studentCount, callbackChangeEvent) {
             if (studentCount === void 0) { studentCount = 1; }
             if (callbackChangeEvent === void 0) { callbackChangeEvent = null; }

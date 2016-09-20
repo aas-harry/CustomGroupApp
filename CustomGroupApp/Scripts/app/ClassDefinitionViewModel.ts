@@ -16,6 +16,7 @@
     };
 
     onClassCountChange = () => {
+    
         var tmpClasses = this.groupingHelper.calculateClassesSize(this.studentCount, this.classCount);
 
         this.createInputTextBox(Enumerable.From(tmpClasses).Select((val, classNo) => 

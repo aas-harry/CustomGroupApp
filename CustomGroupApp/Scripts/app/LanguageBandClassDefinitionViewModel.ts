@@ -21,7 +21,7 @@
         return classes;
     }
 
-    private bandSet = new BandSet(null, "custom", this.studentCount, 1);
+    bandSet = new BandSet(null, "custom", this.studentCount, 1);
     private groupingHelper = new GroupingHelper();
     private kendoHelper = new KendoHelper();
     private bandNumericTextBoxes = new BandNumericTextBoxCollection();
@@ -58,8 +58,9 @@
         this.bandSet.createBands("language", this.studentCount, this.languageSets.length);
         let i = 0;
         for (let item of this.languageSets) {
-            this.bandSet.bands[i].bandName = item.language1 + "/" + item.language2;
+            this.bandSet.bands[i].bandName = item.Description;
             this.bandSet.bands[i].studentCount = item.count;
+            this.bandSet.bands[i].setClassCount(1);
             i++;
         }
     }

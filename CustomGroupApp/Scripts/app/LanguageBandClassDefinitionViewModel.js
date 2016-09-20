@@ -64,8 +64,9 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
             var i = 0;
             for (var _b = 0, _c = this.languageSets; _b < _c.length; _b++) {
                 var item = _c[_b];
-                this.bandSet.bands[i].bandName = item.language1 + "/" + item.language2;
+                this.bandSet.bands[i].bandName = item.Description;
                 this.bandSet.bands[i].studentCount = item.count;
+                this.bandSet.bands[i].setClassCount(1);
                 i++;
             }
         },

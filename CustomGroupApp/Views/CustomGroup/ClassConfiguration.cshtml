@@ -28,7 +28,7 @@
                    data-format="n0"
                    data-min="1"
                    data-max="30"
-                   data-bind="value: classCount, events: { change: onClassCountChange, spin: onClassCountChange  }">
+                   data-bind="value: selectedClassDefinitionViewModel.classCount, events: { change: selectedClassDefinitionViewModel.onClassCountChange, spin: selectedClassDefinitionViewModel.onClassCountChange  }">
             <span>(Max 30 Classes)</span>
         </div>
         <div style="margin-top: 5px; margin-bottom: 5px">You can adjust the number of students in each classes below:</div>

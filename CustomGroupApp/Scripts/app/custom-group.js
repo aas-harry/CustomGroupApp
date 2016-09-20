@@ -71,6 +71,22 @@ var LanguageSet = (function () {
         this.language1LowerCase = language1.toLowerCase();
         this.language2LowerCase = language2.toLowerCase();
     }
+    Object.defineProperty(LanguageSet.prototype, "Description", {
+        get: function () {
+            if (this.language1 && this.language1 !== '' && this.language2 && this.language2 !== '') {
+                return this.language1 + " /\n" + this.language2;
+            }
+            if (this.language1 && this.language1 !== '') {
+                return this.language1;
+            }
+            if (this.language2 && this.language2 !== '') {
+                return this.language2;
+            }
+            return "No Prefs";
+        },
+        enumerable: true,
+        configurable: true
+    });
     LanguageSet.prototype.isEqual = function (language1, language2) {
         if (language1.toLowerCase() === this.language1LowerCase &&
             language2.toLowerCase() === this.language2LowerCase) {

@@ -77,6 +77,19 @@ class LanguageSet {
     public count = 0;
     public students: Array<StudentClass> = [];
 
+    get Description(): string {
+        if (this.language1 && this.language1 !== '' && this.language2 && this.language2 !== '') {
+            return this.language1 + " /\n" + this.language2;
+        }
+        if (this.language1 && this.language1 !== '' ) {
+            return this.language1;
+        }
+        if (this.language2 && this.language2 !== '') {
+            return this.language2;
+        }
+        return "No Prefs";
+    }
+
     isEqual(language1: string, language2: string): boolean {
         if (language1.toLowerCase() === this.language1LowerCase &&
             language2.toLowerCase() === this.language2LowerCase) {

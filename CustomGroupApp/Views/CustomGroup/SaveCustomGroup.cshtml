@@ -1,16 +1,18 @@
-﻿<div class="panel panel-primary" style="width: 600px">
-    <div class="panel-heading">Help</div>
-    <div class="panel-body">
-        Help text goes here
-    </div>
-</div>
-
-<div style="margin: 20px">
+﻿<div style="margin: 20px">
     <span style="margin-right: 10px">Step 4:</span>Enter group name
 </div>
 <div style="margin: 20px">
-
+    <div>Enter a group name</div>
+    <input data-role="maskedtextbox"
+           data-mask=""
+           data-bind="value: groupName"
+           style="width: 500px">
 </div>
 
 
-
+<script>
+    $(document)
+        .ready(function () {
+            kendo.bind($("#custom-group-container"), customGroupViewModel);
+        });
+</script>

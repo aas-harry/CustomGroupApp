@@ -66,7 +66,7 @@ namespace CustomGroupApp.Controllers
         public ActionResult LanguageClassConfigurationStep()
         {
             //var testnumber = 1014181;
-            //var results = _dataService.GetResults(testnumber).Select(x => new {x.Name, x.Id}).OrderBy(x=> x.Name).ToList();
+            //var results = _dataService.GetResults(testnumber).Select(x => new { x.Name, x.Id }).OrderBy(x => x.Name).ToList();
             //using (var sr = new StreamReader(@"c:\temp\Year 6.csv"))
             //{
             //    var csvReader = new CsvReader(sr);
@@ -75,7 +75,7 @@ namespace CustomGroupApp.Controllers
             //    csvReader.Configuration.TrimFields = true;
             //    csvReader.Configuration.TrimHeaders = true;
 
-            //    var rows = csvReader.GetRecords<StudentLanguage>().OrderBy(x=> x.Name).ToList();
+            //    var rows = csvReader.GetRecords<StudentLanguage>().OrderBy(x => x.Name).ToList();
             //    var studentLanguages = new List<StudentLanguagePref>();
             //    foreach (var s in results)
             //    {
@@ -110,5 +110,11 @@ namespace CustomGroupApp.Controllers
         {
             return PartialView("StudentGroupingOptions");
         }
+
+        public ActionResult GenerateCustomGroupStep()
+        {
+            return PartialView("GenerateCustomGroup");
+        }
+
     }
 }

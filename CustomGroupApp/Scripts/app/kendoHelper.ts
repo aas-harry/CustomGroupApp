@@ -77,6 +77,13 @@
         cell.appendChild(label);
 
     }
+    createMultiLineLabel = (cell: HTMLTableCellElement, line1: string, line2: string, separator: string = "/") => {
+        var label = document.createElement("span");
+        label.textContent = line1;
+        label.setAttribute("style", "margin-right: 5px");
+        cell.appendChild(label);
+
+    }
     createClassInputField = (
         element: string,
         studentCount = 1,
