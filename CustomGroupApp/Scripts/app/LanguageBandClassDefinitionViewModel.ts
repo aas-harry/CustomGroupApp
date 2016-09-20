@@ -10,6 +10,7 @@
 
     bandCount = 3;
     classCount = 1;
+    languageSets : Array<LanguageSet> = [];
 
     getClasses = (): Array<number> => {
         var classes = new Array<number>();
@@ -20,7 +21,7 @@
         return classes;
     }
 
-    private bandSet = new TopMiddleLowestBandSet(null, this.studentCount);
+    private bandSet = new BandSet(null, "custom", this.studentCount, 1);
     private groupingHelper = new GroupingHelper();
     private kendoHelper = new KendoHelper();
     private bandNumericTextBoxes = new BandNumericTextBoxCollection();
@@ -34,13 +35,29 @@
         this.bandSet = source;
         this.bandCount = source.bands.length;
         this.bandNumericTextBoxes.initTable("#classes-settings-container", source.bands);
+
         return true;
     }
 
     set students(value: Array<StudentClass>) {
         this._students = value;
-        debugger;
         this.studentWithLanguagePrefCount = Enumerable.From(value).Count(x => x.hasLanguagePreferences);
+
+        this.languageSets = [];
+        for (let s of this._students) {
+
+            let matched = Enumerable.From(this.languageSets)
+                .FirstOrDefault(null, x => x.isEqual(s.langPref1, s.langPref2));
+
+            if (matched == null) {
+                matched = new LanguageSet(s.langPref1, s.langPref2);
+                this.languageSets.push(matched);
+            }
+            matched.addStudent(s);
+            console.log(matched.language1, matched.language2, matched.count);
+        }
+
+        debugger;
     }
 
     studentWithLanguagePrefCount = 0;

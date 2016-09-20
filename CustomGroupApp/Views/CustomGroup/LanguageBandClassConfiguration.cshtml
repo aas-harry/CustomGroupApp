@@ -23,8 +23,16 @@
         </div>
     </div>
     
-    <div style="margin-top: 20px; margin-bottom: 5px">Number of students in this test: <span data-bind="text: studentCount"></span></div>
-    <div style="margin-top: 20px; margin-bottom: 5px">Number of students who has language preferences: <span data-bind="text: selectedClassDefinitionViewModel.studentWithLanguagePrefCount"></span></div>
+    <div style="margin-top: 20px;">Number of students in this test: <span data-bind="text: studentCount"></span></div>
+    <div style="margin-top: 10px; margin-bottom: 5px">
+        <span>Number of students who has language preferences: </span>
+        <span data-bind="text: selectedClassDefinitionViewModel.studentWithLanguagePrefCount"></span>
+        <a href="" style="margin-left: 10px">Import</a>
+        <a href="" style="margin-left: 10px">View/Edit</a>
+    </div>
+    <div style="margin-top: 10px" id="student-language-preferences-container">
+        <div id="student-language-preferences-list"></div>
+    </div>
 
     <div id="class-definition-container">
         <p>You can adjust the number of students in each classes below:</p>

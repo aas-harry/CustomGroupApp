@@ -89,7 +89,7 @@ class TestFile {
         this.hasBoys = false;
         var hasStudentLangPrefs = langPrefs && langPrefs.length > 0;
         var enumerable = Enumerable.From(langPrefs);
-        debugger;
+
         data.forEach((s: any) => {
             let student = new Student(s);
             this.students.push(student);

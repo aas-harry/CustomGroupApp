@@ -73,7 +73,6 @@ var TestFile = (function () {
             _this.hasBoys = false;
             var hasStudentLangPrefs = langPrefs && langPrefs.length > 0;
             var enumerable = Enumerable.From(langPrefs);
-            debugger;
             data.forEach(function (s) {
                 var student = new Student(s);
                 _this.students.push(student);

@@ -15,6 +15,7 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
         ]);
         this.bandCount = 3;
         this.classCount = 1;
+        this.languageSets = [];
         this.getClasses = function () {
             var classes = new Array();
             _this.classes.forEach(function (val) {
@@ -23,7 +24,7 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
             });
             return classes;
         };
-        this.bandSet = new TopMiddleLowestBandSet(null, this.studentCount);
+        this.bandSet = new BandSet(null, "custom", this.studentCount, 1);
         this.groupingHelper = new GroupingHelper();
         this.kendoHelper = new KendoHelper();
         this.bandNumericTextBoxes = new BandNumericTextBoxCollection();
@@ -43,8 +44,24 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
     Object.defineProperty(LanguageBandClassDefinitionViewModel.prototype, "students", {
         set: function (value) {
             this._students = value;
-            debugger;
             this.studentWithLanguagePrefCount = Enumerable.From(value).Count(function (x) { return x.hasLanguagePreferences; });
+            this.languageSets = [];
+            var _loop_1 = function(s) {
+                var matched = Enumerable.From(this_1.languageSets)
+                    .FirstOrDefault(null, function (x) { return x.isEqual(s.langPref1, s.langPref2); });
+                if (matched == null) {
+                    matched = new LanguageSet(s.langPref1, s.langPref2);
+                    this_1.languageSets.push(matched);
+                }
+                matched.addStudent(s);
+                console.log(matched.language1, matched.language2, matched.count);
+            };
+            var this_1 = this;
+            for (var _i = 0, _a = this._students; _i < _a.length; _i++) {
+                var s = _a[_i];
+                _loop_1(s);
+            }
+            debugger;
         },
         enumerable: true,
         configurable: true

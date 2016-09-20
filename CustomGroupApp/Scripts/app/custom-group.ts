@@ -65,6 +65,36 @@ class SummaryClass {
     count: number;
 }
 
+class LanguageSet {
+    constructor(public language1: string, public language2: string) {
+        this.language1LowerCase = language1.toLowerCase();
+        this.language2LowerCase = language2.toLowerCase();
+    }
+
+    private language1LowerCase: string;
+    private language2LowerCase: string;
+
+    public count = 0;
+    public students: Array<StudentClass> = [];
+
+    isEqual(language1: string, language2: string): boolean {
+        if (language1.toLowerCase() === this.language1LowerCase &&
+            language2.toLowerCase() === this.language2LowerCase) {
+            return true;
+        }
+        if (language1.toLowerCase() === this.language2LowerCase &&
+            language2.toLowerCase() === this.language1LowerCase) {
+            return true;
+        }
+        return false;
+    }
+
+    public addStudent(student: StudentClass) {
+        this.count++;
+        this.students.push(student);
+    };
+}
+
 class StudentClass {
     constructor(public s: Student) {
         this.source = s;
@@ -80,12 +110,22 @@ class StudentClass {
     gender: string;
     score: number;
     name: string;
-    languagePrefs: Array<String> = [];
+    languagePrefs: Array<string> = [];
     get hasLanguagePreferences(): boolean {
         return this.languagePrefs && this.languagePrefs.length > 0;
     }
     get classNo(): number {
         return this.class ? this.class.index : 0;
+    }
+
+    get langPref1(): string {
+        return this.languagePrefs && this.languagePrefs.length > 0 ? this.languagePrefs[0] : "";
+    }
+    get langPref2(): string {
+        return this.languagePrefs && this.languagePrefs.length > 1 ? this.languagePrefs[1] : "";
+    }
+    get langPref3(): string {
+        return this.languagePrefs && this.languagePrefs.length > 2 ? this.languagePrefs[2] : "";
     }
 
     bandNo: number;

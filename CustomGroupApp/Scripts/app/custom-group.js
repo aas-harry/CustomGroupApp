@@ -62,6 +62,33 @@ var SummaryClass = (function () {
     }
     return SummaryClass;
 }());
+var LanguageSet = (function () {
+    function LanguageSet(language1, language2) {
+        this.language1 = language1;
+        this.language2 = language2;
+        this.count = 0;
+        this.students = [];
+        this.language1LowerCase = language1.toLowerCase();
+        this.language2LowerCase = language2.toLowerCase();
+    }
+    LanguageSet.prototype.isEqual = function (language1, language2) {
+        if (language1.toLowerCase() === this.language1LowerCase &&
+            language2.toLowerCase() === this.language2LowerCase) {
+            return true;
+        }
+        if (language1.toLowerCase() === this.language2LowerCase &&
+            language2.toLowerCase() === this.language1LowerCase) {
+            return true;
+        }
+        return false;
+    };
+    LanguageSet.prototype.addStudent = function (student) {
+        this.count++;
+        this.students.push(student);
+    };
+    ;
+    return LanguageSet;
+}());
 var StudentClass = (function () {
     function StudentClass(s) {
         var _this = this;
@@ -92,6 +119,27 @@ var StudentClass = (function () {
     Object.defineProperty(StudentClass.prototype, "classNo", {
         get: function () {
             return this.class ? this.class.index : 0;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(StudentClass.prototype, "langPref1", {
+        get: function () {
+            return this.languagePrefs && this.languagePrefs.length > 0 ? this.languagePrefs[0] : "";
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(StudentClass.prototype, "langPref2", {
+        get: function () {
+            return this.languagePrefs && this.languagePrefs.length > 1 ? this.languagePrefs[1] : "";
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(StudentClass.prototype, "langPref3", {
+        get: function () {
+            return this.languagePrefs && this.languagePrefs.length > 2 ? this.languagePrefs[2] : "";
         },
         enumerable: true,
         configurable: true

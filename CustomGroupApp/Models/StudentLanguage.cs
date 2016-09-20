@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-namespace CustomGroupApp.Models
+﻿namespace CustomGroupApp.Models
 {
     public class StudentLanguage
     {
