@@ -88,8 +88,8 @@
 
     loadGenerateCustomGroupViewModel() {
         this.set("selectedClassDefinitionViewModel", this.generateCustomGroupViewModel);
-
-        bandSet.prepare("Mix", classesDefn.students, joinedStudents, separatedStudents);
+        debugger;
+        this.bandSet.prepare("Mix", this.classesDefn.students, [], []);
 
         this.selectedClassDefinitionViewModel.loadOptions(this.bandSet);
     }

@@ -96,6 +96,8 @@ var CustomGroupViewModel = (function (_super) {
     };
     CustomGroupViewModel.prototype.loadGenerateCustomGroupViewModel = function () {
         this.set("selectedClassDefinitionViewModel", this.generateCustomGroupViewModel);
+        debugger;
+        this.bandSet.prepare("Mix", this.classesDefn.students, [], []);
         this.selectedClassDefinitionViewModel.loadOptions(this.bandSet);
     };
     CustomGroupViewModel.prototype.callGetViewStep = function (stepNo) {
