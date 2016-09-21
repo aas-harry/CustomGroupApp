@@ -1,4 +1,10 @@
 ﻿<div class="container-fluid">
+    <style scoped="">
+          .k-grid td {
+            padding-bottom: 2px;
+            padding-top: 2px;
+        }
+    </style>
     <div id="content">
         <div class="row">
             <button class="btn btn-default" onClick="createClasses()">Create New Classes</button>
@@ -79,23 +85,23 @@
     ];
 
     $(document)
-        .ready(function() {
+        .ready(function () {
 
         });
 
     function getResults() {
         $.ajax({
             url: '@Url.Action("GetResults", "CustomGroup")',
-            data: { testnum: 1014405 },
+            data: { testnum: 1014181 },
             type: 'POST',
             cache: false,
-            success: function(data) {
+            success: function (data) {
                 testFile.clear();
                 testFile.set(data.Test, data.Results);
 
                 $("#message-text").replaceWith("Test file with " + data.Results.length);
             },
-            fail: function(data) {
+            fail: function (data) {
 
             }
         });
@@ -158,7 +164,7 @@
         bandSet.prepare("Mix", classesDefn.students, joinedStudents, separatedStudents);
 
         var classlist = new CustomClassGridCollection();
-        
+
         classlist.initTable("#class-container", bandSet.bands);
         //resetGrid();
 
@@ -176,14 +182,14 @@
         //        });
         //}
 
-    //$("#summary-grid")
-    //        .jqGrid({
-    //            datatype: "local",
-    //            data: band.classes,
-    //            colModel: summaryCols,
-    //            viewrecords: true, // show the current page, data rang and total records on the toolbar
-    //            caption: "Group Summary"
-    //        });
+        //$("#summary-grid")
+        //        .jqGrid({
+        //            datatype: "local",
+        //            data: band.classes,
+        //            colModel: summaryCols,
+        //            viewrecords: true, // show the current page, data rang and total records on the toolbar
+        //            caption: "Group Summary"
+        //        });
     }
 
 
@@ -215,7 +221,7 @@
             createStudentSet(classesDefn.students, ["WILTON Simon", "DONA Elise", "MUNTER Hayden"])
         ];
 
-        //    bandSet.prepare("Maths", classesDefn.students, joinedStudents, separatedStudents); 
+        //    bandSet.prepare("Maths", classesDefn.students, joinedStudents, separatedStudents);
         bandSet.prepare("Maths", classesDefn.students, joinedStudents, separatedStudents);
 
         var classes = band.classes;

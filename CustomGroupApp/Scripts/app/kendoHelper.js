@@ -19,10 +19,14 @@ var KendoHelper = (function () {
             return _this.createBandInputField(element.id, classCount, callback);
         };
         this.createStudentClassInputContainer = function (cell, classItem) {
+            var container = document.createElement("div");
+            container.setAttribute("style", "width: 300px; height: 400px; margin: 5px;");
+            container.id = "class" + classItem.parent.bandNo + "-" + classItem.index + "-container";
             var element = document.createElement("div");
-            element.setAttribute("style", "width: 200px");
+            element.setAttribute("style", "height: 100%;");
             element.id = "class" + classItem.parent.bandNo + "-" + classItem.index;
-            cell.appendChild(element);
+            container.appendChild(element);
+            cell.appendChild(container);
             return _this.createStudentClassGrid(element.id, classItem);
             ;
         };
@@ -76,7 +80,7 @@ var KendoHelper = (function () {
             cell.appendChild(label);
         };
         this.createStudentClassGrid = function (element, classItem) {
-            var grid = _this.createGrid(element);
+            var grid = _this.createClassGrid(element, classItem);
             $("#" + element).kendoDraggable({
                 filter: "tr",
                 hint: function (e) {
@@ -87,7 +91,6 @@ var KendoHelper = (function () {
             });
             grid.table.kendoDropTarget({
                 drop: function (e) {
-                    debugger;
                     var foo = e.draggable.currentTarget.data("uid");
                     //var dataItem = dataSource1.getByUid(e.draggable.currentTarget.data("uid"));
                     //dataSource1.remove(dataItem);
@@ -99,6 +102,7 @@ var KendoHelper = (function () {
             Enumerable.From(classItem.students).ForEach(function (x) { return students.push({ 'name': x.name }); });
             grid.dataSource.data(students);
             grid.refresh();
+            grid.resize();
             return grid;
         };
         this.createClassInputField = function (element, studentCount, callbackChangeEvent) {
@@ -116,18 +120,28 @@ var KendoHelper = (function () {
             if (callbackChangeEvent === void 0) { callbackChangeEvent = null; }
             return _this.createNumericTextBox(element, studentCount, 1, 250, _this.integerFormat, callbackChangeEvent);
         };
-        this.createGrid = function (element) {
-            $("#" + element).kendoGrid({
+        this.createClassGrid = function (element, classItem) {
+            $("#" + element)
+                .kendoGrid({
                 columns: [
-                    { field: "name" }
+                    { field: "name", title: "Name", width: '200px', attributes: { 'class': 'text-nowrap' } }
                 ],
-                dataSource: [
-                    { name: "Jane Doe", age: 30 },
-                    { name: "John Doe", age: 33 }
-                ]
+                toolbar: _this.createClassSummary(classItem).innerHTML,
+                dataSource: []
             });
             var grid = $("#" + element).data("kendoGrid");
             return grid;
+        };
+        this.createClassSummary = function (classItem) {
+            var element = document.createElement("div");
+            element.setAttribute("style", "border-style: solid; border-color: gray; height: 300px; padding: 5px 5px 5px 10px");
+            var elementCnt = document.createElement("div");
+            elementCnt.textContent = "No. of Students: " + classItem.count;
+            var elementAvg = document.createElement("div");
+            elementAvg.textContent = "Composite Score Avg.: " + Math.round(classItem.average);
+            element.appendChild(elementCnt);
+            element.appendChild(elementAvg);
+            return element;
         };
         this.createNumericTextBox = function (element, defaultValue, min, max, format, callbackChangeEvent) {
             if (defaultValue === void 0) { defaultValue = 0; }

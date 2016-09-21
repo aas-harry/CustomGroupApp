@@ -28,10 +28,14 @@
         cell: HTMLTableCellElement,
         classItem: ClassDefinition
     ) => {
+        var container = document.createElement("div") as HTMLDivElement;
+        container.setAttribute("style", "width: 300px; height: 400px; margin: 5px;");
+        container.id = `class${classItem.parent.bandNo}-${classItem.index}-container`;
         var element = document.createElement("div") as HTMLDivElement;
-        element.setAttribute("style", "width: 200px");
+        element.setAttribute("style", "height: 100%;");
         element.id = `class${classItem.parent.bandNo}-${classItem.index}`;
-        cell.appendChild(element);
+        container.appendChild(element);
+        cell.appendChild(container);
 
         return this.createStudentClassGrid(element.id, classItem);;
     };
@@ -100,7 +104,7 @@
     createStudentClassGrid = (
         element: string,
         classItem: ClassDefinition) : kendo.ui.Grid=> {
-        var grid = this.createGrid(element);
+        var grid = this.createClassGrid(element, classItem);
 
         $(`#${element}`).kendoDraggable({
             filter: "tr",
@@ -114,7 +118,7 @@
         
         grid.table.kendoDropTarget({
             drop(e) {
-                debugger;
+                
                 var foo = e.draggable.currentTarget.data("uid");
 
                 //var dataItem = dataSource1.getByUid(e.draggable.currentTarget.data("uid"));
@@ -129,6 +133,7 @@
         Enumerable.From(classItem.students).ForEach(x => students.push({'name': x.name}));
         grid.dataSource.data(students);
         grid.refresh();
+        grid.resize();
         return grid;
     }
 
@@ -171,20 +176,31 @@
             callbackChangeEvent);
     }
 
-    createGrid = (element: string): kendo.ui.Grid => {
-        $(`#${element}`).kendoGrid({
-            columns: [
-                { field: "name" }
-            ],
-            dataSource: [
-                { name: "Jane Doe", age: 30 },
-                { name: "John Doe", age: 33 }
-            ]
+    createClassGrid = (element: string, classItem: ClassDefinition): kendo.ui.Grid => {
+        $(`#${element}`)
+            .kendoGrid({
+                columns: [
+                    { field: "name", title: "Name", width: '200px', attributes: { 'class': 'text-nowrap' } }
+                ],
+                toolbar: this.createClassSummary(classItem).innerHTML,
+            dataSource: []
         });
         var grid = $(`#${element}`).data("kendoGrid");
         
         return grid;
     }
+
+    private createClassSummary = (classItem: ClassDefinition): HTMLDivElement => {
+        var element = document.createElement("div");
+        element.setAttribute("style", "border-style: solid; border-color: gray; height: 300px; padding: 5px 5px 5px 10px");
+        var elementCnt = document.createElement("div");
+        elementCnt.textContent = "No. of Students: " + classItem.count;
+        var elementAvg = document.createElement("div");
+        elementAvg.textContent = "Composite Score Avg.: " + Math.round(classItem.average);
+        element.appendChild(elementCnt);
+        element.appendChild(elementAvg);
+        return element;
+    };
 
     createNumericTextBox = (
         element: string,

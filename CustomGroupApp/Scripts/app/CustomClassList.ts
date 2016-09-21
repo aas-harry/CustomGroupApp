@@ -20,17 +20,20 @@ class CustomClassGridCollection {
         
         $(elementName).html("<table id='custom-classes-table'></table>");
         this.table = document.getElementById("custom-classes-table") as HTMLTableElement;
-        this.header = this.table.createTHead();
-
-        this.headerRow = this.header.insertRow();
+        this.header = this.table.createTBody();
         this.classRow = this.header.insertRow();
-        this.footerRow = this.header.insertRow();
 
         this.classes = Enumerable.From(bands).SelectMany(b => b.classes).ToArray();
         this.classCount = this.classes.length;
 
+        var cnt = 0;
         for (let classItem of this.classes) {
-            this.createClassHeader(classItem);
+            if (cnt === 3) {
+                this.classRow = this.header.insertRow();
+                cnt = 0;
+            }
+            cnt++;
+            
             this.kendoHelper.createStudentClassInputContainer(this.classRow.insertCell(), classItem);
         }
     };
