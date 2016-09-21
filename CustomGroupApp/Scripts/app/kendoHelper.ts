@@ -101,8 +101,34 @@
         element: string,
         classItem: ClassDefinition) : kendo.ui.Grid=> {
         var grid = this.createGrid(element);
-        grid.columns.push({ field: "name", title: "name" });
-        grid.dataSource.data(classItem.students);
+
+        $(`#${element}`).kendoDraggable({
+            filter: "tr",
+            hint(e) {
+                var item = $('<div class="k-grid k-widget" style="background-color: DarkOrange; color: black;"><table><tbody><tr>' + e.html() + '</tr></tbody></table></div>');
+                return item;
+            },
+            group: "classGroup"
+        });
+
+        
+        grid.table.kendoDropTarget({
+            drop(e) {
+                debugger;
+                var foo = e.draggable.currentTarget.data("uid");
+
+                //var dataItem = dataSource1.getByUid(e.draggable.currentTarget.data("uid"));
+                //dataSource1.remove(dataItem);
+                //dataSource2.add(dataItem);
+
+            },
+            group: "classGroup"
+        });
+        var students = [];
+
+        Enumerable.From(classItem.students).ForEach(x => students.push({'name': x.name}));
+        grid.dataSource.data(students);
+        grid.refresh();
         return grid;
     }
 
@@ -146,12 +172,17 @@
     }
 
     createGrid = (element: string): kendo.ui.Grid => {
-        $(`#${element}`)
-            .kendoGrid({
-                options: {},
-            } as kendo.ui.Grid);
-
-        const grid = $(`#${element}`).data("kendoGrid");
+        $(`#${element}`).kendoGrid({
+            columns: [
+                { field: "name" }
+            ],
+            dataSource: [
+                { name: "Jane Doe", age: 30 },
+                { name: "John Doe", age: 33 }
+            ]
+        });
+        var grid = $(`#${element}`).data("kendoGrid");
+        
         return grid;
     }
 

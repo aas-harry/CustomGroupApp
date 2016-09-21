@@ -156,7 +156,7 @@ class Student {
 
     languagePrefs: Array<string> = [];
     get hasLanguagePrefs(): boolean {
-        return this.hasLanguagePrefs && this.languagePrefs.length > 0;
+        return this.languagePrefs && this.languagePrefs.length > 0;
     }
 
     constructor(r: any) {

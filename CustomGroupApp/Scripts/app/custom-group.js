@@ -111,6 +111,9 @@ var StudentClass = (function () {
         this.s = s;
         this.languagePrefs = [];
         this.canMoveToOtherClass = true;
+        this.setClass = function (classItem) {
+            _this.class = classItem;
+        };
         this.swapWith = function (studentTo) {
             var fromClass = _this.class;
             var toClass = studentTo.class;
@@ -489,11 +492,11 @@ var ClassDefinition = (function () {
             if (Enumerable.From(_this.students).Any(function (x) { return x.id === student.id; })) {
                 return;
             }
-            student.class = _this;
+            student.setClass(_this);
             _this.students.push(student);
         };
         this.removeStudent = function (student) {
-            student.class = null;
+            student.setClass(null);
             for (var i = 0; i < _this.students.length; i++) {
                 if (_this.students[i].id === student.id) {
                     _this.students.splice(i, 1);

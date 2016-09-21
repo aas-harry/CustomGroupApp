@@ -119,7 +119,7 @@ class StudentClass {
 
     id: number;
     source: Student;
-    class: ClassDefinition;
+    private class: ClassDefinition;
     gender: string;
     score: number;
     name: string;
@@ -144,6 +144,10 @@ class StudentClass {
     bandNo: number;
     flag: number;
     canMoveToOtherClass = true;
+
+    setClass = (classItem: ClassDefinition) => {
+        this.class = classItem; 
+    }
 
     swapWith = (studentTo: StudentClass) => {
         var fromClass = this.class;
@@ -526,12 +530,12 @@ class ClassDefinition {
         if (Enumerable.From(this.students).Any(x => x.id === student.id)) {
             return;
         }
-        student.class = this;
+        student.setClass(this);
         this.students.push(student);
     }
 
     removeStudent = (student: StudentClass) => {
-        student.class = null;
+        student.setClass(null);
         for (let i = 0; i < this.students.length; i++) {
             if (this.students[i].id === student.id) {
                 this.students.splice(i, 1);
