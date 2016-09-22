@@ -13,15 +13,18 @@
     kendoHelper = new KendoHelper();
 
     // This function is called when the student count in a class is changed
-    onStudentCountInClassChanged = () => {
+    onStudentCountInClassChanged = (e: any) => {
+        var uid = this.getUid(e.sender.element[0].id);
+        var classItem = Enumerable.From(this.bandSet.bands[0].classes).FirstOrDefault(undefined, x => x.uid === uid);
+        var inputField = e.sender as kendo.ui.NumericTextBox;
+        if (classItem && inputField) {
+            classItem.count = inputField.value();
+        }
     };
 
     onClassCountChange = () => {
-    
-        var tmpClasses = this.groupingHelper.calculateClassesSize(this.studentCount, this.classCount);
-
-        this.createInputTextBox(Enumerable.From(tmpClasses).Select((val, classNo) => 
-            new ClassDefinition(null, classNo+1, val)).ToArray());
+        this.bandSet.bands[0].setClassCount(this.classCount);
+        this.createInputTextBox(this.bandSet.bands[0].classes);
     }
 
     createInputTextBox(classes: Array<ClassDefinition>) {
@@ -52,16 +55,16 @@
                     .append("<div style='margin-top: 5px></div>");
                 cnt = 0;
             }
-
-          
         }
     }
 
     saveOptions(source: BandSet): boolean {
+
         return true;
     }
 
     loadOptions(source: BandSet): boolean {
+        this.bandSet = source;
         super.set("classCount", source.bands[0].classes.length);
         this.createInputTextBox(source.bands[0].classes);
         return true;
@@ -69,5 +72,16 @@
 
     getBandSet(): BandSet {
         return this.bandSet;
+    }
+
+    private getUid = (elementName: string) => {
+        return elementName.substr(elementName.indexOf("-") + 1);
+    }
+
+    private parseElementClass = (elementName: string) => {
+        var base = elementName.substr(elementName.indexOf("-") + 1);
+        var bandNo = base.substr(0, base.indexOf("-"));
+        var classNo = base.substr(base.indexOf("-", 1) + 1);
+        return { bandNo: parseInt(bandNo), classNo: parseInt(classNo) };
     }
 }

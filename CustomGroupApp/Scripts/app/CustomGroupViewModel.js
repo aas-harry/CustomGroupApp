@@ -37,6 +37,8 @@ var CustomGroupViewModel = (function (_super) {
         this.isCoedSchool = true;
         this.studentCount = 0;
         this.classCount = 1;
+        this.joinedStudents = [];
+        this.separatedStudents = [];
         this.testInfo = new TestFile();
         this.setDatasource = function (test, results, languages) {
             var testInfo = new TestFile();
@@ -76,33 +78,36 @@ var CustomGroupViewModel = (function (_super) {
     }
     CustomGroupViewModel.prototype.generateClasses = function () {
         var bandSet = this.selectedClassDefinitionViewModel.getBandSet();
-        bandSet.prepare(this.groupName);
+        bandSet.prepare(this.groupName, this.classesDefn.students, this.joinedStudents, this.separatedStudents);
     };
     ;
     CustomGroupViewModel.prototype.loadGroupingViewModel = function () {
         switch (parseInt(this.selectedGroupingOption)) {
             case GroupingMethod.Banding:
+                this.bandClassDefinitionViewModel.loadOptions(this.customBandSet);
                 this.set("selectedClassDefinitionViewModel", this.bandClassDefinitionViewModel);
-                this.selectedClassDefinitionViewModel.loadOptions(this.customBandSet);
                 break;
             case GroupingMethod.TopMiddleLowest:
+                this.topMiddleLowestBandClassDefinitionViewModel.loadOptions(this.topMiddleLowestBandSet);
                 this.set("selectedClassDefinitionViewModel", this.topMiddleLowestBandClassDefinitionViewModel);
-                this.selectedClassDefinitionViewModel.loadOptions(this.topMiddleLowestBandSet);
                 break;
             case GroupingMethod.Language:
+                this.languageBandClassDefinitionViewModel.loadOptions(this.languageBandSet);
                 this.set("selectedClassDefinitionViewModel", this.languageBandClassDefinitionViewModel);
-                this.selectedClassDefinitionViewModel.loadOptions(this.languageBandSet);
                 break;
             default:
+                this.classDefinitionViewModel.loadOptions(this.bandSet);
                 this.set("selectedClassDefinitionViewModel", this.classDefinitionViewModel);
-                this.selectedClassDefinitionViewModel.loadOptions(this.bandSet);
                 break;
         }
     };
     CustomGroupViewModel.prototype.loadGenerateCustomGroupViewModel = function () {
+        debugger;
+        var bandSet = this.selectedClassDefinitionViewModel.getBandSet();
+        bandSet.streamType = this.selectedStreamingOption;
+        bandSet.prepare(this.groupName, this.classesDefn.students, this.joinedStudents, this.separatedStudents);
         this.set("selectedClassDefinitionViewModel", this.generateCustomGroupViewModel);
-        this.bandSet.prepare("Mix", this.classesDefn.students, [], []);
-        this.selectedClassDefinitionViewModel.loadOptions(this.bandSet);
+        this.selectedClassDefinitionViewModel.loadOptions(bandSet);
     };
     CustomGroupViewModel.prototype.callGetViewStep = function (stepNo) {
         _super.prototype.set.call(this, "isFirstStep", this.stepCollection.isFirstStep(stepNo));
@@ -123,3 +128,4 @@ var CustomGroupViewModel = (function (_super) {
     };
     return CustomGroupViewModel;
 }(kendo.data.ObservableObject));
+//# sourceMappingURL=CustomGroupViewModel.js.map

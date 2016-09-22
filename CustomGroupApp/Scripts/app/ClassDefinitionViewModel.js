@@ -14,13 +14,26 @@ var ClassDefinitionViewModel = (function (_super) {
         this.groupingHelper = new GroupingHelper();
         this.kendoHelper = new KendoHelper();
         // This function is called when the student count in a class is changed
-        this.onStudentCountInClassChanged = function () {
+        this.onStudentCountInClassChanged = function (e) {
+            var uid = _this.getUid(e.sender.element[0].id);
+            var classItem = Enumerable.From(_this.bandSet.bands[0].classes).FirstOrDefault(undefined, function (x) { return x.uid === uid; });
+            var inputField = e.sender;
+            if (classItem && inputField) {
+                classItem.count = inputField.value();
+            }
         };
         this.onClassCountChange = function () {
-            var tmpClasses = _this.groupingHelper.calculateClassesSize(_this.studentCount, _this.classCount);
-            _this.createInputTextBox(Enumerable.From(tmpClasses).Select(function (val, classNo) {
-                return new ClassDefinition(null, classNo + 1, val);
-            }).ToArray());
+            _this.bandSet.bands[0].setClassCount(_this.classCount);
+            _this.createInputTextBox(_this.bandSet.bands[0].classes);
+        };
+        this.getUid = function (elementName) {
+            return elementName.substr(elementName.indexOf("-") + 1);
+        };
+        this.parseElementClass = function (elementName) {
+            var base = elementName.substr(elementName.indexOf("-") + 1);
+            var bandNo = base.substr(0, base.indexOf("-"));
+            var classNo = base.substr(base.indexOf("-", 1) + 1);
+            return { bandNo: parseInt(bandNo), classNo: parseInt(classNo) };
         };
         _super.prototype.init.call(this, this);
     }
@@ -53,6 +66,7 @@ var ClassDefinitionViewModel = (function (_super) {
         return true;
     };
     ClassDefinitionViewModel.prototype.loadOptions = function (source) {
+        this.bandSet = source;
         _super.prototype.set.call(this, "classCount", source.bands[0].classes.length);
         this.createInputTextBox(source.bands[0].classes);
         return true;
@@ -62,3 +76,4 @@ var ClassDefinitionViewModel = (function (_super) {
     };
     return ClassDefinitionViewModel;
 }(kendo.data.ObservableObject));
+//# sourceMappingURL=ClassDefinitionViewModel.js.map

@@ -48,6 +48,8 @@
     classCount = 1;
     groupName: string;
     selectedClassDefinitionViewModel: IBandClassSettings;
+    joinedStudents: Array<StudentSet> = [];
+    separatedStudents: Array<StudentSet> = [];
 
     private testInfo = new TestFile();
     private customBandSet: BandSet;
@@ -64,38 +66,42 @@
 
     generateClasses() {
         var bandSet = this.selectedClassDefinitionViewModel.getBandSet();
-        bandSet.prepare(this.groupName, );
+
+        bandSet.prepare(this.groupName, this.classesDefn.students, this.joinedStudents, this.separatedStudents );
     };
 
     loadGroupingViewModel() {
         switch (parseInt(this.selectedGroupingOption)) {
             case GroupingMethod.Banding: 
+                this.bandClassDefinitionViewModel.loadOptions(this.customBandSet);
                 this.set("selectedClassDefinitionViewModel", this.bandClassDefinitionViewModel);
-                this.selectedClassDefinitionViewModel.loadOptions(this.customBandSet);
                 break;
 
            case GroupingMethod.TopMiddleLowest:
+                this.topMiddleLowestBandClassDefinitionViewModel.loadOptions(this.topMiddleLowestBandSet);
                 this.set("selectedClassDefinitionViewModel", this.topMiddleLowestBandClassDefinitionViewModel);
-                this.selectedClassDefinitionViewModel.loadOptions(this.topMiddleLowestBandSet);
                 break;
 
            case GroupingMethod.Language:
+                this.languageBandClassDefinitionViewModel.loadOptions(this.languageBandSet);
                 this.set("selectedClassDefinitionViewModel", this.languageBandClassDefinitionViewModel);
-                this.selectedClassDefinitionViewModel.loadOptions(this.languageBandSet);
                 break;
 
             default:
+                this.classDefinitionViewModel.loadOptions(this.bandSet);
                 this.set("selectedClassDefinitionViewModel", this.classDefinitionViewModel);
-                this.selectedClassDefinitionViewModel.loadOptions(this.bandSet);
                 break;
         }
     }
 
     loadGenerateCustomGroupViewModel() {
-        this.set("selectedClassDefinitionViewModel", this.generateCustomGroupViewModel);
-        this.bandSet.prepare("Mix", this.classesDefn.students, [], []);
+        debugger;
+        const bandSet = this.selectedClassDefinitionViewModel.getBandSet();
+        bandSet.streamType = this.selectedStreamingOption;
+        bandSet.prepare(this.groupName, this.classesDefn.students, this.joinedStudents, this.separatedStudents);
 
-        this.selectedClassDefinitionViewModel.loadOptions(this.bandSet);
+        this.set("selectedClassDefinitionViewModel", this.generateCustomGroupViewModel);
+        this.selectedClassDefinitionViewModel.loadOptions(bandSet);
     }
 
     setDatasource = (test, results, languages) => {

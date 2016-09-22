@@ -1,11 +1,16 @@
 ﻿@model CustomGroupApp.Models.CustomGroupViewModel
-
 <div>
     <style scoped>
         input[type="radio"] {
             margin-right: 5px;
             margin-bottom: 5px;
         }
+          .k-grid td {
+        padding-bottom: 2px;
+        padding-top: 2px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
     </style>
 
     <div class="container-fluid" id="custom-group-container">
@@ -29,27 +34,8 @@
 
         $(document)
             .ready(function () {
-
                 customGroupViewModel.setDatasource(test, studentResults, studentLanguages);
-
                 kendo.bind($("#custom-group-container"), customGroupViewModel);
-
-                // getTestResult(1014405);
-
-                function getTestResult(testnum) {
-                    $.ajax({
-                        url: '@Url.Action("GetResults", "CustomGroup")',
-                        data: { 'testnum': testnum },
-                        type: 'POST',
-                        cache: false,
-                        success: function (data) {
-                            customGroupViewModel.setDataSource(data);
-                        },
-                        fail: function () {
-
-                        }
-                    });
-                }
             });
 
         var studentResults =  @Html.Raw(Json.Encode(Model.Results.ToArray()));
