@@ -115,9 +115,11 @@ class StudentClass {
         this.gender = s.sex;
         this.id = s.studentId;
         this.languagePrefs = s.languagePrefs;
+        this.uid = createUuid();
     }
 
     id: number;
+    uid: string;
     source: Student;
     private class: ClassDefinition;
     gender: string;

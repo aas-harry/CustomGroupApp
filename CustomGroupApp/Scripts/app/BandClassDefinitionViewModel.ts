@@ -13,7 +13,7 @@
     getClasses = (): Array<number> => {
         var classes = new Array<number>();
         this.classes.forEach((val: any) => {
-            var classCnt = $(`#class${val.classNo}`).data("kendoNumericTextBox");
+            var classCnt = $(`#class-${val.uid}`).data("kendoNumericTextBox");
             classes.push(classCnt.value());
         });
         return classes;

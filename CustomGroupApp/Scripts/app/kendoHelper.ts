@@ -3,6 +3,7 @@
         super(null);
         this.convert(student);
     }
+    id: number;
     name: string;
     gender: string;
     score: number;
@@ -13,6 +14,7 @@
     hasLanguagePrefs = false;
 
     convert = (student: StudentClass) => {
+        this.id = student.id;
         this.name = student.name;
         this.gender = student.gender;
         this.score = student.score;
@@ -57,22 +59,23 @@ class KendoHelper
     createStudentClassInputContainer = (
         cell: HTMLTableCellElement,
         classItem: ClassDefinition,
-        editGroupNameCallback: any
+        editGroupNameCallback: any,
+        dropCallback: any
     ) => {
         var classGridHeight = classItem.parent.classes.length > 3 ? "500px" : "700px";
         var container = document.createElement("div") as HTMLDivElement;
         container.setAttribute("style", `width: 300px; height: ${classGridHeight}; margin: 5px 0 0 0;`);
-        container.id = `class${classItem.parent.bandNo}-${classItem.index}-container`;
+        container.id = `class-${classItem.uid}-container`;
         var gridElement = document.createElement("div") as HTMLDivElement;
         gridElement.setAttribute("style", "height: 100%;");
-        gridElement.id = `class${classItem.parent.bandNo}-${classItem.index}`;
+        gridElement.id = `class-${classItem.uid}`;
         var summaryElement = this.createClassSummary(classItem);
         container.appendChild(gridElement);
 
         cell.appendChild(container);
         cell.appendChild(summaryElement);
 
-        return this.createStudentClassGrid(gridElement.id, classItem, editGroupNameCallback);;
+        return this.createStudentClassGrid(gridElement.id, classItem, editGroupNameCallback, dropCallback);;
     };
 
     createClassInputContainer = (
@@ -92,7 +95,7 @@ class KendoHelper
         var element = document.createElement("input") as HTMLInputElement;
         element.type = "text";
         element.setAttribute("style", "width: 100px");
-        element.id = `class${bandNo}-${classNo}`;
+        element.id = `class-${bandNo}-${classNo}`;
         cell.appendChild(element);
 
         return this.createClassInputField(element.id, studentCount, callbackChangeEvent);;
@@ -139,14 +142,17 @@ class KendoHelper
     createStudentClassGrid = (
         element: string,
         classItem: ClassDefinition,
-        editGroupNameCallback: any): kendo.ui.Grid => {
+        editGroupNameCallback: any,
+        dropCallback: any): kendo.ui.Grid => {
         var grid = this.createClassGrid(element, classItem, editGroupNameCallback);
 
         $(`#${element}`).kendoDraggable({
             filter: "tr",
             hint(e) {
-                var item = $('<div class="k-grid k-widget" style="background-color: DarkOrange; color: black;"><table><tbody><tr>' + e.html() + "</tr></tbody></table></div>");
-                return item;
+                const studentId = e[0].cells[0].textContent;
+                const studentName = e[0].cells[1].textContent;
+                return $(`<div id="student-${studentId}" class="k-grid k-widget" style="background-color: DarkOrange; color: black; margin=2px">${
+                    studentName}</div>`);
             },
             group: "classGroup"
         });
@@ -154,13 +160,26 @@ class KendoHelper
         
         grid.table.kendoDropTarget({
             drop(e) {
-                
-                var foo = e.draggable.currentTarget.data("uid");
+                const targetObject = (Object) (e.draggable.currentTarget[0]);
+                const studentId = parseInt(targetObject.cells[0].textContent);
+                const sourceClass = $(e.draggable.element).attr('id');
 
-                //var dataItem = dataSource1.getByUid(e.draggable.currentTarget.data("uid"));
-                //dataSource1.remove(dataItem);
-                //dataSource2.add(dataItem);
+                if (dropCallback(`class-${classItem.uid}`, sourceClass, studentId)) {
+                    let sourceGrid = $(`#${sourceClass}`).data("kendoGrid");
+                    let targetGrid = $(`#class-${classItem.uid}`).data("kendoGrid");
+                    var sourceDatasource = sourceGrid.dataSource.view();
 
+                    var targetDatasource = targetGrid.dataSource.view();
+                    for (let i=0; i< sourceDatasource.length; i++) {
+                        if (sourceDatasource[i].id === studentId) {
+                            let student = sourceDatasource[i];
+                            sourceDatasource.remove(student);
+                            targetDatasource.push(student);
+                            sourceGrid.refresh();
+                            targetGrid.refresh();
+                        }
+                    }
+                }
             },
             group: "classGroup"
         });
@@ -218,10 +237,12 @@ class KendoHelper
         $(`#${element}`)
             .kendoGrid({
                 columns: [
+                    { field: "id", title: "studentId", width: "30px", hidden: true},
                     { field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" } },
                     { field: "score", title: "Score", width: "80px", attributes: { 'class': "text-center" } }
                 ],
-                toolbar: [{ template: kendo.template("Group Name: <input id='${groupNameElementId}' style='margin: 0 5px 0 5px' data-validmask-msg='Group name must not be blank' required='required' />")}],
+                toolbar: [{ template: kendo.template(`Group Name: <input id='${groupNameElementId}' style='margin: 0 5px 0 5px' />`) }],
+                selectable: "row",
             dataSource: []
         });
 
@@ -239,6 +260,7 @@ class KendoHelper
                 const dataItem = $(`#${element}`).data("kendoGrid").dataItem(e.target.closest("tr"));
                 const student = dataItem as StudentClassRow;
                 let tooltipText = `<strong>${student.name}</strong><br>Gender: ${student.gender}<br>Composite Score: ${student.score}`;
+                tooltipText += `<br>Id: ${student.id}`;
 
                 if (student.hasLanguagePrefs) {
                     tooltipText += `<br>1st Language Pref: ${student.langPref1 === "" ? "None" : student.langPref1}`;

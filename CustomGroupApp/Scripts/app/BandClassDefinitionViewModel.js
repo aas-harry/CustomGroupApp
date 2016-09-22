@@ -18,7 +18,7 @@ var BandClassDefinitionViewModel = (function (_super) {
         this.getClasses = function () {
             var classes = new Array();
             _this.classes.forEach(function (val) {
-                var classCnt = $("#class" + val.classNo).data("kendoNumericTextBox");
+                var classCnt = $("#class-" + val.uid).data("kendoNumericTextBox");
                 classes.push(classCnt.value());
             });
             return classes;

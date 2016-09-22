@@ -39,10 +39,10 @@
             const inputElement = document.createElement("input") as HTMLInputElement;
             inputElement.type = "text";
             inputElement.setAttribute("style", "width: 100px; margin-right: 10px; margin-left: 10px; margin-bottom: 5px'");
-            inputElement.id = `class${classNo}`;
+            inputElement.id = `class-${classItem.uid}`;
             element.appendChild(inputElement);
 
-            this.kendoHelper.createStudentsInputField(`class${classNo}`,
+            this.kendoHelper.createStudentsInputField(inputElement.id,
                 classItem.count,
                 this.onStudentCountInClassChanged);
 

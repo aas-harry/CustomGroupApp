@@ -34,9 +34,22 @@ class CustomClassGridCollection {
             }
             cnt++;
             
-            this.kendoHelper.createStudentClassInputContainer(this.classRow.insertCell(), classItem, this.onEditGroupName);
+            this.kendoHelper.createStudentClassInputContainer(this.classRow.insertCell(), classItem, this.onEditGroupName, this.onDropItem);
         }
     };
+
+    onDropItem = (targetUid: string, sourceUid: string, studentId: number) : boolean => {
+        var targetClass = Enumerable.From(this.classes).FirstOrDefault(undefined, x => x.uid === this.getUid(targetUid));
+        var sourceClass = Enumerable.From(this.classes).FirstOrDefault(undefined, x => x.uid === this.getUid(sourceUid));
+        var student = Enumerable.From(sourceClass.students).FirstOrDefault(undefined, x => x.id === studentId);
+
+        if (targetClass && sourceClass && student) {
+            sourceClass.removeStudent(student);
+            targetClass.addStudent(student);
+            return true;
+        }
+        return false;
+    }
 
     onEditGroupName = (e: any) => {
         var uid = this.getUid(e.sender.element[0].id);
@@ -64,6 +77,6 @@ class CustomClassGridCollection {
         var base = elementName.substr(elementName.indexOf("-") + 1);
         var bandNo = base.substr(0, base.indexOf("-"));
         var classNo = base.substr(base.indexOf("-", 1) + 1);
-        return { bandNo: bandNo, classNo: classNo };
+        return { bandNo: parseInt(bandNo), classNo: parseInt(classNo) };
     }
 }

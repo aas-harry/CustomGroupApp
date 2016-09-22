@@ -39,9 +39,9 @@ var ClassDefinitionViewModel = (function (_super) {
             var inputElement = document.createElement("input");
             inputElement.type = "text";
             inputElement.setAttribute("style", "width: 100px; margin-right: 10px; margin-left: 10px; margin-bottom: 5px'");
-            inputElement.id = "class" + classNo;
+            inputElement.id = "class-" + classItem.uid;
             element.appendChild(inputElement);
-            this.kendoHelper.createStudentsInputField("class" + classNo, classItem.count, this.onStudentCountInClassChanged);
+            this.kendoHelper.createStudentsInputField(inputElement.id, classItem.count, this.onStudentCountInClassChanged);
             if (cnt === 3) {
                 $("#classes-settings-container")
                     .append("<div style='margin-top: 5px></div>");
