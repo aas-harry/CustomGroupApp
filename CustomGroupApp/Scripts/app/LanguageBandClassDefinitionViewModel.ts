@@ -58,7 +58,7 @@
         this.bandSet.createBands("language", this.studentCount, this.languageSets.length);
         let i = 0;
         for (let item of this.languageSets) {
-            this.bandSet.bands[i].bandName = item.Description;
+            this.bandSet.bands[i].bandName = item.description;
             this.bandSet.bands[i].studentCount = item.count;
             this.bandSet.bands[i].setClassCount(1);
             i++;

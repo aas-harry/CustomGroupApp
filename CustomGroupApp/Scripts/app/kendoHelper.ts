@@ -1,4 +1,34 @@
-﻿class KendoHelper
+﻿class StudentClassRow extends kendo.data.ObservableObject{
+    constructor(student: StudentClass) {
+        super(null);
+        this.convert(student);
+    }
+    name: string;
+    gender: string;
+    score: number;
+    class: number;
+    langPref1: string;
+    langPref2: string;
+    langPref3: string;
+    hasLanguagePrefs = false;
+
+    convert = (student: StudentClass) => {
+        this.name = student.name;
+        this.gender = student.gender;
+        this.score = student.score;
+        this.class = student.classNo;
+        this.langPref1 = student.langPref1;
+        this.langPref2 = student.langPref2;
+        this.langPref3 = student.langPref3;
+        if (this.langPref1 !== "" || this.langPref2 !== "" || this.langPref3 !== "") {
+            this.hasLanguagePrefs = true;
+        }
+    }
+
+    
+}
+
+class KendoHelper
 {
     private integerFormat = "n0";
 
@@ -26,18 +56,23 @@
 
     createStudentClassInputContainer = (
         cell: HTMLTableCellElement,
-        classItem: ClassDefinition
+        classItem: ClassDefinition,
+        editGroupNameCallback: any
     ) => {
+        var classGridHeight = classItem.parent.classes.length > 3 ? "500px" : "700px";
         var container = document.createElement("div") as HTMLDivElement;
-        container.setAttribute("style", "width: 300px; height: 400px; margin: 5px;");
+        container.setAttribute("style", `width: 300px; height: ${classGridHeight}; margin: 5px 0 0 0;`);
         container.id = `class${classItem.parent.bandNo}-${classItem.index}-container`;
-        var element = document.createElement("div") as HTMLDivElement;
-        element.setAttribute("style", "height: 100%;");
-        element.id = `class${classItem.parent.bandNo}-${classItem.index}`;
-        container.appendChild(element);
-        cell.appendChild(container);
+        var gridElement = document.createElement("div") as HTMLDivElement;
+        gridElement.setAttribute("style", "height: 100%;");
+        gridElement.id = `class${classItem.parent.bandNo}-${classItem.index}`;
+        var summaryElement = this.createClassSummary(classItem);
+        container.appendChild(gridElement);
 
-        return this.createStudentClassGrid(element.id, classItem);;
+        cell.appendChild(container);
+        cell.appendChild(summaryElement);
+
+        return this.createStudentClassGrid(gridElement.id, classItem, editGroupNameCallback);;
     };
 
     createClassInputContainer = (
@@ -103,13 +138,14 @@
 
     createStudentClassGrid = (
         element: string,
-        classItem: ClassDefinition) : kendo.ui.Grid=> {
-        var grid = this.createClassGrid(element, classItem);
+        classItem: ClassDefinition,
+        editGroupNameCallback: any): kendo.ui.Grid => {
+        var grid = this.createClassGrid(element, classItem, editGroupNameCallback);
 
         $(`#${element}`).kendoDraggable({
             filter: "tr",
             hint(e) {
-                var item = $('<div class="k-grid k-widget" style="background-color: DarkOrange; color: black;"><table><tbody><tr>' + e.html() + '</tr></tbody></table></div>');
+                var item = $('<div class="k-grid k-widget" style="background-color: DarkOrange; color: black;"><table><tbody><tr>' + e.html() + "</tr></tbody></table></div>");
                 return item;
             },
             group: "classGroup"
@@ -128,9 +164,10 @@
             },
             group: "classGroup"
         });
-        var students = [];
 
-        Enumerable.From(classItem.students).ForEach(x => students.push({'name': x.name}));
+        // Populate the grid
+        var students: Array<StudentClassRow> = [];
+        Enumerable.From(classItem.students).ForEach(x => students.push(new StudentClassRow(x)));
         grid.dataSource.data(students);
         grid.refresh();
         grid.resize();
@@ -176,23 +213,49 @@
             callbackChangeEvent);
     }
 
-    createClassGrid = (element: string, classItem: ClassDefinition): kendo.ui.Grid => {
+    createClassGrid = (element: string, classItem: ClassDefinition, editGroupCallback: any): kendo.ui.Grid => {
+        const groupNameElementId = "groupname-" + classItem.uid;
         $(`#${element}`)
             .kendoGrid({
                 columns: [
-                    { field: "name", title: "Name", width: '200px', attributes: { 'class': 'text-nowrap' } }
+                    { field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" } },
+                    { field: "score", title: "Score", width: "80px", attributes: { 'class': "text-center" } }
                 ],
-                toolbar: this.createClassSummary(classItem).innerHTML,
+                toolbar: [{ template: kendo.template("Group Name: <input id='${groupNameElementId}' style='margin: 0 5px 0 5px' data-validmask-msg='Group name must not be blank' required='required' />")}],
             dataSource: []
         });
-        var grid = $(`#${element}`).data("kendoGrid");
-        
-        return grid;
+
+        $(`#${groupNameElementId}`)
+            .kendoMaskedTextBox({
+                value: classItem.name,
+                change: editGroupCallback
+        });
+
+        // Create name tooltip
+        $(`#${element}`).kendoTooltip({
+            filter: "td:nth-child(1)", //this filter selects the first column cells
+            position: "center",
+            content(e) {
+                const dataItem = $(`#${element}`).data("kendoGrid").dataItem(e.target.closest("tr"));
+                const student = dataItem as StudentClassRow;
+                let tooltipText = `<strong>${student.name}</strong><br>Gender: ${student.gender}<br>Composite Score: ${student.score}`;
+
+                if (student.hasLanguagePrefs) {
+                    tooltipText += `<br>1st Language Pref: ${student.langPref1 === "" ? "None" : student.langPref1}`;
+                    tooltipText += `<br>2nd Language Pref: ${student.langPref2 === "" ? "None" : student.langPref2}`;
+                    tooltipText += `<br>3rd Language Pref: ${student.langPref3 === "" ? "None" : student.langPref3}`;
+                }
+
+                return "<div style='text-align: left; margin: 10px; padding: 5px'>" + tooltipText + "</div>";
+            }
+        }).data("kendoTooltip");
+
+        return $(`#${element}`).data("kendoGrid");
     }
 
     private createClassSummary = (classItem: ClassDefinition): HTMLDivElement => {
         var element = document.createElement("div");
-        element.setAttribute("style", "border-style: solid; border-color: gray; height: 300px; padding: 5px 5px 5px 10px");
+        element.setAttribute("style", "border-style: solid; border-color: #bfbfbf; border-width: 1px; padding: 5px 5px 5px 10px; margin: 5px 0 0 0");
         var elementCnt = document.createElement("div");
         elementCnt.textContent = "No. of Students: " + classItem.count;
         var elementAvg = document.createElement("div");

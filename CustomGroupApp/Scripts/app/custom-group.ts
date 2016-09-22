@@ -77,14 +77,14 @@ class LanguageSet {
     public count = 0;
     public students: Array<StudentClass> = [];
 
-    get Description(): string {
-        if (this.language1 && this.language1 !== '' && this.language2 && this.language2 !== '') {
-            return this.language1 + " /\n" + this.language2;
+    get description(): string {
+        if (this.language1 && this.language1 !== "" && this.language2 && this.language2 !== "") {
+            return this.language1 + " <br>" + this.language2;
         }
-        if (this.language1 && this.language1 !== '' ) {
+        if (this.language1 && this.language1 !== "" ) {
             return this.language1;
         }
-        if (this.language2 && this.language2 !== '') {
+        if (this.language2 && this.language2 !== "") {
             return this.language2;
         }
         return "No Prefs";
