@@ -15,4 +15,7 @@
         this.customClassGridCollection.initTable("#classes-settings-container", source.bands);
         return true;
     }
+    getBandSet() {
+        return this.bandSet;
+    }
 }

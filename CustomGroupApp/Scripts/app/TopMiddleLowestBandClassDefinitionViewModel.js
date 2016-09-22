@@ -37,6 +37,8 @@ var TopMiddleLowestBandClassDefinitionViewModel = (function (_super) {
         this.bandNumericTextBoxes.initTable("#classes-settings-container", source.bands);
         return true;
     };
+    TopMiddleLowestBandClassDefinitionViewModel.prototype.getBandSet = function () {
+        return this.bandSet;
+    };
     return TopMiddleLowestBandClassDefinitionViewModel;
 }(kendo.data.ObservableObject));
-//# sourceMappingURL=TopMiddleLowestBandClassDefinitionViewModel.js.map

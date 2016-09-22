@@ -74,6 +74,11 @@ var CustomGroupViewModel = (function (_super) {
         this.bandClassDefinitionViewModel = new BandClassDefinitionViewModel(studentCount);
         this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(studentCount);
     }
+    CustomGroupViewModel.prototype.generateClasses = function () {
+        var bandSet = this.selectedClassDefinitionViewModel.getBandSet();
+        bandSet.prepare(this.groupName);
+    };
+    ;
     CustomGroupViewModel.prototype.loadGroupingViewModel = function () {
         switch (parseInt(this.selectedGroupingOption)) {
             case GroupingMethod.Banding:
@@ -118,4 +123,3 @@ var CustomGroupViewModel = (function (_super) {
     };
     return CustomGroupViewModel;
 }(kendo.data.ObservableObject));
-//# sourceMappingURL=CustomGroupViewModel.js.map

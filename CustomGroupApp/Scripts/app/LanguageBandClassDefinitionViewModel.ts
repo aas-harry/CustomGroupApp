@@ -39,6 +39,10 @@
         return true;
     }
 
+    getBandSet() {
+        return this.bandSet;
+    }
+
     set students(value: Array<StudentClass>) {
         this._students = value;
         this.studentWithLanguagePrefCount = Enumerable.From(value).Count(x => x.hasLanguagePreferences);

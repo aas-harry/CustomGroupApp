@@ -74,7 +74,7 @@ var LanguageSet = (function () {
     Object.defineProperty(LanguageSet.prototype, "description", {
         get: function () {
             if (this.language1 && this.language1 !== "" && this.language2 && this.language2 !== "") {
-                return this.language1 + " <br>" + this.language2;
+                return this.language1 + " / \n" + this.language2;
             }
             if (this.language1 && this.language1 !== "") {
                 return this.language1;
@@ -811,4 +811,3 @@ var ClassesDefinition = (function () {
     });
     return ClassesDefinition;
 }());
-//# sourceMappingURL=custom-group.js.map

@@ -57,6 +57,8 @@ var ClassDefinitionViewModel = (function (_super) {
         this.createInputTextBox(source.bands[0].classes);
         return true;
     };
+    ClassDefinitionViewModel.prototype.getBandSet = function () {
+        return this.bandSet;
+    };
     return ClassDefinitionViewModel;
 }(kendo.data.ObservableObject));
-//# sourceMappingURL=ClassDefinitionViewModel.js.map

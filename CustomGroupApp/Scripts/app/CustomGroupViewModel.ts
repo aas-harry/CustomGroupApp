@@ -62,6 +62,11 @@
     private languageBandClassDefinitionViewModel: LanguageBandClassDefinitionViewModel;
     private generateCustomGroupViewModel: GenerateCustomGroupViewModel;
 
+    generateClasses() {
+        var bandSet = this.selectedClassDefinitionViewModel.getBandSet();
+        bandSet.prepare(this.groupName, );
+    };
+
     loadGroupingViewModel() {
         switch (parseInt(this.selectedGroupingOption)) {
             case GroupingMethod.Banding: 

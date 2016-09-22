@@ -41,6 +41,9 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
         this.bandNumericTextBoxes.initTable("#classes-settings-container", source.bands);
         return true;
     };
+    LanguageBandClassDefinitionViewModel.prototype.getBandSet = function () {
+        return this.bandSet;
+    };
     Object.defineProperty(LanguageBandClassDefinitionViewModel.prototype, "students", {
         set: function (value) {
             this._students = value;
@@ -75,4 +78,3 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
     });
     return LanguageBandClassDefinitionViewModel;
 }(kendo.data.ObservableObject));
-//# sourceMappingURL=LanguageBandClassDefinitionViewModel.js.map

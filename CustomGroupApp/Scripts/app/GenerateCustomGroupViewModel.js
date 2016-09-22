@@ -20,6 +20,8 @@ var GenerateCustomGroupViewModel = (function (_super) {
         this.customClassGridCollection.initTable("#classes-settings-container", source.bands);
         return true;
     };
+    GenerateCustomGroupViewModel.prototype.getBandSet = function () {
+        return this.bandSet;
+    };
     return GenerateCustomGroupViewModel;
 }(kendo.data.ObservableObject));
-//# sourceMappingURL=GenerateCustomGroupViewModel.js.map

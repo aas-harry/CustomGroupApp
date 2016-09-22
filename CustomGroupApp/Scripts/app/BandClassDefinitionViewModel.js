@@ -47,6 +47,8 @@ var BandClassDefinitionViewModel = (function (_super) {
         this.bandNumericTextBoxes.initTable("#classes-settings-container", source.bands);
         return true;
     };
+    BandClassDefinitionViewModel.prototype.getBandSet = function () {
+        return this.bandSet;
+    };
     return BandClassDefinitionViewModel;
 }(kendo.data.ObservableObject));
-//# sourceMappingURL=BandClassDefinitionViewModel.js.map

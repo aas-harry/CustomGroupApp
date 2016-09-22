@@ -57,6 +57,7 @@ function createUuid() {
 interface IBandClassSettings {
     saveOptions(source: BandSet) : boolean;
     loadOptions(source: BandSet): boolean;
+    getBandSet() : BandSet;
 }
 
 class SummaryClass {
@@ -79,7 +80,7 @@ class LanguageSet {
 
     get description(): string {
         if (this.language1 && this.language1 !== "" && this.language2 && this.language2 !== "") {
-            return this.language1 + " <br>" + this.language2;
+            return this.language1 + " / \n" + this.language2;
         }
         if (this.language1 && this.language1 !== "" ) {
             return this.language1;

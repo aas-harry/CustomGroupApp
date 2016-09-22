@@ -6,6 +6,7 @@
         super.init(this);
     }
 
+    bandSet: BandSet;
     classCount = 1;
 
     groupingHelper = new GroupingHelper();
@@ -64,5 +65,9 @@
         super.set("classCount", source.bands[0].classes.length);
         this.createInputTextBox(source.bands[0].classes);
         return true;
+    }
+
+    getBandSet(): BandSet {
+        return this.bandSet;
     }
 }

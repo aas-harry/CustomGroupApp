@@ -48,4 +48,7 @@
         this.bandNumericTextBoxes.initTable("#classes-settings-container", source.bands);
         return true;
     }
+    getBandSet(): BandSet {
+        return this.bandSet;
+    }
 }
