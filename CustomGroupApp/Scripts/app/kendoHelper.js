@@ -167,6 +167,16 @@ var KendoHelper = (function () {
             if (callbackChangeEvent === void 0) { callbackChangeEvent = null; }
             return _this.createNumericTextBox(element, studentCount, 1, 250, _this.integerFormat, callbackChangeEvent);
         };
+        this.createStudentCountInClassInputControl = function (element, classItem, studentCount, // use this property to overwrite the student count in classItem
+            callbackChangeEvent) {
+            if (studentCount === void 0) { studentCount = 1; }
+            if (callbackChangeEvent === void 0) { callbackChangeEvent = null; }
+            return _this.createNumericTextBox(element, studentCount, 1, 250, _this.integerFormat, function (e) {
+                if (callbackChangeEvent != null) {
+                    callbackChangeEvent(e);
+                }
+            });
+        };
         this.createClassGrid = function (element, classItem, editGroupCallback) {
             var groupNameElementId = "groupname-" + classItem.uid;
             $("#" + element)
@@ -236,4 +246,3 @@ var KendoHelper = (function () {
     }
     return KendoHelper;
 }());
-//# sourceMappingURL=kendoHelper.js.map

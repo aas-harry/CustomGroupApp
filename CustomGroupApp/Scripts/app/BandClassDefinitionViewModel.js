@@ -15,16 +15,10 @@ var BandClassDefinitionViewModel = (function (_super) {
         ]);
         this.bandCount = 1;
         this.classCount = 1;
-        this.getClasses = function () {
-            var classes = new Array();
-            _this.classes.forEach(function (val) {
-                var classCnt = $("#class-" + val.uid).data("kendoNumericTextBox");
-                classes.push(classCnt.value());
-            });
-            return classes;
-        };
         this.groupingHelper = new GroupingHelper();
         this.kendoHelper = new KendoHelper();
+        this.studentCountInBandInputControls = new BandNumericTextBoxCollection();
+        this.studentCountInClassInputControls = new BandNumericTextBoxCollection();
         this.bandNumericTextBoxes = new BandNumericTextBoxCollection();
         this.onBandCountChange = function () {
             _this.bandSet.createBands("Band", _this.studentCount, _this.bandCount);
@@ -52,4 +46,3 @@ var BandClassDefinitionViewModel = (function (_super) {
     };
     return BandClassDefinitionViewModel;
 }(kendo.data.ObservableObject));
-//# sourceMappingURL=BandClassDefinitionViewModel.js.map

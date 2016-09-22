@@ -76,4 +76,3 @@ var ClassDefinitionViewModel = (function (_super) {
     };
     return ClassDefinitionViewModel;
 }(kendo.data.ObservableObject));
-//# sourceMappingURL=ClassDefinitionViewModel.js.map

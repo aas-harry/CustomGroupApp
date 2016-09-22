@@ -232,6 +232,25 @@ class KendoHelper
             callbackChangeEvent);
     }
 
+    createStudentCountInClassInputControl = (
+        element: string,
+        classItem: ClassDefinition,
+        studentCount: number = 1,  // use this property to overwrite the student count in classItem
+        callbackChangeEvent: (e: any) => any = null): kendo.ui.NumericTextBox => {
+        return this.createNumericTextBox(
+            element,
+            studentCount,
+            1,
+            250,
+            this.integerFormat,
+            e => {
+                if (callbackChangeEvent != null) {
+                     callbackChangeEvent(e);
+                }
+            });
+    }
+
+
     createClassGrid = (element: string, classItem: ClassDefinition, editGroupCallback: any): kendo.ui.Grid => {
         const groupNameElementId = "groupname-" + classItem.uid;
         $(`#${element}`)

@@ -12,15 +12,6 @@
     classCount = 1;
     languageSets : Array<LanguageSet> = [];
 
-    getClasses = (): Array<number> => {
-        var classes = new Array<number>();
-        this.classes.forEach((val: any) => {
-            var classCnt = $(`#class-${val.classNo}`).data("kendoNumericTextBox");
-            classes.push(classCnt.value());
-        });
-        return classes;
-    }
-
     bandSet = new BandSet(null, "custom", this.studentCount, 1);
     private groupingHelper = new GroupingHelper();
     private kendoHelper = new KendoHelper();

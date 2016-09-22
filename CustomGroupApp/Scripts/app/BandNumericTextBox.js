@@ -56,7 +56,11 @@ var BandNumericTextBoxCollection = (function () {
         this.me = this;
         this.items = [];
         this.classRows = [];
-        this.add = function (parent, studentCount, inputControl, bandNo, classNo, usage, hidden) {
+        // the studentCount pass to this paameter can be from two different sources:
+        // 1. From band definition class or
+        // 2. Zero if the class no is not in the band classes definition. 
+        //    In the UI this control will be disabled if studentCount == 0 
+        this.add = function (parent, band, studentCount, inputControl, bandNo, classNo, usage, hidden) {
             if (hidden === void 0) { hidden = false; }
             _this.items.push(new BandNumericTextBox(parent, studentCount, inputControl, bandNo, classNo, usage, hidden));
         };
@@ -108,13 +112,15 @@ var BandNumericTextBoxCollection = (function () {
         };
         this.createBandColumnInTable = function (band) {
             _this.kendoHelper.createLabel(_this.columnHeaderRow.insertCell(), band.bandName === null || band.bandName === "" ? "Band " + band.bandNo : band.bandName);
-            _this.createStudentCountInBandCell(band.bandNo, band.studentCount);
-            _this.createBandCountCell(band.bandNo, band.classCount);
+            _this.createStudentCountInBandCell(band);
+            _this.createBandCountCell(band, band.bandNo, band.classCount);
         };
         // Create student count cell for a band
-        this.createStudentCountInBandCell = function (bandNo, studentCount) {
+        this.createStudentCountInBandCell = function (band) {
+            var bandNo = band.bandNo;
+            var studentCount = band.studentCount;
             var studentCell = _this.studentsRow.insertCell();
-            _this.add(studentCell, studentCount, _this.kendoHelper.createStudentsInputContainer(studentCell, studentCount, 1, bandNo, _this.oStudentSettingsChange), bandNo, 1, BandNumericTextBoxUsage.StudentSize);
+            _this.add(studentCell, band, studentCount, _this.kendoHelper.createStudentsInputContainer(studentCell, studentCount, 1, bandNo, _this.oStudentSettingsChange), bandNo, 1, BandNumericTextBoxUsage.StudentSize);
         };
         // Create student count cell for a class in a band
         this.createStudentCountInClassRow = function (classNo, bands, showClass) {
@@ -128,11 +134,11 @@ var BandNumericTextBoxCollection = (function () {
                 var bandNo = band.bandNo;
                 var classCell = classRow.insertCell();
                 var studentCount = classNo <= band.classes.length ? band.classes[classNo - 1].count : 0;
-                _this.add(classCell, studentCount, _this.kendoHelper.createClassInputContainer(classCell, studentCount, classNo, bandNo, _this.onClassSettingsChange()), bandNo, classNo, BandNumericTextBoxUsage.ClassSize, !showClass);
+                _this.add(classCell, band, studentCount, _this.kendoHelper.createClassInputContainer(classCell, studentCount, classNo, bandNo, _this.onClassSettingsChange()), bandNo, classNo, BandNumericTextBoxUsage.ClassSize, !showClass);
             }
         };
         // Create band count cell
-        this.createBandCountCell = function (bandNo, classCount) {
+        this.createBandCountCell = function (band, bandNo, classCount) {
             var bandCell = _this.bandRow.insertCell();
             _this.add(bandCell, classCount, _this.kendoHelper.createBandInputContainer(bandCell, bandNo, classCount, _this.onBandSettingsChange), bandNo, 0, BandNumericTextBoxUsage.BandSize);
         };
@@ -186,6 +192,7 @@ var BandNumericTextBoxCollection = (function () {
         configurable: true
     });
     BandNumericTextBoxCollection.prototype.initTable = function (elementName, bands) {
+        this.bands = bands;
         this.clear();
         $("#classes-settings-container").html("<table id='band-definition-table'></table>");
         this.table = document.getElementById("band-definition-table");
@@ -230,4 +237,3 @@ var BandNumericTextBoxCollection = (function () {
     };
     return BandNumericTextBoxCollection;
 }());
-//# sourceMappingURL=BandNumericTextBox.js.map

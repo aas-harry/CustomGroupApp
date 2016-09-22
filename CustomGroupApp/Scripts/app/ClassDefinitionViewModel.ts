@@ -31,7 +31,7 @@
         $("#classes-settings-container").html("");
         const element = document.getElementById("classes-settings-container") as HTMLTableElement;
 
-        var cnt = 0;
+        let cnt = 0;
         for (let classItem of classes) {
             const classNo = classItem.index;
             cnt++;

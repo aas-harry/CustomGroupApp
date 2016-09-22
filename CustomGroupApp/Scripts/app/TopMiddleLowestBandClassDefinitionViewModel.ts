@@ -11,15 +11,6 @@
     bandCount = 3;
     classCount = 1;
 
-    getClasses = (): Array<number> => {
-        var classes = new Array<number>();
-        this.classes.forEach((val: any) => {
-            var classCnt = $(`#class-${val.classNo}`).data("kendoNumericTextBox");
-            classes.push(classCnt.value());
-        });
-        return classes;
-    }
-
     private bandSet = new TopMiddleLowestBandSet(null, this.studentCount);
     private groupingHelper = new GroupingHelper();
     private kendoHelper = new KendoHelper();

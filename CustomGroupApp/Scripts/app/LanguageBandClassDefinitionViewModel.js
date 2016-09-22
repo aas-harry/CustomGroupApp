@@ -6,7 +6,6 @@ var __extends = (this && this.__extends) || function (d, b) {
 var LanguageBandClassDefinitionViewModel = (function (_super) {
     __extends(LanguageBandClassDefinitionViewModel, _super);
     function LanguageBandClassDefinitionViewModel(studentCount) {
-        var _this = this;
         if (studentCount === void 0) { studentCount = 0; }
         _super.call(this);
         this.studentCount = studentCount;
@@ -16,14 +15,6 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
         this.bandCount = 3;
         this.classCount = 1;
         this.languageSets = [];
-        this.getClasses = function () {
-            var classes = new Array();
-            _this.classes.forEach(function (val) {
-                var classCnt = $("#class-" + val.classNo).data("kendoNumericTextBox");
-                classes.push(classCnt.value());
-            });
-            return classes;
-        };
         this.bandSet = new BandSet(null, "custom", this.studentCount, 1);
         this.groupingHelper = new GroupingHelper();
         this.kendoHelper = new KendoHelper();
@@ -78,4 +69,3 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
     });
     return LanguageBandClassDefinitionViewModel;
 }(kendo.data.ObservableObject));
-//# sourceMappingURL=LanguageBandClassDefinitionViewModel.js.map

@@ -10,18 +10,12 @@
     bandCount = 1;
     classCount = 1;
     
-    getClasses = (): Array<number> => {
-        var classes = new Array<number>();
-        this.classes.forEach((val: any) => {
-            var classCnt = $(`#class-${val.uid}`).data("kendoNumericTextBox");
-            classes.push(classCnt.value());
-        });
-        return classes;
-    }
-
     private bandSet : BandSet;
     private groupingHelper = new GroupingHelper();
     private kendoHelper = new KendoHelper();
+    private bandCountInputControl: BandNumericTextBox;
+    private studentCountInBandInputControls = new BandNumericTextBoxCollection();
+    private studentCountInClassInputControls = new BandNumericTextBoxCollection();
     private bandNumericTextBoxes = new BandNumericTextBoxCollection();
 
 

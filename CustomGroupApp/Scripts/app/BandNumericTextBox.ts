@@ -60,11 +60,13 @@ class BandNumericTextBoxCollection {
     classRows: Array<HTMLTableRowElement> = [];
     bandCount: number;
 
+    private bands : Array<BandDefinition>;
     get classCount(): number {
         return this.classRows.length;
     }
 
     initTable(elementName: string, bands: Array<BandDefinition>) {
+        this.bands = bands;
         this.clear();
 
         $("#classes-settings-container").html("<table id='band-definition-table'></table>");
@@ -95,8 +97,13 @@ class BandNumericTextBoxCollection {
         }
     }
 
+    // the studentCount pass to this paameter can be from two different sources:
+    // 1. From band definition class or
+    // 2. Zero if the class no is not in the band classes definition. 
+    //    In the UI this control will be disabled if studentCount == 0 
     add = (
         parent: HTMLTableCellElement,
+        band: BandDefinition,
         studentCount: number,
         inputControl: kendo.ui.NumericTextBox,
         bandNo: number,
@@ -176,16 +183,19 @@ class BandNumericTextBoxCollection {
     }
 
     createBandColumnInTable = (band: BandDefinition) => {
-        this.kendoHelper.createLabel(this.columnHeaderRow.insertCell(), band.bandName === null || band.bandName === "" ? "Band " + band.bandNo : band.bandName);
-        this.createStudentCountInBandCell(band.bandNo, band.studentCount);
-        this.createBandCountCell(band.bandNo, band.classCount);
+        this.kendoHelper.createLabel(this.columnHeaderRow.insertCell(),
+            band.bandName === null || band.bandName === "" ? "Band " + band.bandNo : band.bandName);
+        this.createStudentCountInBandCell(band);
+        this.createBandCountCell(band, band.bandNo, band.classCount);
 
     }
 
     // Create student count cell for a band
-    createStudentCountInBandCell = (bandNo: number, studentCount: number) => {
+    createStudentCountInBandCell = (band: BandDefinition) => {
+        const bandNo = band.bandNo;
+        const studentCount = band.studentCount;
         const studentCell = this.studentsRow.insertCell();
-        this.add(studentCell, studentCount,
+        this.add(studentCell, band, studentCount,
             this.kendoHelper.createStudentsInputContainer(studentCell, studentCount, 1, bandNo, this.oStudentSettingsChange),
             bandNo,
             1,
@@ -202,7 +212,7 @@ class BandNumericTextBoxCollection {
             const bandNo = band.bandNo;
             const classCell = classRow.insertCell();
             const studentCount = classNo <= band.classes.length ? band.classes[classNo - 1].count : 0;
-            this.add(classCell, studentCount,
+            this.add(classCell,band, studentCount,
                 this.kendoHelper.createClassInputContainer(classCell, studentCount, classNo, bandNo,
                     this.onClassSettingsChange()),
                 bandNo,
@@ -212,7 +222,7 @@ class BandNumericTextBoxCollection {
     }
 
     // Create band count cell
-    createBandCountCell = (bandNo: number, classCount: number) => {
+    createBandCountCell = (band: BandDefinition, bandNo: number, classCount: number) => {
         const bandCell = this.bandRow.insertCell();
         this.add(bandCell, classCount,
             this.kendoHelper.createBandInputContainer(bandCell, bandNo, classCount, this.onBandSettingsChange),

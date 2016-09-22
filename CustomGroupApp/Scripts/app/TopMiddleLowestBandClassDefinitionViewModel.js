@@ -6,7 +6,6 @@ var __extends = (this && this.__extends) || function (d, b) {
 var TopMiddleLowestBandClassDefinitionViewModel = (function (_super) {
     __extends(TopMiddleLowestBandClassDefinitionViewModel, _super);
     function TopMiddleLowestBandClassDefinitionViewModel(studentCount) {
-        var _this = this;
         if (studentCount === void 0) { studentCount = 0; }
         _super.call(this);
         this.studentCount = studentCount;
@@ -15,14 +14,6 @@ var TopMiddleLowestBandClassDefinitionViewModel = (function (_super) {
         ]);
         this.bandCount = 3;
         this.classCount = 1;
-        this.getClasses = function () {
-            var classes = new Array();
-            _this.classes.forEach(function (val) {
-                var classCnt = $("#class-" + val.classNo).data("kendoNumericTextBox");
-                classes.push(classCnt.value());
-            });
-            return classes;
-        };
         this.bandSet = new TopMiddleLowestBandSet(null, this.studentCount);
         this.groupingHelper = new GroupingHelper();
         this.kendoHelper = new KendoHelper();
@@ -42,4 +33,3 @@ var TopMiddleLowestBandClassDefinitionViewModel = (function (_super) {
     };
     return TopMiddleLowestBandClassDefinitionViewModel;
 }(kendo.data.ObservableObject));
-//# sourceMappingURL=TopMiddleLowestBandClassDefinitionViewModel.js.map
