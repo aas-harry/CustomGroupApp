@@ -48,6 +48,15 @@ var BandNumericTextBox = (function () {
     });
     return BandNumericTextBox;
 }());
+var BandTableControl = (function () {
+    function BandTableControl() {
+        var _this = this;
+        this.studentCountInBandControls = function (elementName, bands) {
+            _this.bands = bands;
+        };
+    }
+    return BandTableControl;
+}());
 var BandNumericTextBoxCollection = (function () {
     function BandNumericTextBoxCollection() {
         var _this = this;
