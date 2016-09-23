@@ -68,7 +68,7 @@ class StudentCountInBandInputContainer {
     }
 
     onStudentCountChanged = (count: number, inputControl: kendo.ui.NumericTextBox) => {
-        let oldValue = this.bandItem.classCount;
+        let oldValue = this.bandItem.studentCount;
         let newValue = count;
 
         this.bandItem.studentCount = count;

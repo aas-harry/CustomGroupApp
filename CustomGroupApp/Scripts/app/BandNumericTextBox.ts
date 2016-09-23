@@ -53,13 +53,17 @@ class BandTableControl {
     private tableContainerElementName: string;
     private table: HTMLTableElement;
     private headerTable: HTMLTableSectionElement;
-    private headerTable: HTMLTableSectionElement;
+    private bodyTable: HTMLTableSectionElement;
     private columnHeaderRow: HTMLTableRowElement;
     private studentsRow: HTMLTableRowElement;
     private bandRow: HTMLTableRowElement;
     private classRows: Array<HTMLTableRowElement> = [];
+    private bandCount: number;
 
-    private studentCountInBandControls : Array<kendo.ui.NumericTextBox>;
+    private kendoHelper = new KendoHelper();
+
+    private studentCountInBandControls: Array<StudentCountInBandInputContainer>;
+
     init(elementName: string, bandSet: BandSet) {
         this.bandSet = bandSet;
         this.tableContainerElementName = elementName;
@@ -68,9 +72,118 @@ class BandTableControl {
         $(`#${this.tableContainerElementName}`).html(`<table id='${this.tableElementName}'></table>`);
         this.table = document.getElementById(this.tableElementName) as HTMLTableElement;
         this.headerTable = this.table.createTHead();
+        this.bodyTable = this.table.createTBody();
         this.columnHeaderRow = this.headerTable.insertRow();
-        this.studentsRow = this.headerTable.insertRow();
-        this.bandRow = this.headerTable.insertRow();
+        this.studentsRow = this.bodyTable.insertRow();
+        this.bandRow = this.bodyTable.insertRow();
+
+        this.classRows.splice(0, this.classRows.length);
+
+        this.kendoHelper.createLabel(this.columnHeaderRow.insertCell(), "");
+        this.kendoHelper.createLabel(this.studentsRow.insertCell(), "# Students");
+        this.kendoHelper.createLabel(this.bandRow.insertCell(), "# Classes");
+
+        this.bandCount = bandSet.bands.length;
+        for (let band of bandSet.bands) {
+            this.createBandColumnInTable(band);
+        }
+
+        var maxClassNo = Enumerable.From(bands).Max(x => x.classCount);
+        for (let classNo = 1; classNo <= maxClassNo; classNo++) {
+            this.createStudentCountInClassRow(classNo, bands, true);
+        }
+        for (let band of bands) {
+            if (band.classes.length < maxClassNo) {
+                this.disableUnusedClassCell(band.classes.length, maxClassNo, band.bandNo);
+            }
+        }
+    }
+
+    private createBandColumnInTable = (band: BandDefinition) => {
+        this.kendoHelper.createLabel(this.columnHeaderRow.insertCell(),
+            band.bandName === null || band.bandName === "" ? `Band ${band.bandNo}` : band.bandName);
+        this.addStudentCountInBandCell(band);
+        this.createBandCountCell(band, band.bandNo, band.classCount);
+
+    }
+
+    // Create student count cell for a band
+    private addStudentCountInBandCell = (band: BandDefinition) => {
+        const studentCell = this.studentsRow.insertCell();
+        this.studentCountInBandControls.push(
+            new StudentCountInBandInputContainer(studentCell, band, this.studentCountInBandChangedCallback, false));
+    }
+
+    // This function is called when the number of students in a band is changed
+    private studentCountInBandChangedCallback = (bandItem: BandDefinition,
+        newValue: number,
+        oldValue: number,
+        inputControl: kendo.ui.NumericTextBox) => {
+        
+    }
+
+    // Create band count cell
+    private addcreateBandCountCell = (band: BandDefinition, bandNo: number, classCount: number) => {
+        const bandCell = this.bandRow.insertCell();
+        this.add(bandCell, classCount,
+            this.kendoHelper.createBandInputContainer(bandCell, bandNo, classCount, this.onBandSettingsChange),
+            bandNo,
+            0,
+            BandNumericTextBoxUsage.BandSize);
+    }
+
+    // Create student count cell for a class in a band
+    createStudentCountInClassRow = (classNo: number, bands: Array<BandDefinition>, showClass = false) => {
+        var classRow = this.header.insertRow();
+        this.kendoHelper.createLabel(classRow.insertCell(), `Class ${classNo}`);
+        this.classRows.push(classRow);
+        // Create student in class count cell for all the classes in a band
+        for (let band of bands) {
+            const bandNo = band.bandNo;
+            const classCell = classRow.insertCell();
+            const studentCount = classNo <= band.classes.length ? band.classes[classNo - 1].count : 0;
+            this.add(classCell, band, studentCount,
+                this.kendoHelper.createClassInputContainer(classCell, studentCount, classNo, bandNo,
+                    this.onClassSettingsChange()),
+                bandNo,
+                classNo,
+                BandNumericTextBoxUsage.ClassSize, !showClass);
+        }
+    }
+
+
+    // Create band count cell
+    createBandCountCell = (band: BandDefinition, bandNo: number, classCount: number) => {
+        const bandCell = this.bandRow.insertCell();
+        this.add(bandCell, classCount,
+            this.kendoHelper.createBandInputContainer(bandCell, bandNo, classCount, this.onBandSettingsChange),
+            bandNo,
+            0,
+            BandNumericTextBoxUsage.BandSize);
+    }
+
+
+    // This function is called when the number of classes in a band is changed
+    onBandSettingsChange = () => {
+        for (let bandItem of Enumerable.From(this.items)
+            .Where(x => x.usage === BandNumericTextBoxUsage.BandSize && x.oldValue !== x.value)
+            .Select(x => x).ToArray()) {
+
+            const studentItem = Enumerable.From(this.items)
+                .FirstOrDefault(null, x => x.usage === BandNumericTextBoxUsage.StudentSize &&
+                    x.bandNo === bandItem.bandNo);
+
+            this.updateClassSizeInBand(bandItem, studentItem.studentCount);
+        }
+    }
+
+    // This function is called when the number of students in a class is changed
+    onClassSettingsChange = () => {
+        for (let classItem of Enumerable.From(this.items)
+            .Where(x => x.usage === BandNumericTextBoxUsage.ClassSize && x.oldValue !== x.value)
+            .Select(x => x).ToArray()) {
+            this.updateClassSizes(classItem);
+        }
     }
 }
 

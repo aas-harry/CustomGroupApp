@@ -27,8 +27,8 @@ var StudentClassRow = (function (_super) {
     return StudentClassRow;
 }(kendo.data.ObservableObject));
 // Input container to enter number of students in a band
-var StudentCountInBandContainer = (function () {
-    function StudentCountInBandContainer(cell, bandItem, callback, addLabel) {
+var StudentCountInBandInputContainer = (function () {
+    function StudentCountInBandInputContainer(cell, bandItem, callback, addLabel) {
         var _this = this;
         if (addLabel === void 0) { addLabel = false; }
         this.kendoHelper = new KendoHelper();
@@ -42,12 +42,12 @@ var StudentCountInBandContainer = (function () {
             var element = document.createElement("input");
             element.type = "text";
             element.setAttribute("style", "width: 100px");
-            element.id = "band-" + _this.bandItem.uid;
+            element.id = "studentcountband-" + _this.bandItem.uid;
             _this.cell.appendChild(element);
             _this.kendoHelper.createStudentCountInputControl(element.id, _this.bandItem.studentCount, _this.onStudentCountChanged);
         };
         this.onStudentCountChanged = function (count, inputControl) {
-            var oldValue = _this.bandItem.classCount;
+            var oldValue = _this.bandItem.studentCount;
             var newValue = count;
             _this.bandItem.studentCount = count;
             if (_this.callbackAction != null) {
@@ -59,11 +59,11 @@ var StudentCountInBandContainer = (function () {
         this.callbackAction = callback;
         this.addLabel = addLabel;
     }
-    return StudentCountInBandContainer;
+    return StudentCountInBandInputContainer;
 }());
 // Input container to enter number of classes in a band
-var ClassCountInBandContainer = (function () {
-    function ClassCountInBandContainer(cell, bandItem, callback, addLabel) {
+var ClassCountInBandInputContainer = (function () {
+    function ClassCountInBandInputContainer(cell, bandItem, callback, addLabel) {
         var _this = this;
         if (addLabel === void 0) { addLabel = false; }
         this.kendoHelper = new KendoHelper();
@@ -77,11 +77,11 @@ var ClassCountInBandContainer = (function () {
             var element = document.createElement("input");
             element.type = "text";
             element.setAttribute("style", "width: 100px");
-            element.id = "band-" + _this.bandItem.uid;
+            element.id = "classcountband-" + _this.bandItem.uid;
             _this.cell.appendChild(element);
-            _this.kendoHelper.createClassCountInputControl(element.id, _this.bandItem.classCount, _this.onBandCountChanged);
+            _this.kendoHelper.createClassCountInputControl(element.id, _this.bandItem.classCount, _this.onClassCountChanged);
         };
-        this.onBandCountChanged = function (count, inputControl) {
+        this.onClassCountChanged = function (count, inputControl) {
             var oldValue = _this.bandItem.classCount;
             var newValue = count;
             _this.bandItem.classCount = count;
@@ -94,7 +94,42 @@ var ClassCountInBandContainer = (function () {
         this.callbackAction = callback;
         this.addLabel = addLabel;
     }
-    return ClassCountInBandContainer;
+    return ClassCountInBandInputContainer;
+}());
+// Input container to enter number of students in a band
+var StudentCountInClassInputContainer = (function () {
+    function StudentCountInClassInputContainer(cell, classItem, callback, addLabel) {
+        var _this = this;
+        if (addLabel === void 0) { addLabel = false; }
+        this.kendoHelper = new KendoHelper();
+        this.init = function () {
+            if (_this.addLabel) {
+                var label = document.createElement("span");
+                label.textContent = "Class " + _this.classItem.index;
+                label.setAttribute("style", "margin-right: 5px");
+                _this.cell.appendChild(label);
+            }
+            var element = document.createElement("input");
+            element.type = "text";
+            element.setAttribute("style", "width: 100px");
+            element.id = "studentcountclass-" + _this.classItem.uid;
+            _this.cell.appendChild(element);
+            _this.kendoHelper.createStudentCountInputControl(element.id, _this.classItem.count, _this.onStudentCountChanged);
+        };
+        this.onStudentCountChanged = function (count, inputControl) {
+            var oldValue = _this.classItem.count;
+            var newValue = count;
+            _this.classItem.count = count;
+            if (_this.callbackAction != null) {
+                _this.callbackAction(_this.classItem, newValue, oldValue, inputControl);
+            }
+        };
+        this.cell = cell;
+        this.classItem = classItem;
+        this.callbackAction = callback;
+        this.addLabel = addLabel;
+    }
+    return StudentCountInClassInputContainer;
 }());
 var KendoHelper = (function () {
     function KendoHelper() {
@@ -230,13 +265,13 @@ var KendoHelper = (function () {
         this.createClassCountInputControl = function (element, classCount, callbackChangeEvent) {
             if (classCount === void 0) { classCount = 1; }
             if (callbackChangeEvent === void 0) { callbackChangeEvent = null; }
-            return _this.createNumericTextBox(element, classCount, 1, 5, _this.integerFormat, callbackChangeEvent);
+            return _this.createNumericTextBox(element, classCount, 1, 50, _this.integerFormat, callbackChangeEvent);
         };
         // This function convert the passed element id into numerictextbox for student count input textbox
         this.createStudentCountInputControl = function (element, studentCount, callbackChangeEvent) {
             if (studentCount === void 0) { studentCount = 1; }
             if (callbackChangeEvent === void 0) { callbackChangeEvent = null; }
-            return _this.createNumericTextBox(element, studentCount, 1, 250, _this.integerFormat, callbackChangeEvent);
+            return _this.createNumericTextBox(element, studentCount, 1, 500, _this.integerFormat, callbackChangeEvent);
         };
         this.createStudentCountInClassInputControl = function (element, classItem, studentCount, // use this property to overwrite the student count in classItem
             callbackChangeEvent) {
