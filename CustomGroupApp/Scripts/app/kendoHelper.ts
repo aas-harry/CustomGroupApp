@@ -31,7 +31,7 @@
 }
 
 // Input container to enter number of students in a band
-class StudentCountInBandContainer {
+class StudentCountInBandInputContainer {
     constructor(cell: HTMLTableCellElement,
         bandItem: BandDefinition,
         callback: (bandItem: BandDefinition, newValue: number, oldValue: number, inputControl: kendo.ui.NumericTextBox) => any,
@@ -61,7 +61,7 @@ class StudentCountInBandContainer {
         var element = document.createElement("input") as HTMLInputElement;
         element.type = "text";
         element.setAttribute("style", "width: 100px");
-        element.id = `band-${this.bandItem.uid}`;
+        element.id = `studentcountband-${this.bandItem.uid}`;
         this.cell.appendChild(element);
 
         this.kendoHelper.createStudentCountInputControl(element.id, this.bandItem.studentCount, this.onStudentCountChanged);
@@ -81,7 +81,7 @@ class StudentCountInBandContainer {
 }
 
 // Input container to enter number of classes in a band
-class ClassCountInBandContainer {
+class ClassCountInBandInputContainer {
     constructor(cell: HTMLTableCellElement,
         bandItem: BandDefinition,
         callback: (bandItem: BandDefinition, newValue: number, oldValue: number, inputControl: kendo.ui.NumericTextBox) => any,
@@ -111,13 +111,13 @@ class ClassCountInBandContainer {
         var element = document.createElement("input") as HTMLInputElement;
         element.type = "text";
         element.setAttribute("style", "width: 100px");
-        element.id = `band-${this.bandItem.uid}`;
+        element.id = `classcountband-${this.bandItem.uid}`;
         this.cell.appendChild(element);
 
-        this.kendoHelper.createClassCountInputControl(element.id, this.bandItem.classCount, this.onBandCountChanged);
+        this.kendoHelper.createClassCountInputControl(element.id, this.bandItem.classCount, this.onClassCountChanged);
     }
 
-    onBandCountChanged = (count: number, inputControl: kendo.ui.NumericTextBox) => {
+    onClassCountChanged = (count: number, inputControl: kendo.ui.NumericTextBox) => {
         let oldValue = this.bandItem.classCount;
         let newValue = count;
 
@@ -125,6 +125,56 @@ class ClassCountInBandContainer {
 
         if (this.callbackAction != null) {
             this.callbackAction(this.bandItem, newValue, oldValue, inputControl);
+        }
+    }
+
+}
+
+// Input container to enter number of students in a band
+class StudentCountInClassInputContainer {
+    constructor(cell: HTMLTableCellElement,
+        classItem: ClassDefinition,
+        callback: (classItem: ClassDefinition, newValue: number, oldValue: number, inputControl: kendo.ui.NumericTextBox) => any,
+        addLabel = false) {
+
+        this.cell = cell;
+        this.classItem = classItem;
+        this.callbackAction = callback;
+        this.addLabel = addLabel;
+    }
+
+    private cell: HTMLTableCellElement;
+    private classItem: ClassDefinition;
+    private callbackAction: (classItem: ClassDefinition, newValue: number, oldValue: number, inputControl: kendo.ui.NumericTextBox) => any;
+    private addLabel: boolean;
+    private inputControl: kendo.ui.NumericTextBox;
+    private kendoHelper = new KendoHelper();
+
+    init = () => {
+        if (this.addLabel) {
+            const label = document.createElement("span");
+            label.textContent = `Class ${this.classItem.index}`;
+            label.setAttribute("style", "margin-right: 5px");
+            this.cell.appendChild(label);
+        }
+
+        var element = document.createElement("input") as HTMLInputElement;
+        element.type = "text";
+        element.setAttribute("style", "width: 100px");
+        element.id = `studentcountclass-${this.classItem.uid}`;
+        this.cell.appendChild(element);
+
+        this.kendoHelper.createStudentCountInputControl(element.id, this.classItem.count, this.onStudentCountChanged);
+    }
+
+    onStudentCountChanged = (count: number, inputControl: kendo.ui.NumericTextBox) => {
+        const oldValue = this.classItem.count;
+        const newValue = count;
+
+        this.classItem.count = count;
+
+        if (this.callbackAction != null) {
+            this.callbackAction(this.classItem, newValue, oldValue, inputControl);
         }
     }
 
@@ -316,7 +366,7 @@ class KendoHelper
             element,
             classCount,
             1,
-            5,
+            50,
             this.integerFormat,
             callbackChangeEvent);
     }
@@ -332,7 +382,7 @@ class KendoHelper
             element,
             studentCount,
             1,
-            250,
+            500,
             this.integerFormat,
             callbackChangeEvent);
     }

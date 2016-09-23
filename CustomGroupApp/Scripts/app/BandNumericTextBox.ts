@@ -48,11 +48,29 @@ class BandNumericTextBox {
 }
 
 class BandTableControl {
-    private bands: Array<BandDefinition>;
+    private tableElementName = "band-definition-table";
+    private bandSet: BandSet;
+    private tableContainerElementName: string;
+    private table: HTMLTableElement;
+    private headerTable: HTMLTableSectionElement;
+    private headerTable: HTMLTableSectionElement;
+    private columnHeaderRow: HTMLTableRowElement;
+    private studentsRow: HTMLTableRowElement;
+    private bandRow: HTMLTableRowElement;
+    private classRows: Array<HTMLTableRowElement> = [];
 
-    private studentCountInBandControls : Array<kendo.ui.NumericTextBox
-    init(elementName: string, bands: Array<BandDefinition>) {
-        this.bands = bands;
+    private studentCountInBandControls : Array<kendo.ui.NumericTextBox>;
+    init(elementName: string, bandSet: BandSet) {
+        this.bandSet = bandSet;
+        this.tableContainerElementName = elementName;
+
+        // Create the table
+        $(`#${this.tableContainerElementName}`).html(`<table id='${this.tableElementName}'></table>`);
+        this.table = document.getElementById(this.tableElementName) as HTMLTableElement;
+        this.headerTable = this.table.createTHead();
+        this.columnHeaderRow = this.headerTable.insertRow();
+        this.studentsRow = this.headerTable.insertRow();
+        this.bandRow = this.headerTable.insertRow();
     }
 }
 
