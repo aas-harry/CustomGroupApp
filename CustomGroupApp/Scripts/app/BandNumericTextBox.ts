@@ -47,6 +47,15 @@ class BandNumericTextBox {
     }
 }
 
+class BandTableControl {
+    private bands: Array<BandDefinition>;
+
+    private studentCountInBandControls : Array<kendo.ui.NumericTextBox
+    init(elementName: string, bands: Array<BandDefinition>) {
+        this.bands = bands;
+    }
+}
+
 class BandNumericTextBoxCollection {
     private groupingHelper = new GroupingHelper();
     private kendoHelper = new KendoHelper();

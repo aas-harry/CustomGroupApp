@@ -172,8 +172,37 @@ var KendoHelper = (function () {
             if (studentCount === void 0) { studentCount = 1; }
             if (callbackChangeEvent === void 0) { callbackChangeEvent = null; }
             return _this.createNumericTextBox(element, studentCount, 1, 250, _this.integerFormat, function (e) {
+                var inputControl = e.sender;
+                if (classItem && inputControl) {
+                    classItem.count = inputControl.value();
+                }
                 if (callbackChangeEvent != null) {
-                    callbackChangeEvent(e);
+                    callbackChangeEvent(classItem, inputControl);
+                }
+            });
+        };
+        // Input control to enter the number of students in a band in a bandset
+        this.createStudentCountInBandInputControl = function (element, bandItem, studentCount, // use this property to overwrite the student count in a band
+            callbackChangeEvent) {
+            if (studentCount === void 0) { studentCount = 1; }
+            if (callbackChangeEvent === void 0) { callbackChangeEvent = null; }
+            return _this.createNumericTextBox(element, studentCount, 1, 250, _this.integerFormat, function (e) {
+                var inputControl = e.sender;
+                if (bandItem && inputControl) {
+                    bandItem.studentCount = inputControl.value();
+                }
+                if (callbackChangeEvent != null) {
+                    callbackChangeEvent(bandItem, inputControl);
+                }
+            });
+        };
+        this.createBandCountInBandSetInputControl = function (element, bandSet, bandCount, // use this property to overwrite the band count in bandSet
+            callbackChangeEvent) {
+            if (callbackChangeEvent === void 0) { callbackChangeEvent = null; }
+            return _this.createNumericTextBox(element, bandCount, 1, 250, _this.integerFormat, function (e) {
+                var inputControl = e.sender;
+                if (callbackChangeEvent != null) {
+                    callbackChangeEvent(bandSet, inputControl);
                 }
             });
         };

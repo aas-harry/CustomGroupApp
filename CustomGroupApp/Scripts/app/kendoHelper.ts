@@ -30,10 +30,51 @@
     
 }
 
+class ClassCountInBandContainer {
+    constructor(cell: HTMLTableCellElement,
+        bandItem: BandDefinition,
+        callback,
+        addLabel = false) {
+
+        this.cell = cell;
+        this.bandItem = bandItem;
+        this.callbackAction = callback;
+        this.addLabel = addLabel;
+    }
+
+    private cell: HTMLTableCellElement;
+    private bandItem: BandDefinition;
+    private callbackAction;
+    private addLabel: boolean;
+    private inputControl: kendo.ui.NumericTextBox;
+    private kendoHelper = new KendoHelper();
+
+    init = () => {
+        if (this.addLabel) {
+            const label = document.createElement("span");
+            label.textContent = `Band ${this.bandItem.bandNo}`;
+            label.setAttribute("style", "margin-right: 5px");
+            this.cell.appendChild(label);
+        }
+
+        var element = document.createElement("input") as HTMLInputElement;
+        element.type = "text";
+        element.setAttribute("style", "width: 100px");
+        element.id = `band-${this.bandItem.uid}`;
+        this.cell.appendChild(element);
+
+        this.kendoHelper.createBandInputField(element.id, this.bandItem.classCount,)
+        return this.createBandInputField(element.id, classCount, callback);
+    }
+
+    
+}
+
 class KendoHelper
 {
     private integerFormat = "n0";
 
+    
     createBandInputContainer = (
         cell: HTMLTableCellElement,
         bandNo: number,
@@ -209,7 +250,8 @@ class KendoHelper
     createBandInputField = (
         element: string,
         classCount = 1,
-        callbackChangeEvent = null): kendo.ui.NumericTextBox => {
+        callbackChangeEvent: (bandItem: BandDefinition, inputControl: kendo.ui.NumericTextBox) => any = null)
+        : kendo.ui.NumericTextBox => {
         return this.createNumericTextBox(
             element,
             classCount,
@@ -236,7 +278,7 @@ class KendoHelper
         element: string,
         classItem: ClassDefinition,
         studentCount: number = 1,  // use this property to overwrite the student count in classItem
-        callbackChangeEvent: (e: any) => any = null): kendo.ui.NumericTextBox => {
+        callbackChangeEvent: (classItem: ClassDefinition, inputControl: kendo.ui.NumericTextBox) => any = null): kendo.ui.NumericTextBox => {
         return this.createNumericTextBox(
             element,
             studentCount,
@@ -244,12 +286,61 @@ class KendoHelper
             250,
             this.integerFormat,
             e => {
+
+                var inputControl = e.sender as kendo.ui.NumericTextBox;
+                if (classItem && inputControl) {
+                    classItem.count = inputControl.value();
+                }
+
                 if (callbackChangeEvent != null) {
-                     callbackChangeEvent(e);
+                    callbackChangeEvent(classItem, inputControl);
                 }
             });
     }
 
+    // Input control to enter the number of students in a band in a bandset
+    createStudentCountInBandInputControl = (
+        element: string,
+        bandItem: BandDefinition,
+        studentCount: number = 1,  // use this property to overwrite the student count in a band
+        callbackChangeEvent: (bandItem: BandDefinition, inputControl: kendo.ui.NumericTextBox) => any = null): kendo.ui.NumericTextBox => {
+        return this.createNumericTextBox(
+            element,
+            studentCount,
+            1,
+            250,
+            this.integerFormat,
+            e => {
+
+                var inputControl = e.sender as kendo.ui.NumericTextBox;
+                if (bandItem && inputControl) {
+                    bandItem.studentCount = inputControl.value();
+                }
+
+                if (callbackChangeEvent != null) {
+                    callbackChangeEvent(bandItem, inputControl);
+                }
+            });
+    }
+
+    createBandCountInBandSetInputControl = (
+        element: string,
+        bandSet: BandSet,
+        bandCount: number,  // use this property to overwrite the band count in bandSet
+        callbackChangeEvent: (bandSet: BandSet, inputControl: kendo.ui.NumericTextBox) => any = null): kendo.ui.NumericTextBox => {
+        return this.createNumericTextBox(
+            element,
+            bandCount,
+            1,
+            250,
+            this.integerFormat,
+            e => {
+                var inputControl = e.sender as kendo.ui.NumericTextBox;
+                if (callbackChangeEvent != null) {
+                    callbackChangeEvent(bandSet, inputControl);
+                }
+            });
+    }
 
     createClassGrid = (element: string, classItem: ClassDefinition, editGroupCallback: any): kendo.ui.Grid => {
         const groupNameElementId = "groupname-" + classItem.uid;
