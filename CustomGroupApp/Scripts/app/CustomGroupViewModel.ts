@@ -129,18 +129,28 @@
         var bandSet = this.selectedClassDefinitionViewModel.getBandSet();
         switch (this.groupingOption) {
             case GroupingMethod.Banding:
+            case GroupingMethod.Language:
+                bandSet.groupType = GroupingMethod.Streaming;
+                bandSet.streamType = this.streamType;
+                for (let band of bandSet.bands) {
+                    band.groupType = GroupingMethod.MixedAbility;
+                    band.streamType = this.streamType;
+                }
                 bandSet.prepare(!this.groupName || this.groupName === "" ? "Class" : this.groupName, this.classesDefn.students, this.joinedStudents, this.separatedStudents);
                 break;
 
             case GroupingMethod.TopMiddleLowest:
-                bandSet.prepare(!this.groupName || this.groupName === "" ? "Class" : this.groupName, this.classesDefn.students, this.joinedStudents, this.separatedStudents);
-                break;
-
-            case GroupingMethod.Language:
+                bandSet.groupType = GroupingMethod.Streaming;
+                bandSet.bands[0].groupType = this.topClassGroupingOption;
+                bandSet.bands[2].groupType = this.lowestClassGroupingOption;
+                for (let band of bandSet.bands) {
+                    band.streamType = this.streamType;
+                }
                 bandSet.prepare(!this.groupName || this.groupName === "" ? "Class" : this.groupName, this.classesDefn.students, this.joinedStudents, this.separatedStudents);
                 break;
 
             default:
+                bandSet.groupType = GroupingMethod.Streaming;
                 bandSet.bands[0].groupType = this.groupingOption;
                 bandSet.bands[0].streamType = this.streamType;
                 bandSet.prepare(!this.groupName || this.groupName === "" ? "Class" : this.groupName, this.classesDefn.students, this.joinedStudents, this.separatedStudents);

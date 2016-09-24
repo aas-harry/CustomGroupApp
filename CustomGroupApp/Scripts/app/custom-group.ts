@@ -35,9 +35,9 @@ enum StreamType {
 }
 
 enum BandStreamType {
-    None = 0,
-    Streaming = 1,
-    Parallel = 2,
+    None,
+    Streaming,
+    Parallel,
 }
 
 function createUuid() {
@@ -633,6 +633,12 @@ class BandDefinition {
         if (students) {
             this.students = students;
         }
+
+        // Reset the students list
+        for (let classItem of this.classes) {
+            classItem.students = [];
+        }
+
         switch (this.groupType) {
         case GroupingMethod.MixedAbility:
             this.groupHelper.groupByMixAbility(this.classes,
@@ -710,6 +716,7 @@ class BandSet {
         separatedStudents: Array<StudentSet> = []) => {
         this.students = students;
 
+        debugger;
 
         if (this.bandCount === 1) {
             this.bands[0].students = this.students;
@@ -717,6 +724,10 @@ class BandSet {
             return;
         }
         var classes = this.convertToClasses(this);
+        // Reset the students list
+        for (let classItem of classes) {
+            classItem.students = [];
+        }
         if (this.bandStreamType === BandStreamType.Streaming) {
             this.groupingHelper.groupByStreaming(classes,
                 this.students,

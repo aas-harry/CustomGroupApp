@@ -149,15 +149,28 @@ var CustomGroupViewModel = (function (_super) {
         var bandSet = this.selectedClassDefinitionViewModel.getBandSet();
         switch (this.groupingOption) {
             case GroupingMethod.Banding:
+            case GroupingMethod.Language:
+                bandSet.groupType = GroupingMethod.Streaming;
+                bandSet.streamType = this.streamType;
+                for (var _i = 0, _a = bandSet.bands; _i < _a.length; _i++) {
+                    var band = _a[_i];
+                    band.groupType = GroupingMethod.MixedAbility;
+                    band.streamType = this.streamType;
+                }
                 bandSet.prepare(!this.groupName || this.groupName === "" ? "Class" : this.groupName, this.classesDefn.students, this.joinedStudents, this.separatedStudents);
                 break;
             case GroupingMethod.TopMiddleLowest:
-                bandSet.prepare(!this.groupName || this.groupName === "" ? "Class" : this.groupName, this.classesDefn.students, this.joinedStudents, this.separatedStudents);
-                break;
-            case GroupingMethod.Language:
+                bandSet.groupType = GroupingMethod.Streaming;
+                bandSet.bands[0].groupType = this.topClassGroupingOption;
+                bandSet.bands[2].groupType = this.lowestClassGroupingOption;
+                for (var _b = 0, _c = bandSet.bands; _b < _c.length; _b++) {
+                    var band = _c[_b];
+                    band.streamType = this.streamType;
+                }
                 bandSet.prepare(!this.groupName || this.groupName === "" ? "Class" : this.groupName, this.classesDefn.students, this.joinedStudents, this.separatedStudents);
                 break;
             default:
+                bandSet.groupType = GroupingMethod.Streaming;
                 bandSet.bands[0].groupType = this.groupingOption;
                 bandSet.bands[0].streamType = this.streamType;
                 bandSet.prepare(!this.groupName || this.groupName === "" ? "Class" : this.groupName, this.classesDefn.students, this.joinedStudents, this.separatedStudents);

@@ -607,6 +607,11 @@ var BandDefinition = (function () {
             if (students) {
                 _this.students = students;
             }
+            // Reset the students list
+            for (var _i = 0, _a = _this.classes; _i < _a.length; _i++) {
+                var classItem = _a[_i];
+                classItem.students = [];
+            }
             switch (_this.groupType) {
                 case GroupingMethod.MixedAbility:
                     _this.groupHelper.groupByMixAbility(_this.classes, _this.students, _this.streamType, _this.mixBoysGirls, joinedStudents, separatedStudents);
@@ -667,12 +672,18 @@ var BandSet = (function () {
             if (joinedStudents === void 0) { joinedStudents = []; }
             if (separatedStudents === void 0) { separatedStudents = []; }
             _this.students = students;
+            debugger;
             if (_this.bandCount === 1) {
                 _this.bands[0].students = _this.students;
                 _this.bands[0].prepare(name, _this.students, joinedStudents, separatedStudents);
                 return;
             }
             var classes = _this.convertToClasses(_this);
+            // Reset the students list
+            for (var _i = 0, classes_1 = classes; _i < classes_1.length; _i++) {
+                var classItem = classes_1[_i];
+                classItem.students = [];
+            }
             if (_this.bandStreamType === BandStreamType.Streaming) {
                 _this.groupingHelper.groupByStreaming(classes, _this.students, _this.streamType, _this.mixBoysGirls);
             }
