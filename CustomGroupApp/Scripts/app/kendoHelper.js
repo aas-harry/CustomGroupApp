@@ -27,8 +27,8 @@ var StudentClassRow = (function (_super) {
     return StudentClassRow;
 }(kendo.data.ObservableObject));
 // Input container to enter number of students in a band
-var StudentCountInBandInputContainer = (function () {
-    function StudentCountInBandInputContainer(cell, bandItem, callback, addLabel) {
+var StudentBandInputContainer = (function () {
+    function StudentBandInputContainer(cell, bandItem, callback, addLabel) {
         var _this = this;
         if (addLabel === void 0) { addLabel = false; }
         this.kendoHelper = new KendoHelper();
@@ -42,7 +42,7 @@ var StudentCountInBandInputContainer = (function () {
             var element = document.createElement("input");
             element.type = "text";
             element.setAttribute("style", "width: 100px");
-            element.id = "studentcountband-" + _this.bandItem.uid;
+            element.id = "studentband-" + _this.bandItem.uid;
             _this.cell.appendChild(element);
             _this.kendoHelper.createStudentCountInputControl(element.id, _this.bandItem.studentCount, _this.onStudentCountChanged);
         };
@@ -58,12 +58,13 @@ var StudentCountInBandInputContainer = (function () {
         this.bandItem = bandItem;
         this.callbackAction = callback;
         this.addLabel = addLabel;
+        this.init();
     }
-    return StudentCountInBandInputContainer;
+    return StudentBandInputContainer;
 }());
 // Input container to enter number of classes in a band
-var ClassCountInBandInputContainer = (function () {
-    function ClassCountInBandInputContainer(cell, bandItem, callback, addLabel) {
+var ClassBandInputContainer = (function () {
+    function ClassBandInputContainer(cell, bandItem, callback, addLabel) {
         var _this = this;
         if (addLabel === void 0) { addLabel = false; }
         this.kendoHelper = new KendoHelper();
@@ -77,7 +78,7 @@ var ClassCountInBandInputContainer = (function () {
             var element = document.createElement("input");
             element.type = "text";
             element.setAttribute("style", "width: 100px");
-            element.id = "classcountband-" + _this.bandItem.uid;
+            element.id = "classband-" + _this.bandItem.uid;
             _this.cell.appendChild(element);
             _this.kendoHelper.createClassCountInputControl(element.id, _this.bandItem.classCount, _this.onClassCountChanged);
         };
@@ -93,14 +94,16 @@ var ClassCountInBandInputContainer = (function () {
         this.bandItem = bandItem;
         this.callbackAction = callback;
         this.addLabel = addLabel;
+        this.init();
     }
-    return ClassCountInBandInputContainer;
+    return ClassBandInputContainer;
 }());
 // Input container to enter number of students in a band
-var StudentCountInClassInputContainer = (function () {
-    function StudentCountInClassInputContainer(cell, classItem, callback, addLabel) {
+var StudentClassInputContainer = (function () {
+    function StudentClassInputContainer(cell, classItem, callback, addLabel) {
         var _this = this;
         if (addLabel === void 0) { addLabel = false; }
+        this.classItem = classItem;
         this.kendoHelper = new KendoHelper();
         this.init = function () {
             if (_this.addLabel) {
@@ -111,10 +114,15 @@ var StudentCountInClassInputContainer = (function () {
             }
             var element = document.createElement("input");
             element.type = "text";
-            element.setAttribute("style", "width: 100px");
-            element.id = "studentcountclass-" + _this.classItem.uid;
+            element.setAttribute("style", "width: 100px; margin-right: 20px");
+            var elementId = _this.classItem ? _this.classItem.uid : createUuid();
+            element.id = "studentclass-" + elementId;
             _this.cell.appendChild(element);
-            _this.kendoHelper.createStudentCountInputControl(element.id, _this.classItem.count, _this.onStudentCountChanged);
+            var studentCount = _this.classItem ? _this.classItem.count : 0;
+            _this.inputControl = _this.kendoHelper.createStudentCountInputControl(element.id, studentCount, _this.onStudentCountChanged);
+            if (_this.classItem.notUsed) {
+                _this.hideInput();
+            }
         };
         this.onStudentCountChanged = function (count, inputControl) {
             var oldValue = _this.classItem.count;
@@ -124,33 +132,28 @@ var StudentCountInClassInputContainer = (function () {
                 _this.callbackAction(_this.classItem, newValue, oldValue, inputControl);
             }
         };
+        this.hideInput = function () {
+            _this.classItem.notUsed = true;
+            _this.inputControl.value(_this.inputControl.min());
+            _this.inputControl.enable(false);
+        };
+        this.showInput = function (count) {
+            _this.classItem.notUsed = false;
+            _this.inputControl.value(count);
+            _this.inputControl.enable(true);
+        };
         this.cell = cell;
         this.classItem = classItem;
         this.callbackAction = callback;
         this.addLabel = addLabel;
+        this.init();
     }
-    return StudentCountInClassInputContainer;
+    return StudentClassInputContainer;
 }());
 var KendoHelper = (function () {
     function KendoHelper() {
         var _this = this;
         this.integerFormat = "n0";
-        this.createBandInputContainer = function (cell, bandNo, classCount, callback, addLabel) {
-            if (classCount === void 0) { classCount = 1; }
-            if (addLabel === void 0) { addLabel = false; }
-            if (addLabel) {
-                var label = document.createElement("span");
-                label.textContent = "Band " + bandNo;
-                label.setAttribute("style", "margin-right: 5px");
-                cell.appendChild(label);
-            }
-            var element = document.createElement("input");
-            element.type = "text";
-            element.setAttribute("style", "width: 100px");
-            element.id = "band-" + bandNo;
-            cell.appendChild(element);
-            return _this.createBandInputField(element.id, classCount, callback);
-        };
         this.createStudentClassInputContainer = function (cell, classItem, editGroupNameCallback, dropCallback) {
             var classGridHeight = classItem.parent.classes.length > 3 ? "500px" : "700px";
             var container = document.createElement("div");
@@ -202,10 +205,11 @@ var KendoHelper = (function () {
             cell.appendChild(element);
             return _this.createStudentCountInputControl(element.id, studentCount, callbackChangeEvent);
         };
-        this.createLabel = function (cell, description) {
+        this.createLabel = function (cell, description, width) {
+            if (width === void 0) { width = 150; }
             var label = document.createElement("span");
             label.textContent = description;
-            label.setAttribute("style", "margin-right: 5px");
+            label.setAttribute("style", "margin-right: 5px; width: " + width + "px");
             cell.appendChild(label);
         };
         this.createMultiLineLabel = function (cell, line1, line2, separator) {
@@ -277,12 +281,12 @@ var KendoHelper = (function () {
             callbackChangeEvent) {
             if (studentCount === void 0) { studentCount = 1; }
             if (callbackChangeEvent === void 0) { callbackChangeEvent = null; }
-            return _this.createNumericTextBox(element, studentCount, 1, 250, _this.integerFormat, function (e) {
-                var inputControl = e.sender;
-                if (classItem && inputControl) {
-                    classItem.count = inputControl.value();
+            return _this.createNumericTextBox(element, studentCount, 1, 250, _this.integerFormat, function (value, e) {
+                if (classItem) {
+                    classItem.count = value;
                 }
                 if (callbackChangeEvent != null) {
+                    var inputControl = e;
                     callbackChangeEvent(classItem, inputControl);
                 }
             });
@@ -292,12 +296,12 @@ var KendoHelper = (function () {
             callbackChangeEvent) {
             if (studentCount === void 0) { studentCount = 1; }
             if (callbackChangeEvent === void 0) { callbackChangeEvent = null; }
-            return _this.createNumericTextBox(element, studentCount, 1, 250, _this.integerFormat, function (e) {
-                var inputControl = e.sender;
-                if (bandItem && inputControl) {
-                    bandItem.studentCount = inputControl.value();
+            return _this.createNumericTextBox(element, studentCount, 1, 250, _this.integerFormat, function (value, e) {
+                if (bandItem) {
+                    bandItem.studentCount = value;
                 }
                 if (callbackChangeEvent != null) {
+                    var inputControl = e;
                     callbackChangeEvent(bandItem, inputControl);
                 }
             });
@@ -305,9 +309,9 @@ var KendoHelper = (function () {
         this.createBandCountInBandSetInputControl = function (element, bandSet, bandCount, // use this property to overwrite the band count in bandSet
             callbackChangeEvent) {
             if (callbackChangeEvent === void 0) { callbackChangeEvent = null; }
-            return _this.createNumericTextBox(element, bandCount, 1, 250, _this.integerFormat, function (e) {
-                var inputControl = e.sender;
+            return _this.createNumericTextBox(element, bandCount, 1, 250, _this.integerFormat, function (value, e) {
                 if (callbackChangeEvent != null) {
+                    var inputControl = e;
                     callbackChangeEvent(bandSet, inputControl);
                 }
             });
@@ -383,6 +387,19 @@ var KendoHelper = (function () {
             numericTextBox.min(min);
             return numericTextBox;
         };
+        this.createUuid = function () {
+            var s = [];
+            var hexDigits = "0123456789abcdef";
+            for (var i = 0; i < 36; i++) {
+                s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+            }
+            s[14] = "4"; // bits 12-15 of the time_hi_and_version field to 0010
+            s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1); // bits 6-7 of the clock_seq_hi_and_reserved to 01
+            s[8] = s[13] = s[18] = s[23] = "-";
+            var uuid = s.join("");
+            return uuid;
+        };
     }
     return KendoHelper;
 }());
+//# sourceMappingURL=kendoHelper.js.map

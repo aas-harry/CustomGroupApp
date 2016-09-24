@@ -8,29 +8,11 @@ var CustomGroupViewModel = (function (_super) {
     function CustomGroupViewModel(studentCount) {
         var _this = this;
         _super.call(this);
-        this.stepCollection = new StepCollection();
-        // Html elements
-        this.groupingOptions = new kendo.data.ObservableArray([
-            { caption: "Mixed Ability", value: GroupingMethod.MixedAbility, id: "mixed-ability" },
-            { caption: "Streaming", value: GroupingMethod.Streaming, id: "streaming" },
-            { caption: "Banding", value: GroupingMethod.Banding, id: "banding" },
-            { caption: "Top, Mixed Middle, Lowest", value: GroupingMethod.TopMiddleLowest, id: "top-middle-lowest" },
-            { caption: "Language", value: GroupingMethod.Language, id: "languages" }
-        ]);
-        this.streamingOptions = new kendo.data.ObservableArray([
-            { caption: "Overall Ability", value: StreamType.OverallAbilty, id: "overall-ability" },
-            { caption: "English", value: StreamType.English, id: "english" },
-            { caption: "Maths Achievement", value: StreamType.MathsAchievement, id: "maths-Achievement" }
-        ]);
-        this.topMiddleLowestGroupingOptions = [
-            { caption: "Streaming", value: BandStreamType.Streaming, id: "streaming-tml" },
-            { caption: "Parallel", value: BandStreamType.Parallel, id: "parallel-tml" }
-        ];
         this.selectedGroupingOption = 1;
-        this.selectedStreamingOption = 0;
+        this.selectedStreamingOption = 1;
         this.selectedTopClassGroupingOption = 0;
         this.selectedLowestClassGroupingOption = 0;
-        this.selectedGenderOption = 1;
+        this.selectedGenderOption = 0;
         this.currentGroupStep = 1;
         this.isLastStep = false;
         this.isFirstStep = true;
@@ -39,7 +21,21 @@ var CustomGroupViewModel = (function (_super) {
         this.classCount = 1;
         this.joinedStudents = [];
         this.separatedStudents = [];
+        this.stepCollection = new StepCollection();
         this.testInfo = new TestFile();
+        this.nextStep = function () {
+            _super.prototype.set.call(_this, "currentGroupStep", _this.currentGroupStep + 1);
+            _this.callGetViewStep(_this.currentGroupStep);
+        };
+        this.previousStep = function () {
+            _super.prototype.set.call(_this, "currentGroupStep", _this.currentGroupStep - 1);
+            _this.callGetViewStep(_this.currentGroupStep);
+        };
+        this.cancelStep = function () {
+            console.log("cancelStep");
+        };
+        this.showStep = function (data) {
+        };
         this.setDatasource = function (test, results, languages) {
             var testInfo = new TestFile();
             testInfo.set(test, results, languages);
@@ -58,31 +54,79 @@ var CustomGroupViewModel = (function (_super) {
             _this.generateCustomGroupViewModel = new GenerateCustomGroupViewModel();
             _this.set("selectedClassDefinitionViewModel", _this.classDefinitionViewModel);
         };
-        this.nextStep = function () {
-            _super.prototype.set.call(_this, "currentGroupStep", _this.currentGroupStep + 1);
-            _this.callGetViewStep(_this.currentGroupStep);
-        };
-        this.previousStep = function () {
-            _super.prototype.set.call(_this, "currentGroupStep", _this.currentGroupStep - 1);
-            _this.callGetViewStep(_this.currentGroupStep);
-        };
-        this.cancelStep = function () {
-            console.log("cancelStep");
-        };
-        this.showStep = function (data) {
-        };
         this.studentCount = studentCount;
         this.classDefinitionViewModel = new ClassDefinitionViewModel(studentCount);
         this.bandClassDefinitionViewModel = new BandClassDefinitionViewModel(studentCount);
         this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(studentCount);
     }
-    CustomGroupViewModel.prototype.generateClasses = function () {
-        var bandSet = this.selectedClassDefinitionViewModel.getBandSet();
-        bandSet.prepare(this.groupName, this.classesDefn.students, this.joinedStudents, this.separatedStudents);
+    Object.defineProperty(CustomGroupViewModel.prototype, "topClassGroupingOption", {
+        // Radio button value is string type and they need to be converted to number
+        get: function () {
+            var selectedTopClassGroupingOption = this.selectedTopClassGroupingOption;
+            return typeof selectedTopClassGroupingOption === "number"
+                ? selectedTopClassGroupingOption
+                : parseInt(selectedTopClassGroupingOption);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(CustomGroupViewModel.prototype, "lowestClassGroupingOption", {
+        get: function () {
+            var selectedLowestClassGroupingOption = this.selectedLowestClassGroupingOption;
+            return typeof selectedLowestClassGroupingOption === "number"
+                ? selectedLowestClassGroupingOption
+                : parseInt(selectedLowestClassGroupingOption);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(CustomGroupViewModel.prototype, "groupingOption", {
+        get: function () {
+            var selectedGroupingOption = this.selectedGroupingOption;
+            return typeof selectedGroupingOption === "number"
+                ? selectedGroupingOption
+                : parseInt(selectedGroupingOption);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(CustomGroupViewModel.prototype, "streamType", {
+        get: function () {
+            return typeof this.selectedStreamingOption === "number"
+                ? this.selectedStreamingOption
+                : parseInt(this.selectedStreamingOption);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(CustomGroupViewModel.prototype, "genderOption", {
+        get: function () {
+            return typeof this.selectedGenderOption === "number"
+                ? this.selectedGenderOption
+                : parseInt(this.selectedGenderOption);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    CustomGroupViewModel.prototype.callGetViewStep = function (stepNo) {
+        _super.prototype.set.call(this, "isFirstStep", this.stepCollection.isFirstStep(stepNo));
+        _super.prototype.set.call(this, "isLastStep", this.stepCollection.isLastStep(stepNo));
+        var viewName = this.stepCollection.getStepView(this.groupingOption, stepNo);
+        console.log("View: ", viewName);
+        if (!viewName) {
+            return;
+        }
+        $.ajax({
+            type: "POST",
+            url: "Customgroup\\" + viewName,
+            dataType: "html",
+            success: function (data) {
+                $("#custom-group-content").html(data);
+            }
+        });
     };
-    ;
     CustomGroupViewModel.prototype.loadGroupingViewModel = function () {
-        switch (parseInt(this.selectedGroupingOption)) {
+        switch (this.groupingOption) {
             case GroupingMethod.Banding:
                 this.bandClassDefinitionViewModel.loadOptions(this.customBandSet);
                 this.set("selectedClassDefinitionViewModel", this.bandClassDefinitionViewModel);
@@ -101,30 +145,28 @@ var CustomGroupViewModel = (function (_super) {
                 break;
         }
     };
-    CustomGroupViewModel.prototype.loadGenerateCustomGroupViewModel = function () {
-        debugger;
+    CustomGroupViewModel.prototype.generateClasses = function () {
         var bandSet = this.selectedClassDefinitionViewModel.getBandSet();
-        bandSet.streamType = this.selectedStreamingOption;
-        bandSet.prepare(this.groupName, this.classesDefn.students, this.joinedStudents, this.separatedStudents);
+        switch (this.groupingOption) {
+            case GroupingMethod.Banding:
+                bandSet.prepare(!this.groupName || this.groupName === "" ? "Class" : this.groupName, this.classesDefn.students, this.joinedStudents, this.separatedStudents);
+                break;
+            case GroupingMethod.TopMiddleLowest:
+                bandSet.prepare(!this.groupName || this.groupName === "" ? "Class" : this.groupName, this.classesDefn.students, this.joinedStudents, this.separatedStudents);
+                break;
+            case GroupingMethod.Language:
+                bandSet.prepare(!this.groupName || this.groupName === "" ? "Class" : this.groupName, this.classesDefn.students, this.joinedStudents, this.separatedStudents);
+                break;
+            default:
+                bandSet.bands[0].groupType = this.groupingOption;
+                bandSet.bands[0].streamType = this.streamType;
+                bandSet.prepare(!this.groupName || this.groupName === "" ? "Class" : this.groupName, this.classesDefn.students, this.joinedStudents, this.separatedStudents);
+                break;
+        }
         this.set("selectedClassDefinitionViewModel", this.generateCustomGroupViewModel);
         this.selectedClassDefinitionViewModel.loadOptions(bandSet);
     };
-    CustomGroupViewModel.prototype.callGetViewStep = function (stepNo) {
-        _super.prototype.set.call(this, "isFirstStep", this.stepCollection.isFirstStep(stepNo));
-        _super.prototype.set.call(this, "isLastStep", this.stepCollection.isLastStep(stepNo));
-        var viewName = this.stepCollection.getStepView(this.selectedGroupingOption, stepNo);
-        console.log("View: ", viewName);
-        if (!viewName) {
-            return;
-        }
-        $.ajax({
-            type: "POST",
-            url: "Customgroup\\" + viewName,
-            dataType: "html",
-            success: function (data) {
-                $("#custom-group-content").html(data);
-            }
-        });
-    };
+    ;
     return CustomGroupViewModel;
 }(kendo.data.ObservableObject));
+//# sourceMappingURL=CustomGroupViewModel.js.map

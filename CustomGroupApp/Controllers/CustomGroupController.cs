@@ -41,9 +41,10 @@ namespace CustomGroupApp.Controllers
 
         public ActionResult CustomGroupWizard(int testnum)
         {
+            //return View("BandClassDefinitionView");
             return View("CustomGroupWizard", new CustomGroupViewModel
             {
-                Test= _dataService.GetTest(testnum),
+                Test = _dataService.GetTest(testnum),
                 Results = _dataService.GetResults(testnum).ToList(),
                 StudentLanguages = _dataService.GetStudentLanguagePrefs(testnum).ToList()
             });

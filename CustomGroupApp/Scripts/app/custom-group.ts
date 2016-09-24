@@ -497,6 +497,9 @@ class GroupingHelper {
             classes[classNo].addStudent(sortedStudents[i]);
             if (classes[classNo].moreStudents <= 0) {
                 classNo++;
+                if (classNo >= classes.length) {
+                    break;
+                }
             }
         }
         return classes;
@@ -508,7 +511,7 @@ class StudentSet {
 }
 
 class ClassDefinition {
-    constructor(public parent: BandDefinition, public index: number, public count: number) {
+    constructor(public parent: BandDefinition, public index: number, public count: number = 0, public notUsed = false) {
         this.uid = createUuid();
     }
 
@@ -592,7 +595,7 @@ class ClassDefinition {
 }
 
 class BandDefinition {
-    constructor(public parent: ClassesDefinition,
+    constructor(public parent: BandSet,
         public bandNo: number,
         public bandName: string,
         public studentCount: number,
@@ -706,6 +709,8 @@ class BandSet {
         joinedStudents: Array<StudentSet> = [],
         separatedStudents: Array<StudentSet> = []) => {
         this.students = students;
+
+
         if (this.bandCount === 1) {
             this.bands[0].students = this.students;
             this.bands[0].prepare(name, this.students, joinedStudents, separatedStudents);
@@ -747,7 +752,7 @@ class BandSet {
         this.bands = [];
         for (let i = 0; i < bandCount; i++) {
             const bandNo = i + 1;
-            const band = new BandDefinition(this.parent,
+            const band = new BandDefinition(this,
                 bandNo,
                 name + " " + bandNo,
                 tmpBands[i],

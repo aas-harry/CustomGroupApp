@@ -469,6 +469,9 @@ var GroupingHelper = (function () {
                 classes[classNo].addStudent(sortedStudents[i]);
                 if (classes[classNo].moreStudents <= 0) {
                     classNo++;
+                    if (classNo >= classes.length) {
+                        break;
+                    }
                 }
             }
             return classes;
@@ -483,11 +486,14 @@ var StudentSet = (function () {
     return StudentSet;
 }());
 var ClassDefinition = (function () {
-    function ClassDefinition(parent, index, count) {
+    function ClassDefinition(parent, index, count, notUsed) {
         var _this = this;
+        if (count === void 0) { count = 0; }
+        if (notUsed === void 0) { notUsed = false; }
         this.parent = parent;
         this.index = index;
         this.count = count;
+        this.notUsed = notUsed;
         this.students = [];
         this.addStudent = function (student) {
             if (Enumerable.From(_this.students).Any(function (x) { return x.id === student.id; })) {
@@ -689,7 +695,7 @@ var BandSet = (function () {
             _this.bands = [];
             for (var i = 0; i < bandCount; i++) {
                 var bandNo = i + 1;
-                var band = new BandDefinition(_this.parent, bandNo, name + " " + bandNo, tmpBands[i], 1, bandType, streamType, groupType, mixBoysGirls);
+                var band = new BandDefinition(_this, bandNo, name + " " + bandNo, tmpBands[i], 1, bandType, streamType, groupType, mixBoysGirls);
                 _this.bands.push(band);
             }
         };
@@ -811,3 +817,4 @@ var ClassesDefinition = (function () {
     });
     return ClassesDefinition;
 }());
+//# sourceMappingURL=custom-group.js.map

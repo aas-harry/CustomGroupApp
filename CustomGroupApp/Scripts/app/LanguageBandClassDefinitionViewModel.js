@@ -9,16 +9,13 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
         if (studentCount === void 0) { studentCount = 0; }
         _super.call(this);
         this.studentCount = studentCount;
-        this.classes = new kendo.data.ObservableArray([
-            { classNo: 1, studentCount: 1 }
-        ]);
         this.bandCount = 3;
         this.classCount = 1;
         this.languageSets = [];
         this.bandSet = new BandSet(null, "custom", this.studentCount, 1);
         this.groupingHelper = new GroupingHelper();
         this.kendoHelper = new KendoHelper();
-        this.bandNumericTextBoxes = new BandNumericTextBoxCollection();
+        this.bandTableControl = new BandTableControl();
         this.studentWithLanguagePrefCount = 0;
         // ReSharper disable once InconsistentNaming
         this._students = [];
@@ -28,8 +25,8 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
     };
     LanguageBandClassDefinitionViewModel.prototype.loadOptions = function (source) {
         this.bandSet = source;
-        this.bandCount = source.bands.length;
-        this.bandNumericTextBoxes.initTable("#classes-settings-container", source.bands);
+        _super.prototype.set.call(this, "bandCount", source.bands.length);
+        this.bandTableControl.init("classes-settings-container", source);
         return true;
     };
     LanguageBandClassDefinitionViewModel.prototype.getBandSet = function () {
@@ -69,3 +66,4 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
     });
     return LanguageBandClassDefinitionViewModel;
 }(kendo.data.ObservableObject));
+//# sourceMappingURL=LanguageBandClassDefinitionViewModel.js.map

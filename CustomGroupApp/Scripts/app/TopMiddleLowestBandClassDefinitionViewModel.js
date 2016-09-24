@@ -9,23 +9,18 @@ var TopMiddleLowestBandClassDefinitionViewModel = (function (_super) {
         if (studentCount === void 0) { studentCount = 0; }
         _super.call(this);
         this.studentCount = studentCount;
-        this.classes = new kendo.data.ObservableArray([
-            { classNo: 1, studentCount: 1 }
-        ]);
         this.bandCount = 3;
         this.classCount = 1;
         this.bandSet = new TopMiddleLowestBandSet(null, this.studentCount);
-        this.groupingHelper = new GroupingHelper();
-        this.kendoHelper = new KendoHelper();
-        this.bandNumericTextBoxes = new BandNumericTextBoxCollection();
+        this.bandTableControl = new BandTableControl();
     }
     TopMiddleLowestBandClassDefinitionViewModel.prototype.saveOptions = function (source) {
         return true;
     };
     TopMiddleLowestBandClassDefinitionViewModel.prototype.loadOptions = function (source) {
         this.bandSet = source;
-        this.bandCount = source.bands.length;
-        this.bandNumericTextBoxes.initTable("#classes-settings-container", source.bands);
+        _super.prototype.set.call(this, "bandCount", source.bands.length);
+        this.bandTableControl.init("classes-settings-container", source);
         return true;
     };
     TopMiddleLowestBandClassDefinitionViewModel.prototype.getBandSet = function () {
@@ -33,3 +28,4 @@ var TopMiddleLowestBandClassDefinitionViewModel = (function (_super) {
     };
     return TopMiddleLowestBandClassDefinitionViewModel;
 }(kendo.data.ObservableObject));
+//# sourceMappingURL=TopMiddleLowestBandClassDefinitionViewModel.js.map

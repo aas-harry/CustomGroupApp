@@ -35,14 +35,8 @@ class StepCollection {
 
     steps: Array<StepDefinition> = [];
 
-    getStepView = (groupType: any, stepNo: number): string => {
+    getStepView = (groupType: number, stepNo: number): string => {
         console.log("GetStep: ", stepNo, groupType);
-        if (typeof groupType === "string") {
-            groupType = parseInt(groupType);
-        }
-        if (stepNo > this.steps.length || stepNo < 1) {
-
-        }
         var stepView = this.steps[stepNo - 1];
         if (stepView.isCommon) {
             return stepView.viewName;

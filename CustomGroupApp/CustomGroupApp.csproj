@@ -1033,7 +1033,8 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\app\BandClassDefinitionViewModel.ts" />
-    <TypeScriptCompile Include="Scripts\app\BandNumericTextBox.ts" />
+    <TypeScriptCompile Include="Scripts\app\BandTabControl.ts" />
+    <TypeScriptCompile Include="Scripts\app\ClassTabControl.ts" />
     <TypeScriptCompile Include="Scripts\app\CustomClassList.ts" />
     <TypeScriptCompile Include="Scripts\app\GenerateCustomGroupViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\GroupingTypeViewModel.ts" />

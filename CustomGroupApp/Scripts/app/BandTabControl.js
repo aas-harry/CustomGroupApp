@@ -1,9 +1,3 @@
-var BandNumericTextBoxUsage;
-(function (BandNumericTextBoxUsage) {
-    BandNumericTextBoxUsage[BandNumericTextBoxUsage["BandSize"] = 0] = "BandSize";
-    BandNumericTextBoxUsage[BandNumericTextBoxUsage["ClassSize"] = 1] = "ClassSize";
-    BandNumericTextBoxUsage[BandNumericTextBoxUsage["StudentSize"] = 2] = "StudentSize";
-})(BandNumericTextBoxUsage || (BandNumericTextBoxUsage = {}));
 var BandTableControl = (function () {
     function BandTableControl() {
         var _this = this;
@@ -33,18 +27,39 @@ var BandTableControl = (function () {
             for (var _i = 0, bands_1 = bands; _i < bands_1.length; _i++) {
                 var band = bands_1[_i];
                 var classCell = classRow.insertCell();
-                var classItem = classNo <= band.classes.length ? band.classes[classNo - 1] : null;
+                var classItem = classNo <= band.classes.length ? band.classes[classNo - 1] : new ClassDefinition(band, classNo, 0, true);
                 _this.studentClassControls.push(new StudentClassInputContainer(classCell, classItem, _this.studentCountInClassChangedCallback, false));
             }
         };
         // This function is called when the number of students in a band is changed
         this.studentCountInBandChangedCallback = function (bandItem, newValue, oldValue, inputControl) {
+            console.log("#Student Band " + bandItem.bandNo, newValue, bandItem.studentCount);
         };
         // This function is called when the number of students in a band is changed
         this.classCountInBandChangedCallback = function (bandItem, newValue, oldValue, inputControl) {
+            console.log("#Classes Band " + bandItem.bandNo, newValue, bandItem.classCount);
+            bandItem.setClassCount(newValue);
+            _this.init(_this.tableContainerElementName, _this.bandSet);
+            //for (let classItem of bandItem.classes) {
+            //    if (classItem.index <= this.classRows.length) {
+            //        const container = Enumerable.From(this.studentClassControls)
+            //            .FirstOrDefault(null, x => x.classItem.parent.bandNo === classItem.parent.bandNo
+            //                && x.classItem.index === classItem.index);
+            //        if (container) {
+            //            container.classItem = classItem;
+            //            container.showInput(classItem.count);
+            //        }
+            //        continue;
+            //    }
+            //    this.addStudentClassRow(classItem.index, bandItem.parent.bands, true);
+            //}
+            //Enumerable.From(this.studentClassControls)
+            //    .Where(x => x.classItem.parent.bandNo === bandItem.bandNo && x.classItem.index > bandItem.classes.length)
+            //    .ForEach(x => x.hideInput());
         };
         // This function is called when the number of students in class is changed
         this.studentCountInClassChangedCallback = function (classItem, newValue, oldValue, inputControl) {
+            console.log("Class " + classItem.index, newValue, classItem.count);
         };
     }
     BandTableControl.prototype.init = function (elementName, bandSet) {
@@ -77,3 +92,4 @@ var BandTableControl = (function () {
     };
     return BandTableControl;
 }());
+//# sourceMappingURL=BandTabControl.js.map

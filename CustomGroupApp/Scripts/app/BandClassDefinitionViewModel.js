@@ -10,26 +10,12 @@ var BandClassDefinitionViewModel = (function (_super) {
         if (studentCount === void 0) { studentCount = 0; }
         _super.call(this);
         this.studentCount = studentCount;
-        this.classes = new kendo.data.ObservableArray([
-            { classNo: 1, studentCount: 1 }
-        ]);
         this.bandCount = 1;
         this.classCount = 1;
-        this.groupingHelper = new GroupingHelper();
-        this.kendoHelper = new KendoHelper();
-        this.studentCountInBandInputControls = new BandNumericTextBoxCollection();
-        this.studentCountInClassInputControls = new BandNumericTextBoxCollection();
-        this.bandNumericTextBoxes = new BandNumericTextBoxCollection();
+        this.bandTableControl = new BandTableControl();
         this.onBandCountChange = function () {
             _this.bandSet.createBands("Band", _this.studentCount, _this.bandCount);
-            _this.bandNumericTextBoxes.initTable("#classes-settings-container", _this.bandSet.bands);
-        };
-        this.createNumberInputField = function (elementId) {
-            var element = document.createElement("input");
-            element.type = "text";
-            element.setAttribute("style", "width: 100px");
-            element.id = elementId;
-            return element;
+            _this.bandTableControl.init("classes-settings-container", _this.bandSet);
         };
     }
     BandClassDefinitionViewModel.prototype.saveOptions = function (source) {
@@ -38,7 +24,7 @@ var BandClassDefinitionViewModel = (function (_super) {
     BandClassDefinitionViewModel.prototype.loadOptions = function (source) {
         this.bandSet = source;
         _super.prototype.set.call(this, "bandCount", source.bands.length);
-        this.bandNumericTextBoxes.initTable("#classes-settings-container", source.bands);
+        this.bandTableControl.init("classes-settings-container", source);
         return true;
     };
     BandClassDefinitionViewModel.prototype.getBandSet = function () {
@@ -46,3 +32,4 @@ var BandClassDefinitionViewModel = (function (_super) {
     };
     return BandClassDefinitionViewModel;
 }(kendo.data.ObservableObject));
+//# sourceMappingURL=BandClassDefinitionViewModel.js.map

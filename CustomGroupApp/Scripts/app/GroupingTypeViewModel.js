@@ -10,3 +10,4 @@ var GroupingTypeViewModel = (function (_super) {
     }
     return GroupingTypeViewModel;
 }(kendo.data.ObservableObject));
+//# sourceMappingURL=GroupingTypeViewModel.js.map

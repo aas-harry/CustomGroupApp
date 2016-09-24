@@ -21,11 +21,6 @@ var StepCollection = (function () {
         this.steps = [];
         this.getStepView = function (groupType, stepNo) {
             console.log("GetStep: ", stepNo, groupType);
-            if (typeof groupType === "string") {
-                groupType = parseInt(groupType);
-            }
-            if (stepNo > _this.steps.length || stepNo < 1) {
-            }
             var stepView = _this.steps[stepNo - 1];
             if (stepView.isCommon) {
                 return stepView.viewName;
@@ -60,3 +55,4 @@ var StepCollection = (function () {
     }
     return StepCollection;
 }());
+//# sourceMappingURL=StepDefinition.js.map

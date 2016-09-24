@@ -1,9 +1,5 @@
 ﻿class LanguageBandClassDefinitionViewModel extends kendo.data.ObservableObject
     implements IBandClassSettings {
-    classes: kendo.data.ObservableArray = new kendo.data.ObservableArray(
-        [
-            { classNo: 1, studentCount: 1 }
-        ]);
     constructor(public studentCount: number = 0) {
         super();
     }
@@ -15,8 +11,7 @@
     bandSet = new BandSet(null, "custom", this.studentCount, 1);
     private groupingHelper = new GroupingHelper();
     private kendoHelper = new KendoHelper();
-    private bandNumericTextBoxes = new BandNumericTextBoxCollection();
-
+    private bandTableControl = new BandTableControl();
 
     saveOptions(source: BandSet): boolean {
         return true;
@@ -24,9 +19,8 @@
 
     loadOptions(source: BandSet): boolean {
         this.bandSet = source;
-        this.bandCount = source.bands.length;
-        this.bandNumericTextBoxes.initTable("#classes-settings-container", source.bands);
-
+        super.set("bandCount", source.bands.length);
+        this.bandTableControl.init("classes-settings-container", source);
         return true;
     }
 
