@@ -8,11 +8,11 @@ var CustomGroupViewModel = (function (_super) {
     function CustomGroupViewModel(studentCount) {
         var _this = this;
         _super.call(this);
-        this.selectedGroupingOption = 1;
-        this.selectedStreamingOption = 1;
-        this.selectedTopClassGroupingOption = 0;
-        this.selectedLowestClassGroupingOption = 0;
-        this.selectedGenderOption = 0;
+        this.selectedGroupingOption = "MixedAbility";
+        this.selectedStreamingOption = "OverallAbilty";
+        this.selectedTopClassGroupingOption = "Streaming";
+        this.selectedLowestClassGroupingOption = "Streaming";
+        this.selectedGenderOption = "All";
         this.currentGroupStep = 1;
         this.isLastStep = false;
         this.isFirstStep = true;
@@ -23,6 +23,7 @@ var CustomGroupViewModel = (function (_super) {
         this.separatedStudents = [];
         this.stepCollection = new StepCollection();
         this.testInfo = new TestFile();
+        this.groupingHelper = new GroupingHelper();
         this.nextStep = function () {
             _super.prototype.set.call(_this, "currentGroupStep", _this.currentGroupStep + 1);
             _this.callGetViewStep(_this.currentGroupStep);
@@ -60,12 +61,10 @@ var CustomGroupViewModel = (function (_super) {
         this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(studentCount);
     }
     Object.defineProperty(CustomGroupViewModel.prototype, "topClassGroupingOption", {
-        // Radio button value is string type and they need to be converted to number
+        // Radio button value is string type and they need to be converted to enum
         get: function () {
             var selectedTopClassGroupingOption = this.selectedTopClassGroupingOption;
-            return typeof selectedTopClassGroupingOption === "number"
-                ? selectedTopClassGroupingOption
-                : parseInt(selectedTopClassGroupingOption);
+            return this.groupingHelper.convertGroupingOptionFromString(selectedTopClassGroupingOption);
         },
         enumerable: true,
         configurable: true
@@ -73,9 +72,7 @@ var CustomGroupViewModel = (function (_super) {
     Object.defineProperty(CustomGroupViewModel.prototype, "lowestClassGroupingOption", {
         get: function () {
             var selectedLowestClassGroupingOption = this.selectedLowestClassGroupingOption;
-            return typeof selectedLowestClassGroupingOption === "number"
-                ? selectedLowestClassGroupingOption
-                : parseInt(selectedLowestClassGroupingOption);
+            return this.groupingHelper.convertGroupingOptionFromString(selectedLowestClassGroupingOption);
         },
         enumerable: true,
         configurable: true
@@ -83,27 +80,21 @@ var CustomGroupViewModel = (function (_super) {
     Object.defineProperty(CustomGroupViewModel.prototype, "groupingOption", {
         get: function () {
             var selectedGroupingOption = this.selectedGroupingOption;
-            return typeof selectedGroupingOption === "number"
-                ? selectedGroupingOption
-                : parseInt(selectedGroupingOption);
+            return this.groupingHelper.convertGroupingOptionFromString(selectedGroupingOption);
         },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(CustomGroupViewModel.prototype, "streamType", {
         get: function () {
-            return typeof this.selectedStreamingOption === "number"
-                ? this.selectedStreamingOption
-                : parseInt(this.selectedStreamingOption);
+            return this.groupingHelper.convertStreamTypeFromString(this.selectedStreamingOption);
         },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(CustomGroupViewModel.prototype, "genderOption", {
         get: function () {
-            return typeof this.selectedGenderOption === "number"
-                ? this.selectedGenderOption
-                : parseInt(this.selectedGenderOption);
+            return this.groupingHelper.convertGenderFromString(this.selectedGenderOption);
         },
         enumerable: true,
         configurable: true

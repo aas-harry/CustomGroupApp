@@ -1,11 +1,11 @@
 ﻿enum GroupingMethod {
-    Unknown = 0,
-    MixedAbility = 1,
-    Streaming = 2,
-    Banding = 3,
-    TopMiddleLowest = 4,
-    Language = 5,
-    CustomGroup = 6
+    Unknown,
+    MixedAbility,
+    Streaming,
+    Banding,
+    TopMiddleLowest,
+    Language,
+    CustomGroup
 }
 
 enum SearchDirection {
@@ -14,9 +14,9 @@ enum SearchDirection {
 }
 
 enum Gender {
-    All = 0,
-    Girls = 1,
-    Boys = 2
+    All,
+    Girls,
+    Boys
 }
 
 enum BandType {
@@ -28,10 +28,10 @@ enum BandType {
 }
 
 enum StreamType {
-    None = 0,
-    OverallAbilty = 1,
-    English = 1,
-    MathsAchievement = 2
+    None,
+    OverallAbilty,
+    English,
+    MathsAchievement
 }
 
 enum BandStreamType {
@@ -178,6 +178,59 @@ class SearchClassContext {
 }
 
 class GroupingHelper {
+
+    // This function can be used to convert GroupingMethod and BandStreamType string
+    convertGroupingOptionFromString = (groupType: string): GroupingMethod => {
+        switch (groupType) {
+            case "Parallel":
+            case "MixedAbility":
+                return GroupingMethod.MixedAbility;
+            case "Streaming":
+                return GroupingMethod.Streaming;
+            case "Banding":
+                return GroupingMethod.Banding;
+            case "TopMiddleLowest":
+                return GroupingMethod.TopMiddleLowest;
+            case "Language":
+                return GroupingMethod.Language;
+            case "Unknown":
+            case "None":
+                return GroupingMethod.Unknown;
+            default:
+                alert("incorrect type");
+                return GroupingMethod.Unknown;
+        }
+    }
+
+    convertStreamTypeFromString = (streamType: string): StreamType => {
+        switch (streamType) {
+            case "OverallAbilty":
+                return StreamType.OverallAbilty;
+            case "English":
+                return StreamType.English;
+            case "MathsAchievement":
+                return StreamType.MathsAchievement;
+            case "None":
+                return StreamType.None;
+            default:
+                alert("incorrect type");
+                return StreamType.None;
+        }
+    }
+
+    convertGenderFromString = (gender: string): Gender => {
+        switch (gender) {
+            case "All":
+                return Gender.All;
+            case "Girls":
+                return Gender.Girls;
+            case "Boys":
+                return Gender.Boys;
+            default:
+                alert("incorrect type");
+                return Gender.All;
+        }
+    }
     createBlankClasses = (parent: BandDefinition, totalStudents: number, classCount: number):
         Array<ClassDefinition> => {
             var classSizes = this.calculateClassesSize(totalStudents, classCount);

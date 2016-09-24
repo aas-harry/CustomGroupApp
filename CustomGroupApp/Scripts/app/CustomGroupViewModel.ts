@@ -7,11 +7,11 @@
         this.bandClassDefinitionViewModel = new BandClassDefinitionViewModel(studentCount);
         this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(studentCount);
     }
-    selectedGroupingOption: any = 1;
-    selectedStreamingOption: any = 1;
-    selectedTopClassGroupingOption: any = 0;
-    selectedLowestClassGroupingOption: any = 0;
-    selectedGenderOption: any = 0;
+    selectedGroupingOption = "MixedAbility";
+    selectedStreamingOption = "OverallAbilty";
+    selectedTopClassGroupingOption = "Streaming";
+    selectedLowestClassGroupingOption = "Streaming";
+    selectedGenderOption = "All";
     currentGroupStep = 1;
     isLastStep = false;
     isFirstStep = true;
@@ -23,34 +23,26 @@
     joinedStudents: Array<StudentSet> = [];
     separatedStudents: Array<StudentSet> = [];
 
-    // Radio button value is string type and they need to be converted to number
-    get topClassGroupingOption(): number {
-        var selectedTopClassGroupingOption = this.selectedTopClassGroupingOption;   
-        return typeof selectedTopClassGroupingOption === "number"
-            ? selectedTopClassGroupingOption
-            : parseInt(selectedTopClassGroupingOption);
+    // Radio button value is string type and they need to be converted to enum
+    get topClassGroupingOption(): GroupingMethod {
+        const selectedTopClassGroupingOption = this.selectedTopClassGroupingOption;
+        return this.groupingHelper.convertGroupingOptionFromString(selectedTopClassGroupingOption);
     }
-    get lowestClassGroupingOption(): number {
-        var selectedLowestClassGroupingOption = this.selectedLowestClassGroupingOption;
-        return typeof selectedLowestClassGroupingOption === "number"
-            ? selectedLowestClassGroupingOption
-            : parseInt(selectedLowestClassGroupingOption);
+
+    get lowestClassGroupingOption(): GroupingMethod {
+        const selectedLowestClassGroupingOption = this.selectedLowestClassGroupingOption;
+        return this.groupingHelper.convertGroupingOptionFromString(selectedLowestClassGroupingOption);
     }
-    get groupingOption(): number {
-        var selectedGroupingOption = this.selectedGroupingOption;
-        return typeof selectedGroupingOption === "number"
-            ? selectedGroupingOption
-            : parseInt(selectedGroupingOption);
+
+    get groupingOption(): GroupingMethod {
+        const selectedGroupingOption = this.selectedGroupingOption;
+        return this.groupingHelper.convertGroupingOptionFromString(selectedGroupingOption);
     }
-    get streamType(): number {
-        return typeof this.selectedStreamingOption === "number"
-            ? this.selectedStreamingOption
-            : parseInt(this.selectedStreamingOption);
+    get streamType(): StreamType {
+        return this.groupingHelper.convertStreamTypeFromString(this.selectedStreamingOption);
     }
-    get genderOption(): number  {
-        return typeof this.selectedGenderOption === "number"
-            ? this.selectedGenderOption
-            : parseInt(this.selectedGenderOption);
+    get genderOption(): Gender {
+        return this.groupingHelper.convertGenderFromString(this.selectedGenderOption);
     }
 
     private stepCollection = new StepCollection();
@@ -65,7 +57,8 @@
     private topMiddleLowestBandClassDefinitionViewModel: TopMiddleLowestBandClassDefinitionViewModel;
     private languageBandClassDefinitionViewModel: LanguageBandClassDefinitionViewModel;
     private generateCustomGroupViewModel: GenerateCustomGroupViewModel;
-    
+    private groupingHelper = new GroupingHelper();
+
     private nextStep = () => {
         super.set("currentGroupStep", this.currentGroupStep + 1);
         this.callGetViewStep(this.currentGroupStep);
