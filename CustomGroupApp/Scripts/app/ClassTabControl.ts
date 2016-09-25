@@ -1,4 +1,7 @@
 ﻿class ClassTableControl {
+    constructor(studentCountChangedCallback: () => any) {
+        this.studentCountChangedCallback = studentCountChangedCallback;
+    }
     private tableElementName = "class-definition-table";
     private bandSet: BandSet;
     private tableContainerElementName: string;
@@ -6,7 +9,7 @@
     private bodyTable: HTMLTableSectionElement;
     private kendoHelper = new KendoHelper();
     private maxColumns = 4;
-
+    private studentCountChangedCallback;
 
     init(elementName: string, bandSet: BandSet) {
         this.tableContainerElementName = elementName;
@@ -37,6 +40,10 @@
         newValue: number,
         oldValue: number,
         inputControl: kendo.ui.NumericTextBox) => {
-        console.log("Class " + classItem.index, newValue, classItem.count);
+
+        const studentCountChangedCallback = this.studentCountChangedCallback;
+        if (studentCountChangedCallback != null) {
+            studentCountChangedCallback();
+        }
     }
 }

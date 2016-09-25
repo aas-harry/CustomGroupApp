@@ -1,5 +1,5 @@
 var BandTableControl = (function () {
-    function BandTableControl() {
+    function BandTableControl(studentCountChangedCallback) {
         var _this = this;
         this.tableElementName = "band-definition-table";
         this.classRows = [];
@@ -7,11 +7,6 @@ var BandTableControl = (function () {
         this.studentBandControls = [];
         this.classBandControls = [];
         this.studentClassControls = [];
-        // Create student count cell for a band
-        this.addStudentBandCell = function (band) {
-            var studentCell = _this.studentsRow.insertCell();
-            _this.studentBandControls.push(new StudentBandInputContainer(studentCell, band, _this.studentCountInBandChangedCallback, false));
-        };
         // Create band count cell
         this.addClassBandCell = function (band, bandNo, classCount) {
             var bandCell = _this.bandRow.insertCell();
@@ -33,34 +28,31 @@ var BandTableControl = (function () {
         };
         // This function is called when the number of students in a band is changed
         this.studentCountInBandChangedCallback = function (bandItem, newValue, oldValue, inputControl) {
-            console.log("#Student Band " + bandItem.bandNo, newValue, bandItem.studentCount);
+            bandItem.studentCount = Enumerable.From(bandItem.classes).Sum(function (b) { return b.count; });
+            var studentCountChangedCallback = _this.studentCountChangedCallback;
+            if (studentCountChangedCallback != null) {
+                studentCountChangedCallback();
+            }
         };
         // This function is called when the number of students in a band is changed
         this.classCountInBandChangedCallback = function (bandItem, newValue, oldValue, inputControl) {
             console.log("#Classes Band " + bandItem.bandNo, newValue, bandItem.classCount);
             bandItem.setClassCount(newValue);
             _this.init(_this.tableContainerElementName, _this.bandSet);
-            //for (let classItem of bandItem.classes) {
-            //    if (classItem.index <= this.classRows.length) {
-            //        const container = Enumerable.From(this.studentClassControls)
-            //            .FirstOrDefault(null, x => x.classItem.parent.bandNo === classItem.parent.bandNo
-            //                && x.classItem.index === classItem.index);
-            //        if (container) {
-            //            container.classItem = classItem;
-            //            container.showInput(classItem.count);
-            //        }
-            //        continue;
-            //    }
-            //    this.addStudentClassRow(classItem.index, bandItem.parent.bands, true);
-            //}
-            //Enumerable.From(this.studentClassControls)
-            //    .Where(x => x.classItem.parent.bandNo === bandItem.bandNo && x.classItem.index > bandItem.classes.length)
-            //    .ForEach(x => x.hideInput());
+            var studentCountChangedCallback = _this.studentCountChangedCallback;
+            if (studentCountChangedCallback != null) {
+                studentCountChangedCallback();
+            }
         };
         // This function is called when the number of students in class is changed
         this.studentCountInClassChangedCallback = function (classItem, newValue, oldValue, inputControl) {
             console.log("Class " + classItem.index, newValue, classItem.count);
+            var studentCountChangedCallback = _this.studentCountChangedCallback;
+            if (studentCountChangedCallback != null) {
+                studentCountChangedCallback();
+            }
         };
+        this.studentCountChangedCallback = studentCountChangedCallback;
     }
     BandTableControl.prototype.init = function (elementName, bandSet) {
         this.tableContainerElementName = elementName;
@@ -72,17 +64,14 @@ var BandTableControl = (function () {
         this.headerTable = this.table.createTHead();
         this.bodyTable = this.table.createTBody();
         this.columnHeaderRow = this.headerTable.insertRow();
-        this.studentsRow = this.bodyTable.insertRow();
         this.bandRow = this.bodyTable.insertRow();
         this.classRows.splice(0, this.classRows.length);
         this.kendoHelper.createLabel(this.columnHeaderRow.insertCell(), "");
-        this.kendoHelper.createLabel(this.studentsRow.insertCell(), "# Students");
         this.kendoHelper.createLabel(this.bandRow.insertCell(), "# Classes");
         this.bandCount = bandSet.bands.length;
         for (var _i = 0, _a = bandSet.bands; _i < _a.length; _i++) {
             var band = _a[_i];
             this.kendoHelper.createLabel(this.columnHeaderRow.insertCell(), band.bandName === null || band.bandName === "" ? "Band " + band.bandNo : band.bandName);
-            this.addStudentBandCell(band);
             this.addClassBandCell(band, band.bandNo, band.classCount);
         }
         var maxClassNo = Enumerable.From(bands).Max(function (x) { return x.classCount; });

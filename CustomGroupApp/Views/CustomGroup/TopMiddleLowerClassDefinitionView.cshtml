@@ -7,7 +7,10 @@
             border-bottom-style: none;
         }
     </style>
-   
+
+    <div style="margin-top: 20px; margin-bottom: 5px">Number of students in this test: <span data-bind="text: studentCount"></span></div>
+    <div style="margin-bottom: 5px">Number of students in all classes: <span data-bind="text: studentCountInAllClasses"></span></div>
+
     <p>You can adjust the number of students in each classes below:</p>
     <div id="classes-settings-container" style="width: 540px">
         <table id="band-definition-table"></table>
@@ -33,7 +36,7 @@
     bandClassDefinitionViewModel.loadOptions(bandSet);
 
     $(document)
-        .ready(function() {
+        .ready(function () {
             kendo.bind($("#class-definition-container"), bandClassDefinitionViewModel);
         });
 </script>

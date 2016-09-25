@@ -5,14 +5,22 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var TopMiddleLowestBandClassDefinitionViewModel = (function (_super) {
     __extends(TopMiddleLowestBandClassDefinitionViewModel, _super);
-    function TopMiddleLowestBandClassDefinitionViewModel(studentCount) {
+    function TopMiddleLowestBandClassDefinitionViewModel(studentCount, onStudentCountChangedEvent) {
+        var _this = this;
         if (studentCount === void 0) { studentCount = 0; }
         _super.call(this);
         this.studentCount = studentCount;
         this.bandCount = 3;
         this.classCount = 1;
         this.bandSet = new TopMiddleLowestBandSet(null, this.studentCount);
-        this.bandTableControl = new BandTableControl();
+        this.callOnStudentCountChangedEvent = function () {
+            var onStudentCountChangedEvent = _this.onStudentCountChangedEvent;
+            if (onStudentCountChangedEvent != null) {
+                onStudentCountChangedEvent(Enumerable.From(_this.bandSet.bands).SelectMany(function (b) { return b.classes; }).Sum(function (x) { return x.count; }));
+            }
+        };
+        this.onStudentCountChangedEvent = onStudentCountChangedEvent;
+        this.bandTableControl = new BandTableControl(this.callOnStudentCountChangedEvent);
     }
     TopMiddleLowestBandClassDefinitionViewModel.prototype.saveOptions = function (source) {
         return true;

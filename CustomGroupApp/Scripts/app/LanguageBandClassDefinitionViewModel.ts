@@ -1,7 +1,10 @@
 ﻿class LanguageBandClassDefinitionViewModel extends kendo.data.ObservableObject
     implements IBandClassSettings {
-    constructor(public studentCount: number = 0) {
+    constructor(public studentCount: number = 0, onStudentCountChangedEvent: (classCount: number) => any) {
         super();
+
+        this.onStudentCountChangedEvent = onStudentCountChangedEvent;
+        this.bandTableControl = new BandTableControl(this.callOnStudentCountChangedEvent);
     }
 
     bandCount = 3;
@@ -11,7 +14,7 @@
     bandSet = new BandSet(null, "custom", this.studentCount, 1);
     private groupingHelper = new GroupingHelper();
     private kendoHelper = new KendoHelper();
-    private bandTableControl = new BandTableControl();
+    private bandTableControl: BandTableControl;
 
     saveOptions(source: BandSet): boolean {
         return true;
@@ -57,4 +60,12 @@
     studentWithLanguagePrefCount = 0;
     // ReSharper disable once InconsistentNaming
     _students: Array<StudentClass> = [];
+
+    onStudentCountChangedEvent: (classCount: number) => any;
+    callOnStudentCountChangedEvent = () => {
+        const onStudentCountChangedEvent = this.onStudentCountChangedEvent;
+        if (onStudentCountChangedEvent != null) {
+            onStudentCountChangedEvent(Enumerable.From(this.bandSet.bands).SelectMany(b => b.classes).Sum(x => x.count));
+        }
+    };
 }

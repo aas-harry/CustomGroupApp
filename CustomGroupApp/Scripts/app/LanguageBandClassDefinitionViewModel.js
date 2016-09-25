@@ -5,7 +5,8 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var LanguageBandClassDefinitionViewModel = (function (_super) {
     __extends(LanguageBandClassDefinitionViewModel, _super);
-    function LanguageBandClassDefinitionViewModel(studentCount) {
+    function LanguageBandClassDefinitionViewModel(studentCount, onStudentCountChangedEvent) {
+        var _this = this;
         if (studentCount === void 0) { studentCount = 0; }
         _super.call(this);
         this.studentCount = studentCount;
@@ -15,10 +16,17 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
         this.bandSet = new BandSet(null, "custom", this.studentCount, 1);
         this.groupingHelper = new GroupingHelper();
         this.kendoHelper = new KendoHelper();
-        this.bandTableControl = new BandTableControl();
         this.studentWithLanguagePrefCount = 0;
         // ReSharper disable once InconsistentNaming
         this._students = [];
+        this.callOnStudentCountChangedEvent = function () {
+            var onStudentCountChangedEvent = _this.onStudentCountChangedEvent;
+            if (onStudentCountChangedEvent != null) {
+                onStudentCountChangedEvent(Enumerable.From(_this.bandSet.bands).SelectMany(function (b) { return b.classes; }).Sum(function (x) { return x.count; }));
+            }
+        };
+        this.onStudentCountChangedEvent = onStudentCountChangedEvent;
+        this.bandTableControl = new BandTableControl(this.callOnStudentCountChangedEvent);
     }
     LanguageBandClassDefinitionViewModel.prototype.saveOptions = function (source) {
         return true;

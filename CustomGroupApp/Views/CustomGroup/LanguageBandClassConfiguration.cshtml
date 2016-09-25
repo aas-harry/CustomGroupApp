@@ -30,14 +30,14 @@
         <div id="student-language-preferences-list"></div>
     </div>
 
-    <div id="class-definition-container">
+    <div id="class-definition-container" style="margin-bottom: 20px">
         <p>You can adjust the number of students in each classes below:</p>
         <div id="classes-settings-container" style="width: 540px">
             <table id="band-definition-table"></table>
         </div>
     </div>
 
-    <div data-bind="visible: isCoedSchool" style="margin-top: 20px">
+    <div data-bind="visible: isCoedSchool">
         <input type="checkbox" name="mixGirlsBoys" value="0" data-bind="checked: checkboxMixChecked, events: { change: checkboxMixCheckedEvent }"> Mix girls and boys equally.
     </div>
 

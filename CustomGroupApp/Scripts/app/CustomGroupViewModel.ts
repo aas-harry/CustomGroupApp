@@ -3,9 +3,9 @@
         super();
 
         this.studentCount = studentCount;
-        this.classDefinitionViewModel = new ClassDefinitionViewModel(studentCount);
-        this.bandClassDefinitionViewModel = new BandClassDefinitionViewModel(studentCount);
-        this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(studentCount);
+        //this.classDefinitionViewModel = new ClassDefinitionViewModel(studentCount, this.onStudentCountChanged);
+        //this.bandClassDefinitionViewModel = new BandClassDefinitionViewModel(studentCount);
+        //this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(studentCount);
     }
     selectedGroupingOption = "MixedAbility";
     selectedStreamingOption = "OverallAbilty";
@@ -18,11 +18,13 @@
     isFirstStep = true;
     isCoedSchool = true;
     studentCount = 0;
+    studentCountInAllClasses = 0;
     classCount = 1;
     groupName: string;
     selectedClassDefinitionViewModel: IBandClassSettings;
     joinedStudents: Array<StudentSet> = [];
     separatedStudents: Array<StudentSet> = [];
+    errorMessage: string;
 
     // Radio button value is string type and they need to be converted to enum
     get topClassGroupingOption(): GroupingMethod {
@@ -59,6 +61,7 @@
     private languageBandClassDefinitionViewModel: LanguageBandClassDefinitionViewModel;
     private generateCustomGroupViewModel: GenerateCustomGroupViewModel;
     private groupingHelper = new GroupingHelper();
+
 
     private nextStep = () => {
         super.set("currentGroupStep", this.currentGroupStep + 1);
@@ -164,25 +167,39 @@
     setDatasource = (test, results, languages) => {
         var testInfo = new TestFile();
         testInfo.set(test, results, languages);
+        this.isCoedSchool = testInfo.isUnisex;
         this.studentCount = testInfo.studentCount;
+        this.studentCountInAllClasses = testInfo.studentCount;
         this.classesDefn = new ClassesDefinition(testInfo);
 
         this.bandSet = this.classesDefn.createBandSet("class", this.studentCount);
         this.bandSet.bands[0].setClassCount(3);
-        this.classDefinitionViewModel = new ClassDefinitionViewModel(this.studentCount);
+        this.classDefinitionViewModel = new ClassDefinitionViewModel(this.studentCount, this.onStudentCountChanged);
 
         this.customBandSet = this.classesDefn.createBandSet("Band", this.studentCount, 2);
-        this.bandClassDefinitionViewModel = new BandClassDefinitionViewModel(this.studentCount);
+        this.bandClassDefinitionViewModel = new BandClassDefinitionViewModel(this.studentCount, this.onStudentCountChanged);
 
-        this.languageBandClassDefinitionViewModel = new LanguageBandClassDefinitionViewModel(this.studentCount);
+        this.languageBandClassDefinitionViewModel = new LanguageBandClassDefinitionViewModel(this.studentCount, this.onStudentCountChanged);
         this.languageBandClassDefinitionViewModel.students = this.classesDefn.students;
         this.languageBandSet = this.languageBandClassDefinitionViewModel.bandSet;
 
         this.topMiddleLowestBandSet = this.classesDefn.createTopMiddleBottomBandSet("class", this.studentCount);
-        this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(this.studentCount);
+        this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(this.studentCount, this.onStudentCountChanged);
 
         this.generateCustomGroupViewModel = new GenerateCustomGroupViewModel();
 
         this.set("selectedClassDefinitionViewModel", this.classDefinitionViewModel);
     };
+
+    onStudentCountChanged = (count: number) => {
+        // set the total number students in all classes
+        this.set("studentCountInAllClasses", count);
+        if (this.studentCount !== this.studentCountInAllClasses) {
+            this.set("errorMessage",
+                "The total number students in all classes doesn't match with number of students in test file");
+        } else {
+            this.set("errorMessage", "");
+        }
+
+    }
 }

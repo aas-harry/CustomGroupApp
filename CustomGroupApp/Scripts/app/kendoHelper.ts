@@ -574,7 +574,12 @@ class KendoHelper
                         callbackChangeEvent(inputControl.value(), inputControl);
                     }
                 }
-                //spin: callbackChangeEvent
+                //spin: (e) => {
+                //    var inputControl = e.sender as kendo.ui.NumericTextBox;
+                //    if (callbackChangeEvent != null) {
+                //        callbackChangeEvent(inputControl.value(), inputControl);
+                //    }
+                //}
             } as kendo.ui.NumericTextBoxOptions);
 
         const numericTextBox = $(`#${element}`).data("kendoNumericTextBox");

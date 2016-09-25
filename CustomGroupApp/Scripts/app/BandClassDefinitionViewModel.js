@@ -5,18 +5,25 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var BandClassDefinitionViewModel = (function (_super) {
     __extends(BandClassDefinitionViewModel, _super);
-    function BandClassDefinitionViewModel(studentCount) {
+    function BandClassDefinitionViewModel(studentCount, onStudentCountChangedEvent) {
         var _this = this;
         if (studentCount === void 0) { studentCount = 0; }
         _super.call(this);
         this.studentCount = studentCount;
         this.bandCount = 1;
         this.classCount = 1;
-        this.bandTableControl = new BandTableControl();
         this.onBandCountChange = function () {
             _this.bandSet.createBands("Band", _this.studentCount, _this.bandCount);
             _this.bandTableControl.init("classes-settings-container", _this.bandSet);
         };
+        this.callOnStudentCountChangedEvent = function () {
+            var onStudentCountChangedEvent = _this.onStudentCountChangedEvent;
+            if (onStudentCountChangedEvent != null) {
+                onStudentCountChangedEvent(Enumerable.From(_this.bandSet.bands).SelectMany(function (b) { return b.classes; }).Sum(function (x) { return x.count; }));
+            }
+        };
+        this.onStudentCountChangedEvent = onStudentCountChangedEvent;
+        this.bandTableControl = new BandTableControl(this.callOnStudentCountChangedEvent);
     }
     BandClassDefinitionViewModel.prototype.saveOptions = function (source) {
         return true;

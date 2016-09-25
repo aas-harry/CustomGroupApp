@@ -5,7 +5,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var ClassDefinitionViewModel = (function (_super) {
     __extends(ClassDefinitionViewModel, _super);
-    function ClassDefinitionViewModel(studentCount) {
+    function ClassDefinitionViewModel(studentCount, onStudentCountChangedEvent) {
         var _this = this;
         if (studentCount === void 0) { studentCount = 0; }
         _super.call(this);
@@ -13,12 +13,23 @@ var ClassDefinitionViewModel = (function (_super) {
         this.classCount = 1;
         this.groupingHelper = new GroupingHelper();
         this.kendoHelper = new KendoHelper();
-        this.classTableControl = new ClassTableControl();
-        this.onClassCountChange = function () {
+        this.onClassCountChanged = function () {
             _this.bandSet.bands[0].setClassCount(_this.classCount);
             _this.classTableControl.init("classes-settings-container", _this.bandSet);
+            var onStudentCountChangedEvent = _this.onStudentCountChangedEvent;
+            if (onStudentCountChangedEvent != null) {
+                onStudentCountChangedEvent(Enumerable.From(_this.bandSet.bands[0].classes).Sum(function (x) { return x.count; }));
+            }
+        };
+        this.callOnStudentCountChangedEvent = function () {
+            var onStudentCountChangedEvent = _this.onStudentCountChangedEvent;
+            if (onStudentCountChangedEvent != null) {
+                onStudentCountChangedEvent(Enumerable.From(_this.bandSet.bands[0].classes).Sum(function (x) { return x.count; }));
+            }
         };
         _super.prototype.init.call(this, this);
+        this.onStudentCountChangedEvent = onStudentCountChangedEvent;
+        this.classTableControl = new ClassTableControl(this.callOnStudentCountChangedEvent);
     }
     ClassDefinitionViewModel.prototype.saveOptions = function (source) {
         return true;

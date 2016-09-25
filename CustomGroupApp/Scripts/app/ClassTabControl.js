@@ -1,12 +1,17 @@
 var ClassTableControl = (function () {
-    function ClassTableControl() {
+    function ClassTableControl(studentCountChangedCallback) {
+        var _this = this;
         this.tableElementName = "class-definition-table";
         this.kendoHelper = new KendoHelper();
         this.maxColumns = 4;
         // This function is called when the number of students in class is changed
         this.studentCountInClassChangedCallback = function (classItem, newValue, oldValue, inputControl) {
-            console.log("Class " + classItem.index, newValue, classItem.count);
+            var studentCountChangedCallback = _this.studentCountChangedCallback;
+            if (studentCountChangedCallback != null) {
+                studentCountChangedCallback();
+            }
         };
+        this.studentCountChangedCallback = studentCountChangedCallback;
     }
     ClassTableControl.prototype.init = function (elementName, bandSet) {
         this.tableContainerElementName = elementName;

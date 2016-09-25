@@ -19,6 +19,7 @@ var CustomGroupViewModel = (function (_super) {
         this.isFirstStep = true;
         this.isCoedSchool = true;
         this.studentCount = 0;
+        this.studentCountInAllClasses = 0;
         this.classCount = 1;
         this.joinedStudents = [];
         this.separatedStudents = [];
@@ -41,25 +42,37 @@ var CustomGroupViewModel = (function (_super) {
         this.setDatasource = function (test, results, languages) {
             var testInfo = new TestFile();
             testInfo.set(test, results, languages);
+            _this.isCoedSchool = testInfo.isUnisex;
             _this.studentCount = testInfo.studentCount;
+            _this.studentCountInAllClasses = testInfo.studentCount;
             _this.classesDefn = new ClassesDefinition(testInfo);
             _this.bandSet = _this.classesDefn.createBandSet("class", _this.studentCount);
             _this.bandSet.bands[0].setClassCount(3);
-            _this.classDefinitionViewModel = new ClassDefinitionViewModel(_this.studentCount);
+            _this.classDefinitionViewModel = new ClassDefinitionViewModel(_this.studentCount, _this.onStudentCountChanged);
             _this.customBandSet = _this.classesDefn.createBandSet("Band", _this.studentCount, 2);
-            _this.bandClassDefinitionViewModel = new BandClassDefinitionViewModel(_this.studentCount);
-            _this.languageBandClassDefinitionViewModel = new LanguageBandClassDefinitionViewModel(_this.studentCount);
+            _this.bandClassDefinitionViewModel = new BandClassDefinitionViewModel(_this.studentCount, _this.onStudentCountChanged);
+            _this.languageBandClassDefinitionViewModel = new LanguageBandClassDefinitionViewModel(_this.studentCount, _this.onStudentCountChanged);
             _this.languageBandClassDefinitionViewModel.students = _this.classesDefn.students;
             _this.languageBandSet = _this.languageBandClassDefinitionViewModel.bandSet;
             _this.topMiddleLowestBandSet = _this.classesDefn.createTopMiddleBottomBandSet("class", _this.studentCount);
-            _this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(_this.studentCount);
+            _this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(_this.studentCount, _this.onStudentCountChanged);
             _this.generateCustomGroupViewModel = new GenerateCustomGroupViewModel();
             _this.set("selectedClassDefinitionViewModel", _this.classDefinitionViewModel);
         };
+        this.onStudentCountChanged = function (count) {
+            // set the total number students in all classes
+            _this.set("studentCountInAllClasses", count);
+            if (_this.studentCount !== _this.studentCountInAllClasses) {
+                _this.set("errorMessage", "The total number students in all classes doesn't match with number of students in test file");
+            }
+            else {
+                _this.set("errorMessage", "");
+            }
+        };
         this.studentCount = studentCount;
-        this.classDefinitionViewModel = new ClassDefinitionViewModel(studentCount);
-        this.bandClassDefinitionViewModel = new BandClassDefinitionViewModel(studentCount);
-        this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(studentCount);
+        //this.classDefinitionViewModel = new ClassDefinitionViewModel(studentCount, this.onStudentCountChanged);
+        //this.bandClassDefinitionViewModel = new BandClassDefinitionViewModel(studentCount);
+        //this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(studentCount);
     }
     Object.defineProperty(CustomGroupViewModel.prototype, "topClassGroupingOption", {
         // Radio button value is string type and they need to be converted to enum

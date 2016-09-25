@@ -19,8 +19,9 @@
     </div>
 
     <div style="margin-top: 20px; margin-bottom: 5px">Number of students in this test: <span data-bind="text: studentCount"></span></div>
+    <div style="margin-bottom: 5px">Number of students in all classes: <span data-bind="text: studentCountInAllClasses"></span></div>
 
-    <div id="class-definition-container">
+    <div id="class-definition-container" style="margin-bottom: 20px">
         <div>
             <span>Number of classes: </span>
             <input style="width: 80px; margin-right: 15px; margin-left: 10px; margin-bottom: 5px"
@@ -28,7 +29,7 @@
                    data-format="n0"
                    data-min="1"
                    data-max="30"
-                   data-bind="value: selectedClassDefinitionViewModel.classCount, events: { change: selectedClassDefinitionViewModel.onClassCountChange, spin: selectedClassDefinitionViewModel.onClassCountChange  }">
+                   data-bind="value: selectedClassDefinitionViewModel.classCount, events: { change: selectedClassDefinitionViewModel.onClassCountChanged, spin: selectedClassDefinitionViewModel.onClassCountChanged  }">
             <span>(Max 30 Classes)</span>
         </div>
         <div style="margin-top: 5px; margin-bottom: 5px">You can adjust the number of students in each classes below:</div>
@@ -36,7 +37,7 @@
         </div>
     </div>
 
-    <div data-bind="visible: isCoedSchool" style="margin-top: 20px">
+    <div data-bind="visible: isCoedSchool">
         <input type="checkbox" name="mixGirlsBoys" value="0" data-bind="checked: mixGirlsBoysOption"> Mix girls and boys equally.
     </div>
 
