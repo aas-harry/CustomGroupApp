@@ -43,6 +43,7 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
     Object.defineProperty(LanguageBandClassDefinitionViewModel.prototype, "students", {
         set: function (value) {
             this._students = value;
+            debugger;
             this.studentWithLanguagePrefCount = Enumerable.From(value).Count(function (x) { return x.hasLanguagePreferences; });
             this.languageSets = [];
             var _loop_1 = function(s) {
@@ -65,6 +66,7 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
                 var item = _c[_b];
                 this.bandSet.bands[i].bandName = item.description;
                 this.bandSet.bands[i].studentCount = item.count;
+                this.bandSet.bands[i].students = item.students;
                 this.bandSet.bands[i].setClassCount(1);
                 i++;
             }

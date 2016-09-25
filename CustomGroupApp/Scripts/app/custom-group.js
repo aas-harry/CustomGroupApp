@@ -493,7 +493,10 @@ var GroupingHelper = (function () {
                 classQueue.push(classes[i]);
             }
             for (var i = 0; i <= nextClassNo; i++) {
-                classQueue.push(classes[i]);
+                /// TODO : check this condition
+                if (i < classes.length) {
+                    classQueue.push(classes[i]);
+                }
             }
             for (var i = 0; i < classQueue.length; i++) {
                 if (classQueue[i].students.length >= classQueue[i].count) {

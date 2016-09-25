@@ -54,6 +54,7 @@ var CustomGroupViewModel = (function (_super) {
             _this.languageBandClassDefinitionViewModel = new LanguageBandClassDefinitionViewModel(_this.studentCount, _this.onStudentCountChanged);
             _this.languageBandClassDefinitionViewModel.students = _this.classesDefn.students;
             _this.languageBandSet = _this.languageBandClassDefinitionViewModel.bandSet;
+            _this.languageBandSet.parent = _this.classesDefn;
             _this.topMiddleLowestBandSet = _this.classesDefn.createTopMiddleBottomBandSet("class", _this.studentCount);
             _this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(_this.studentCount, _this.onStudentCountChanged);
             _this.generateCustomGroupViewModel = new GenerateCustomGroupViewModel();
@@ -154,7 +155,6 @@ var CustomGroupViewModel = (function (_super) {
         var bandSet = this.selectedClassDefinitionViewModel.getBandSet();
         switch (this.groupingOption) {
             case GroupingMethod.Banding:
-            case GroupingMethod.Language:
                 bandSet.groupType = GroupingMethod.Streaming;
                 bandSet.streamType = this.streamType;
                 for (var _i = 0, _a = bandSet.bands; _i < _a.length; _i++) {
@@ -175,6 +175,15 @@ var CustomGroupViewModel = (function (_super) {
                     band.mixBoysGirls = this.mixGirlsBoysOption;
                 }
                 bandSet.prepare(!this.groupName || this.groupName === "" ? "Class" : this.groupName, this.classesDefn.students, this.joinedStudents, this.separatedStudents);
+                break;
+            case GroupingMethod.Language:
+                for (var _d = 0, _e = bandSet.bands; _d < _e.length; _d++) {
+                    var band = _e[_d];
+                    band.groupType = GroupingMethod.MixedAbility;
+                    band.streamType = this.streamType;
+                    band.mixBoysGirls = this.mixGirlsBoysOption;
+                    band.prepare(band.bandName, band.students, this.joinedStudents, this.separatedStudents);
+                }
                 break;
             default:
                 bandSet.groupType = GroupingMethod.Streaming;

@@ -122,11 +122,9 @@
     }
 
     generateClasses() {
-
         var bandSet = this.selectedClassDefinitionViewModel.getBandSet();
         switch (this.groupingOption) {
             case GroupingMethod.Banding:
-            case GroupingMethod.Language:
                 bandSet.groupType = GroupingMethod.Streaming;
                 bandSet.streamType = this.streamType;
                 for (let band of bandSet.bands) {
@@ -148,6 +146,15 @@
                 }
                 bandSet.prepare(!this.groupName || this.groupName === "" ? "Class" : this.groupName,
                     this.classesDefn.students, this.joinedStudents, this.separatedStudents);
+                break;
+
+            case GroupingMethod.Language:
+                for (let band of bandSet.bands) {
+                    band.groupType = GroupingMethod.MixedAbility;
+                    band.streamType = this.streamType;
+                    band.mixBoysGirls = this.mixGirlsBoysOption;
+                    band.prepare(band.bandName, band.students, this.joinedStudents, this.separatedStudents);
+                }
                 break;
 
             default:
@@ -182,6 +189,7 @@
         this.languageBandClassDefinitionViewModel = new LanguageBandClassDefinitionViewModel(this.studentCount, this.onStudentCountChanged);
         this.languageBandClassDefinitionViewModel.students = this.classesDefn.students;
         this.languageBandSet = this.languageBandClassDefinitionViewModel.bandSet;
+        this.languageBandSet.parent = this.classesDefn;
 
         this.topMiddleLowestBandSet = this.classesDefn.createTopMiddleBottomBandSet("class", this.studentCount);
         this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(this.studentCount, this.onStudentCountChanged);

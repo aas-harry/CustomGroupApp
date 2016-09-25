@@ -520,7 +520,10 @@ class GroupingHelper {
                 classQueue.push(classes[i]);
             }
             for (let i = 0; i <= nextClassNo; i++) {
-                classQueue.push(classes[i]);
+                /// TODO : check this condition
+                if (i < classes.length) {
+                    classQueue.push(classes[i]);
+                }
             }
 
             for (let i = 0; i < classQueue.length; i++) {

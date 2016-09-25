@@ -33,6 +33,7 @@
 
     set students(value: Array<StudentClass>) {
         this._students = value;
+        debugger;
         this.studentWithLanguagePrefCount = Enumerable.From(value).Count(x => x.hasLanguagePreferences);
 
         this.languageSets = [];
@@ -52,6 +53,7 @@
         for (let item of this.languageSets) {
             this.bandSet.bands[i].bandName = item.description;
             this.bandSet.bands[i].studentCount = item.count;
+            this.bandSet.bands[i].students = item.students;
             this.bandSet.bands[i].setClassCount(1);
             i++;
         }
