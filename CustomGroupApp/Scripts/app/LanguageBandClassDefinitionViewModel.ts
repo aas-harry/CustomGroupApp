@@ -11,7 +11,7 @@
     classCount = 1;
     languageSets : Array<LanguageSet> = [];
 
-    bandSet = new BandSet(null, "custom", this.studentCount, 1);
+    bandSet: BandSet;
     private groupingHelper = new GroupingHelper();
     private kendoHelper = new KendoHelper();
     private bandTableControl: BandTableControl;
@@ -33,7 +33,6 @@
 
     set students(value: Array<StudentClass>) {
         this._students = value;
-        debugger;
         this.studentWithLanguagePrefCount = Enumerable.From(value).Count(x => x.hasLanguagePreferences);
 
         this.languageSets = [];

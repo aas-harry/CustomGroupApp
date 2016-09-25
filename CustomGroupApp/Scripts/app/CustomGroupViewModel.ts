@@ -111,6 +111,11 @@
 
            case GroupingMethod.Language:
                 this.languageBandClassDefinitionViewModel.loadOptions(this.languageBandSet);
+                if (!this.languageBandClassDefinitionViewModel.students ||
+                    this.languageBandClassDefinitionViewModel.students.length === 0) {
+                    this.languageBandClassDefinitionViewModel.students = this.classesDefn.students;
+                }
+
                 this.set("selectedClassDefinitionViewModel", this.languageBandClassDefinitionViewModel);
                 break;
 
@@ -151,6 +156,7 @@
             case GroupingMethod.Language:
                 for (let band of bandSet.bands) {
                     band.groupType = GroupingMethod.MixedAbility;
+                    band.bandType = BandType.Language;
                     band.streamType = this.streamType;
                     band.mixBoysGirls = this.mixGirlsBoysOption;
                     band.prepare(band.bandName, band.students, this.joinedStudents, this.separatedStudents);
@@ -171,6 +177,7 @@
         this.selectedClassDefinitionViewModel.loadOptions(bandSet);
     };
 
+    //
     setDatasource = (test, results, languages) => {
         var testInfo = new TestFile();
         testInfo.set(test, results, languages);
@@ -186,10 +193,8 @@
         this.customBandSet = this.classesDefn.createBandSet("Band", this.studentCount, 2);
         this.bandClassDefinitionViewModel = new BandClassDefinitionViewModel(this.studentCount, this.onStudentCountChanged);
 
+        this.languageBandSet = this.classesDefn.createBandSet("Band", this.studentCount, 1);
         this.languageBandClassDefinitionViewModel = new LanguageBandClassDefinitionViewModel(this.studentCount, this.onStudentCountChanged);
-        this.languageBandClassDefinitionViewModel.students = this.classesDefn.students;
-        this.languageBandSet = this.languageBandClassDefinitionViewModel.bandSet;
-        this.languageBandSet.parent = this.classesDefn;
 
         this.topMiddleLowestBandSet = this.classesDefn.createTopMiddleBottomBandSet("class", this.studentCount);
         this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(this.studentCount, this.onStudentCountChanged);

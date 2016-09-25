@@ -24,7 +24,8 @@ enum BandType {
     Custom = 1,
     Top = 2,
     Middle = 3,
-    Lowest = 4
+    Lowest = 4,
+    Language = 5
 }
 
 enum StreamType {
@@ -611,8 +612,11 @@ class ClassDefinition {
         case BandType.None:
             this.name = name + " " + this.index;
             break;
+        case BandType.Language:
+            this.name = name + " " + this.index;
+            break;
         case BandType.Custom:
-            this.name = name + " " + this.index + "/" + this.parent.bandNo;
+            this.name = name + " " + this.index + " of " + this.parent.bandNo;
             break;
         case BandType.Top:
             this.name = name + " " + "Top " + this.index;

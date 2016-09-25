@@ -13,7 +13,6 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
         this.bandCount = 3;
         this.classCount = 1;
         this.languageSets = [];
-        this.bandSet = new BandSet(null, "custom", this.studentCount, 1);
         this.groupingHelper = new GroupingHelper();
         this.kendoHelper = new KendoHelper();
         this.studentWithLanguagePrefCount = 0;
@@ -43,7 +42,6 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
     Object.defineProperty(LanguageBandClassDefinitionViewModel.prototype, "students", {
         set: function (value) {
             this._students = value;
-            debugger;
             this.studentWithLanguagePrefCount = Enumerable.From(value).Count(function (x) { return x.hasLanguagePreferences; });
             this.languageSets = [];
             var _loop_1 = function(s) {

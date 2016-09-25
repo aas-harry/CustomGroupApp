@@ -31,6 +31,7 @@ var BandType;
     BandType[BandType["Top"] = 2] = "Top";
     BandType[BandType["Middle"] = 3] = "Middle";
     BandType[BandType["Lowest"] = 4] = "Lowest";
+    BandType[BandType["Language"] = 5] = "Language";
 })(BandType || (BandType = {}));
 var StreamType;
 (function (StreamType) {
@@ -569,8 +570,11 @@ var ClassDefinition = (function () {
                 case BandType.None:
                     _this.name = name + " " + _this.index;
                     break;
+                case BandType.Language:
+                    _this.name = name + " " + _this.index;
+                    break;
                 case BandType.Custom:
-                    _this.name = name + " " + _this.index + "/" + _this.parent.bandNo;
+                    _this.name = name + " " + _this.index + " of " + _this.parent.bandNo;
                     break;
                 case BandType.Top:
                     _this.name = name + " " + "Top " + _this.index;

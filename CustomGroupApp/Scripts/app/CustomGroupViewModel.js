@@ -39,6 +39,7 @@ var CustomGroupViewModel = (function (_super) {
         };
         this.showStep = function (data) {
         };
+        //
         this.setDatasource = function (test, results, languages) {
             var testInfo = new TestFile();
             testInfo.set(test, results, languages);
@@ -51,10 +52,8 @@ var CustomGroupViewModel = (function (_super) {
             _this.classDefinitionViewModel = new ClassDefinitionViewModel(_this.studentCount, _this.onStudentCountChanged);
             _this.customBandSet = _this.classesDefn.createBandSet("Band", _this.studentCount, 2);
             _this.bandClassDefinitionViewModel = new BandClassDefinitionViewModel(_this.studentCount, _this.onStudentCountChanged);
+            _this.languageBandSet = _this.classesDefn.createBandSet("Band", _this.studentCount, 1);
             _this.languageBandClassDefinitionViewModel = new LanguageBandClassDefinitionViewModel(_this.studentCount, _this.onStudentCountChanged);
-            _this.languageBandClassDefinitionViewModel.students = _this.classesDefn.students;
-            _this.languageBandSet = _this.languageBandClassDefinitionViewModel.bandSet;
-            _this.languageBandSet.parent = _this.classesDefn;
             _this.topMiddleLowestBandSet = _this.classesDefn.createTopMiddleBottomBandSet("class", _this.studentCount);
             _this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(_this.studentCount, _this.onStudentCountChanged);
             _this.generateCustomGroupViewModel = new GenerateCustomGroupViewModel();
@@ -143,6 +142,10 @@ var CustomGroupViewModel = (function (_super) {
                 break;
             case GroupingMethod.Language:
                 this.languageBandClassDefinitionViewModel.loadOptions(this.languageBandSet);
+                if (!this.languageBandClassDefinitionViewModel.students ||
+                    this.languageBandClassDefinitionViewModel.students.length === 0) {
+                    this.languageBandClassDefinitionViewModel.students = this.classesDefn.students;
+                }
                 this.set("selectedClassDefinitionViewModel", this.languageBandClassDefinitionViewModel);
                 break;
             default:
@@ -180,6 +183,7 @@ var CustomGroupViewModel = (function (_super) {
                 for (var _d = 0, _e = bandSet.bands; _d < _e.length; _d++) {
                     var band = _e[_d];
                     band.groupType = GroupingMethod.MixedAbility;
+                    band.bandType = BandType.Language;
                     band.streamType = this.streamType;
                     band.mixBoysGirls = this.mixGirlsBoysOption;
                     band.prepare(band.bandName, band.students, this.joinedStudents, this.separatedStudents);
@@ -199,4 +203,3 @@ var CustomGroupViewModel = (function (_super) {
     ;
     return CustomGroupViewModel;
 }(kendo.data.ObservableObject));
-//# sourceMappingURL=CustomGroupViewModel.js.map
