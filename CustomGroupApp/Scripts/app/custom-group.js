@@ -722,7 +722,6 @@ var BandSet = (function () {
             if (joinedStudents === void 0) { joinedStudents = []; }
             if (separatedStudents === void 0) { separatedStudents = []; }
             _this.students = students;
-            debugger;
             if (_this.bandCount === 1) {
                 _this.bands[0].students = _this.students;
                 _this.bands[0].prepare(name, _this.students, joinedStudents, separatedStudents);

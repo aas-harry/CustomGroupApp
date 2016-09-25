@@ -769,8 +769,6 @@ class BandSet {
         separatedStudents: Array<StudentSet> = []) => {
         this.students = students;
 
-        debugger;
-
         if (this.bandCount === 1) {
             this.bands[0].students = this.students;
             this.bands[0].prepare(name, this.students, joinedStudents, separatedStudents);

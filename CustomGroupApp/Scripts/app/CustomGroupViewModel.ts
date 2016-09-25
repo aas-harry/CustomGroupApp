@@ -12,6 +12,7 @@
     selectedTopClassGroupingOption = "Streaming";
     selectedLowestClassGroupingOption = "Streaming";
     selectedGenderOption = "All";
+    mixGirlsBoysOption = false;
     currentGroupStep = 1;
     isLastStep = false;
     isFirstStep = true;
@@ -128,8 +129,10 @@
                 for (let band of bandSet.bands) {
                     band.groupType = GroupingMethod.MixedAbility;
                     band.streamType = this.streamType;
+                    band.mixBoysGirls = this.mixGirlsBoysOption;
                 }
-                bandSet.prepare(!this.groupName || this.groupName === "" ? "Class" : this.groupName, this.classesDefn.students, this.joinedStudents, this.separatedStudents);
+                bandSet.prepare(!this.groupName || this.groupName === "" ? "Class" : this.groupName,
+                    this.classesDefn.students, this.joinedStudents, this.separatedStudents);
                 break;
 
             case GroupingMethod.TopMiddleLowest:
@@ -138,15 +141,19 @@
                 bandSet.bands[2].groupType = this.lowestClassGroupingOption;
                 for (let band of bandSet.bands) {
                     band.streamType = this.streamType;
+                    band.mixBoysGirls = this.mixGirlsBoysOption;
                 }
-                bandSet.prepare(!this.groupName || this.groupName === "" ? "Class" : this.groupName, this.classesDefn.students, this.joinedStudents, this.separatedStudents);
+                bandSet.prepare(!this.groupName || this.groupName === "" ? "Class" : this.groupName,
+                    this.classesDefn.students, this.joinedStudents, this.separatedStudents);
                 break;
 
             default:
                 bandSet.groupType = GroupingMethod.Streaming;
                 bandSet.bands[0].groupType = this.groupingOption;
                 bandSet.bands[0].streamType = this.streamType;
-                bandSet.prepare(!this.groupName || this.groupName === "" ? "Class" : this.groupName, this.classesDefn.students, this.joinedStudents, this.separatedStudents);
+                bandSet.bands[0].mixBoysGirls = this.mixGirlsBoysOption;
+                bandSet.prepare(!this.groupName || this.groupName === "" ? "Class" : this.groupName,
+                    this.classesDefn.students, this.joinedStudents, this.separatedStudents);
                 break;
         }
 

@@ -156,8 +156,10 @@ var KendoHelper = (function () {
         this.integerFormat = "n0";
         this.createStudentClassInputContainer = function (cell, classItem, editGroupNameCallback, dropCallback) {
             var classGridHeight = classItem.parent.classes.length > 3 ? "500px" : "700px";
+            var classGridWidth = classItem.parent.parent.parent.testFile.isUnisex ? "400px" : "300px";
+            console.log("School Unisex: ", classItem.parent.parent.parent.testFile.isUnisex);
             var container = document.createElement("div");
-            container.setAttribute("style", "width: 300px; height: " + classGridHeight + "; margin: 5px 0 0 0;");
+            container.setAttribute("style", "width: " + classGridWidth + "; height: " + classGridHeight + "; margin: 5px 0 0 0;");
             container.id = "class-" + classItem.uid + "-container";
             var gridElement = document.createElement("div");
             gridElement.setAttribute("style", "height: 100%;");
@@ -205,11 +207,19 @@ var KendoHelper = (function () {
             cell.appendChild(element);
             return _this.createStudentCountInputControl(element.id, studentCount, callbackChangeEvent);
         };
-        this.createLabel = function (cell, description, width) {
+        this.createLabel = function (cell, description, width, textAlign) {
             if (width === void 0) { width = 150; }
+            if (textAlign === void 0) { textAlign = "left"; }
             var label = document.createElement("span");
             label.textContent = description;
-            label.setAttribute("style", "margin-right: 5px; width: " + width + "px");
+            label.setAttribute("style", "margin-right: 5px; width: " + width + "px; textAlign: " + textAlign);
+            cell.appendChild(label);
+        };
+        this.createNumberLabel = function (cell, value, width) {
+            if (width === void 0) { width = 150; }
+            var label = document.createElement("span");
+            label.textContent = value.toString();
+            label.setAttribute("style", "margin-right: 5px; width: " + width + "px; text-align: center");
             cell.appendChild(label);
         };
         this.createMultiLineLabel = function (cell, line1, line2, separator) {
@@ -318,13 +328,28 @@ var KendoHelper = (function () {
         };
         this.createClassGrid = function (element, classItem, editGroupCallback) {
             var groupNameElementId = "groupname-" + classItem.uid;
-            $("#" + element)
-                .kendoGrid({
-                columns: [
-                    { field: "id", title: "studentId", width: "30px", hidden: true },
+            var isUniSex = classItem.parent.parent.parent.testFile.isUnisex;
+            var columns;
+            if (isUniSex) {
+                columns = [
+                    { field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" } },
+                    { field: "gender", title: "Sex", width: "80px", attributes: { 'class': "text-center" } },
+                    { field: "score", title: "Score", width: "80px", attributes: { 'class': "text-center" } }
+                ];
+            }
+            else {
+                columns = [
                     { field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" } },
                     { field: "score", title: "Score", width: "80px", attributes: { 'class': "text-center" } }
-                ],
+                ];
+            }
+            $("#" + element)
+                .kendoGrid({
+                columns: columns,
+                sortable: {
+                    mode: "single",
+                    allowUnsort: true
+                },
                 toolbar: [{ template: kendo.template("Group Name: <input id='" + groupNameElementId + "' style='margin: 0 5px 0 5px' />") }],
                 selectable: "row",
                 dataSource: []
@@ -356,12 +381,36 @@ var KendoHelper = (function () {
         this.createClassSummary = function (classItem) {
             var element = document.createElement("div");
             element.setAttribute("style", "border-style: solid; border-color: #bfbfbf; border-width: 1px; padding: 5px 5px 5px 10px; margin: 5px 0 0 0");
-            var elementCnt = document.createElement("div");
-            elementCnt.textContent = "No. of Students: " + classItem.count;
-            var elementAvg = document.createElement("div");
-            elementAvg.textContent = "Composite Score Avg.: " + Math.round(classItem.average);
-            element.appendChild(elementCnt);
-            element.appendChild(elementAvg);
+            if (classItem.parent.parent.parent.testFile.isUnisex) {
+                var table = document.createElement("table");
+                var header = table.createTHead();
+                var headerRow = header.insertRow();
+                _this.createLabel(headerRow.insertCell(), "", 400);
+                _this.createLabel(headerRow.insertCell(), "Count", 100, "center");
+                _this.createLabel(headerRow.insertCell(), "Average", 100, "center");
+                var body = table.createTBody();
+                var schoolRow = body.insertRow();
+                _this.createLabel(schoolRow.insertCell(), "Composite Score Avg.", 400);
+                _this.createNumberLabel(schoolRow.insertCell(), classItem.count, 100);
+                _this.createLabel(schoolRow.insertCell(), classItem.average.toFixed(0), 100);
+                schoolRow = body.insertRow();
+                _this.createLabel(schoolRow.insertCell(), "Girs Comp. Score Avg.", 400);
+                _this.createNumberLabel(schoolRow.insertCell(), classItem.girlsCount, 100);
+                _this.createLabel(schoolRow.insertCell(), classItem.girlsAverage.toFixed(0), 100);
+                schoolRow = body.insertRow();
+                _this.createLabel(schoolRow.insertCell(), "Boys Comp. Score Avg.", 400);
+                _this.createNumberLabel(schoolRow.insertCell(), classItem.boysCount, 100);
+                _this.createLabel(schoolRow.insertCell(), classItem.boysAverage.toFixed(0), 100);
+                element.appendChild(table);
+            }
+            else {
+                var elementCnt = document.createElement("div");
+                elementCnt.textContent = "No. of Students: " + classItem.count;
+                var elementAvg = document.createElement("div");
+                elementAvg.textContent = "Composite Score Avg.: " + Math.round(classItem.average);
+                element.appendChild(elementCnt);
+                element.appendChild(elementAvg);
+            }
             return element;
         };
         this.createNumericTextBox = function (element, defaultValue, min, max, format, callbackChangeEvent) {

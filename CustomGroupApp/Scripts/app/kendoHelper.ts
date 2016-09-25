@@ -213,8 +213,10 @@ class KendoHelper
         dropCallback: any
     ) => {
         var classGridHeight = classItem.parent.classes.length > 3 ? "500px" : "700px";
+        var classGridWidth = classItem.parent.parent.parent.testFile.isUnisex ? "400px" : "300px";
+        console.log("School Unisex: ", classItem.parent.parent.parent.testFile.isUnisex);
         var container = document.createElement("div") as HTMLDivElement;
-        container.setAttribute("style", `width: 300px; height: ${classGridHeight}; margin: 5px 0 0 0;`);
+        container.setAttribute("style", `width: ${classGridWidth}; height: ${classGridHeight}; margin: 5px 0 0 0;`);
         container.id = `class-${classItem.uid}-container`;
         var gridElement = document.createElement("div") as HTMLDivElement;
         gridElement.setAttribute("style", "height: 100%;");
@@ -274,13 +276,20 @@ class KendoHelper
         return this.createStudentCountInputControl(element.id, studentCount, callbackChangeEvent);
     }
 
-    createLabel = (cell: HTMLTableCellElement, description: string, width = 150) => {
-     var label = document.createElement("span");
+    createLabel = (cell: HTMLTableCellElement, description: string, width = 150, textAlign = "left") => {
+        var label = document.createElement("span");
         label.textContent = description;
-        label.setAttribute("style", `margin-right: 5px; width: ${width}px`);
+        label.setAttribute("style", `margin-right: 5px; width: ${width}px; textAlign: ${textAlign}`);
         cell.appendChild(label);
 
     }
+    createNumberLabel = (cell: HTMLTableCellElement, value: number, width = 150) => {
+        var label = document.createElement("span");
+        label.textContent = value.toString();
+        label.setAttribute("style", `margin-right: 5px; width: ${width}px; text-align: center`);
+        cell.appendChild(label);
+    }
+
     createMultiLineLabel = (cell: HTMLTableCellElement, line1: string, line2: string, separator: string = "/") => {
         var label = document.createElement("span");
         label.textContent = line1;
@@ -456,13 +465,28 @@ class KendoHelper
 
     createClassGrid = (element: string, classItem: ClassDefinition, editGroupCallback: any): kendo.ui.Grid => {
         const groupNameElementId = "groupname-" + classItem.uid;
+        var isUniSex = classItem.parent.parent.parent.testFile.isUnisex;
+        var columns: { field: string;title: string;width: string;attributes: { class: string } }[];
+        if (isUniSex) {
+            columns = [
+                { field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" } },
+                { field: "gender", title: "Sex", width: "80px", attributes: { 'class': "text-center" } },
+                { field: "score", title: "Score", width: "80px", attributes: { 'class': "text-center" } }
+            ];
+        } else {
+            columns = [
+                { field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" } },
+                { field: "score", title: "Score", width: "80px", attributes: { 'class': "text-center" } }
+            ];
+        }
+
         $(`#${element}`)
             .kendoGrid({
-                columns: [
-                    { field: "id", title: "studentId", width: "30px", hidden: true},
-                    { field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" } },
-                    { field: "score", title: "Score", width: "80px", attributes: { 'class': "text-center" } }
-                ],
+                columns: columns,
+                sortable: {
+                    mode: "single",
+                    allowUnsort: true
+                },
                 toolbar: [{ template: kendo.template(`Group Name: <input id='${groupNameElementId}' style='margin: 0 5px 0 5px' />`) }],
                 selectable: "row",
             dataSource: []
@@ -500,12 +524,37 @@ class KendoHelper
     private createClassSummary = (classItem: ClassDefinition): HTMLDivElement => {
         var element = document.createElement("div");
         element.setAttribute("style", "border-style: solid; border-color: #bfbfbf; border-width: 1px; padding: 5px 5px 5px 10px; margin: 5px 0 0 0");
-        var elementCnt = document.createElement("div");
-        elementCnt.textContent = "No. of Students: " + classItem.count;
-        var elementAvg = document.createElement("div");
-        elementAvg.textContent = "Composite Score Avg.: " + Math.round(classItem.average);
-        element.appendChild(elementCnt);
-        element.appendChild(elementAvg);
+        if (classItem.parent.parent.parent.testFile.isUnisex) {
+            const table = document.createElement("table") as HTMLTableElement;
+            const header = table.createTHead();
+            const headerRow = header.insertRow();
+            this.createLabel(headerRow.insertCell(), "", 400);
+            this.createLabel(headerRow.insertCell(), "Count", 100, "center");
+            this.createLabel(headerRow.insertCell(), "Average", 100, "center");
+
+            const body = table.createTBody();
+            let schoolRow = body.insertRow();
+            this.createLabel(schoolRow.insertCell(), "Composite Score Avg.", 400);
+            this.createNumberLabel(schoolRow.insertCell(), classItem.count, 100);
+            this.createLabel(schoolRow.insertCell(), classItem.average.toFixed(0), 100);
+            schoolRow = body.insertRow();
+            this.createLabel(schoolRow.insertCell(), "Girs Comp. Score Avg.", 400);
+            this.createNumberLabel(schoolRow.insertCell(), classItem.girlsCount, 100);
+            this.createLabel(schoolRow.insertCell(), classItem.girlsAverage.toFixed(0), 100);
+            schoolRow = body.insertRow();
+            this.createLabel(schoolRow.insertCell(), "Boys Comp. Score Avg.", 400);
+            this.createNumberLabel(schoolRow.insertCell(), classItem.boysCount, 100);
+            this.createLabel(schoolRow.insertCell(), classItem.boysAverage.toFixed(0), 100);
+
+            element.appendChild(table);
+        } else {
+            var elementCnt = document.createElement("div");
+            elementCnt.textContent = "No. of Students: " + classItem.count;
+            var elementAvg = document.createElement("div");
+            elementAvg.textContent = "Composite Score Avg.: " + Math.round(classItem.average);
+            element.appendChild(elementCnt);
+            element.appendChild(elementAvg);
+        }
         return element;
     };
 

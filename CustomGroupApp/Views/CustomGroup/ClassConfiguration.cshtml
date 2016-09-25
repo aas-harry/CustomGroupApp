@@ -37,11 +37,11 @@
     </div>
 
     <div data-bind="visible: isCoedSchool" style="margin-top: 20px">
-        <input type="checkbox" name="mixGirlsBoys" value="0" data-bind="checked: checkboxMixChecked, events: { change: checkboxMixCheckedEvent }"> Mix girls and boys equally.
+        <input type="checkbox" name="mixGirlsBoys" value="0" data-bind="checked: mixGirlsBoysOption"> Mix girls and boys equally.
     </div>
 
     <div>
-        <input type="checkbox" value="0" data-bind="checked: checkboxChecked, events: { change: checkboxCheckedEvent }">
+        <input type="checkbox" value="0" data-bind="checked: checkboxChecked">
         <span>Exclude students who are leaving school at the end of the year.</span>
     </div>
 </div>

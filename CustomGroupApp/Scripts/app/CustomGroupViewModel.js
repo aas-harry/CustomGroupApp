@@ -13,6 +13,7 @@ var CustomGroupViewModel = (function (_super) {
         this.selectedTopClassGroupingOption = "Streaming";
         this.selectedLowestClassGroupingOption = "Streaming";
         this.selectedGenderOption = "All";
+        this.mixGirlsBoysOption = false;
         this.currentGroupStep = 1;
         this.isLastStep = false;
         this.isFirstStep = true;
@@ -147,6 +148,7 @@ var CustomGroupViewModel = (function (_super) {
                     var band = _a[_i];
                     band.groupType = GroupingMethod.MixedAbility;
                     band.streamType = this.streamType;
+                    band.mixBoysGirls = this.mixGirlsBoysOption;
                 }
                 bandSet.prepare(!this.groupName || this.groupName === "" ? "Class" : this.groupName, this.classesDefn.students, this.joinedStudents, this.separatedStudents);
                 break;
@@ -157,6 +159,7 @@ var CustomGroupViewModel = (function (_super) {
                 for (var _b = 0, _c = bandSet.bands; _b < _c.length; _b++) {
                     var band = _c[_b];
                     band.streamType = this.streamType;
+                    band.mixBoysGirls = this.mixGirlsBoysOption;
                 }
                 bandSet.prepare(!this.groupName || this.groupName === "" ? "Class" : this.groupName, this.classesDefn.students, this.joinedStudents, this.separatedStudents);
                 break;
@@ -164,6 +167,7 @@ var CustomGroupViewModel = (function (_super) {
                 bandSet.groupType = GroupingMethod.Streaming;
                 bandSet.bands[0].groupType = this.groupingOption;
                 bandSet.bands[0].streamType = this.streamType;
+                bandSet.bands[0].mixBoysGirls = this.mixGirlsBoysOption;
                 bandSet.prepare(!this.groupName || this.groupName === "" ? "Class" : this.groupName, this.classesDefn.students, this.joinedStudents, this.separatedStudents);
                 break;
         }
