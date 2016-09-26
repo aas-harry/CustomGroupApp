@@ -149,11 +149,11 @@
                 break;
 
            case GroupingMethod.Language:
-                this.languageBandClassDefinitionViewModel.loadOptions(this.languageBandSet);
                 if (!this.languageBandClassDefinitionViewModel.students ||
                     this.languageBandClassDefinitionViewModel.students.length === 0) {
                     this.languageBandClassDefinitionViewModel.students = this.classesDefn.students;
                 }
+                this.languageBandClassDefinitionViewModel.loadOptions(this.languageBandSet);
 
                 this.set("selectedClassDefinitionViewModel", this.languageBandClassDefinitionViewModel);
                 break;
@@ -172,6 +172,7 @@
                 bandSet.groupType = GroupingMethod.Streaming;
                 bandSet.streamType = this.streamType;
                 for (let band of bandSet.bands) {
+                    band.bandType = BandType.Custom;
                     band.groupType = GroupingMethod.MixedAbility;
                     band.streamType = this.streamType;
                     band.mixBoysGirls = this.mixGirlsBoysOption;

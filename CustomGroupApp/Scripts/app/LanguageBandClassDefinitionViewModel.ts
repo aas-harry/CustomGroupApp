@@ -15,6 +15,7 @@
     private groupingHelper = new GroupingHelper();
     private kendoHelper = new KendoHelper();
     private bandTableControl: BandTableControl;
+    private hasBandSetInitialised = false;
 
     saveOptions(source: BandSet): boolean {
         return true;
@@ -23,12 +24,30 @@
     loadOptions(source: BandSet): boolean {
         this.bandSet = source;
         super.set("bandCount", source.bands.length);
+
+        if (this.hasBandSetInitialised === false) {
+            this.bandSet.createBands("language", this.studentCount, this.languageSets.length);
+            let i = 0;
+            for (let item of this.languageSets) {
+                this.bandSet.bands[i].bandName = item.description;
+                this.bandSet.bands[i].studentCount = item.count;
+                this.bandSet.bands[i].students = item.students;
+                this.bandSet.bands[i].setClassCount(1);
+                i++;
+
+                this.hasBandSetInitialised = true;
+            }
+        }
         this.bandTableControl.init("classes-settings-container", source);
         return true;
     }
 
     getBandSet() {
         return this.bandSet;
+    }
+
+    ShowStudentLanguagePreferences = () => {
+        
     }
 
     set students(value: Array<StudentClass>) {
@@ -45,16 +64,6 @@
                 this.languageSets.push(matched);
             }
             matched.addStudent(s);
-        }
-
-        this.bandSet.createBands("language", this.studentCount, this.languageSets.length);
-        let i = 0;
-        for (let item of this.languageSets) {
-            this.bandSet.bands[i].bandName = item.description;
-            this.bandSet.bands[i].studentCount = item.count;
-            this.bandSet.bands[i].students = item.students;
-            this.bandSet.bands[i].setClassCount(1);
-            i++;
         }
     }
 

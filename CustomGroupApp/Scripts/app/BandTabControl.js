@@ -81,4 +81,3 @@ var BandTableControl = (function () {
     };
     return BandTableControl;
 }());
-//# sourceMappingURL=BandTabControl.js.map

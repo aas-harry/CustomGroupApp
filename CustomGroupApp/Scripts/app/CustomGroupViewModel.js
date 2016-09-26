@@ -187,11 +187,11 @@ var CustomGroupViewModel = (function (_super) {
                 this.set("selectedClassDefinitionViewModel", this.topMiddleLowestBandClassDefinitionViewModel);
                 break;
             case GroupingMethod.Language:
-                this.languageBandClassDefinitionViewModel.loadOptions(this.languageBandSet);
                 if (!this.languageBandClassDefinitionViewModel.students ||
                     this.languageBandClassDefinitionViewModel.students.length === 0) {
                     this.languageBandClassDefinitionViewModel.students = this.classesDefn.students;
                 }
+                this.languageBandClassDefinitionViewModel.loadOptions(this.languageBandSet);
                 this.set("selectedClassDefinitionViewModel", this.languageBandClassDefinitionViewModel);
                 break;
             default:
@@ -208,6 +208,7 @@ var CustomGroupViewModel = (function (_super) {
                 bandSet.streamType = this.streamType;
                 for (var _i = 0, _a = bandSet.bands; _i < _a.length; _i++) {
                     var band = _a[_i];
+                    band.bandType = BandType.Custom;
                     band.groupType = GroupingMethod.MixedAbility;
                     band.streamType = this.streamType;
                     band.mixBoysGirls = this.mixGirlsBoysOption;
@@ -249,4 +250,3 @@ var CustomGroupViewModel = (function (_super) {
     ;
     return CustomGroupViewModel;
 }(kendo.data.ObservableObject));
-//# sourceMappingURL=CustomGroupViewModel.js.map

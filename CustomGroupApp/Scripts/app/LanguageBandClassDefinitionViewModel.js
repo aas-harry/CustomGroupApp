@@ -15,6 +15,9 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
         this.languageSets = [];
         this.groupingHelper = new GroupingHelper();
         this.kendoHelper = new KendoHelper();
+        this.hasBandSetInitialised = false;
+        this.ShowStudentLanguagePreferences = function () {
+        };
         this.studentWithLanguagePrefCount = 0;
         // ReSharper disable once InconsistentNaming
         this._students = [];
@@ -33,6 +36,19 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
     LanguageBandClassDefinitionViewModel.prototype.loadOptions = function (source) {
         this.bandSet = source;
         _super.prototype.set.call(this, "bandCount", source.bands.length);
+        if (this.hasBandSetInitialised === false) {
+            this.bandSet.createBands("language", this.studentCount, this.languageSets.length);
+            var i = 0;
+            for (var _i = 0, _a = this.languageSets; _i < _a.length; _i++) {
+                var item = _a[_i];
+                this.bandSet.bands[i].bandName = item.description;
+                this.bandSet.bands[i].studentCount = item.count;
+                this.bandSet.bands[i].students = item.students;
+                this.bandSet.bands[i].setClassCount(1);
+                i++;
+                this.hasBandSetInitialised = true;
+            }
+        }
         this.bandTableControl.init("classes-settings-container", source);
         return true;
     };
@@ -58,20 +74,9 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
                 var s = _a[_i];
                 _loop_1(s);
             }
-            this.bandSet.createBands("language", this.studentCount, this.languageSets.length);
-            var i = 0;
-            for (var _b = 0, _c = this.languageSets; _b < _c.length; _b++) {
-                var item = _c[_b];
-                this.bandSet.bands[i].bandName = item.description;
-                this.bandSet.bands[i].studentCount = item.count;
-                this.bandSet.bands[i].students = item.students;
-                this.bandSet.bands[i].setClassCount(1);
-                i++;
-            }
         },
         enumerable: true,
         configurable: true
     });
     return LanguageBandClassDefinitionViewModel;
 }(kendo.data.ObservableObject));
-//# sourceMappingURL=LanguageBandClassDefinitionViewModel.js.map

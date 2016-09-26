@@ -155,7 +155,7 @@ var KendoHelper = (function () {
         var _this = this;
         this.integerFormat = "n0";
         this.createStudentClassInputContainer = function (cell, classItem, editGroupNameCallback, dropCallback) {
-            var classGridHeight = classItem.parent.classes.length > 3 ? "500px" : "700px";
+            var classGridHeight = classItem.parent.classes.length > 3 && classItem.parent.bandType == BandType.None ? "500px" : "700px";
             var classGridWidth = classItem.parent.parent.parent.testFile.isUnisex ? "400px" : "300px";
             console.log("School Unisex: ", classItem.parent.parent.parent.testFile.isUnisex);
             var container = document.createElement("div");
@@ -326,6 +326,39 @@ var KendoHelper = (function () {
                 }
             });
         };
+        this.createStudentLanguageGrid = function (element, students, isUnisex) {
+            var columns;
+            if (isUnisex) {
+                columns = [
+                    { field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" } },
+                    { field: "gender", title: "Sex", width: "80px", attributes: { 'class': "text-center" } },
+                    { field: "LangPref1", title: "Pref1", width: "80px" },
+                    { field: "LangPref2", title: "Pref1", width: "80px" },
+                    { field: "LangPref3", title: "Pref1", width: "80px" }
+                ];
+            }
+            else {
+                columns = [
+                    { field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" } },
+                    { field: "score", title: "Score", width: "80px", attributes: { 'class': "text-center" } },
+                    { field: "LangPref1", title: "Pref1", width: "80px" },
+                    { field: "LangPref2", title: "Pref1", width: "80px" },
+                    { field: "LangPref3", title: "Pref1", width: "80px" }
+                ];
+            }
+            var studentLanguages = Enumerable.From(students).Select(function (x) { return new StudentClassRow(x); }).ToArray();
+            $("#" + element)
+                .kendoGrid({
+                columns: columns,
+                sortable: {
+                    mode: "single",
+                    allowUnsort: true
+                },
+                selectable: "row",
+                dataSource: studentLanguages
+            });
+            return $("#" + element).data("kendoGrid");
+        };
         this.createClassGrid = function (element, classItem, editGroupCallback) {
             var groupNameElementId = "groupname-" + classItem.uid;
             var isUniSex = classItem.parent.parent.parent.testFile.isUnisex;
@@ -394,7 +427,7 @@ var KendoHelper = (function () {
                 _this.createNumberLabel(schoolRow.insertCell(), classItem.count, 100);
                 _this.createLabel(schoolRow.insertCell(), classItem.average.toFixed(0), 100);
                 schoolRow = body.insertRow();
-                _this.createLabel(schoolRow.insertCell(), "Girs Comp. Score Avg.", 400);
+                _this.createLabel(schoolRow.insertCell(), "Girls Comp. Score Avg.", 400);
                 _this.createNumberLabel(schoolRow.insertCell(), classItem.girlsCount, 100);
                 _this.createLabel(schoolRow.insertCell(), classItem.girlsAverage.toFixed(0), 100);
                 schoolRow = body.insertRow();
@@ -451,4 +484,3 @@ var KendoHelper = (function () {
     }
     return KendoHelper;
 }());
-//# sourceMappingURL=kendoHelper.js.map
