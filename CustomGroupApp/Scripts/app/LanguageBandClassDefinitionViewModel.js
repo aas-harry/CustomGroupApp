@@ -16,7 +16,9 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
         this.groupingHelper = new GroupingHelper();
         this.kendoHelper = new KendoHelper();
         this.hasBandSetInitialised = false;
-        this.ShowStudentLanguagePreferences = function () {
+        this.showStudentLanguagePreferences = function () {
+            debugger;
+            _this.kendoHelper.createStudentLanguageGrid("student-language-preferences-list", _this.bandSet.students, true);
         };
         this.studentWithLanguagePrefCount = 0;
         // ReSharper disable once InconsistentNaming
@@ -49,6 +51,7 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
                 this.hasBandSetInitialised = true;
             }
         }
+        this.showStudentLanguagePreferences();
         this.bandTableControl.init("classes-settings-container", source);
         return true;
     };
@@ -80,3 +83,4 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
     });
     return LanguageBandClassDefinitionViewModel;
 }(kendo.data.ObservableObject));
+//# sourceMappingURL=LanguageBandClassDefinitionViewModel.js.map

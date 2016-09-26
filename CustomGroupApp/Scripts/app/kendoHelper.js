@@ -327,6 +327,7 @@ var KendoHelper = (function () {
             });
         };
         this.createStudentLanguageGrid = function (element, students, isUnisex) {
+            if (element === void 0) { element = "student-language-preferences-list"; }
             var columns;
             if (isUnisex) {
                 columns = [
@@ -484,3 +485,4 @@ var KendoHelper = (function () {
     }
     return KendoHelper;
 }());
+//# sourceMappingURL=kendoHelper.js.map

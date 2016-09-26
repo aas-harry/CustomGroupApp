@@ -462,7 +462,8 @@ class KendoHelper
                 }
             });
     }
-    createStudentLanguageGrid = (element: string, students: Array<StudentClass>, isUnisex: boolean): kendo.ui.Grid => {
+
+    createStudentLanguageGrid = (element: string = "student-language-preferences-list", students: Array<StudentClass>, isUnisex: boolean): kendo.ui.Grid => {
         var columns;
         if (isUnisex) {
             columns = [

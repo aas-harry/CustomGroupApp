@@ -38,6 +38,8 @@
                 this.hasBandSetInitialised = true;
             }
         }
+
+        this.showStudentLanguagePreferences();
         this.bandTableControl.init("classes-settings-container", source);
         return true;
     }
@@ -46,8 +48,9 @@
         return this.bandSet;
     }
 
-    ShowStudentLanguagePreferences = () => {
-        
+    showStudentLanguagePreferences = () => {
+        debugger;
+        this.kendoHelper.createStudentLanguageGrid("student-language-preferences-list", this.bandSet.students, true);
     }
 
     set students(value: Array<StudentClass>) {
