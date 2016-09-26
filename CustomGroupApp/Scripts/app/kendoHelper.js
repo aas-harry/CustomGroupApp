@@ -236,7 +236,7 @@ var KendoHelper = (function () {
                 hint: function (e) {
                     var studentId = e[0].cells[0].textContent;
                     var studentName = e[0].cells[1].textContent;
-                    return $("<div id=\"student-" + studentId + "\" class=\"k-grid k-widget\" style=\"background-color: DarkOrange; color: black; margin=2px\">" + studentName + "</div>");
+                    return $("<div id=\"student-" + studentId + "\" style=\"background-color: DarkOrange\"><div class=\"k-grid k-widget\" style=\"color: black; padding=15px\">" + studentName + "</div></div>");
                 },
                 group: "classGroup"
             });
@@ -332,19 +332,19 @@ var KendoHelper = (function () {
             if (isUnisex) {
                 columns = [
                     { field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" } },
-                    { field: "gender", title: "Sex", width: "80px", attributes: { 'class': "text-center" } },
-                    { field: "LangPref1", title: "Pref1", width: "80px" },
-                    { field: "LangPref2", title: "Pref1", width: "80px" },
-                    { field: "LangPref3", title: "Pref1", width: "80px" }
+                    { field: "gender", title: "Sex", width: "80px" },
+                    { field: "langPref1", title: "Pref1", width: "80px" },
+                    { field: "langPref2", title: "Pref1", width: "80px" },
+                    { field: "langPref3", title: "Pref1", width: "80px" }
                 ];
             }
             else {
                 columns = [
                     { field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" } },
-                    { field: "score", title: "Score", width: "80px", attributes: { 'class': "text-center" } },
-                    { field: "LangPref1", title: "Pref1", width: "80px" },
-                    { field: "LangPref2", title: "Pref1", width: "80px" },
-                    { field: "LangPref3", title: "Pref1", width: "80px" }
+                    { field: "score", title: "Score", width: "80px" },
+                    { field: "langPref1", title: "Pref1", width: "80px" },
+                    { field: "langPref2", title: "Pref1", width: "80px" },
+                    { field: "langPref3", title: "Pref1", width: "80px" }
                 ];
             }
             var studentLanguages = Enumerable.From(students).Select(function (x) { return new StudentClassRow(x); }).ToArray();
@@ -366,6 +366,7 @@ var KendoHelper = (function () {
             var columns;
             if (isUniSex) {
                 columns = [
+                    { field: "id", title: "Id", width: "0px", attributes: { 'class': "text-nowrap" } },
                     { field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" } },
                     { field: "gender", title: "Sex", width: "80px", attributes: { 'class': "text-center" } },
                     { field: "score", title: "Score", width: "80px", attributes: { 'class': "text-center" } }
@@ -373,6 +374,7 @@ var KendoHelper = (function () {
             }
             else {
                 columns = [
+                    { field: "id", title: "Id", width: "0px", attributes: { 'class': "text-nowrap" } },
                     { field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" } },
                     { field: "score", title: "Score", width: "80px", attributes: { 'class': "text-center" } }
                 ];
@@ -401,13 +403,12 @@ var KendoHelper = (function () {
                     var dataItem = $("#" + element).data("kendoGrid").dataItem(e.target.closest("tr"));
                     var student = dataItem;
                     var tooltipText = "<strong>" + student.name + "</strong><br>Gender: " + student.gender + "<br>Composite Score: " + student.score;
-                    tooltipText += "<br>Id: " + student.id;
                     if (student.hasLanguagePrefs) {
-                        tooltipText += "<br>1st Language Pref: " + (student.langPref1 === "" ? "None" : student.langPref1);
+                        tooltipText += "<br><br>1st Language Pref: " + (student.langPref1 === "" ? "None" : student.langPref1);
                         tooltipText += "<br>2nd Language Pref: " + (student.langPref2 === "" ? "None" : student.langPref2);
                         tooltipText += "<br>3rd Language Pref: " + (student.langPref3 === "" ? "None" : student.langPref3);
                     }
-                    return "<div style='text-align: left; margin: 10px; padding: 5px'>" + tooltipText + "</div>";
+                    return "<div style='background-color: lightgoldenrodyellow'><div style='text-align: left; padding: 15px;'>" + tooltipText + "</div></div>";
                 }
             }).data("kendoTooltip");
             return $("#" + element).data("kendoGrid");

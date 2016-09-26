@@ -16,10 +16,18 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
         this.groupingHelper = new GroupingHelper();
         this.kendoHelper = new KendoHelper();
         this.hasBandSetInitialised = false;
+        this.showStudentLanguageCaption = "View Students";
         this.showStudentLanguagePreferences = function () {
-            debugger;
-            _this.kendoHelper.createStudentLanguageGrid("student-language-preferences-list", _this.bandSet.students, true);
+            _this.set("showStudentLanguageList", !_this.showStudentLanguageList);
+            if (_this.showStudentLanguageList) {
+                _this.set("showStudentLanguageCaption", "Hide Students");
+                _this.kendoHelper.createStudentLanguageGrid("student-language-preferences-list", _this._students, true);
+            }
+            else {
+                _this.set("showStudentLanguageCaption", "Show Students");
+            }
         };
+        this.showStudentLanguageList = false;
         this.studentWithLanguagePrefCount = 0;
         // ReSharper disable once InconsistentNaming
         this._students = [];
@@ -51,7 +59,6 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
                 this.hasBandSetInitialised = true;
             }
         }
-        this.showStudentLanguagePreferences();
         this.bandTableControl.init("classes-settings-container", source);
         return true;
     };

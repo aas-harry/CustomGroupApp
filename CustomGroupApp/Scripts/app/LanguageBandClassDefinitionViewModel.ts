@@ -39,7 +39,6 @@
             }
         }
 
-        this.showStudentLanguagePreferences();
         this.bandTableControl.init("classes-settings-container", source);
         return true;
     }
@@ -48,9 +47,15 @@
         return this.bandSet;
     }
 
+    showStudentLanguageCaption = "View Students";
     showStudentLanguagePreferences = () => {
-        debugger;
-        this.kendoHelper.createStudentLanguageGrid("student-language-preferences-list", this.bandSet.students, true);
+        this.set("showStudentLanguageList", ! this.showStudentLanguageList);
+        if (this.showStudentLanguageList) {
+            this.set("showStudentLanguageCaption", "Hide Students");
+            this.kendoHelper.createStudentLanguageGrid("student-language-preferences-list", this._students, true);
+        } else {
+            this.set("showStudentLanguageCaption", "Show Students");
+        }
     }
 
     set students(value: Array<StudentClass>) {
@@ -70,6 +75,7 @@
         }
     }
 
+    showStudentLanguageList = false;
     studentWithLanguagePrefCount = 0;
     // ReSharper disable once InconsistentNaming
     _students: Array<StudentClass> = [];

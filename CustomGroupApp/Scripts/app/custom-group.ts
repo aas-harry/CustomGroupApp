@@ -58,7 +58,8 @@ function createUuid() {
 interface IBandClassSettings {
     saveOptions(source: BandSet) : boolean;
     loadOptions(source: BandSet): boolean;
-    getBandSet() : BandSet;
+    getBandSet(): BandSet;
+    showStudentLanguagePreferences();
 }
 
 class SummaryClass {

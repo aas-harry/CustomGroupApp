@@ -1,8 +1,7 @@
-﻿<div>
+﻿<div class="step-title">
     <span style="margin-right: 10px">Step 2:</span>Enter number of classes
 </div>
 <div style="margin: 20px">
-  
     <div data-bind="visible: isCoedSchool">
         <div>Choose students to include option:</div>
         <div>
@@ -23,14 +22,16 @@
     <div style="margin-top: 10px; margin-bottom: 5px">
         <span>Number of students who has language preferences: </span>
         <span data-bind="text: selectedClassDefinitionViewModel.studentWithLanguagePrefCount"></span>
-        <a href="" style="margin-left: 10px">Import</a>
-        <a href="" style="margin-left: 10px">View/Edit</a>
+        <button id="showStudent" class="btn btn-default" style="margin-left: 10px" 
+                data-bind="text: selectedClassDefinitionViewModel.showStudentLanguageCaption, click: selectedClassDefinitionViewModel.showStudentLanguagePreferences">View</button>
+        <button class="btn btn-default"style="margin-left: 10px">Import</button>
     </div>
-    <div style="margin-top: 10px" id="student-language-preferences-container">
-        <div id="student-language-preferences-list"></div>
+    <div style="margin-top: 10px;" id="student-language-preferences-container">
+        <div id="student-language-preferences-list" style="width: 700px; height: 400px" 
+             data-bind="visible: selectedClassDefinitionViewModel.showStudentLanguageList"></div>
     </div>
 
-    <div id="class-definition-container" style="margin-bottom: 20px">
+    <div id="class-definition-container" style="margin-bottom: 20px; margin-top: 10px">
         <p>You can adjust the number of students in each classes below:</p>
         <div id="classes-settings-container" style="width: 540px">
             <table id="band-definition-table"></table>

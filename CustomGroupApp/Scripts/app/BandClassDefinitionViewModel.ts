@@ -1,4 +1,4 @@
-﻿class BandClassDefinitionViewModel extends kendo.data.ObservableObject implements IBandClassSettings{
+﻿class BandClassDefinitionViewModel extends kendo.data.ObservableObject implements IBandClassSettings {
     constructor(public studentCount: number = 0, onStudentCountChangedEvent: (classCount: number) => any) {
         super();
 
@@ -8,14 +8,15 @@
 
     bandCount = 1;
     classCount = 1;
-    
-    private bandSet : BandSet;
+
+    private bandSet: BandSet;
     private bandTableControl: BandTableControl;
 
     onBandCountChange = () => {
         this.bandSet.createBands("Band", this.studentCount, this.bandCount);
         this.bandTableControl.init("classes-settings-container", this.bandSet);
     }
+
     saveOptions(source: BandSet): boolean {
         return true;
     }
@@ -26,9 +27,13 @@
         this.bandTableControl.init("classes-settings-container", source);
         return true;
     }
+
     getBandSet(): BandSet {
         return this.bandSet;
     }
+
+    showStudentLanguagePreferences = () => {};
+
 
     onStudentCountChangedEvent: (classCount: number) => any;
     callOnStudentCountChangedEvent = () => {

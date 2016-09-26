@@ -25,6 +25,7 @@
     joinedStudents: Array<StudentSet> = [];
     separatedStudents: Array<StudentSet> = [];
     errorMessage: string;
+    hasErrors = false;
 
     // Radio button value is string type and they need to be converted to enum
     get topClassGroupingOption(): GroupingMethod {
@@ -243,9 +244,11 @@
         // set the total number students in all classes
         this.set("studentCountInAllClasses", count);
         if (this.studentCount !== this.studentCountInAllClasses) {
+            this.set("hasErrors", true);
             this.set("errorMessage",
                 "The total number students in all classes doesn't match with number of students in test file");
         } else {
+            this.set("hasErrors", false);
             this.set("errorMessage", "");
         }
 

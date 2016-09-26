@@ -23,6 +23,7 @@ var CustomGroupViewModel = (function (_super) {
         this.classCount = 1;
         this.joinedStudents = [];
         this.separatedStudents = [];
+        this.hasErrors = false;
         this.stepCollection = new StepCollection();
         this.testInfo = new TestFile();
         this.groupingHelper = new GroupingHelper();
@@ -58,9 +59,11 @@ var CustomGroupViewModel = (function (_super) {
             // set the total number students in all classes
             _this.set("studentCountInAllClasses", count);
             if (_this.studentCount !== _this.studentCountInAllClasses) {
+                _this.set("hasErrors", true);
                 _this.set("errorMessage", "The total number students in all classes doesn't match with number of students in test file");
             }
             else {
+                _this.set("hasErrors", false);
                 _this.set("errorMessage", "");
             }
         };

@@ -28,6 +28,8 @@
         return this.bandSet;
     }
 
+    showStudentLanguagePreferences = () => { };
+
     onStudentCountChangedEvent: (classCount: number) => any;
     callOnStudentCountChangedEvent = () => {
         const onStudentCountChangedEvent = this.onStudentCountChangedEvent;
