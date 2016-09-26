@@ -49,14 +49,9 @@ var CustomGroupViewModel = (function (_super) {
             _this.classesDefn = new ClassesDefinition(testInfo);
             _this.bandSet = _this.classesDefn.createBandSet("class", _this.studentCount);
             _this.bandSet.bands[0].setClassCount(3);
-            _this.classDefinitionViewModel = new ClassDefinitionViewModel(_this.studentCount, _this.onStudentCountChanged);
             _this.customBandSet = _this.classesDefn.createBandSet("Band", _this.studentCount, 2);
-            _this.bandClassDefinitionViewModel = new BandClassDefinitionViewModel(_this.studentCount, _this.onStudentCountChanged);
             _this.languageBandSet = _this.classesDefn.createBandSet("Band", _this.studentCount, 1);
-            _this.languageBandClassDefinitionViewModel = new LanguageBandClassDefinitionViewModel(_this.studentCount, _this.onStudentCountChanged);
             _this.topMiddleLowestBandSet = _this.classesDefn.createTopMiddleBottomBandSet("class", _this.studentCount);
-            _this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(_this.studentCount, _this.onStudentCountChanged);
-            _this.generateCustomGroupViewModel = new GenerateCustomGroupViewModel();
             _this.set("selectedClassDefinitionViewModel", _this.classDefinitionViewModel);
         };
         this.onStudentCountChanged = function (count) {
@@ -109,6 +104,57 @@ var CustomGroupViewModel = (function (_super) {
     Object.defineProperty(CustomGroupViewModel.prototype, "genderOption", {
         get: function () {
             return this.groupingHelper.convertGenderFromString(this.selectedGenderOption);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(CustomGroupViewModel.prototype, "classDefinitionViewModel", {
+        // ReSharper restore InconsistentNaming
+        get: function () {
+            if (this._classDefinitionViewModel === undefined) {
+                this._classDefinitionViewModel = new ClassDefinitionViewModel(this.studentCount, this.onStudentCountChanged);
+            }
+            return this._classDefinitionViewModel;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(CustomGroupViewModel.prototype, "topMiddleLowestBandClassDefinitionViewModel", {
+        get: function () {
+            if (this._topMiddleLowestBandClassDefinitionViewModel === undefined) {
+                this._topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(this.studentCount, this.onStudentCountChanged);
+            }
+            return this._topMiddleLowestBandClassDefinitionViewModel;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(CustomGroupViewModel.prototype, "bandClassDefinitionViewModel", {
+        get: function () {
+            if (this._bandClassDefinitionViewModel === undefined) {
+                this._bandClassDefinitionViewModel = new BandClassDefinitionViewModel(this.studentCount, this.onStudentCountChanged);
+            }
+            return this._bandClassDefinitionViewModel;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(CustomGroupViewModel.prototype, "languageBandClassDefinitionViewModel", {
+        get: function () {
+            if (this._languageBandClassDefinitionViewModel === undefined) {
+                this._languageBandClassDefinitionViewModel = new LanguageBandClassDefinitionViewModel(this.studentCount, this.onStudentCountChanged);
+            }
+            return this._languageBandClassDefinitionViewModel;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(CustomGroupViewModel.prototype, "generateCustomGroupViewModel", {
+        get: function () {
+            if (this._generateCustomGroupViewModel === undefined) {
+                this._generateCustomGroupViewModel = new GenerateCustomGroupViewModel(this.studentCount, this.onStudentCountChanged);
+            }
+            return this._generateCustomGroupViewModel;
         },
         enumerable: true,
         configurable: true
@@ -203,3 +249,4 @@ var CustomGroupViewModel = (function (_super) {
     ;
     return CustomGroupViewModel;
 }(kendo.data.ObservableObject));
+//# sourceMappingURL=CustomGroupViewModel.js.map

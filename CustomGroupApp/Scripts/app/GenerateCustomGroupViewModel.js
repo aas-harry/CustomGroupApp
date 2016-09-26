@@ -5,11 +5,22 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var GenerateCustomGroupViewModel = (function (_super) {
     __extends(GenerateCustomGroupViewModel, _super);
-    function GenerateCustomGroupViewModel() {
-        _super.apply(this, arguments);
+    function GenerateCustomGroupViewModel(studentCount, onStudentCountChangedEvent) {
+        var _this = this;
+        if (studentCount === void 0) { studentCount = 0; }
+        _super.call(this);
+        this.studentCount = studentCount;
         this.groupingHelper = new GroupingHelper();
         this.kendoHelper = new KendoHelper();
         this.customClassGridCollection = new CustomClassGridCollection();
+        this.callOnStudentCountChangedEvent = function () {
+            var onStudentCountChangedEvent = _this.onStudentCountChangedEvent;
+            if (onStudentCountChangedEvent != null) {
+                onStudentCountChangedEvent(Enumerable.From(_this.bandSet.bands).SelectMany(function (b) { return b.classes; }).Sum(function (x) { return x.count; }));
+            }
+        };
+        this.onStudentCountChangedEvent = onStudentCountChangedEvent;
+        this.bandTableControl = new BandTableControl(this.callOnStudentCountChangedEvent);
     }
     GenerateCustomGroupViewModel.prototype.saveOptions = function (source) {
         return true;

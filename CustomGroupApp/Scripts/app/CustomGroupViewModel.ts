@@ -55,11 +55,50 @@
     private languageBandSet: BandSet;
     private bandSet: BandSet;
     private classesDefn: ClassesDefinition;
-    private classDefinitionViewModel: ClassDefinitionViewModel;
-    private bandClassDefinitionViewModel: BandClassDefinitionViewModel;
-    private topMiddleLowestBandClassDefinitionViewModel: TopMiddleLowestBandClassDefinitionViewModel;
-    private languageBandClassDefinitionViewModel: LanguageBandClassDefinitionViewModel;
-    private generateCustomGroupViewModel: GenerateCustomGroupViewModel;
+    // ReSharper disable InconsistentNaming
+    private _classDefinitionViewModel: ClassDefinitionViewModel;
+    private _bandClassDefinitionViewModel: BandClassDefinitionViewModel;
+    private _topMiddleLowestBandClassDefinitionViewModel: TopMiddleLowestBandClassDefinitionViewModel;
+    private _languageBandClassDefinitionViewModel: LanguageBandClassDefinitionViewModel;
+    private _generateCustomGroupViewModel: GenerateCustomGroupViewModel;
+    // ReSharper restore InconsistentNaming
+
+    get classDefinitionViewModel(): ClassDefinitionViewModel {
+        if (this._classDefinitionViewModel === undefined) {
+            this._classDefinitionViewModel = new
+                ClassDefinitionViewModel(this.studentCount, this.onStudentCountChanged);
+        }
+        return this._classDefinitionViewModel;
+    }
+    get topMiddleLowestBandClassDefinitionViewModel(): TopMiddleLowestBandClassDefinitionViewModel {
+        if (this._topMiddleLowestBandClassDefinitionViewModel === undefined) {
+            this._topMiddleLowestBandClassDefinitionViewModel = new
+                TopMiddleLowestBandClassDefinitionViewModel(this.studentCount, this.onStudentCountChanged);
+        }
+        return this._topMiddleLowestBandClassDefinitionViewModel;
+    }
+    get bandClassDefinitionViewModel(): BandClassDefinitionViewModel {
+        if (this._bandClassDefinitionViewModel === undefined) {
+            this._bandClassDefinitionViewModel = new
+                BandClassDefinitionViewModel(this.studentCount, this.onStudentCountChanged);
+        }
+        return this._bandClassDefinitionViewModel;
+    }
+    get languageBandClassDefinitionViewModel(): LanguageBandClassDefinitionViewModel {
+        if (this._languageBandClassDefinitionViewModel === undefined) {
+            this._languageBandClassDefinitionViewModel = new
+                LanguageBandClassDefinitionViewModel(this.studentCount, this.onStudentCountChanged);
+        }
+        return this._languageBandClassDefinitionViewModel;
+    }
+    get generateCustomGroupViewModel(): GenerateCustomGroupViewModel {
+        if (this._generateCustomGroupViewModel === undefined) {
+            this._generateCustomGroupViewModel = new
+                GenerateCustomGroupViewModel(this.studentCount, this.onStudentCountChanged);
+        }
+        return this._generateCustomGroupViewModel;
+    }
+
     private groupingHelper = new GroupingHelper();
 
 
@@ -188,18 +227,13 @@
 
         this.bandSet = this.classesDefn.createBandSet("class", this.studentCount);
         this.bandSet.bands[0].setClassCount(3);
-        this.classDefinitionViewModel = new ClassDefinitionViewModel(this.studentCount, this.onStudentCountChanged);
 
         this.customBandSet = this.classesDefn.createBandSet("Band", this.studentCount, 2);
-        this.bandClassDefinitionViewModel = new BandClassDefinitionViewModel(this.studentCount, this.onStudentCountChanged);
 
         this.languageBandSet = this.classesDefn.createBandSet("Band", this.studentCount, 1);
-        this.languageBandClassDefinitionViewModel = new LanguageBandClassDefinitionViewModel(this.studentCount, this.onStudentCountChanged);
 
         this.topMiddleLowestBandSet = this.classesDefn.createTopMiddleBottomBandSet("class", this.studentCount);
-        this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(this.studentCount, this.onStudentCountChanged);
 
-        this.generateCustomGroupViewModel = new GenerateCustomGroupViewModel();
 
         this.set("selectedClassDefinitionViewModel", this.classDefinitionViewModel);
     };
