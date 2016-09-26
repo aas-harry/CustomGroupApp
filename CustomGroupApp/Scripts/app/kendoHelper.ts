@@ -214,7 +214,6 @@ class KendoHelper
     ) => {
         var classGridHeight = classItem.parent.classes.length > 3 && classItem.parent.bandType == BandType.None ? "500px" : "700px";
         var classGridWidth = classItem.parent.parent.parent.testFile.isUnisex ? "400px" : "300px";
-        console.log("School Unisex: ", classItem.parent.parent.parent.testFile.isUnisex);
         var container = document.createElement("div") as HTMLDivElement;
         container.setAttribute("style", `width: ${classGridWidth}; height: ${classGridHeight}; margin: 5px 0 0 0;`);
         container.id = `class-${classItem.uid}-container`;
@@ -227,9 +226,16 @@ class KendoHelper
         cell.appendChild(container);
         cell.appendChild(summaryElement);
 
-        return this.createStudentClassGrid(gridElement.id, classItem, editGroupNameCallback, dropCallback);;
+        return this.createStudentClassGrid(gridElement.id, classItem, editGroupNameCallback, (e: any) => {
+
+            var tmpDropCallback = dropCallback;
+            if (tmpDropCallback) {
+                tmpDropCallback(e);
+            }
+        });;
     };
 
+    
     createClassInputContainer = (
         cell: HTMLTableCellElement,
         studentCount = 1,
@@ -308,9 +314,9 @@ class KendoHelper
         $(`#${element}`).kendoDraggable({
             filter: "tr",
             hint(e) {
-                const studentId = e[0].cells[0].textContent;
-                const studentName = e[0].cells[1].textContent;
-                return $(`<div id="student-${studentId}" style="background-color: DarkOrange"><div class="k-grid k-widget" style="color: black; padding=15px">${
+                const studentId = e[0].cells[1].textContent;
+                const studentName = e[0].cells[0].textContent;
+                return $(`<div id="student-${studentId}" style="background-color: DarkOrange; color: black"><div class="k-grid k-widget" style="padding=15px">${
                     studentName}</div></div>`);
             },
             group: "classGroup"
@@ -320,14 +326,14 @@ class KendoHelper
         grid.table.kendoDropTarget({
             drop(e) {
                 const targetObject = (Object) (e.draggable.currentTarget[0]);
-                const studentId = parseInt(targetObject.cells[0].textContent);
+                const studentId = parseInt(targetObject.cells[1].textContent);
                 const sourceClass = $(e.draggable.element).attr('id');
-
+                debugger;
                 if (dropCallback(`class-${classItem.uid}`, sourceClass, studentId)) {
                     let sourceGrid = $(`#${sourceClass}`).data("kendoGrid");
                     let targetGrid = $(`#class-${classItem.uid}`).data("kendoGrid");
                     var sourceDatasource = sourceGrid.dataSource.view();
-
+                
                     var targetDatasource = targetGrid.dataSource.view();
                     for (let i=0; i< sourceDatasource.length; i++) {
                         if (sourceDatasource[i].id === studentId) {
@@ -504,15 +510,15 @@ class KendoHelper
         var columns: { field: string; title: string; width: string; attributes: { class: string } }[];
         if (isUniSex) {
             columns = [
-                { field: "id", title: "Id", width: "0px", attributes: { 'class': "text-nowrap" } },
                 { field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" } },
+                { field: "id", title: "Id", width: "0px", attributes: { 'class': "text-nowrap" } },
                 { field: "gender", title: "Sex", width: "80px", attributes: { 'class': "text-center" } },
                 { field: "score", title: "Score", width: "80px", attributes: { 'class': "text-center" } }
             ];
         } else {
             columns = [
-                { field: "id", title: "Id", width: "0px", attributes: { 'class': "text-nowrap" } },
                 { field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" } },
+                { field: "id", title: "Id", width: "0px", attributes: { 'class': "text-nowrap" } },
                 { field: "score", title: "Score", width: "80px", attributes: { 'class': "text-center" } }
             ];
         }
@@ -549,7 +555,7 @@ class KendoHelper
                     tooltipText += `<br>2nd Language Pref: ${student.langPref2 === "" ? "None" : student.langPref2}`;
                     tooltipText += `<br>3rd Language Pref: ${student.langPref3 === "" ? "None" : student.langPref3}`;
                 }
-
+                
                 return "<div style='background-color: lightgoldenrodyellow'><div style='text-align: left; padding: 15px;'>" + tooltipText + "</div></div>";
             }
         }).data("kendoTooltip");
@@ -559,7 +565,26 @@ class KendoHelper
 
     private createClassSummary = (classItem: ClassDefinition): HTMLDivElement => {
         var element = document.createElement("div");
+        element.id = `summary-${classItem.uid}`;
         element.setAttribute("style", "border-style: solid; border-color: #bfbfbf; border-width: 1px; padding: 5px 5px 5px 10px; margin: 5px 0 0 0");
+        
+        return this.createClassSummaryContent(classItem, element);
+    };
+
+    updateClassSummaryContent = (classItem: ClassDefinition) => {
+        var element = document.getElementById(`summary-${classItem.uid}`) as HTMLDivElement;
+        if (element) {
+            this.createClassSummaryContent(classItem, element);
+        }
+    }
+
+    private createClassSummaryContent = (classItem: ClassDefinition, container: HTMLDivElement): HTMLDivElement => {
+        debugger;
+        if (container.childElementCount > 0) {
+            while (container.hasChildNodes()) {
+                container.removeChild(container.lastChild);
+            }
+        }
         if (classItem.parent.parent.parent.testFile.isUnisex) {
             const table = document.createElement("table") as HTMLTableElement;
             const header = table.createTHead();
@@ -569,7 +594,7 @@ class KendoHelper
             this.createLabel(headerRow.insertCell(), "Average", 100, "center");
 
             const body = table.createTBody();
-      
+
             let schoolRow = body.insertRow();
             this.createLabel(schoolRow.insertCell(), "Composite Score Avg.", 400);
             this.createNumberLabel(schoolRow.insertCell(), classItem.count, 100);
@@ -583,17 +608,17 @@ class KendoHelper
             this.createNumberLabel(schoolRow.insertCell(), classItem.boysCount, 100);
             this.createLabel(schoolRow.insertCell(), classItem.boysAverage.toFixed(0), 100);
 
-            element.appendChild(table);
+            container.appendChild(table);
         } else {
             var elementCnt = document.createElement("div");
             elementCnt.textContent = "No. of Students: " + classItem.count;
             var elementAvg = document.createElement("div");
             elementAvg.textContent = "Composite Score Avg.: " + Math.round(classItem.average);
-            element.appendChild(elementCnt);
-            element.appendChild(elementAvg);
+            container.appendChild(elementCnt);
+            container.appendChild(elementAvg);
         }
-        return element;
-    };
+        return container;
+    }
 
     createNumericTextBox = (
         element: string,

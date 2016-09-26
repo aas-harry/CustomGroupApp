@@ -43,9 +43,16 @@ class CustomClassGridCollection {
         var sourceClass = Enumerable.From(this.classes).FirstOrDefault(undefined, x => x.uid === this.getUid(sourceUid));
         var student = Enumerable.From(sourceClass.students).FirstOrDefault(undefined, x => x.id === studentId);
 
-        if (targetClass && sourceClass && student) {
+        if (targetClass && sourceClass && student && targetClass.index !== sourceClass.index) {
             sourceClass.removeStudent(student);
             targetClass.addStudent(student);
+            sourceClass.calculateClassesAverage();
+            targetClass.calculateClassesAverage();
+
+            debugger;
+            this.kendoHelper.updateClassSummaryContent(sourceClass);
+            this.kendoHelper.updateClassSummaryContent(targetClass);
+
             return true;
         }
         return false;

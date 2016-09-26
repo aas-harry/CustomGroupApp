@@ -157,7 +157,6 @@ var KendoHelper = (function () {
         this.createStudentClassInputContainer = function (cell, classItem, editGroupNameCallback, dropCallback) {
             var classGridHeight = classItem.parent.classes.length > 3 && classItem.parent.bandType == BandType.None ? "500px" : "700px";
             var classGridWidth = classItem.parent.parent.parent.testFile.isUnisex ? "400px" : "300px";
-            console.log("School Unisex: ", classItem.parent.parent.parent.testFile.isUnisex);
             var container = document.createElement("div");
             container.setAttribute("style", "width: " + classGridWidth + "; height: " + classGridHeight + "; margin: 5px 0 0 0;");
             container.id = "class-" + classItem.uid + "-container";
@@ -168,7 +167,12 @@ var KendoHelper = (function () {
             container.appendChild(gridElement);
             cell.appendChild(container);
             cell.appendChild(summaryElement);
-            return _this.createStudentClassGrid(gridElement.id, classItem, editGroupNameCallback, dropCallback);
+            return _this.createStudentClassGrid(gridElement.id, classItem, editGroupNameCallback, function (e) {
+                var tmpDropCallback = dropCallback;
+                if (tmpDropCallback) {
+                    tmpDropCallback(e);
+                }
+            });
             ;
         };
         this.createClassInputContainer = function (cell, studentCount, classNo, bandNo, callbackChangeEvent, addLabel) {
@@ -234,17 +238,18 @@ var KendoHelper = (function () {
             $("#" + element).kendoDraggable({
                 filter: "tr",
                 hint: function (e) {
-                    var studentId = e[0].cells[0].textContent;
-                    var studentName = e[0].cells[1].textContent;
-                    return $("<div id=\"student-" + studentId + "\" style=\"background-color: DarkOrange\"><div class=\"k-grid k-widget\" style=\"color: black; padding=15px\">" + studentName + "</div></div>");
+                    var studentId = e[0].cells[1].textContent;
+                    var studentName = e[0].cells[0].textContent;
+                    return $("<div id=\"student-" + studentId + "\" style=\"background-color: DarkOrange; color: black\"><div class=\"k-grid k-widget\" style=\"padding=15px\">" + studentName + "</div></div>");
                 },
                 group: "classGroup"
             });
             grid.table.kendoDropTarget({
                 drop: function (e) {
                     var targetObject = (Object)(e.draggable.currentTarget[0]);
-                    var studentId = parseInt(targetObject.cells[0].textContent);
+                    var studentId = parseInt(targetObject.cells[1].textContent);
                     var sourceClass = $(e.draggable.element).attr('id');
+                    debugger;
                     if (dropCallback("class-" + classItem.uid, sourceClass, studentId)) {
                         var sourceGrid = $("#" + sourceClass).data("kendoGrid");
                         var targetGrid = $("#class-" + classItem.uid).data("kendoGrid");
@@ -366,16 +371,16 @@ var KendoHelper = (function () {
             var columns;
             if (isUniSex) {
                 columns = [
-                    { field: "id", title: "Id", width: "0px", attributes: { 'class': "text-nowrap" } },
                     { field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" } },
+                    { field: "id", title: "Id", width: "0px", attributes: { 'class': "text-nowrap" } },
                     { field: "gender", title: "Sex", width: "80px", attributes: { 'class': "text-center" } },
                     { field: "score", title: "Score", width: "80px", attributes: { 'class': "text-center" } }
                 ];
             }
             else {
                 columns = [
-                    { field: "id", title: "Id", width: "0px", attributes: { 'class': "text-nowrap" } },
                     { field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" } },
+                    { field: "id", title: "Id", width: "0px", attributes: { 'class': "text-nowrap" } },
                     { field: "score", title: "Score", width: "80px", attributes: { 'class': "text-center" } }
                 ];
             }
@@ -415,7 +420,23 @@ var KendoHelper = (function () {
         };
         this.createClassSummary = function (classItem) {
             var element = document.createElement("div");
+            element.id = "summary-" + classItem.uid;
             element.setAttribute("style", "border-style: solid; border-color: #bfbfbf; border-width: 1px; padding: 5px 5px 5px 10px; margin: 5px 0 0 0");
+            return _this.createClassSummaryContent(classItem, element);
+        };
+        this.updateClassSummaryContent = function (classItem) {
+            var element = document.getElementById("summary-" + classItem.uid);
+            if (element) {
+                _this.createClassSummaryContent(classItem, element);
+            }
+        };
+        this.createClassSummaryContent = function (classItem, container) {
+            debugger;
+            if (container.childElementCount > 0) {
+                while (container.hasChildNodes()) {
+                    container.removeChild(container.lastChild);
+                }
+            }
             if (classItem.parent.parent.parent.testFile.isUnisex) {
                 var table = document.createElement("table");
                 var header = table.createTHead();
@@ -436,17 +457,17 @@ var KendoHelper = (function () {
                 _this.createLabel(schoolRow.insertCell(), "Boys Comp. Score Avg.", 400);
                 _this.createNumberLabel(schoolRow.insertCell(), classItem.boysCount, 100);
                 _this.createLabel(schoolRow.insertCell(), classItem.boysAverage.toFixed(0), 100);
-                element.appendChild(table);
+                container.appendChild(table);
             }
             else {
                 var elementCnt = document.createElement("div");
                 elementCnt.textContent = "No. of Students: " + classItem.count;
                 var elementAvg = document.createElement("div");
                 elementAvg.textContent = "Composite Score Avg.: " + Math.round(classItem.average);
-                element.appendChild(elementCnt);
-                element.appendChild(elementAvg);
+                container.appendChild(elementCnt);
+                container.appendChild(elementAvg);
             }
-            return element;
+            return container;
         };
         this.createNumericTextBox = function (element, defaultValue, min, max, format, callbackChangeEvent) {
             if (defaultValue === void 0) { defaultValue = 0; }

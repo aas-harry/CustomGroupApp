@@ -34,9 +34,14 @@ var CustomClassGridCollection = (function () {
             var targetClass = Enumerable.From(_this.classes).FirstOrDefault(undefined, function (x) { return x.uid === _this.getUid(targetUid); });
             var sourceClass = Enumerable.From(_this.classes).FirstOrDefault(undefined, function (x) { return x.uid === _this.getUid(sourceUid); });
             var student = Enumerable.From(sourceClass.students).FirstOrDefault(undefined, function (x) { return x.id === studentId; });
-            if (targetClass && sourceClass && student) {
+            if (targetClass && sourceClass && student && targetClass.index !== sourceClass.index) {
                 sourceClass.removeStudent(student);
                 targetClass.addStudent(student);
+                sourceClass.calculateClassesAverage();
+                targetClass.calculateClassesAverage();
+                debugger;
+                _this.kendoHelper.updateClassSummaryContent(sourceClass);
+                _this.kendoHelper.updateClassSummaryContent(targetClass);
                 return true;
             }
             return false;
