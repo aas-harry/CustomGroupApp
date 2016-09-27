@@ -210,9 +210,9 @@ class KendoHelper
         cell: HTMLTableCellElement,
         classItem: ClassDefinition,
         editGroupNameCallback: any,
-        dropCallback: any
+        dropCallback: (targetUid: string, sourceUid: string, studentId: number) => any
     ) => {
-        var classGridHeight = classItem.parent.classes.length > 3 && classItem.parent.bandType == BandType.None ? "500px" : "700px";
+        var classGridHeight = classItem.parent.classes.length > 3 && classItem.parent.bandType === BandType.None ? "500px" : "700px";
         var classGridWidth = classItem.parent.parent.parent.testFile.isUnisex ? "400px" : "300px";
         var container = document.createElement("div") as HTMLDivElement;
         container.setAttribute("style", `width: ${classGridWidth}; height: ${classGridHeight}; margin: 5px 0 0 0;`);
@@ -226,13 +226,7 @@ class KendoHelper
         cell.appendChild(container);
         cell.appendChild(summaryElement);
 
-        return this.createStudentClassGrid(gridElement.id, classItem, editGroupNameCallback, (e: any) => {
-
-            var tmpDropCallback = dropCallback;
-            if (tmpDropCallback) {
-                tmpDropCallback(e);
-            }
-        });;
+        return this.createStudentClassGrid(gridElement.id, classItem, editGroupNameCallback, dropCallback);;
     };
 
     
@@ -298,7 +292,7 @@ class KendoHelper
 
     createMultiLineLabel = (cell: HTMLTableCellElement, line1: string, line2: string, separator: string = "/") => {
         var label = document.createElement("span");
-        label.textContent = line1;
+        label.textContent = line1 + " " + separator + line2;
         label.setAttribute("style", "margin-right: 5px");
         cell.appendChild(label);
 
@@ -308,7 +302,7 @@ class KendoHelper
         element: string,
         classItem: ClassDefinition,
         editGroupNameCallback: any,
-        dropCallback: any): kendo.ui.Grid => {
+        dropCallback: (targetUid: string, sourceUid: string, studentId: number) => any): kendo.ui.Grid => {
         var grid = this.createClassGrid(element, classItem, editGroupNameCallback);
 
         $(`#${element}`).kendoDraggable({
@@ -328,7 +322,6 @@ class KendoHelper
                 const targetObject = (Object) (e.draggable.currentTarget[0]);
                 const studentId = parseInt(targetObject.cells[1].textContent);
                 const sourceClass = $(e.draggable.element).attr('id');
-                debugger;
                 if (dropCallback(`class-${classItem.uid}`, sourceClass, studentId)) {
                     let sourceGrid = $(`#${sourceClass}`).data("kendoGrid");
                     let targetGrid = $(`#class-${classItem.uid}`).data("kendoGrid");
@@ -579,7 +572,6 @@ class KendoHelper
     }
 
     private createClassSummaryContent = (classItem: ClassDefinition, container: HTMLDivElement): HTMLDivElement => {
-        debugger;
         if (container.childElementCount > 0) {
             while (container.hasChildNodes()) {
                 container.removeChild(container.lastChild);

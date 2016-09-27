@@ -46,10 +46,11 @@ class CustomClassGridCollection {
         if (targetClass && sourceClass && student && targetClass.index !== sourceClass.index) {
             sourceClass.removeStudent(student);
             targetClass.addStudent(student);
+
+            debugger;
             sourceClass.calculateClassesAverage();
             targetClass.calculateClassesAverage();
 
-            debugger;
             this.kendoHelper.updateClassSummaryContent(sourceClass);
             this.kendoHelper.updateClassSummaryContent(targetClass);
 

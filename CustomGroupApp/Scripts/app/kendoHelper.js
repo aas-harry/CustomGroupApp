@@ -155,7 +155,7 @@ var KendoHelper = (function () {
         var _this = this;
         this.integerFormat = "n0";
         this.createStudentClassInputContainer = function (cell, classItem, editGroupNameCallback, dropCallback) {
-            var classGridHeight = classItem.parent.classes.length > 3 && classItem.parent.bandType == BandType.None ? "500px" : "700px";
+            var classGridHeight = classItem.parent.classes.length > 3 && classItem.parent.bandType === BandType.None ? "500px" : "700px";
             var classGridWidth = classItem.parent.parent.parent.testFile.isUnisex ? "400px" : "300px";
             var container = document.createElement("div");
             container.setAttribute("style", "width: " + classGridWidth + "; height: " + classGridHeight + "; margin: 5px 0 0 0;");
@@ -167,12 +167,7 @@ var KendoHelper = (function () {
             container.appendChild(gridElement);
             cell.appendChild(container);
             cell.appendChild(summaryElement);
-            return _this.createStudentClassGrid(gridElement.id, classItem, editGroupNameCallback, function (e) {
-                var tmpDropCallback = dropCallback;
-                if (tmpDropCallback) {
-                    tmpDropCallback(e);
-                }
-            });
+            return _this.createStudentClassGrid(gridElement.id, classItem, editGroupNameCallback, dropCallback);
             ;
         };
         this.createClassInputContainer = function (cell, studentCount, classNo, bandNo, callbackChangeEvent, addLabel) {
@@ -229,7 +224,7 @@ var KendoHelper = (function () {
         this.createMultiLineLabel = function (cell, line1, line2, separator) {
             if (separator === void 0) { separator = "/"; }
             var label = document.createElement("span");
-            label.textContent = line1;
+            label.textContent = line1 + " " + separator + line2;
             label.setAttribute("style", "margin-right: 5px");
             cell.appendChild(label);
         };
@@ -249,7 +244,6 @@ var KendoHelper = (function () {
                     var targetObject = (Object)(e.draggable.currentTarget[0]);
                     var studentId = parseInt(targetObject.cells[1].textContent);
                     var sourceClass = $(e.draggable.element).attr('id');
-                    debugger;
                     if (dropCallback("class-" + classItem.uid, sourceClass, studentId)) {
                         var sourceGrid = $("#" + sourceClass).data("kendoGrid");
                         var targetGrid = $("#class-" + classItem.uid).data("kendoGrid");
@@ -431,7 +425,6 @@ var KendoHelper = (function () {
             }
         };
         this.createClassSummaryContent = function (classItem, container) {
-            debugger;
             if (container.childElementCount > 0) {
                 while (container.hasChildNodes()) {
                     container.removeChild(container.lastChild);
