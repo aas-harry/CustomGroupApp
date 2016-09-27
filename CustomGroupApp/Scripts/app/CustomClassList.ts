@@ -47,7 +47,6 @@ class CustomClassGridCollection {
             sourceClass.removeStudent(student);
             targetClass.addStudent(student);
 
-            debugger;
             sourceClass.calculateClassesAverage();
             targetClass.calculateClassesAverage();
 

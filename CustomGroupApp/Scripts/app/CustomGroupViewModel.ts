@@ -26,6 +26,9 @@
     separatedStudents: Array<StudentSet> = [];
     errorMessage: string;
     hasErrors = false;
+    get testNumber(): number {
+        return this.testInfo ? this.testInfo.fileNumber : 0;
+    }
 
     // Radio button value is string type and they need to be converted to enum
     get topClassGroupingOption(): GroupingMethod {

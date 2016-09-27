@@ -27,6 +27,7 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
                 _this.set("showStudentLanguageCaption", "Show Students");
             }
         };
+        this.hasStudentLanguagePreferences = false;
         this.showStudentLanguageList = false;
         this.studentWithLanguagePrefCount = 0;
         // ReSharper disable once InconsistentNaming
@@ -59,6 +60,7 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
                 this.hasBandSetInitialised = true;
             }
         }
+        this.kendoHelper.createUploadControl("import-file", "aa", null);
         this.bandTableControl.init("classes-settings-container", source);
         return true;
     };
@@ -84,6 +86,7 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
                 var s = _a[_i];
                 _loop_1(s);
             }
+            this.set("hasStudentLanguagePreferences", this.studentWithLanguagePrefCount > 0);
         },
         enumerable: true,
         configurable: true

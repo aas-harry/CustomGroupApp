@@ -39,6 +39,7 @@
             }
         }
 
+        this.kendoHelper.createUploadControl("import-file","aa", null);
         this.bandTableControl.init("classes-settings-container", source);
         return true;
     }
@@ -58,6 +59,8 @@
         }
     }
 
+    hasStudentLanguagePreferences = false;
+
     set students(value: Array<StudentClass>) {
         this._students = value;
         this.studentWithLanguagePrefCount = Enumerable.From(value).Count(x => x.hasLanguagePreferences);
@@ -73,6 +76,7 @@
             }
             matched.addStudent(s);
         }
+        this.set("hasStudentLanguagePreferences", this.studentWithLanguagePrefCount > 0);
     }
 
     showStudentLanguageList = false;

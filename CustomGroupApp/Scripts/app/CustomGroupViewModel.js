@@ -72,6 +72,13 @@ var CustomGroupViewModel = (function (_super) {
         //this.bandClassDefinitionViewModel = new BandClassDefinitionViewModel(studentCount);
         //this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(studentCount);
     }
+    Object.defineProperty(CustomGroupViewModel.prototype, "testNumber", {
+        get: function () {
+            return this.testInfo ? this.testInfo.fileNumber : 0;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(CustomGroupViewModel.prototype, "topClassGroupingOption", {
         // Radio button value is string type and they need to be converted to enum
         get: function () {

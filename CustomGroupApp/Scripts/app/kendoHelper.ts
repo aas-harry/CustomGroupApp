@@ -612,6 +612,17 @@ class KendoHelper
         return container;
     }
 
+    createUploadControl = (
+        element: string,
+        saveUrl: string,
+        completeCallback: (e: any) => any) => {
+        $(`#${element}`)
+            .kendoUpload({
+               
+                complete: completeCallback,
+    });
+    };
+
     createNumericTextBox = (
         element: string,
         defaultValue = 0,

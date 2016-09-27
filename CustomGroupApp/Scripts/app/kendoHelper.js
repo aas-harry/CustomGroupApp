@@ -462,6 +462,12 @@ var KendoHelper = (function () {
             }
             return container;
         };
+        this.createUploadControl = function (element, saveUrl, completeCallback) {
+            $("#" + element)
+                .kendoUpload({
+                complete: completeCallback,
+            });
+        };
         this.createNumericTextBox = function (element, defaultValue, min, max, format, callbackChangeEvent) {
             if (defaultValue === void 0) { defaultValue = 0; }
             if (min === void 0) { min = 0; }

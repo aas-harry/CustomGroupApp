@@ -636,6 +636,7 @@ class ClassDefinition {
 
     calculateClassesAverage = () => {
         this.average = Enumerable.From(this.students).Average(x => x.score);
+        this.count = this.students.length;
         const boys = Enumerable.From(this.students).Where(x => x.gender === "M").ToArray();
         const girls = Enumerable.From(this.students).Where(x => x.gender === "F").ToArray();
 

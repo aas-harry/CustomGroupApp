@@ -23,8 +23,12 @@
         <span>Number of students who has language preferences: </span>
         <span data-bind="text: selectedClassDefinitionViewModel.studentWithLanguagePrefCount"></span>
         <button id="showStudent" class="btn btn-default" style="margin-left: 10px" 
-                data-bind="text: selectedClassDefinitionViewModel.showStudentLanguageCaption, click: selectedClassDefinitionViewModel.showStudentLanguagePreferences">View</button>
-        <button class="btn btn-default"style="margin-left: 10px">Import</button>
+                data-bind="text: selectedClassDefinitionViewModel.showStudentLanguageCaption, 
+                click: selectedClassDefinitionViewModel.showStudentLanguagePreferences,
+                enabled: selectedClassDefinitionViewModel.hasStudentLanguagePreferences">View</button>
+        <button class="btn btn-default" style="margin-left: 10px" data-bind="click: selectedClassDefinitionViewModel.importStudentLanguages">Import</button>
+        <input type="file" id="import-file" style="width: 400px"/>
+
     </div>
     <div style="margin-top: 10px;" id="student-language-preferences-container">
         <div id="student-language-preferences-list" style="width: 700px; height: 400px" 
@@ -53,5 +57,7 @@
         .ready(function () {
             kendo.bind($("#custom-group-container"), customGroupViewModel);
             customGroupViewModel.loadGroupingViewModel();
+
+           
         });
 </script>

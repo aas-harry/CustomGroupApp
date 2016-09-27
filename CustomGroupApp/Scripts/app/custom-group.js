@@ -592,6 +592,7 @@ var ClassDefinition = (function () {
         };
         this.calculateClassesAverage = function () {
             _this.average = Enumerable.From(_this.students).Average(function (x) { return x.score; });
+            _this.count = _this.students.length;
             var boys = Enumerable.From(_this.students).Where(function (x) { return x.gender === "M"; }).ToArray();
             var girls = Enumerable.From(_this.students).Where(function (x) { return x.gender === "F"; }).ToArray();
             _this.boysCount = boys.length;
