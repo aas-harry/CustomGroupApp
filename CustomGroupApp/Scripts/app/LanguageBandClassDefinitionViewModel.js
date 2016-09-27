@@ -83,6 +83,7 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
         set: function (value) {
             this._students = value;
             this.studentWithLanguagePrefCount = Enumerable.From(value).Count(function (x) { return x.hasLanguagePreferences; });
+            debugger;
             this.languageSets = [];
             var _loop_1 = function(s) {
                 var matched = Enumerable.From(this_1.languageSets)

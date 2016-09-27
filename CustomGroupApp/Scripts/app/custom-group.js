@@ -69,18 +69,25 @@ var LanguageSet = (function () {
         this.language2 = language2;
         this.count = 0;
         this.students = [];
-        this.language1LowerCase = language1.toLowerCase();
-        this.language2LowerCase = language2.toLowerCase();
+        this.isNoPrefs = function (language) {
+            if (!language) {
+                return true;
+            }
+            language = language.toLowerCase();
+            return (language === "" || language === "no" || language === "none");
+        };
+        this.language1LowerCase = this.isNoPrefs(language1) ? "" : language1.toLowerCase();
+        this.language2LowerCase = this.isNoPrefs(language2) ? "" : language2.toLowerCase();
     }
     Object.defineProperty(LanguageSet.prototype, "description", {
         get: function () {
-            if (this.language1 && this.language1 !== "" && this.language2 && this.language2 !== "") {
+            if (!this.isNoPrefs(this.language1) && !this.isNoPrefs(this.language2)) {
                 return this.language1 + " / \n" + this.language2;
             }
-            if (this.language1 && this.language1 !== "") {
+            if (this.language1 && !this.isNoPrefs(this.language2)) {
                 return this.language1;
             }
-            if (this.language2 && this.language2 !== "") {
+            if (this.language2 && !this.isNoPrefs(this.language1)) {
                 return this.language2;
             }
             return "No Prefs";
@@ -89,6 +96,8 @@ var LanguageSet = (function () {
         configurable: true
     });
     LanguageSet.prototype.isEqual = function (language1, language2) {
+        language1 = this.isNoPrefs(language1) ? "" : language1;
+        language2 = this.isNoPrefs(language2) ? "" : language2;
         if (language1.toLowerCase() === this.language1LowerCase &&
             language2.toLowerCase() === this.language2LowerCase) {
             return true;

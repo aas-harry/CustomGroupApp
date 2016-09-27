@@ -71,8 +71,8 @@ class SummaryClass {
 
 class LanguageSet {
     constructor(public language1: string, public language2: string) {
-        this.language1LowerCase = language1.toLowerCase();
-        this.language2LowerCase = language2.toLowerCase();
+        this.language1LowerCase = this.isNoPrefs(language1) ? "" : language1.toLowerCase();
+        this.language2LowerCase = this.isNoPrefs(language2) ? "" : language2.toLowerCase();
     }
 
     private language1LowerCase: string;
@@ -82,19 +82,22 @@ class LanguageSet {
     public students: Array<StudentClass> = [];
 
     get description(): string {
-        if (this.language1 && this.language1 !== "" && this.language2 && this.language2 !== "") {
+        if (! this.isNoPrefs(this.language1) && ! this.isNoPrefs(this.language2)) {
             return this.language1 + " / \n" + this.language2;
         }
-        if (this.language1 && this.language1 !== "" ) {
+        if (this.language1 && !this.isNoPrefs(this.language2)) {
             return this.language1;
         }
-        if (this.language2 && this.language2 !== "") {
+        if (this.language2 && !this.isNoPrefs(this.language1)) {
             return this.language2;
         }
         return "No Prefs";
     }
 
     isEqual(language1: string, language2: string): boolean {
+        language1 = this.isNoPrefs(language1) ? "" : language1;
+        language2 = this.isNoPrefs(language2) ? "" : language2;
+
         if (language1.toLowerCase() === this.language1LowerCase &&
             language2.toLowerCase() === this.language2LowerCase) {
             return true;
@@ -104,6 +107,13 @@ class LanguageSet {
             return true;
         }
         return false;
+    }
+    isNoPrefs = (language: string): boolean => {
+        if (! language) {
+            return true;
+        }
+        language = language.toLowerCase();
+        return (language === "" || language === "no" || language === "none");
     }
 
     public addStudent(student: StudentClass) {
