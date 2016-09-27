@@ -17,21 +17,25 @@
             <span>Boys Only</span>
         </div>
     </div>
-    
+
     <div style="margin-top: 20px;">Number of students in this test: <span data-bind="text: studentCount"></span></div>
     <div style="margin-top: 10px; margin-bottom: 5px">
         <span>Number of students who has language preferences: </span>
         <span data-bind="text: selectedClassDefinitionViewModel.studentWithLanguagePrefCount"></span>
-        <button id="showStudent" class="btn btn-default" style="margin-left: 10px" 
-                data-bind="text: selectedClassDefinitionViewModel.showStudentLanguageCaption, 
+        <button id="showStudent" class="btn btn-default" style="margin-left: 10px"
+                data-bind="text: selectedClassDefinitionViewModel.showStudentLanguageCaption,
                 click: selectedClassDefinitionViewModel.showStudentLanguagePreferences,
-                enabled: selectedClassDefinitionViewModel.hasStudentLanguagePreferences">View</button>
+                enabled: selectedClassDefinitionViewModel.hasStudentLanguagePreferences">
+            View
+        </button>
         <button class="btn btn-default" style="margin-left: 10px" data-bind="click: selectedClassDefinitionViewModel.importStudentLanguages">Import</button>
-        <input type="file" id="import-file" style="width: 400px"/>
+        <div style="width: 400px; margin-top: 10px" id="import-language-preferences">
+            <input type="file" id="files" name="files"  />
+        </div>
 
     </div>
     <div style="margin-top: 10px;" id="student-language-preferences-container">
-        <div id="student-language-preferences-list" style="width: 700px; height: 400px" 
+        <div id="student-language-preferences-list" style="width: 700px; height: 400px"
              data-bind="visible: selectedClassDefinitionViewModel.showStudentLanguageList"></div>
     </div>
 
@@ -58,6 +62,6 @@
             kendo.bind($("#custom-group-container"), customGroupViewModel);
             customGroupViewModel.loadGroupingViewModel();
 
-           
+
         });
 </script>

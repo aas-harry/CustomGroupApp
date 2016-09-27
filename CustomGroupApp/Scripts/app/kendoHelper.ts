@@ -615,12 +615,19 @@ class KendoHelper
     createUploadControl = (
         element: string,
         saveUrl: string,
-        completeCallback: (e: any) => any) => {
+        completeCallback: (e: any) => any) : kendo.ui.Upload => {
         $(`#${element}`)
             .kendoUpload({
-               
-                complete: completeCallback,
-    });
+                async: {
+                    'saveUrl': saveUrl,
+                    'autoUpload': true
+                },
+                showFileList: false,
+                success: completeCallback
+            });
+
+        const uploadCtrl = $(`#${element}`).data("kendoUpload") as kendo.ui.Upload;
+        return uploadCtrl;
     };
 
     createNumericTextBox = (

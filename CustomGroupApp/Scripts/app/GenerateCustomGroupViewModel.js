@@ -14,6 +14,7 @@ var GenerateCustomGroupViewModel = (function (_super) {
         this.kendoHelper = new KendoHelper();
         this.customClassGridCollection = new CustomClassGridCollection();
         this.showStudentLanguagePreferences = function () { };
+        this.importStudentLanguages = function () { };
         this.callOnStudentCountChangedEvent = function () {
             var onStudentCountChangedEvent = _this.onStudentCountChangedEvent;
             if (onStudentCountChangedEvent != null) {

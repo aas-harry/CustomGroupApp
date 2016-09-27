@@ -1,7 +1,8 @@
 ﻿class CustomGroupViewModel extends kendo.data.ObservableObject {
-    constructor(studentCount: number) {
+    constructor(studentCount: number, rootSite: string) {
         super();
 
+        this.rootSite = rootSite;
         this.studentCount = studentCount;
         //this.classDefinitionViewModel = new ClassDefinitionViewModel(studentCount, this.onStudentCountChanged);
         //this.bandClassDefinitionViewModel = new BandClassDefinitionViewModel(studentCount);
@@ -26,6 +27,7 @@
     separatedStudents: Array<StudentSet> = [];
     errorMessage: string;
     hasErrors = false;
+    rootSite: string;
     get testNumber(): number {
         return this.testInfo ? this.testInfo.fileNumber : 0;
     }

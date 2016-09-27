@@ -17,6 +17,7 @@ var BandClassDefinitionViewModel = (function (_super) {
             _this.bandTableControl.init("classes-settings-container", _this.bandSet);
         };
         this.showStudentLanguagePreferences = function () { };
+        this.importStudentLanguages = function () { };
         this.callOnStudentCountChangedEvent = function () {
             var onStudentCountChangedEvent = _this.onStudentCountChangedEvent;
             if (onStudentCountChangedEvent != null) {

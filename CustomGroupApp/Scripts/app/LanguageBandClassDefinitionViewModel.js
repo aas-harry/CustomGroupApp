@@ -27,6 +27,18 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
                 _this.set("showStudentLanguageCaption", "Show Students");
             }
         };
+        this.importStudentLanguages = function () {
+            _this.kendoHelper.createUploadControl("files", "Customgroup\\ImportStudentLanguages?id=1014181", _this.onUploadCompleted);
+            $("#import-language-preferences").show();
+            _this.set("showStudentLanguageList", false);
+        };
+        this.onUploadCompleted = function (e) {
+            if (e && e.response) {
+            }
+            $("#import-language-preferences").hide();
+            _this.set("showStudentLanguageList", true);
+            _this.set("showStudentLanguageCaption", "Hide Students");
+        };
         this.hasStudentLanguagePreferences = false;
         this.showStudentLanguageList = false;
         this.studentWithLanguagePrefCount = 0;
@@ -60,8 +72,8 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
                 this.hasBandSetInitialised = true;
             }
         }
-        this.kendoHelper.createUploadControl("import-file", "aa", null);
         this.bandTableControl.init("classes-settings-container", source);
+        $("#import-language-preferences").hide();
         return true;
     };
     LanguageBandClassDefinitionViewModel.prototype.getBandSet = function () {

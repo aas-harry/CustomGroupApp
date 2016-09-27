@@ -39,8 +39,9 @@
             }
         }
 
-        this.kendoHelper.createUploadControl("import-file","aa", null);
+       
         this.bandTableControl.init("classes-settings-container", source);
+        $("#import-language-preferences").hide();
         return true;
     }
 
@@ -57,6 +58,21 @@
         } else {
             this.set("showStudentLanguageCaption", "Show Students");
         }
+    }
+
+    importStudentLanguages = () => {
+        this.kendoHelper.createUploadControl("files", "Customgroup\\ImportStudentLanguages?id=1014181", this.onUploadCompleted);    
+        $("#import-language-preferences").show();
+        this.set("showStudentLanguageList", false);
+    };
+
+    onUploadCompleted = (e: any): any => {
+        if (e && e.response) {
+            
+        }
+        $("#import-language-preferences").hide();
+        this.set("showStudentLanguageList", true);
+        this.set("showStudentLanguageCaption", "Hide Students");
     }
 
     hasStudentLanguagePreferences = false;

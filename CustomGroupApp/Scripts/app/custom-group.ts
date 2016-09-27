@@ -60,6 +60,7 @@ interface IBandClassSettings {
     loadOptions(source: BandSet): boolean;
     getBandSet(): BandSet;
     showStudentLanguagePreferences();
+    importStudentLanguages();
 }
 
 class SummaryClass {

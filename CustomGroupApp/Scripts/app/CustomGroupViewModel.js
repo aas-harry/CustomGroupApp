@@ -5,7 +5,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var CustomGroupViewModel = (function (_super) {
     __extends(CustomGroupViewModel, _super);
-    function CustomGroupViewModel(studentCount) {
+    function CustomGroupViewModel(studentCount, rootSite) {
         var _this = this;
         _super.call(this);
         this.selectedGroupingOption = "MixedAbility";
@@ -67,6 +67,7 @@ var CustomGroupViewModel = (function (_super) {
                 _this.set("errorMessage", "");
             }
         };
+        this.rootSite = rootSite;
         this.studentCount = studentCount;
         //this.classDefinitionViewModel = new ClassDefinitionViewModel(studentCount, this.onStudentCountChanged);
         //this.bandClassDefinitionViewModel = new BandClassDefinitionViewModel(studentCount);

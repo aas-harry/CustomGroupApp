@@ -29,6 +29,7 @@
     }
 
     showStudentLanguagePreferences = () => { };
+    importStudentLanguages = () => { };
 
     onStudentCountChangedEvent: (classCount: number) => any;
     callOnStudentCountChangedEvent = () => {

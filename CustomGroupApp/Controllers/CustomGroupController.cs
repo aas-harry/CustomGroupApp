@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Web;
@@ -51,8 +52,9 @@ namespace CustomGroupApp.Controllers
             });
         }
 
-        public JsonResult ImportStudentLanguages(IEnumerable<HttpPostedFileBase> files, int testNumber)
+        public JsonResult ImportStudentLanguages(IEnumerable<HttpPostedFileBase> files, string id)
         {
+            var testNumber = int.Parse(id);
             var studentLanguages = new List<StudentLanguagePref>();
 
             if (files != null)

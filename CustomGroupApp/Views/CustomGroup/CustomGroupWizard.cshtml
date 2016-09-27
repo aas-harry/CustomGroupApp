@@ -37,7 +37,7 @@
     </div>
     <script>
 
-        var customGroupViewModel = new CustomGroupViewModel(@Html.Raw(Json.Encode(Model.Results.Count())));
+        var customGroupViewModel = new CustomGroupViewModel(@Html.Raw(Json.Encode(Model.Results.Count())), '@Url.Action("CustomGroupWizard", "CustomGroup")');
 
         $(document)
             .ready(function() {

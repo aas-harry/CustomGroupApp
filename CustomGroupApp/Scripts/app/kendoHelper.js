@@ -465,8 +465,15 @@ var KendoHelper = (function () {
         this.createUploadControl = function (element, saveUrl, completeCallback) {
             $("#" + element)
                 .kendoUpload({
-                complete: completeCallback,
+                async: {
+                    'saveUrl': saveUrl,
+                    'autoUpload': true
+                },
+                showFileList: false,
+                success: completeCallback
             });
+            var uploadCtrl = $("#" + element).data("kendoUpload");
+            return uploadCtrl;
         };
         this.createNumericTextBox = function (element, defaultValue, min, max, format, callbackChangeEvent) {
             if (defaultValue === void 0) { defaultValue = 0; }
