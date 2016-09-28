@@ -5,6 +5,7 @@
 class CustomClassGridCollection {
 
     private groupingHelper = new GroupingHelper();
+    private studentClassListControls = new StudentClassListControls();
     private kendoHelper = new KendoHelper();
     private me = this;
     items: Array<CustomClassGrid> = [];
@@ -33,8 +34,12 @@ class CustomClassGridCollection {
                 cnt = 0;
             }
             cnt++;
-            
-            this.kendoHelper.createStudentClassInputContainer(this.classRow.insertCell(), classItem, this.onEditGroupName, this.onDropItem);
+
+            this.studentClassListControls
+                .createStudentClassInputContainer(this.classRow.insertCell(),
+                    classItem,
+                    this.onEditGroupName,
+                    this.onDropItem);
         }
     };
 
@@ -50,8 +55,8 @@ class CustomClassGridCollection {
             sourceClass.calculateClassesAverage();
             targetClass.calculateClassesAverage();
 
-            this.kendoHelper.updateClassSummaryContent(sourceClass);
-            this.kendoHelper.updateClassSummaryContent(targetClass);
+            this.studentClassListControls.updateClassSummaryContent(sourceClass);
+            this.studentClassListControls.updateClassSummaryContent(targetClass);
 
             return true;
         }

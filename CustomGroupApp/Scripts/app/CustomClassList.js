@@ -7,6 +7,7 @@ var CustomClassGridCollection = (function () {
     function CustomClassGridCollection() {
         var _this = this;
         this.groupingHelper = new GroupingHelper();
+        this.studentClassListControls = new StudentClassListControls();
         this.kendoHelper = new KendoHelper();
         this.me = this;
         this.items = [];
@@ -27,7 +28,8 @@ var CustomClassGridCollection = (function () {
                     cnt = 0;
                 }
                 cnt++;
-                _this.kendoHelper.createStudentClassInputContainer(_this.classRow.insertCell(), classItem, _this.onEditGroupName, _this.onDropItem);
+                _this.studentClassListControls
+                    .createStudentClassInputContainer(_this.classRow.insertCell(), classItem, _this.onEditGroupName, _this.onDropItem);
             }
         };
         this.onDropItem = function (targetUid, sourceUid, studentId) {
@@ -39,8 +41,8 @@ var CustomClassGridCollection = (function () {
                 targetClass.addStudent(student);
                 sourceClass.calculateClassesAverage();
                 targetClass.calculateClassesAverage();
-                _this.kendoHelper.updateClassSummaryContent(sourceClass);
-                _this.kendoHelper.updateClassSummaryContent(targetClass);
+                _this.studentClassListControls.updateClassSummaryContent(sourceClass);
+                _this.studentClassListControls.updateClassSummaryContent(targetClass);
                 return true;
             }
             return false;

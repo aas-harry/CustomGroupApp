@@ -199,6 +199,7 @@
             case GroupingMethod.TopMiddleLowest:
                 bandSet.groupType = GroupingMethod.Streaming;
                 bandSet.bands[0].groupType = this.topClassGroupingOption;
+                bandSet.bands[1].groupType = GroupingMethod.MixedAbility; // Middle class always using mixed ability
                 bandSet.bands[2].groupType = this.lowestClassGroupingOption;
                 for (let band of bandSet.bands) {
                     band.streamType = this.streamType;
