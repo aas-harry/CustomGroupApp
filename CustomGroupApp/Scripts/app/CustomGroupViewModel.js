@@ -12,7 +12,7 @@ var CustomGroupViewModel = (function (_super) {
         this.selectedStreamingOption = "OverallAbilty";
         this.selectedTopClassGroupingOption = "Streaming";
         this.selectedLowestClassGroupingOption = "Streaming";
-        this.selectedGenderOption = "All";
+        this._genderOption = "All";
         this.mixGirlsBoysOption = false;
         this.currentGroupStep = 1;
         this.isLastStep = false;
@@ -73,6 +73,19 @@ var CustomGroupViewModel = (function (_super) {
         //this.bandClassDefinitionViewModel = new BandClassDefinitionViewModel(studentCount);
         //this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(studentCount);
     }
+    Object.defineProperty(CustomGroupViewModel.prototype, "selectedGenderOption", {
+        get: function () {
+            return this._genderOption;
+        },
+        set: function (value) {
+            this._genderOption = value;
+            console.log("Gender: " + value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    ;
+    ;
     Object.defineProperty(CustomGroupViewModel.prototype, "testNumber", {
         get: function () {
             return this.testInfo ? this.testInfo.fileNumber : 0;

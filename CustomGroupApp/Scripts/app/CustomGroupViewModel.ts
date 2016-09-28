@@ -12,7 +12,16 @@
     selectedStreamingOption = "OverallAbilty";
     selectedTopClassGroupingOption = "Streaming";
     selectedLowestClassGroupingOption = "Streaming";
-    selectedGenderOption = "All";
+
+    private _genderOption = "All";
+    get selectedGenderOption(): string {
+        return this._genderOption;
+    };
+    set selectedGenderOption(value: string) {
+        this._genderOption = value;
+        console.log("Gender: " + value);
+    };
+
     mixGirlsBoysOption = false;
     currentGroupStep = 1;
     isLastStep = false;
