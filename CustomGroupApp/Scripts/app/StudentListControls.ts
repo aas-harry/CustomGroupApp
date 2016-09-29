@@ -14,7 +14,7 @@
     }
 }
 
-class StudentListControl {
+class StudentListControls {
     createStudentGrid = (element: string, isCoedSchool: boolean): kendo.ui.Grid => {
         var columns: { field: string; title: string; width: string; attributes: { class: string } }[];
         if (isCoedSchool) {

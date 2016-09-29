@@ -577,6 +577,9 @@ class GroupingHelper {
 
 class StudentSet {
     students: Array<StudentClass> = [];
+    get studentList() {
+        return Enumerable.From(this.students).Take(5).Select(x => x.name).ToString(",") + (this.students.length > 5 ? " and more..." : "");
+    }
 }
 
 class ClassDefinition {

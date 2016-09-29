@@ -115,7 +115,8 @@
     }
 
     private groupingHelper = new GroupingHelper();
-    private studentListContrrol = new StudentListControl();
+    private studentListControls = new StudentListControls();
+    private studentSetListControls = new StudentSetListControls();
 
     private nextStep = () => {
         super.set("currentGroupStep", this.currentGroupStep + 1);
@@ -181,11 +182,27 @@
     }
 
     showStudentGroupingOption = (
-        studentListcell: HTMLTableCellElement,
-        joinedStudentsElement: string,
-        separatedStudentsElement: string) => {
+        joinedStudentsCell: HTMLTableCellElement,
+        separatedStudentsCell: HTMLTableCellElement) => {
         
-        this.studentListContrrol.createStudentClassInputContainer("students", studentListcell, this.classesDefn.testFile.students,
+        var studentSet1 = new StudentSet();
+        studentSet1.students.push(this.classesDefn.students[0]);
+        studentSet1.students.push(this.classesDefn.students[1]);
+        studentSet1.students.push(this.classesDefn.students[2]);
+        studentSet1.students.push(this.classesDefn.students[3]);
+        var studentSet2 = new StudentSet();
+        studentSet2.students.push(this.classesDefn.students[4]);
+        studentSet2.students.push(this.classesDefn.students[5]);
+        studentSet2.students.push(this.classesDefn.students[6]);
+
+        this.joinedStudents.push(studentSet1);
+        this.joinedStudents.push(studentSet2);
+        this.separatedStudents.push(studentSet1);
+        this.separatedStudents.push(studentSet2);
+        
+        this.studentSetListControls.createStudentSetContainer("Paired", joinedStudentsCell, this.joinedStudents, 
+            this.classesDefn.testFile.isUnisex);
+        this.studentSetListControls.createStudentSetContainer("Separated", separatedStudentsCell, this.separatedStudents,
             this.classesDefn.testFile.isUnisex);
     }
 

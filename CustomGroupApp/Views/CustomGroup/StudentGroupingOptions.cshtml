@@ -4,9 +4,10 @@
 <div style="margin: 20px">
     <table>
         <tr>
-            <td style="width: 300px" id="student-list"></td>
-            <td style="width: 300px" id="joined-student-list"></td>
-            <td style="width: 300px" id="separated-student-list"></td>
+            <td style="width: 500px" id="joined-student-list"></td>
+        </tr>
+        <tr>
+            <td style="width: 500px" id="separated-student-list"></td>
         </tr>
     </table>
 </div>
@@ -17,7 +18,8 @@
         .ready(function () {
             kendo.bind($("#custom-group-container"), customGroupViewModel);
 
-            customGroupViewModel.showStudentGroupingOption(document.getElementById("student-list")
-                , "jopined-student-list", "separated-student-list");
+            customGroupViewModel.showStudentGroupingOption(
+                document.getElementById("joined-student-list"),
+                document.getElementById("separated-student-list"));
         });
 </script>

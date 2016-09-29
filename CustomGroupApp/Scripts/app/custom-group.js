@@ -546,6 +546,13 @@ var StudentSet = (function () {
     function StudentSet() {
         this.students = [];
     }
+    Object.defineProperty(StudentSet.prototype, "studentList", {
+        get: function () {
+            return Enumerable.From(this.students).Take(5).Select(function (x) { return x.name; }).ToString(",") + (this.students.length > 5 ? " and more..." : "");
+        },
+        enumerable: true,
+        configurable: true
+    });
     return StudentSet;
 }());
 var ClassDefinition = (function () {

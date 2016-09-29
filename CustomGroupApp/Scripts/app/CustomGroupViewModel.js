@@ -27,7 +27,8 @@ var CustomGroupViewModel = (function (_super) {
         this.stepCollection = new StepCollection();
         this.testInfo = new TestFile();
         this.groupingHelper = new GroupingHelper();
-        this.studentListContrrol = new StudentListControl();
+        this.studentListControls = new StudentListControls();
+        this.studentSetListControls = new StudentSetListControls();
         this.nextStep = function () {
             _super.prototype.set.call(_this, "currentGroupStep", _this.currentGroupStep + 1);
             _this.callGetViewStep(_this.currentGroupStep);
@@ -41,8 +42,22 @@ var CustomGroupViewModel = (function (_super) {
         };
         this.showStep = function (data) {
         };
-        this.showStudentGroupingOption = function (studentListcell, joinedStudentsElement, separatedStudentsElement) {
-            _this.studentListContrrol.createStudentClassInputContainer("students", studentListcell, _this.classesDefn.testFile.students, _this.classesDefn.testFile.isUnisex);
+        this.showStudentGroupingOption = function (joinedStudentsCell, separatedStudentsCell) {
+            var studentSet1 = new StudentSet();
+            studentSet1.students.push(_this.classesDefn.students[0]);
+            studentSet1.students.push(_this.classesDefn.students[1]);
+            studentSet1.students.push(_this.classesDefn.students[2]);
+            studentSet1.students.push(_this.classesDefn.students[3]);
+            var studentSet2 = new StudentSet();
+            studentSet2.students.push(_this.classesDefn.students[4]);
+            studentSet2.students.push(_this.classesDefn.students[5]);
+            studentSet2.students.push(_this.classesDefn.students[6]);
+            _this.joinedStudents.push(studentSet1);
+            _this.joinedStudents.push(studentSet2);
+            _this.separatedStudents.push(studentSet1);
+            _this.separatedStudents.push(studentSet2);
+            _this.studentSetListControls.createStudentSetContainer("Paired", joinedStudentsCell, _this.joinedStudents, _this.classesDefn.testFile.isUnisex);
+            _this.studentSetListControls.createStudentSetContainer("Separated", separatedStudentsCell, _this.separatedStudents, _this.classesDefn.testFile.isUnisex);
         };
         //
         this.setDatasource = function (test, results, languages) {
