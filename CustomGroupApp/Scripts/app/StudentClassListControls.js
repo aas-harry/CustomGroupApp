@@ -202,7 +202,7 @@ var StudentSetListControls = (function () {
         this.createStudentSetContainer = function (name, cell, studentSets, isCoedSchool, width, height) {
             if (width === void 0) { width = 500; }
             if (height === void 0) { height = 200; }
-            _this.uid = _this.commonUtils.createUuid();
+            _this.uid = _this.commonUtils.createUid();
             var container = document.createElement("div");
             container.setAttribute("style", "width: " + width + "px; height: " + height + "px; margin: 5px 0 0 0;");
             container.id = name + "-studentsets-" + _this.uid + "-container";
@@ -244,3 +244,4 @@ var StudentSetListControls = (function () {
     }
     return StudentSetListControls;
 }());
+//# sourceMappingURL=StudentClassListControls.js.map

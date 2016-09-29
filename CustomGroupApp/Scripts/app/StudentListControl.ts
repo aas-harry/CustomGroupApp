@@ -14,8 +14,19 @@
     }
 }
 
-class StudentListControls {
-    createStudentGrid = (element: string, isCoedSchool: boolean): kendo.ui.Grid => {
+class StudentSelector {
+    constuctor(element: HTMLDivElement, students: Array<Student>, selectedStudents: Array<Student>) {
+        
+    }
+}
+class StudentListControl {
+    constructor(public hostElement: HTMLTableCellElement) {
+    }
+    private commonUtils = new CommonUtils();
+    private gridControl: kendo.ui.Grid;
+    private self = this;
+
+    setColumns = (isCoedSchool: boolean): StudentListControl => {
         var columns: { field: string; title: string; width: string; attributes: { class: string } }[];
         if (isCoedSchool) {
             columns = [
@@ -30,9 +41,33 @@ class StudentListControls {
             ];
         }
 
-        $(`#${element}`)
+        for (let column of columns) {
+            this.gridControl.columns.push(column);
+        }
+    
+        return this.self;
+    }
+
+    create = (
+        name = "students"   ,
+        width = 300,
+        height = 500) => {
+
+        // Create HTML element for hosting the grid control
+        var container = document.createElement("div") as HTMLDivElement;
+        container.setAttribute("style", `width: ${width}px; height: ${height}px; margin: 5px 0 0 0;`);
+        container.id = `${name}-${this.commonUtils.createUid()}-container`;
+
+        var gridElement = document.createElement("div") as HTMLDivElement;
+        gridElement.setAttribute("style", "height: 100%;");
+        gridElement.id = `${name}-${this.commonUtils.createUid()}-list`;
+
+        container.appendChild(gridElement);
+        this.hostElement.appendChild(container);
+
+        $(`#${gridElement.id}`)
             .kendoGrid({
-                columns: columns,
+                columns: [],
                 sortable: {
                     mode: "single",
                     allowUnsort: true
@@ -41,44 +76,19 @@ class StudentListControls {
                 dataSource: []
             });
 
-        return $(`#${element}`).data("kendoGrid");
-    }
-
-    createStudentClassInputContainer = (
-        name: string,
-        cell: HTMLTableCellElement,
-        students: Array<Student>,
-        isCoedSchool: boolean,
-        width = 300,
-        height = 500) => {
-        var container = document.createElement("div") as HTMLDivElement;
-        container.setAttribute("style", `width: ${width}px; height: ${height}px; margin: 5px 0 0 0;`);
-        container.id = `${name}-container`;
-        var gridElement = document.createElement("div") as HTMLDivElement;
-        gridElement.setAttribute("style", "height: 100%;");
-        gridElement.id = `${name}-list`;
-        container.appendChild(gridElement);
-
-        cell.appendChild(container);
-
-        this.createStudentListGrid(name, gridElement.id, students, isCoedSchool);
-      
+        this.gridControl = $(`#${gridElement.id}`).data("kendoGrid");
+        return this.self;
     };
 
-    createStudentListGrid = (
-        name: string,
-        element: string,
-        students: Array<Student>,
-        isCoedSchool: boolean): kendo.ui.Grid => {
-        var grid = this.createStudentGrid(element, isCoedSchool);
-
+    setDatasource = (students: Array<Student>): StudentListControl => {
         // Populate the grid
+        debugger;
         var studentRows: Array<StudentRow> = [];
         Enumerable.From(students).ForEach(x => studentRows.push(new StudentRow(x)));
-        grid.dataSource.data(students);
-        grid.refresh();
-        grid.resize();
-        return grid;
+        this.gridControl.dataSource.data(studentRows);
+        this.gridControl.refresh();
+        this.gridControl.resize();
+        return this.self;
     }
 
 }

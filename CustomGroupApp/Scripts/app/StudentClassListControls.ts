@@ -236,7 +236,7 @@ class StudentSetListControls {
         isCoedSchool: boolean,
         width = 500,
         height = 200) => {
-        this.uid = this.commonUtils.createUuid();
+        this.uid = this.commonUtils.createUid();
         var container = document.createElement("div") as HTMLDivElement;
         container.setAttribute("style", `width: ${width}px; height: ${height}px; margin: 5px 0 0 0;`);
         container.id = `${name}-studentsets-${this.uid}-container`;

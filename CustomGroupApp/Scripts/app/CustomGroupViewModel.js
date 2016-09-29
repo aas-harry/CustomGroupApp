@@ -27,7 +27,6 @@ var CustomGroupViewModel = (function (_super) {
         this.stepCollection = new StepCollection();
         this.testInfo = new TestFile();
         this.groupingHelper = new GroupingHelper();
-        this.studentListControls = new StudentListControls();
         this.studentSetListControls = new StudentSetListControls();
         this.nextStep = function () {
             _super.prototype.set.call(_this, "currentGroupStep", _this.currentGroupStep + 1);

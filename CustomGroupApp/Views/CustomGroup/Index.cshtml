@@ -11,41 +11,26 @@
         <div class="row">
             <input id="test-number" style="width: 280px; margin-right: 5px; margin-left: 10px">
             <button class="btn btn-default" onClick="createClasses()">Create</button>
+            <button class="btn btn-default" onClick="testControl()">Test</button>
             @*<button class="btn btn-default" onClick="getResults()">Get Results</button>
             <button class="btn btn-default" onClick="createMixClasses()">Create Mix</button>
             <button class="btn btn-default" onClick="createStreamingClasses()">Create streaming</button>
             <button class="btn btn-default" onClick="createBandingClasses()">Create Banding</button>
             <button class="btn btn-default" onclick="createTopMidBottomClasses()">Create TMB</button>
-            <input type="checkbox" id="mixBoysGirls" value="0" style="margin-right: 10px; margin-left: 10px" onclick="changeMixBoysGirls(this)" />Mix Boys and Girls
-            <div id="message-text"></div>*@
+            <input type="checkbox" id="mixBoysGirls" value="0" style="margin-right: 10px; margin-left: 10px" onclick="changeMixBoysGirls(this)" />Mix Boys and Girls*@
+            <div id="message-text"></div>
         </div>
-        <div id="class-container"></div>
-        <div class="row" style="margin-bottom: 30px">
-            <div class="col-md-4" id="jqgrid1-container">
-                <table id="jqGrid1"></table>
-            </div>
-            <div class="col-md-4" id="jqgrid2-container">
-                <table id="jqGrid2"></table>
-            </div>
-            <div class="col-md-4" id="jqgrid3-container">
-                <table id="jqGrid3"></table>
-            </div>
-        </div>
-
-        <div class="row" style="margin-bottom: 30px">
-            <div class="col-md-4" id="jqgrid4-container">
-                <table id="jqGrid4"></table>
-            </div>
-            <div class="col-md-4" id="jqgrid5-container">
-                <table id="jqGrid5"></table>
-            </div>
-            <div class="col-md-4" id="jqgrid6-container">
-                <table id="jqGrid6"></table>
-            </div>
-        </div>
-        <div class="row" style="margin-bottom: 30px">
-            <div class="col-md-4" id="summary-container">
-                <table id="summary-grid"></table>
+      
+        <div class="row" style="margin-bottom: 20px">
+            <div id="test-container">
+                <table>
+                    <tr>
+                        <td style="width: 500px" id="student-list"></td>
+                    </tr>
+                    <tr>
+                        <td style="width: 500px" id="separated-student-list"></td>
+                    </tr>
+                </table>
             </div>
         </div>
     </div>
@@ -119,6 +104,30 @@
         });
     }
 
+    function testControl() {
+ 
+        var numericTextBox = $("#test-number").data("kendoComboBox");
+        var testnumber = parseInt(numericTextBox.value());
+
+        $.ajax({
+            url: '@Url.Action("GetResults", "CustomGroup")',
+            data: { testnum: testnumber },
+            type: 'POST',
+            cache: false,
+            success: function (data) {
+                testFile.clear();
+                testFile.set(data.Test, data.Results);
+
+                $("#message-text").replaceWith("Test file with " + data.Results.length);
+
+                var control = new StudentListControl(document.getElementById("student-list"));
+                control.create().setColumns().setDatasource(testFile.students);
+            },
+            fail: function (data) {
+
+            }
+        });
+    }
     function createClasses() {
         var numericTextBox = $("#test-number").data("kendoComboBox");
         var testnumber = parseInt(numericTextBox.value());

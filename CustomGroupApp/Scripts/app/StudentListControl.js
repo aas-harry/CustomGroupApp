@@ -17,10 +17,20 @@ var StudentRow = (function (_super) {
     }
     return StudentRow;
 }(kendo.data.ObservableObject));
+var StudentSelector = (function () {
+    function StudentSelector() {
+    }
+    StudentSelector.prototype.constuctor = function (element, students, selectedStudents) {
+    };
+    return StudentSelector;
+}());
 var StudentListControl = (function () {
-    function StudentListControl() {
+    function StudentListControl(hostElement) {
         var _this = this;
-        this.createStudentGrid = function (element, isCoedSchool) {
+        this.hostElement = hostElement;
+        this.commonUtils = new CommonUtils();
+        this.self = this;
+        this.setColumns = function (isCoedSchool) {
             var columns;
             if (isCoedSchool) {
                 columns = [
@@ -35,9 +45,28 @@ var StudentListControl = (function () {
                     { field: "id", title: "Id", width: "0px", attributes: { 'class': "text-nowrap" } }
                 ];
             }
-            $("#" + element)
+            for (var _i = 0, columns_1 = columns; _i < columns_1.length; _i++) {
+                var column = columns_1[_i];
+                _this.gridControl.columns.push(column);
+            }
+            return _this.self;
+        };
+        this.create = function (name, width, height) {
+            if (name === void 0) { name = "students"; }
+            if (width === void 0) { width = 300; }
+            if (height === void 0) { height = 500; }
+            // Create HTML element for hosting the grid control
+            var container = document.createElement("div");
+            container.setAttribute("style", "width: " + width + "px; height: " + height + "px; margin: 5px 0 0 0;");
+            container.id = name + "-" + _this.commonUtils.createUid() + "-container";
+            var gridElement = document.createElement("div");
+            gridElement.setAttribute("style", "height: 100%;");
+            gridElement.id = name + "-" + _this.commonUtils.createUid() + "-list";
+            container.appendChild(gridElement);
+            _this.hostElement.appendChild(container);
+            $("#" + gridElement.id)
                 .kendoGrid({
-                columns: columns,
+                columns: [],
                 sortable: {
                     mode: "single",
                     allowUnsort: true
@@ -45,30 +74,18 @@ var StudentListControl = (function () {
                 selectable: "row",
                 dataSource: []
             });
-            return $("#" + element).data("kendoGrid");
+            _this.gridControl = $("#" + gridElement.id).data("kendoGrid");
+            return _this.self;
         };
-        this.createStudentClassInputContainer = function (name, cell, students, isCoedSchool, width, height) {
-            if (width === void 0) { width = 300; }
-            if (height === void 0) { height = 500; }
-            var container = document.createElement("div");
-            container.setAttribute("style", "width: " + width + "px; height: " + height + "px; margin: 5px 0 0 0;");
-            container.id = name + "-container";
-            var gridElement = document.createElement("div");
-            gridElement.setAttribute("style", "height: 100%;");
-            gridElement.id = name + "-list";
-            container.appendChild(gridElement);
-            cell.appendChild(container);
-            _this.createStudentListGrid(name, gridElement.id, students, isCoedSchool);
-        };
-        this.createStudentListGrid = function (name, element, students, isCoedSchool) {
-            var grid = _this.createStudentGrid(element, isCoedSchool);
+        this.setDatasource = function (students) {
             // Populate the grid
+            debugger;
             var studentRows = [];
             Enumerable.From(students).ForEach(function (x) { return studentRows.push(new StudentRow(x)); });
-            grid.dataSource.data(students);
-            grid.refresh();
-            grid.resize();
-            return grid;
+            _this.gridControl.dataSource.data(studentRows);
+            _this.gridControl.refresh();
+            _this.gridControl.resize();
+            return _this.self;
         };
     }
     return StudentListControl;

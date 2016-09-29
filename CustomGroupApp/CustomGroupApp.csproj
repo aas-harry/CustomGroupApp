@@ -1049,7 +1049,7 @@
     <TypeScriptCompile Include="Scripts\app\LanguageBandClassDefinitionViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\StepDefinition.ts" />
     <TypeScriptCompile Include="Scripts\app\StudentClassListControls.ts" />
-    <TypeScriptCompile Include="Scripts\app\StudentListControls.ts" />
+    <TypeScriptCompile Include="Scripts\app\StudentListControl.ts" />
     <TypeScriptCompile Include="Scripts\app\TopMiddleLowestBandClassDefinitionViewModel.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\kendo-ui\kendo-ui.d.ts" />

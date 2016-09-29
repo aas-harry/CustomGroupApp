@@ -115,7 +115,6 @@
     }
 
     private groupingHelper = new GroupingHelper();
-    private studentListControls = new StudentListControls();
     private studentSetListControls = new StudentSetListControls();
 
     private nextStep = () => {
@@ -199,6 +198,7 @@
         this.joinedStudents.push(studentSet2);
         this.separatedStudents.push(studentSet1);
         this.separatedStudents.push(studentSet2);
+
         
         this.studentSetListControls.createStudentSetContainer("Paired", joinedStudentsCell, this.joinedStudents, 
             this.classesDefn.testFile.isUnisex);

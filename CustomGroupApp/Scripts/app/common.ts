@@ -1,5 +1,5 @@
 ﻿class CommonUtils {
-    createUuid = (): string => {
+    createUid = (): string => {
         const s = [];
         const hexDigits = "0123456789abcdef";
         for (let i = 0; i < 36; i++) {
