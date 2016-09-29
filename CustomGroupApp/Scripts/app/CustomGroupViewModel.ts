@@ -115,7 +115,7 @@
     }
 
     private groupingHelper = new GroupingHelper();
-
+    private studentListContrrol = new StudentListControl();
 
     private nextStep = () => {
         super.set("currentGroupStep", this.currentGroupStep + 1);
@@ -180,7 +180,16 @@
         }
     }
 
-    generateClasses() {
+    showStudentGroupingOption = (
+        studentListcell: HTMLTableCellElement,
+        joinedStudentsElement: string,
+        separatedStudentsElement: string) => {
+        
+        this.studentListContrrol.createStudentClassInputContainer("students", studentListcell, this.classesDefn.testFile.students,
+            this.classesDefn.testFile.isUnisex);
+    }
+
+    generateClasses()  {
         var bandSet = this.selectedClassDefinitionViewModel.getBandSet();
         switch (this.groupingOption) {
             case GroupingMethod.Banding:

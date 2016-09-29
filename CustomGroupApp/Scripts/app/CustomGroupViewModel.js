@@ -27,6 +27,7 @@ var CustomGroupViewModel = (function (_super) {
         this.stepCollection = new StepCollection();
         this.testInfo = new TestFile();
         this.groupingHelper = new GroupingHelper();
+        this.studentListContrrol = new StudentListControl();
         this.nextStep = function () {
             _super.prototype.set.call(_this, "currentGroupStep", _this.currentGroupStep + 1);
             _this.callGetViewStep(_this.currentGroupStep);
@@ -39,6 +40,9 @@ var CustomGroupViewModel = (function (_super) {
             console.log("cancelStep");
         };
         this.showStep = function (data) {
+        };
+        this.showStudentGroupingOption = function (studentListcell, joinedStudentsElement, separatedStudentsElement) {
+            _this.studentListContrrol.createStudentClassInputContainer("students", studentListcell, _this.classesDefn.testFile.students, _this.classesDefn.testFile.isUnisex);
         };
         //
         this.setDatasource = function (test, results, languages) {

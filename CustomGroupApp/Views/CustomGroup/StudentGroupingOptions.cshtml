@@ -2,6 +2,22 @@
     <span style="margin-right: 10px">Step 3:</span>Enter paired and/or separated students if required
 </div>
 <div style="margin: 20px">
-   
+    <table>
+        <tr>
+            <td style="width: 300px" id="student-list"></td>
+            <td style="width: 300px" id="joined-student-list"></td>
+            <td style="width: 300px" id="separated-student-list"></td>
+        </tr>
+    </table>
 </div>
 
+
+<script>
+    $(document)
+        .ready(function () {
+            kendo.bind($("#custom-group-container"), customGroupViewModel);
+
+            customGroupViewModel.showStudentGroupingOption(document.getElementById("student-list")
+                , "jopined-student-list", "separated-student-list");
+        });
+</script>
