@@ -120,8 +120,10 @@
 
                 $("#message-text").replaceWith("Test file with " + data.Results.length);
 
-                var control = new StudentListControl(document.getElementById("student-list"));
-                control.create().setColumns(true).setDatasource(testFile.students);
+                debugger;
+                var control = new StudentSelector(document.getElementById("student-list"),
+                    data.Results);
+                control.createTable();
             },
             fail: function (data) {
 

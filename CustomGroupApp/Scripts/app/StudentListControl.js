@@ -20,17 +20,31 @@ var StudentRow = (function (_super) {
 var StudentSelector = (function () {
     function StudentSelector() {
         var _this = this;
+        this.students = [];
         this.createTable = function () {
             // Create the table
-            $("#" + _this.tableContainerElementName).html("<table id='" + _this.name + "-table-container'></table>");
-            _this.table = document.getElementById('{this.name}-table-container');
-            _this.headerTable = _this.table.createTHead();
-            _this.bodyTable = _this.table.createTBody();
+            var table = document.createElement("table");
+            var body = table.createTBody();
+            var studentRow = body.insertRow();
+            for (var _i = 0, _a = _this.students; _i < _a.length; _i++) {
+                var student = _a[_i];
+                _this.createStudentCell(studentRow
+                    .insertCell(), student);
+            }
+        };
+        this.createStudentCell = function (cell, student) {
+            var checkBox = document.createElement("input");
+            checkBox.type = "checkbox";
+            checkBox.id = "studentid-" + student.studentId;
+            cell.appendChild(checkBox);
+            var label = document.createElement("span");
+            label.textContent = student.name;
+            label.setAttribute("style", "margin-right: 5px");
+            cell.appendChild(label);
         };
     }
     StudentSelector.prototype.constuctor = function (name, element, students, selectedStudents) {
         this.name = name;
-        this.tableContainerElementName = element;
         this.createTable();
     };
     return StudentSelector;
@@ -110,3 +124,4 @@ var StudentListControl = (function () {
     }
     return StudentListControl;
 }());
+//# sourceMappingURL=StudentListControl.js.map

@@ -38,3 +38,4 @@ var TopMiddleLowestBandClassDefinitionViewModel = (function (_super) {
     };
     return TopMiddleLowestBandClassDefinitionViewModel;
 }(kendo.data.ObservableObject));
+//# sourceMappingURL=TopMiddleLowestBandClassDefinitionViewModel.js.map

@@ -41,3 +41,4 @@ var BandClassDefinitionViewModel = (function (_super) {
     };
     return BandClassDefinitionViewModel;
 }(kendo.data.ObservableObject));
+//# sourceMappingURL=BandClassDefinitionViewModel.js.map

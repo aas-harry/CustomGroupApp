@@ -17,23 +17,34 @@
 class StudentSelector {
     constuctor(name: string, element: HTMLDivElement, students: Array<Student>, selectedStudents: Array<Student>) {
         this.name = name;
-        this.tableContainerElementName = element;
         this.createTable();
     }
     name: string;
-    tableContainerElementName: HTMLDivElement;
-    table: HTMLTableElement;
-    header: HTMLTableSectionElement;
-    headerRow: HTMLTableRowElement;
-    classRow: HTMLTableRowElement;
-    footerRow: HTMLTableRowElement;
+    students : Array<Student> = [];
+
 
     createTable = () => {
         // Create the table
-        $(`#${this.tableContainerElementName}`).html(`<table id='${this.name}-table-container'></table>`);
-        this.table = document.getElementById('{this.name}-table-container') as HTMLTablenameElement;
-        this.headerTable = this.table.createTHead();
-        this.bodyTable = this.table.createTBody();
+        const table = document.createElement("table") as HTMLTableElement;
+        const body = table.createTBody();
+
+        let studentRow = body.insertRow();
+        for (let student of this.students) {
+            this.createStudentCell(studentRow
+                .insertCell(), student);
+        }
+    }
+
+    createStudentCell = (cell: HTMLTableCellElement, student: Student) => {
+        const checkBox = document.createElement("input");
+        checkBox.type = "checkbox";
+        checkBox.id = "studentid-" + student.studentId;
+        cell.appendChild(checkBox);
+
+        const label = document.createElement("span");
+        label.textContent = student.name;
+        label.setAttribute("style", "margin-right: 5px");
+        cell.appendChild(label);
     }
 }
 class StudentListControl {
