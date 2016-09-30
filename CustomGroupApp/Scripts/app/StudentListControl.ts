@@ -15,23 +15,33 @@
 }
 
 class StudentSelector {
-    constuctor(name: string, element: HTMLDivElement, students: Array<Student>, selectedStudents: Array<Student>) {
-        this.name = name;
-        this.createTable();
-    }
+    constructor(public maxRows = 40){}
+
+    container: HTMLElement;
     name: string;
     students : Array<Student> = [];
 
 
-    createTable = () => {
+    createTable = (element: HTMLElement, students: Array<Student>) => {
         // Create the table
+        this.container = element; // $("#" + element)[0];
         const table = document.createElement("table") as HTMLTableElement;
+        this.container.appendChild(table);
+        var cnt = 0;
+        var studentRows = [];
         const body = table.createTBody();
+        studentRows.push(body.insertRow());
 
-        let studentRow = body.insertRow();
-        for (let student of this.students) {
-            this.createStudentCell(studentRow
+        for (let student of students) {
+            if (cnt > this.maxRows) {
+                cnt = 0;
+            }
+            if (cnt >= studentRows.length) {
+                studentRows.push(body.insertRow());
+            }
+            this.createStudentCell(studentRows[cnt]
                 .insertCell(), student);
+            cnt++;
         }
     }
 
@@ -43,7 +53,7 @@ class StudentSelector {
 
         const label = document.createElement("span");
         label.textContent = student.name;
-        label.setAttribute("style", "margin-right: 5px");
+        label.setAttribute("style", "margin-left: 5px");
         cell.appendChild(label);
     }
 }
@@ -81,7 +91,7 @@ class StudentListControl {
     }
 
     create = (
-        name = "students"   ,
+        name = "students",
         width = 300,
         height = 500) => {
 
@@ -122,8 +132,6 @@ class StudentListControl {
 
     setDatasource = (students: Array<Student>): StudentListControl => {
         // Populate the grid
-
-
         var studentRows: Array<StudentRow> = [];
         Enumerable.From(students).ForEach(x => studentRows.push(new StudentRow(x)));
         this.gridControl.dataSource.data(studentRows);

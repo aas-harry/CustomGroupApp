@@ -115,7 +115,7 @@
     }
 
     private groupingHelper = new GroupingHelper();
-    private studentSetListControls = new StudentSetListControls();
+    private studentSetListControls = new StudentSetListControl();
 
     private nextStep = () => {
         super.set("currentGroupStep", this.currentGroupStep + 1);
@@ -204,6 +204,13 @@
             this.classesDefn.testFile.isUnisex);
         this.studentSetListControls.createStudentSetContainer("Separated", separatedStudentsCell, this.separatedStudents,
             this.classesDefn.testFile.isUnisex);
+    }
+
+    editPairStudent = (e: any) => {
+        debugger;
+    }
+    deletePairStudent = (e: any) => {
+        debugger;
     }
 
     generateClasses()  {

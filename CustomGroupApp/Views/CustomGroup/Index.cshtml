@@ -25,13 +25,14 @@
             <div id="test-container">
                 <table>
                     <tr>
-                        <td style="width: 500px" id="student-list"></td>
+                        <td style="width: 500px" id="joined-student-list"></td>
                     </tr>
                     <tr>
                         <td style="width: 500px" id="separated-student-list"></td>
                     </tr>
                 </table>
             </div>
+            <div id="student-list"></div>
         </div>
     </div>
 </div>
@@ -118,12 +119,11 @@
                 testFile.clear();
                 testFile.set(data.Test, data.Results);
 
-                $("#message-text").replaceWith("Test file with " + data.Results.length);
+                $("#message-text").replaceWith("Test file with " + testFile.students.length);
 
-                debugger;
-                var control = new StudentSelector(document.getElementById("student-list"),
-                    data.Results);
-                control.createTable();
+                var control = new StudentSelector(20);
+                control.createTable(document.getElementById("student-list"), testFile.students);
+                
             },
             fail: function (data) {
 

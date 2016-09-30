@@ -544,7 +544,9 @@ var GroupingHelper = (function () {
 }());
 var StudentSet = (function () {
     function StudentSet() {
+        this.kendoHelper = new KendoHelper();
         this.students = [];
+        this.uid = this.kendoHelper.createUuid();
     }
     Object.defineProperty(StudentSet.prototype, "studentList", {
         get: function () {

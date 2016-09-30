@@ -16,10 +16,10 @@
 <script>
     $(document)
         .ready(function () {
-            kendo.bind($("#custom-group-container"), customGroupViewModel);
-
             customGroupViewModel.showStudentGroupingOption(
                 document.getElementById("joined-student-list"),
                 document.getElementById("separated-student-list"));
+
+            kendo.bind($("#custom-group-container"), customGroupViewModel);
         });
 </script>

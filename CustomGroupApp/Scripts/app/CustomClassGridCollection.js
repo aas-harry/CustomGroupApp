@@ -2,7 +2,7 @@ var CustomClassGridCollection = (function () {
     function CustomClassGridCollection() {
         var _this = this;
         this.groupingHelper = new GroupingHelper();
-        this.studentClassListControls = new StudentClassListControls();
+        this.studentClassListControls = new StudentClassListControl();
         this.kendoHelper = new KendoHelper();
         this.me = this;
         this.classes = [];
@@ -66,3 +66,4 @@ var CustomClassGridCollection = (function () {
     }
     return CustomClassGridCollection;
 }());
+//# sourceMappingURL=CustomClassGridCollection.js.map

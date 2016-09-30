@@ -1,5 +1,5 @@
-var StudentClassListControls = (function () {
-    function StudentClassListControls() {
+var StudentClassListControl = (function () {
+    function StudentClassListControl() {
         var _this = this;
         this.kendoHelper = new KendoHelper();
         this.createStudentClassInputContainer = function (cell, classItem, editGroupNameCallback, dropCallback) {
@@ -164,6 +164,6 @@ var StudentClassListControls = (function () {
             return container;
         };
     }
-    return StudentClassListControls;
+    return StudentClassListControl;
 }());
-//# sourceMappingURL=StudentClassListControls.js.map
+//# sourceMappingURL=StudentClassListControl.js.map

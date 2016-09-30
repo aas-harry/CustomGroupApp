@@ -1,14 +1,9 @@
-﻿class CustomClassGrid {
-    
-}
-
-class CustomClassGridCollection {
+﻿class CustomClassGridCollection {
 
     private groupingHelper = new GroupingHelper();
-    private studentClassListControls = new StudentClassListControls();
+    private studentClassListControls = new StudentClassListControl();
     private kendoHelper = new KendoHelper();
     private me = this;
-    items: Array<CustomClassGrid> = [];
     table: HTMLTableElement;
     header: HTMLTableSectionElement;
     headerRow: HTMLTableRowElement;
@@ -73,7 +68,6 @@ class CustomClassGridCollection {
     }
 
     clear = () => {
-        this.items.splice(0, this.items.length);
     }
 
     createClassHeader = (classItem: ClassDefinition) => {

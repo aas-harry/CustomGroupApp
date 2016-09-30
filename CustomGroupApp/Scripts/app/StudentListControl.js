@@ -18,18 +18,31 @@ var StudentRow = (function (_super) {
     return StudentRow;
 }(kendo.data.ObservableObject));
 var StudentSelector = (function () {
-    function StudentSelector() {
+    function StudentSelector(maxRows) {
         var _this = this;
+        if (maxRows === void 0) { maxRows = 40; }
+        this.maxRows = maxRows;
         this.students = [];
-        this.createTable = function () {
+        this.createTable = function (element, students) {
             // Create the table
+            _this.container = element; // $("#" + element)[0];
             var table = document.createElement("table");
+            _this.container.appendChild(table);
+            var cnt = 0;
+            var studentRows = [];
             var body = table.createTBody();
-            var studentRow = body.insertRow();
-            for (var _i = 0, _a = _this.students; _i < _a.length; _i++) {
-                var student = _a[_i];
-                _this.createStudentCell(studentRow
+            studentRows.push(body.insertRow());
+            for (var _i = 0, students_1 = students; _i < students_1.length; _i++) {
+                var student = students_1[_i];
+                if (cnt > _this.maxRows) {
+                    cnt = 0;
+                }
+                if (cnt >= studentRows.length) {
+                    studentRows.push(body.insertRow());
+                }
+                _this.createStudentCell(studentRows[cnt]
                     .insertCell(), student);
+                cnt++;
             }
         };
         this.createStudentCell = function (cell, student) {
@@ -39,14 +52,10 @@ var StudentSelector = (function () {
             cell.appendChild(checkBox);
             var label = document.createElement("span");
             label.textContent = student.name;
-            label.setAttribute("style", "margin-right: 5px");
+            label.setAttribute("style", "margin-left: 5px");
             cell.appendChild(label);
         };
     }
-    StudentSelector.prototype.constuctor = function (name, element, students, selectedStudents) {
-        this.name = name;
-        this.createTable();
-    };
     return StudentSelector;
 }());
 var StudentListControl = (function () {

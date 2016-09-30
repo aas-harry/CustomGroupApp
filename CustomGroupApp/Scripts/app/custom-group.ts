@@ -576,6 +576,12 @@ class GroupingHelper {
 }
 
 class StudentSet {
+    constructor() {
+        this.uid = this.kendoHelper.createUuid();
+    }
+
+    private kendoHelper = new KendoHelper();
+    uid: string;
     students: Array<StudentClass> = [];
     get studentList() {
         return Enumerable.From(this.students).Take(5).Select(x => x.name).ToString(",") + (this.students.length > 5 ? " and more..." : "");
