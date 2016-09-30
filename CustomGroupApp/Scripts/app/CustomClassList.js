@@ -73,4 +73,3 @@ var CustomClassGridCollection = (function () {
     }
     return CustomClassGridCollection;
 }());
-//# sourceMappingURL=CustomClassList.js.map

@@ -15,8 +15,25 @@
 }
 
 class StudentSelector {
-    constuctor(element: HTMLDivElement, students: Array<Student>, selectedStudents: Array<Student>) {
-        
+    constuctor(name: string, element: HTMLDivElement, students: Array<Student>, selectedStudents: Array<Student>) {
+        this.name = name;
+        this.tableContainerElementName = element;
+        this.createTable();
+    }
+    name: string;
+    tableContainerElementName: HTMLDivElement;
+    table: HTMLTableElement;
+    header: HTMLTableSectionElement;
+    headerRow: HTMLTableRowElement;
+    classRow: HTMLTableRowElement;
+    footerRow: HTMLTableRowElement;
+
+    createTable = () => {
+        // Create the table
+        $(`#${this.tableContainerElementName}`).html(`<table id='${this.name}-table-container'></table>`);
+        this.table = document.getElementById('{this.name}-table-container') as HTMLTablenameElement;
+        this.headerTable = this.table.createTHead();
+        this.bodyTable = this.table.createTBody();
     }
 }
 class StudentListControl {
@@ -41,10 +58,14 @@ class StudentListControl {
             ];
         }
 
+        const options = this.gridControl.options;
+        options.columns.splice(0, options.columns.length);
         for (let column of columns) {
-            this.gridControl.columns.push(column);
+            options.columns.push(column);
         }
-    
+        
+        this.gridControl.setOptions(options);
+
         return this.self;
     }
 
@@ -52,6 +73,12 @@ class StudentListControl {
         name = "students"   ,
         width = 300,
         height = 500) => {
+
+        if (this.hostElement.childElementCount > 0) {
+            while (this.hostElement.hasChildNodes()) {
+                this.hostElement.removeChild(this.hostElement.lastChild);
+            }
+        }
 
         // Create HTML element for hosting the grid control
         var container = document.createElement("div") as HTMLDivElement;
@@ -67,7 +94,9 @@ class StudentListControl {
 
         $(`#${gridElement.id}`)
             .kendoGrid({
-                columns: [],
+                columns: [
+                    { field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" } }
+                ],
                 sortable: {
                     mode: "single",
                     allowUnsort: true
@@ -82,13 +111,16 @@ class StudentListControl {
 
     setDatasource = (students: Array<Student>): StudentListControl => {
         // Populate the grid
-        debugger;
+
+
         var studentRows: Array<StudentRow> = [];
         Enumerable.From(students).ForEach(x => studentRows.push(new StudentRow(x)));
         this.gridControl.dataSource.data(studentRows);
         this.gridControl.refresh();
+      
         this.gridControl.resize();
         return this.self;
     }
 
 }
+
