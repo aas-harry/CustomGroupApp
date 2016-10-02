@@ -4,10 +4,8 @@
 
         this.rootSite = rootSite;
         this.studentCount = studentCount;
-        //this.classDefinitionViewModel = new ClassDefinitionViewModel(studentCount, this.onStudentCountChanged);
-        //this.bandClassDefinitionViewModel = new BandClassDefinitionViewModel(studentCount);
-        //this.topMiddleLowestBandClassDefinitionViewModel = new TopMiddleLowestBandClassDefinitionViewModel(studentCount);
     }
+
     selectedGroupingOption = "MixedAbility";
     selectedStreamingOption = "OverallAbilty";
     selectedTopClassGroupingOption = "Streaming";
@@ -46,12 +44,10 @@
         const selectedTopClassGroupingOption = this.selectedTopClassGroupingOption;
         return this.groupingHelper.convertGroupingOptionFromString(selectedTopClassGroupingOption);
     }
-
     get lowestClassGroupingOption(): GroupingMethod {
         const selectedLowestClassGroupingOption = this.selectedLowestClassGroupingOption;
         return this.groupingHelper.convertGroupingOptionFromString(selectedLowestClassGroupingOption);
     }
-
     get groupingOption(): GroupingMethod {
         const selectedGroupingOption = this.selectedGroupingOption;
         return this.groupingHelper.convertGroupingOptionFromString(selectedGroupingOption);
@@ -114,8 +110,10 @@
         return this._generateCustomGroupViewModel;
     }
 
+    private commonUtils = new CommonUtils();
     private groupingHelper = new GroupingHelper();
-    private studentSetListControls = new StudentSetListControl();
+    private pairedStudentsControl: StudentSetListControl;
+    private separatedStudentsControl: StudentSetListControl;
 
     private nextStep = () => {
         super.set("currentGroupStep", this.currentGroupStep + 1);
@@ -183,37 +181,31 @@
     showStudentGroupingOption = (
         joinedStudentsCell: HTMLTableCellElement,
         separatedStudentsCell: HTMLTableCellElement) => {
-        
-        var studentSet1 = new StudentSet();
-        studentSet1.students.push(this.classesDefn.students[0]);
-        studentSet1.students.push(this.classesDefn.students[1]);
-        studentSet1.students.push(this.classesDefn.students[2]);
-        studentSet1.students.push(this.classesDefn.students[3]);
-        var studentSet2 = new StudentSet();
-        studentSet2.students.push(this.classesDefn.students[4]);
-        studentSet2.students.push(this.classesDefn.students[5]);
-        studentSet2.students.push(this.classesDefn.students[6]);
+    
+        this.pairedStudentsControl.createStudentSetContainer(joinedStudentsCell, this.classesDefn.testFile.isUnisex);
+        this.separatedStudentsControl.createStudentSetContainer(separatedStudentsCell, this.classesDefn.testFile.isUnisex);
+    }
 
-        this.joinedStudents.push(studentSet1);
-        this.joinedStudents.push(studentSet2);
-        this.separatedStudents.push(studentSet1);
-        this.separatedStudents.push(studentSet2);
-
-        
-        this.studentSetListControls.createStudentSetContainer("Paired", joinedStudentsCell, this.joinedStudents, 
-            this.classesDefn.testFile.isUnisex);
-        this.studentSetListControls.createStudentSetContainer("Separated", separatedStudentsCell, this.separatedStudents,
-            this.classesDefn.testFile.isUnisex);
+    addPairStudent = (e: any) => {
+        if (!this.pairedStudentsControl.onAddPairStudent(e.target.id)) {
+            this.separatedStudentsControl.onAddPairStudent(e.target.id);
+        }
     }
 
     editPairStudent = (e: any) => {
-        debugger;
-    }
-    deletePairStudent = (e: any) => {
-        debugger;
+        if (! this.pairedStudentsControl.onEditPairStudent(e.target.id)) {
+            this.separatedStudentsControl.onEditPairStudent(e.target.id);
+        }
     }
 
-    generateClasses()  {
+    deletePairStudent = (e: any) => {
+        if (!this.pairedStudentsControl.onDeletePairStudent(e.target.id)) {
+            this.separatedStudentsControl.onDeletePairStudent(e.target.id);
+        }
+    }
+
+    generateClasses() {
+        debugger;
         var bandSet = this.selectedClassDefinitionViewModel.getBandSet();
         switch (this.groupingOption) {
             case GroupingMethod.Banding:
@@ -284,6 +276,17 @@
 
         this.topMiddleLowestBandSet = this.classesDefn.createTopMiddleBottomBandSet("class", this.studentCount);
 
+        this.pairedStudentsControl = new
+            StudentSetListControl("Paired",
+                this.joinedStudents,
+                testInfo.students,
+                document.getElementById("popup-window-container"));
+
+        this.separatedStudentsControl = new
+            StudentSetListControl("Separated",
+            this.separatedStudents,
+            testInfo.students,
+            document.getElementById("popup-window-container"));
 
         this.set("selectedClassDefinitionViewModel", this.classDefinitionViewModel);
     };

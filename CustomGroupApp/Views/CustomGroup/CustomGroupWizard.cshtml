@@ -14,10 +14,11 @@
 
         .step-title {
             font-size: 12px;
-            font-weight: bold;   
+            font-weight: bold;
         }
     </style>
 
+    <div id="popup-window-container"></div>
     <div class="container-fluid" id="custom-group-container">
         <div class="row">
             <div id="custom-group-content" style="margin: 20px">
@@ -25,9 +26,10 @@
             </div>
         </div>
         <div>
-            <span style="margin-right: 20px; color: red" data-bind="text: errorMessage, visible: hasErrors"></span></div>
+            <span style="margin-right: 20px; color: red" data-bind="text: errorMessage, visible: hasErrors"></span>
+        </div>
         <div class="row">
-            <hr/>
+            <hr />
             <div id="navigation-buttons" style="margin-left: 20px">
                 <button class="btn btn-default" data-bind="click: nextStep, disabled: isLastStep ">Next</button>
                 <button class="btn btn-default" data-bind="click: previousStep, disabled: isFirstStep">Previous</button>

@@ -1,22 +1,7 @@
-﻿enum GroupingMethod {
-    Unknown,
-    MixedAbility,
+﻿enum BandStreamType {
+    None,
     Streaming,
-    Banding,
-    TopMiddleLowest,
-    Language,
-    CustomGroup
-}
-
-enum SearchDirection {
-    Forward,
-    Backward
-}
-
-enum Gender {
-    All,
-    Girls,
-    Boys
+    Parallel,
 }
 
 enum BandType {
@@ -28,17 +13,27 @@ enum BandType {
     Language = 5
 }
 
+enum Gender {
+    All,
+    Girls,
+    Boys
+}
+
+enum GroupingMethod {
+    Unknown,
+    MixedAbility,
+    Streaming,
+    Banding,
+    TopMiddleLowest,
+    Language,
+    CustomGroup
+}
+
 enum StreamType {
     None,
     OverallAbilty,
     English,
     MathsAchievement
-}
-
-enum BandStreamType {
-    None,
-    Streaming,
-    Parallel,
 }
 
 function createUuid() {
@@ -577,12 +572,12 @@ class GroupingHelper {
 
 class StudentSet {
     constructor() {
-        this.uid = this.kendoHelper.createUuid();
+        this.studentSetId = this.kendoHelper.createUuid();
     }
 
     private kendoHelper = new KendoHelper();
-    uid: string;
-    students: Array<StudentClass> = [];
+    studentSetId: string;
+    students: Array<Student> = [];
     get studentList() {
         return Enumerable.From(this.students).Take(5).Select(x => x.name).ToString(",") + (this.students.length > 5 ? " and more..." : "");
     }

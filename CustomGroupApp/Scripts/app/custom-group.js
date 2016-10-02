@@ -3,6 +3,27 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+var BandStreamType;
+(function (BandStreamType) {
+    BandStreamType[BandStreamType["None"] = 0] = "None";
+    BandStreamType[BandStreamType["Streaming"] = 1] = "Streaming";
+    BandStreamType[BandStreamType["Parallel"] = 2] = "Parallel";
+})(BandStreamType || (BandStreamType = {}));
+var BandType;
+(function (BandType) {
+    BandType[BandType["None"] = 0] = "None";
+    BandType[BandType["Custom"] = 1] = "Custom";
+    BandType[BandType["Top"] = 2] = "Top";
+    BandType[BandType["Middle"] = 3] = "Middle";
+    BandType[BandType["Lowest"] = 4] = "Lowest";
+    BandType[BandType["Language"] = 5] = "Language";
+})(BandType || (BandType = {}));
+var Gender;
+(function (Gender) {
+    Gender[Gender["All"] = 0] = "All";
+    Gender[Gender["Girls"] = 1] = "Girls";
+    Gender[Gender["Boys"] = 2] = "Boys";
+})(Gender || (Gender = {}));
 var GroupingMethod;
 (function (GroupingMethod) {
     GroupingMethod[GroupingMethod["Unknown"] = 0] = "Unknown";
@@ -13,26 +34,6 @@ var GroupingMethod;
     GroupingMethod[GroupingMethod["Language"] = 5] = "Language";
     GroupingMethod[GroupingMethod["CustomGroup"] = 6] = "CustomGroup";
 })(GroupingMethod || (GroupingMethod = {}));
-var SearchDirection;
-(function (SearchDirection) {
-    SearchDirection[SearchDirection["Forward"] = 0] = "Forward";
-    SearchDirection[SearchDirection["Backward"] = 1] = "Backward";
-})(SearchDirection || (SearchDirection = {}));
-var Gender;
-(function (Gender) {
-    Gender[Gender["All"] = 0] = "All";
-    Gender[Gender["Girls"] = 1] = "Girls";
-    Gender[Gender["Boys"] = 2] = "Boys";
-})(Gender || (Gender = {}));
-var BandType;
-(function (BandType) {
-    BandType[BandType["None"] = 0] = "None";
-    BandType[BandType["Custom"] = 1] = "Custom";
-    BandType[BandType["Top"] = 2] = "Top";
-    BandType[BandType["Middle"] = 3] = "Middle";
-    BandType[BandType["Lowest"] = 4] = "Lowest";
-    BandType[BandType["Language"] = 5] = "Language";
-})(BandType || (BandType = {}));
 var StreamType;
 (function (StreamType) {
     StreamType[StreamType["None"] = 0] = "None";
@@ -40,12 +41,6 @@ var StreamType;
     StreamType[StreamType["English"] = 2] = "English";
     StreamType[StreamType["MathsAchievement"] = 3] = "MathsAchievement";
 })(StreamType || (StreamType = {}));
-var BandStreamType;
-(function (BandStreamType) {
-    BandStreamType[BandStreamType["None"] = 0] = "None";
-    BandStreamType[BandStreamType["Streaming"] = 1] = "Streaming";
-    BandStreamType[BandStreamType["Parallel"] = 2] = "Parallel";
-})(BandStreamType || (BandStreamType = {}));
 function createUuid() {
     var s = [];
     var hexDigits = "0123456789abcdef";
@@ -546,7 +541,7 @@ var StudentSet = (function () {
     function StudentSet() {
         this.kendoHelper = new KendoHelper();
         this.students = [];
-        this.uid = this.kendoHelper.createUuid();
+        this.studentSetId = this.kendoHelper.createUuid();
     }
     Object.defineProperty(StudentSet.prototype, "studentList", {
         get: function () {

@@ -12,4 +12,9 @@
         const uuid = s.join("");
         return uuid;
     }
+
+    getUid = (elementName: string) => {
+        return elementName.substr(elementName.indexOf("-") + 1);
+    }
+
 }

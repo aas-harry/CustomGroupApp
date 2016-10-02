@@ -12,7 +12,10 @@ var CommonUtils = (function () {
             var uuid = s.join("");
             return uuid;
         };
+        this.getUid = function (elementName) {
+            return elementName.substr(elementName.indexOf("-") + 1);
+        };
     }
     return CommonUtils;
 }());
-//# sourceMappingURL=common.js.map
+//# sourceMappingURL=CommonUtils.js.map

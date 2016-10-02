@@ -1,4 +1,5 @@
-﻿<div class="container-fluid">
+﻿<div id="window-popup"></div>
+<div class="container-fluid">
     <style scoped="">
           .k-grid td {
             padding-bottom: 2px;
@@ -122,8 +123,9 @@
                 $("#message-text").replaceWith("Test file with " + testFile.students.length);
 
                 var control = new StudentSelector(20);
-                control.createTable(document.getElementById("student-list"), testFile.students);
-                
+                control.openDialog(document.getElementById("window-popup"), testFile.students, Enumerable.From(testFile.students).Take(5).ToArray());
+                // control.createTable(document.getElementById("student-list"), testFile.students);
+
             },
             fail: function (data) {
 

@@ -1020,8 +1020,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Scripts\app\Enums\" />
-    <Folder Include="Scripts\app\Models\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
@@ -1042,27 +1040,30 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="Scripts\app\Viewmodels\BandClassDefinitionViewModel.ts" />
+    <TypeScriptCompile Include="Scripts\app\BandClassDefinitionViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\BandTabControl.ts" />
+    <TypeScriptCompile Include="Scripts\app\ClassBandInputContainer.ts" />
     <TypeScriptCompile Include="Scripts\app\ClassTabControl.ts" />
     <TypeScriptCompile Include="Scripts\app\CustomClassGridCollection.ts" />
-    <TypeScriptCompile Include="Scripts\app\Viewmodels\GenerateCustomGroupViewModel.ts" />
-    <TypeScriptCompile Include="Scripts\app\Viewmodels\GroupingTypeViewModel.ts" />
-    <TypeScriptCompile Include="Scripts\app\Viewmodels\ClassDefinitionViewModel.ts" />
-    <TypeScriptCompile Include="Scripts\app\common.ts" />
+    <TypeScriptCompile Include="Scripts\app\GenerateCustomGroupViewModel.ts" />
+    <TypeScriptCompile Include="Scripts\app\GroupingTypeViewModel.ts" />
+    <TypeScriptCompile Include="Scripts\app\ClassDefinitionViewModel.ts" />
+    <TypeScriptCompile Include="Scripts\app\CommonUtils.ts" />
     <TypeScriptCompile Include="Scripts\app\custom-group.ts" />
-    <TypeScriptCompile Include="Scripts\app\Viewmodels\CustomGroupViewModel.ts" />
+    <TypeScriptCompile Include="Scripts\app\CustomGroupViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\entities.ts" />
     <TypeScriptCompile Include="Scripts\app\IndividualStudentTestResult.ts" />
-    <TypeScriptCompile Include="Scripts\app\Helpers\kendoHelper.ts" />
+    <TypeScriptCompile Include="Scripts\app\KendoHelper.ts" />
     <TypeScriptCompile Include="Scripts\app\repository.ts" />
-    <TypeScriptCompile Include="Scripts\app\Viewmodels\LanguageBandClassDefinitionViewModel.ts" />
+    <TypeScriptCompile Include="Scripts\app\LanguageBandClassDefinitionViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\StepDefinition.ts" />
+    <TypeScriptCompile Include="Scripts\app\StudentBandInputContainer.ts" />
+    <TypeScriptCompile Include="Scripts\app\StudentClassInputContainer.ts" />
     <TypeScriptCompile Include="Scripts\app\StudentClassListControl.ts" />
     <TypeScriptCompile Include="Scripts\app\StudentClassRow.ts" />
     <TypeScriptCompile Include="Scripts\app\StudentListControl.ts" />
     <TypeScriptCompile Include="Scripts\app\StudentSetListControl.ts" />
-    <TypeScriptCompile Include="Scripts\app\Viewmodels\TopMiddleLowestBandClassDefinitionViewModel.ts" />
+    <TypeScriptCompile Include="Scripts\app\TopMiddleLowestBandClassDefinitionViewModel.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\kendo-ui\kendo-ui.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\linq\linq.d.ts" />

@@ -80,7 +80,6 @@
     set students(value: Array<StudentClass>) {
         this._students = value;
         this.studentWithLanguagePrefCount = Enumerable.From(value).Count(x => x.hasLanguagePreferences);
-        debugger;
         this.languageSets = [];
         for (let s of this._students) {
             let matched = Enumerable.From(this.languageSets)
