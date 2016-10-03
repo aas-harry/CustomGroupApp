@@ -11,19 +11,34 @@ var CustomClassGridCollection = (function () {
             $(elementName).html("<table id='custom-classes-table'></table>");
             _this.table = document.getElementById("custom-classes-table");
             _this.header = _this.table.createTBody();
-            _this.classRow = _this.header.insertRow();
-            _this.classes = Enumerable.From(bands).SelectMany(function (b) { return b.classes; }).ToArray();
-            _this.classCount = _this.classes.length;
-            var cnt = 0;
-            for (var _i = 0, _a = _this.classes; _i < _a.length; _i++) {
-                var classItem = _a[_i];
-                if (cnt === 3) {
-                    _this.classRow = _this.header.insertRow();
-                    cnt = 0;
+            if (bands.length === 1) {
+                _this.classRow = _this.header.insertRow();
+                _this.classes = Enumerable.From(bands).SelectMany(function (b) { return b.classes; }).ToArray();
+                _this.classCount = _this.classes.length;
+                var cnt = 0;
+                for (var _i = 0, _a = _this.classes; _i < _a.length; _i++) {
+                    var classItem = _a[_i];
+                    if (cnt === 3) {
+                        _this.classRow = _this.header.insertRow();
+                        cnt = 0;
+                    }
+                    cnt++;
+                    _this.studentClassListControls
+                        .createStudentClassInputContainer(_this.classRow.insertCell(), classItem, _this.onEditGroupName, _this.onDropItem);
                 }
-                cnt++;
-                _this.studentClassListControls
-                    .createStudentClassInputContainer(_this.classRow.insertCell(), classItem, _this.onEditGroupName, _this.onDropItem);
+            }
+            else {
+                for (var _b = 0, bands_1 = bands; _b < bands_1.length; _b++) {
+                    var band = bands_1[_b];
+                    _this.classes = Enumerable.From(bands).SelectMany(function (b) { return b.classes; }).ToArray();
+                    _this.classCount = _this.classes.length;
+                    _this.classRow = _this.header.insertRow();
+                    for (var _c = 0, _d = band.classes; _c < _d.length; _c++) {
+                        var classItem = _d[_c];
+                        _this.studentClassListControls
+                            .createStudentClassInputContainer(_this.classRow.insertCell(), classItem, _this.onEditGroupName, _this.onDropItem);
+                    }
+                }
             }
         };
         this.onDropItem = function (targetUid, sourceUid, studentId) {

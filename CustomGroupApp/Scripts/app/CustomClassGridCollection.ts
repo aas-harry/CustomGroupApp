@@ -17,24 +17,41 @@
         $(elementName).html("<table id='custom-classes-table'></table>");
         this.table = document.getElementById("custom-classes-table") as HTMLTableElement;
         this.header = this.table.createTBody();
-        this.classRow = this.header.insertRow();
 
-        this.classes = Enumerable.From(bands).SelectMany(b => b.classes).ToArray();
-        this.classCount = this.classes.length;
+        if (bands.length === 1) {
+            this.classRow = this.header.insertRow();
+            this.classes = Enumerable.From(bands).SelectMany(b => b.classes).ToArray();
+            this.classCount = this.classes.length;
 
-        var cnt = 0;
-        for (let classItem of this.classes) {
-            if (cnt === 3) {
-                this.classRow = this.header.insertRow();
-                cnt = 0;
+            var cnt = 0;
+            for (let classItem of this.classes) {
+                if (cnt === 3) {
+                    this.classRow = this.header.insertRow();
+                    cnt = 0;
+                }
+                cnt++;
+
+                this.studentClassListControls
+                    .createStudentClassInputContainer(this.classRow.insertCell(),
+                        classItem,
+                        this.onEditGroupName,
+                        this.onDropItem);
             }
-            cnt++;
+        } else {
+            for (let band of bands) {
+                this.classes = Enumerable.From(bands).SelectMany(b => b.classes).ToArray();
+                this.classCount = this.classes.length;
 
-            this.studentClassListControls
-                .createStudentClassInputContainer(this.classRow.insertCell(),
-                    classItem,
-                    this.onEditGroupName,
-                    this.onDropItem);
+                this.classRow = this.header.insertRow();
+                for (let classItem of band.classes) {
+
+                    this.studentClassListControls
+                        .createStudentClassInputContainer(this.classRow.insertCell(),
+                        classItem,
+                        this.onEditGroupName,
+                        this.onDropItem);
+                }
+            }
         }
     };
 
