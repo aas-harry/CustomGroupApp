@@ -40,16 +40,17 @@ var StepCollection = (function () {
         this.isFirstStep = function (stepNo) {
             return _this.firstStep.stepNo === stepNo;
         };
-        this.steps.push(new StepDefinition(1, true, "SelectGroupingTypeStep"));
-        var step2 = new StepDefinition(2, false, "ClassConfigurationStep");
+        this.steps.push(new StepDefinition(1, true, "SourceCustomGroupStep"));
+        this.steps.push(new StepDefinition(2, true, "SelectGroupingTypeStep"));
+        var step2 = new StepDefinition(3, false, "ClassConfigurationStep");
         step2.views.push(new ViewDefinition(GroupingMethod.Banding, "BandClassConfigurationStep"));
         step2.views.push(new ViewDefinition(GroupingMethod.TopMiddleLowest, "TopMiddleLowestClassConfigurationStep"));
         step2.views.push(new ViewDefinition(GroupingMethod.Language, "LanguageClassConfigurationStep"));
         this.steps.push(step2);
-        this.steps.push(new StepDefinition(3, true, "StudentGroupingOptionsStep"));
-        this.steps.push(new StepDefinition(4, true, "EnterCustomGroupNameStep"));
-        this.steps.push(new StepDefinition(5, true, "GenerateCustomGroupStep"));
-        this.steps.push(new StepDefinition(6, true, "SaveCustomGroupStep"));
+        this.steps.push(new StepDefinition(4, true, "StudentGroupingOptionsStep"));
+        this.steps.push(new StepDefinition(5, true, "EnterCustomGroupNameStep"));
+        this.steps.push(new StepDefinition(6, true, "GenerateCustomGroupStep"));
+        this.steps.push(new StepDefinition(7, true, "SaveCustomGroupStep"));
         this.stepCount = this.steps.length;
         this.lastStep = this.steps[this.stepCount - 1];
         this.firstStep = this.steps[0];

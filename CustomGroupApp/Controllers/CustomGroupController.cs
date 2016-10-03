@@ -48,7 +48,8 @@ namespace CustomGroupApp.Controllers
             {
                 Test = _dataService.GetTest(testnum),
                 Results = _dataService.GetResults(testnum).ToList(),
-                StudentLanguages = _dataService.GetStudentLanguagePrefs(testnum).ToList()
+                StudentLanguages = _dataService.GetStudentLanguagePrefs(testnum).ToList(),
+                GroupSets = _dataService.GetCustomGroupSet(testnum).ToList()
             });
         }
 
@@ -137,6 +138,11 @@ namespace CustomGroupApp.Controllers
         public ActionResult SaveCustomGroupStep()
         {
             return PartialView("SaveCustomGroup");
+        }
+
+        public ActionResult SourceCustomGroupStep()
+        {
+            return PartialView("SourceCustomGroup");
         }
 
         public ActionResult StudentGroupingOptionsStep()

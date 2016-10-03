@@ -22,7 +22,7 @@
     <div class="container-fluid" id="custom-group-container">
         <div class="row">
             <div id="custom-group-content" style="margin: 20px">
-                @Html.Partial("SelectGroupingType")
+                @Html.Partial("SourceCustomGroup")
             </div>
         </div>
         <div>
@@ -42,12 +42,14 @@
 
         $(document)
             .ready(function() {
-                customGroupViewModel.setDatasource(test, studentResults, studentLanguages);
+                customGroupViewModel.setDatasource(test, studentResults, studentLanguages, groupSets);
+                customGroupViewModel.showExistingCustomGroup(document.getElementById("custom-groups-list"));
                 kendo.bind($("#custom-group-container"), customGroupViewModel);
             });
 
         var studentResults = @Html.Raw(Json.Encode(Model.Results.ToArray()));
         var test = @Html.Raw(Json.Encode(Model.Test));
         var studentLanguages = @Html.Raw(Json.Encode(Model.StudentLanguages.ToArray()));
+        var groupSets = @Html.Raw(Json.Encode(Model.GroupSets.ToArray()));
     </script>
 </div>

@@ -19,6 +19,8 @@
     private _topMiddleLowestBandClassDefinitionViewModel: TopMiddleLowestBandClassDefinitionViewModel;
     private _languageBandClassDefinitionViewModel: LanguageBandClassDefinitionViewModel;
     private _generateCustomGroupViewModel: GenerateCustomGroupViewModel;
+    private _classListControl: ClassListControl;
+
     private _genderOption = "All";
     // ReSharper restore InconsistentNaming
     get selectedGenderOption(): string {
@@ -29,7 +31,7 @@
         const gender = this.commonUtils.genderFromString(value);
         this.set("studentCount", this.classesDefn.genderStudentCount(gender));
         this.set("studentCountInAllClasses", this.studentCount);
-        this.selectedClassDefinitionViewModel.genderChanged(gender, this.studentCount);
+        // this.selectedClassDefinitionViewModel.genderChanged(gender, this.studentCount);
     };
 
     selectedGroupingOption = "MixedAbility";
@@ -77,6 +79,12 @@
     }
 
    
+    get classListControl(): ClassListControl {
+        if (this._classListControl === undefined) {
+            this._classListControl = new ClassListControl();
+        }
+        return this._classListControl;
+    }
 
     get classDefinitionViewModel(): ClassDefinitionViewModel {
         if (this._classDefinitionViewModel === undefined) {
@@ -155,12 +163,14 @@
 
     loadGroupingViewModel() {
         switch (this.groupingOption) {
-            case GroupingMethod.Banding: 
+            case GroupingMethod.Banding:
+                this.customBandSet.studentCount = this.studentCount;
                 this.bandClassDefinitionViewModel.loadOptions(this.customBandSet);
                 this.set("selectedClassDefinitionViewModel", this.bandClassDefinitionViewModel);
                 break;
 
            case GroupingMethod.TopMiddleLowest:
+                this.topMiddleLowestBandSet.studentCount = this.studentCount;
                 this.topMiddleLowestBandClassDefinitionViewModel.loadOptions(this.topMiddleLowestBandSet);
                 this.set("selectedClassDefinitionViewModel", this.topMiddleLowestBandClassDefinitionViewModel);
                 break;
@@ -175,11 +185,16 @@
                 this.set("selectedClassDefinitionViewModel", this.languageBandClassDefinitionViewModel);
                 break;
 
-            default:
+           default:
+                this.bandSet.studentCount = this.studentCount;
                 this.classDefinitionViewModel.loadOptions(this.bandSet);
                 this.set("selectedClassDefinitionViewModel", this.classDefinitionViewModel);
                 break;
         }
+    }
+
+    showExistingCustomGroup = (parentElement: HTMLElement) => {
+        this.classListControl.create(parentElement, this.classesDefn.customGroups);
     }
 
     showStudentGroupingOption = (
@@ -283,9 +298,12 @@
     };
 
     //
-    setDatasource = (test, results, languages) => {
+    hasDatasource = false;
+    setDatasource = (test, results, languages, groupSets) => {
+        this.hasDatasource = true;
+
         var testInfo = new TestFile();
-        testInfo.set(test, results, languages);
+        testInfo.set(test, results, languages, groupSets);
         this.isCoedSchool = testInfo.isUnisex;
         this.studentCount = testInfo.studentCount;
         this.studentCountInAllClasses = testInfo.studentCount;

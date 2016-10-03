@@ -40,6 +40,7 @@ var TestFile = (function () {
         this.school = new School();
         this.subjectTypes = [];
         this.students = [];
+        this.customGroups = [];
         this.hasBoys = false;
         this.hasGirls = false;
         this.description = function () {
@@ -48,12 +49,18 @@ var TestFile = (function () {
             }
             return _this.fileNumber + " " + _this.category;
         };
-        this.set = function (test, results, languages) {
+        this.set = function (test, results, languages, groupSets) {
             _this.fileNumber = test.Testnum;
             _this.grade = test.Grade;
             _this.category = test.Category;
             _this.testDate = test.Testdate;
             _this.setStudents(results, languages);
+            for (var _i = 0, groupSets_1 = groupSets; _i < groupSets_1.length; _i++) {
+                var item = groupSets_1[_i];
+                var classItem = new ClassDefinition(null, 0, 0);
+                classItem.name = item.Name;
+                _this.customGroups.push(classItem);
+            }
         };
         this.clear = function () {
             _this.fileNumber = undefined;

@@ -947,12 +947,15 @@ class ClassesDefinition {
                     this.girlsCount++;
                 }
             }
+
+            this.customGroups = this.testFile.customGroups;
         }
     }
    
 
     uid: string;
     students: Array<StudentClass> = [];
+    customGroups: Array<ClassDefinition> = [];
     groupName: string;
     groupGender: Gender;
     streamType: StreamType;

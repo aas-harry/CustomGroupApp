@@ -1,0 +1,40 @@
+﻿<div class="step-title">
+    <span style="margin-right: 10px">Step 2:</span>Enter number of classes
+</div>
+<div style="margin: 20px">
+    <div>
+        <input type="checkbox" /><span>From test file</span>
+        <div data-bind="visible: isCoedSchool">
+            <div>Choose students to include option:</div>
+            <div>
+                <input type="radio" value="All" data-bind="checked:selectedGenderOption" />
+                <span>All Students</span>
+            </div>
+            <div>
+                <input type="radio" value="Girls" data-bind="checked:selectedGenderOption" />
+                <span>Girls Only</span>
+            </div>
+            <div>
+                <input type="radio" value="Boys" data-bind="checked:selectedGenderOption" />
+                <span>Boys Only</span>
+            </div>
+        </div>
+    </div>
+    
+    <div>
+        <input type="checkbox" /><span>From existing custom groups</span>
+        <div id="custom-groups-container">
+            <div id="custom-groups-list"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document)
+        .ready(function () {
+            if (customGroupViewModel && customGroupViewModel.hasDataSource) {
+                customGroupViewModel.showExistingCustomGroup(document.getElementById("custom-groups-list"));
+                kendo.bind($("#custom-group-container"), customGroupViewModel);
+            }
+        });
+</script>

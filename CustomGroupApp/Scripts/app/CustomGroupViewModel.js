@@ -43,6 +43,9 @@ var CustomGroupViewModel = (function (_super) {
         };
         this.showStep = function (data) {
         };
+        this.showExistingCustomGroup = function (parentElement) {
+            _this.classListControl.create(parentElement, _this.classesDefn.customGroups);
+        };
         this.showStudentGroupingOption = function (joinedStudentsCell, separatedStudentsCell) {
             _this.pairedStudentsControl.createStudentSetContainer(joinedStudentsCell, _this.classesDefn.testFile.isUnisex);
             _this.separatedStudentsControl.createStudentSetContainer(separatedStudentsCell, _this.classesDefn.testFile.isUnisex);
@@ -79,9 +82,11 @@ var CustomGroupViewModel = (function (_super) {
             }
         };
         //
-        this.setDatasource = function (test, results, languages) {
+        this.hasDatasource = false;
+        this.setDatasource = function (test, results, languages, groupSets) {
+            _this.hasDatasource = true;
             var testInfo = new TestFile();
-            testInfo.set(test, results, languages);
+            testInfo.set(test, results, languages, groupSets);
             _this.isCoedSchool = testInfo.isUnisex;
             _this.studentCount = testInfo.studentCount;
             _this.studentCountInAllClasses = testInfo.studentCount;
@@ -120,7 +125,7 @@ var CustomGroupViewModel = (function (_super) {
             var gender = this.commonUtils.genderFromString(value);
             this.set("studentCount", this.classesDefn.genderStudentCount(gender));
             this.set("studentCountInAllClasses", this.studentCount);
-            this.selectedClassDefinitionViewModel.genderChanged(gender, this.studentCount);
+            // this.selectedClassDefinitionViewModel.genderChanged(gender, this.studentCount);
         },
         enumerable: true,
         configurable: true
@@ -169,6 +174,16 @@ var CustomGroupViewModel = (function (_super) {
     Object.defineProperty(CustomGroupViewModel.prototype, "genderOption", {
         get: function () {
             return this.groupingHelper.convertGenderFromString(this.selectedGenderOption);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(CustomGroupViewModel.prototype, "classListControl", {
+        get: function () {
+            if (this._classListControl === undefined) {
+                this._classListControl = new ClassListControl();
+            }
+            return this._classListControl;
         },
         enumerable: true,
         configurable: true
@@ -243,10 +258,12 @@ var CustomGroupViewModel = (function (_super) {
     CustomGroupViewModel.prototype.loadGroupingViewModel = function () {
         switch (this.groupingOption) {
             case GroupingMethod.Banding:
+                this.customBandSet.studentCount = this.studentCount;
                 this.bandClassDefinitionViewModel.loadOptions(this.customBandSet);
                 this.set("selectedClassDefinitionViewModel", this.bandClassDefinitionViewModel);
                 break;
             case GroupingMethod.TopMiddleLowest:
+                this.topMiddleLowestBandSet.studentCount = this.studentCount;
                 this.topMiddleLowestBandClassDefinitionViewModel.loadOptions(this.topMiddleLowestBandSet);
                 this.set("selectedClassDefinitionViewModel", this.topMiddleLowestBandClassDefinitionViewModel);
                 break;
@@ -259,6 +276,7 @@ var CustomGroupViewModel = (function (_super) {
                 this.set("selectedClassDefinitionViewModel", this.languageBandClassDefinitionViewModel);
                 break;
             default:
+                this.bandSet.studentCount = this.studentCount;
                 this.classDefinitionViewModel.loadOptions(this.bandSet);
                 this.set("selectedClassDefinitionViewModel", this.classDefinitionViewModel);
                 break;
