@@ -1,5 +1,5 @@
 ﻿class CustomGroupViewModel extends kendo.data.ObservableObject {
-    constructor(studentCount: number, rootSite: string) {
+    constructor(public containerElementName, public studentCount: number, rootSite: string) {
         super();
 
         this.rootSite = rootSite;
@@ -41,7 +41,6 @@
     isLastStep = false;
     isFirstStep = true;
     isCoedSchool = true;
-    studentCount = 0;
     studentCountInAllClasses = 0;
     classCount = 1;
     groupName: string;
@@ -51,6 +50,8 @@
     errorMessage: string;
     hasErrors = false;
     rootSite: string;
+    hasHiddenClasses: boolean = false;
+
     get testNumber(): number {
         return this.testInfo ? this.testInfo.fileNumber : 0;
     }
@@ -120,16 +121,16 @@
 
     private nextStep = () => {
         super.set("currentGroupStep", this.currentGroupStep + 1);
-        this.callGetViewStep(this.currentGroupStep);
+        this.callGetViewStep(this.currentGroupStep, this.containerElementName);
     };
     private previousStep = () => {
         super.set("currentGroupStep", this.currentGroupStep - 1);
-        this.callGetViewStep(this.currentGroupStep);
+        this.callGetViewStep(this.currentGroupStep, this.containerElementName);
     };
     private cancelStep = () => {
         console.log("cancelStep");
     };
-    private callGetViewStep(stepNo: number) {
+    private callGetViewStep(stepNo: number, containerElementName: string) {
         super.set("isFirstStep", this.stepCollection.isFirstStep(stepNo));
         super.set("isLastStep", this.stepCollection.isLastStep(stepNo));
 
@@ -145,7 +146,7 @@
             url: "Customgroup\\" + viewName,
             dataType: "html",
             success(data) {
-                $("#custom-group-content").html(data);
+                $(`#${containerElementName}`).html(data);
             }
         });
     }
@@ -189,6 +190,25 @@
         this.separatedStudentsControl.createStudentSetContainer(separatedStudentsCell, this.classesDefn.testFile.isUnisex);
     }
 
+    showAllClasses = (e: any) => {
+        var vm = this.selectedClassDefinitionViewModel as GenerateCustomGroupViewModel;
+        if (vm) {
+            vm.showAllClasses();
+
+            this.set("hasHiddenClasses", false);
+            kendo.bind($("#custom-group-container"), this);
+        }
+    }
+
+    hideClass = (e: any) => {
+        var vm = this.selectedClassDefinitionViewModel as GenerateCustomGroupViewModel;
+        if (vm) {
+            vm.hideClass(this.commonUtils.getUid(e.target.id));
+
+            this.set("hasHiddenClasses", true);
+            kendo.bind($("#custom-group-container"), this);
+        }
+    }
 
     addPairStudent = (e: any) => {
         if (!this.pairedStudentsControl.onAddPairStudent(e.target.id)) {

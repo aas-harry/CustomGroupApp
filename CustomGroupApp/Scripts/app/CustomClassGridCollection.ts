@@ -12,19 +12,23 @@
     classes: Array<ClassDefinition> = [];
     classCount = 0;
 
-    initTable = (elementName: string, bands: Array<BandDefinition>) => {
-        
+    initTable = (elementName: string, bands: Array<BandDefinition>, hiddenClasses: Array<string> = []) => {
         $(elementName).html("<table id='custom-classes-table'></table>");
         this.table = document.getElementById("custom-classes-table") as HTMLTableElement;
         this.header = this.table.createTBody();
+
+        const hiddenClassLookup = Enumerable.From(hiddenClasses).ToDictionary(x => x, x => x);
 
         if (bands.length === 1) {
             this.classRow = this.header.insertRow();
             this.classes = Enumerable.From(bands).SelectMany(b => b.classes).ToArray();
             this.classCount = this.classes.length;
 
-            var cnt = 0;
+            let cnt = 0;
             for (let classItem of this.classes) {
+                if (hiddenClassLookup.Contains(classItem.uid)) {
+                    continue;
+                }
                 if (cnt === 3) {
                     this.classRow = this.header.insertRow();
                     cnt = 0;
@@ -44,6 +48,9 @@
 
                 this.classRow = this.header.insertRow();
                 for (let classItem of band.classes) {
+                    if (hiddenClassLookup.Contains(classItem.uid)) {
+                        continue;
+                    }
 
                     this.studentClassListControls
                         .createStudentClassInputContainer(this.classRow.insertCell(),

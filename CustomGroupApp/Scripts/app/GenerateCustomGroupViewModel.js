@@ -13,6 +13,15 @@ var GenerateCustomGroupViewModel = (function (_super) {
         this.groupingHelper = new GroupingHelper();
         this.kendoHelper = new KendoHelper();
         this.customClassGridCollection = new CustomClassGridCollection();
+        this.hiddenClasses = [];
+        this.showAllClasses = function () {
+            _this.hiddenClasses = [];
+            _this.customClassGridCollection.initTable("#classes-settings-container", _this.bandSet.bands);
+        };
+        this.hideClass = function (uid) {
+            _this.hiddenClasses.push(uid);
+            _this.customClassGridCollection.initTable("#classes-settings-container", _this.bandSet.bands, _this.hiddenClasses);
+        };
         this.genderChanged = function (gender, studentCount) {
             _this.studentCount = studentCount;
             _this.bandSet.studentCount = studentCount;

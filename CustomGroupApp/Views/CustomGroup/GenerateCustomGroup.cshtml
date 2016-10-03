@@ -1,7 +1,8 @@
 ﻿<div class="step-title">
-    <span style="margin-right: 10px">Step 4:</span>Finalise Custom Groups
+    <span style="margin-right: 10px">Step 5:</span>Review Custom Groups
 </div>
 <div style="margin: 20px">
+    <button class="btn btn-default" data-bind="click: showAllClasses, enabled: hasHiddenClasses">Show All Classes</button>
     <div id="classes-settings-container" style="width: 600px">
         <table id="custom-classes-table"></table>
     </div>
@@ -11,8 +12,7 @@
 <script>
     $(document)
         .ready(function () {
-            kendo.bind($("#custom-group-container"), customGroupViewModel);
-
             customGroupViewModel.generateClasses();
+            kendo.bind($("#custom-group-container"), customGroupViewModel);
         });
 </script>

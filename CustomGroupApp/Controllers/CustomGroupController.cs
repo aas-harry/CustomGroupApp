@@ -130,6 +130,10 @@ namespace CustomGroupApp.Controllers
             return PartialView("BandClassConfiguration");
         }
 
+        public ActionResult EnterCustomGroupNameStep()
+        {
+            return PartialView("EnterCustomGroupName");
+        }
         public ActionResult SaveCustomGroupStep()
         {
             return PartialView("SaveCustomGroup");

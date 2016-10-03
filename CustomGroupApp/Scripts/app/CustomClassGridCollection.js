@@ -7,10 +7,12 @@ var CustomClassGridCollection = (function () {
         this.me = this;
         this.classes = [];
         this.classCount = 0;
-        this.initTable = function (elementName, bands) {
+        this.initTable = function (elementName, bands, hiddenClasses) {
+            if (hiddenClasses === void 0) { hiddenClasses = []; }
             $(elementName).html("<table id='custom-classes-table'></table>");
             _this.table = document.getElementById("custom-classes-table");
             _this.header = _this.table.createTBody();
+            var hiddenClassLookup = Enumerable.From(hiddenClasses).ToDictionary(function (x) { return x; }, function (x) { return x; });
             if (bands.length === 1) {
                 _this.classRow = _this.header.insertRow();
                 _this.classes = Enumerable.From(bands).SelectMany(function (b) { return b.classes; }).ToArray();
@@ -18,6 +20,9 @@ var CustomClassGridCollection = (function () {
                 var cnt = 0;
                 for (var _i = 0, _a = _this.classes; _i < _a.length; _i++) {
                     var classItem = _a[_i];
+                    if (hiddenClassLookup.Contains(classItem.uid)) {
+                        continue;
+                    }
                     if (cnt === 3) {
                         _this.classRow = _this.header.insertRow();
                         cnt = 0;
@@ -35,6 +40,9 @@ var CustomClassGridCollection = (function () {
                     _this.classRow = _this.header.insertRow();
                     for (var _c = 0, _d = band.classes; _c < _d.length; _c++) {
                         var classItem = _d[_c];
+                        if (hiddenClassLookup.Contains(classItem.uid)) {
+                            continue;
+                        }
                         _this.studentClassListControls
                             .createStudentClassInputContainer(_this.classRow.insertCell(), classItem, _this.onEditGroupName, _this.onDropItem);
                     }

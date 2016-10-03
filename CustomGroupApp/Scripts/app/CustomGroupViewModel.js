@@ -5,9 +5,11 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var CustomGroupViewModel = (function (_super) {
     __extends(CustomGroupViewModel, _super);
-    function CustomGroupViewModel(studentCount, rootSite) {
+    function CustomGroupViewModel(containerElementName, studentCount, rootSite) {
         var _this = this;
         _super.call(this);
+        this.containerElementName = containerElementName;
+        this.studentCount = studentCount;
         this.stepCollection = new StepCollection();
         this.testInfo = new TestFile();
         this._genderOption = "All";
@@ -20,21 +22,21 @@ var CustomGroupViewModel = (function (_super) {
         this.isLastStep = false;
         this.isFirstStep = true;
         this.isCoedSchool = true;
-        this.studentCount = 0;
         this.studentCountInAllClasses = 0;
         this.classCount = 1;
         this.joinedStudents = [];
         this.separatedStudents = [];
         this.hasErrors = false;
+        this.hasHiddenClasses = false;
         this.commonUtils = new CommonUtils();
         this.groupingHelper = new GroupingHelper();
         this.nextStep = function () {
             _super.prototype.set.call(_this, "currentGroupStep", _this.currentGroupStep + 1);
-            _this.callGetViewStep(_this.currentGroupStep);
+            _this.callGetViewStep(_this.currentGroupStep, _this.containerElementName);
         };
         this.previousStep = function () {
             _super.prototype.set.call(_this, "currentGroupStep", _this.currentGroupStep - 1);
-            _this.callGetViewStep(_this.currentGroupStep);
+            _this.callGetViewStep(_this.currentGroupStep, _this.containerElementName);
         };
         this.cancelStep = function () {
             console.log("cancelStep");
@@ -44,6 +46,22 @@ var CustomGroupViewModel = (function (_super) {
         this.showStudentGroupingOption = function (joinedStudentsCell, separatedStudentsCell) {
             _this.pairedStudentsControl.createStudentSetContainer(joinedStudentsCell, _this.classesDefn.testFile.isUnisex);
             _this.separatedStudentsControl.createStudentSetContainer(separatedStudentsCell, _this.classesDefn.testFile.isUnisex);
+        };
+        this.showAllClasses = function (e) {
+            var vm = _this.selectedClassDefinitionViewModel;
+            if (vm) {
+                vm.showAllClasses();
+                _this.set("hasHiddenClasses", false);
+                kendo.bind($("#custom-group-container"), _this);
+            }
+        };
+        this.hideClass = function (e) {
+            var vm = _this.selectedClassDefinitionViewModel;
+            if (vm) {
+                vm.hideClass(_this.commonUtils.getUid(e.target.id));
+                _this.set("hasHiddenClasses", true);
+                kendo.bind($("#custom-group-container"), _this);
+            }
         };
         this.addPairStudent = function (e) {
             if (!_this.pairedStudentsControl.onAddPairStudent(e.target.id)) {
@@ -205,7 +223,7 @@ var CustomGroupViewModel = (function (_super) {
         enumerable: true,
         configurable: true
     });
-    CustomGroupViewModel.prototype.callGetViewStep = function (stepNo) {
+    CustomGroupViewModel.prototype.callGetViewStep = function (stepNo, containerElementName) {
         _super.prototype.set.call(this, "isFirstStep", this.stepCollection.isFirstStep(stepNo));
         _super.prototype.set.call(this, "isLastStep", this.stepCollection.isLastStep(stepNo));
         var viewName = this.stepCollection.getStepView(this.groupingOption, stepNo);
@@ -218,7 +236,7 @@ var CustomGroupViewModel = (function (_super) {
             url: "Customgroup\\" + viewName,
             dataType: "html",
             success: function (data) {
-                $("#custom-group-content").html(data);
+                $("#" + containerElementName).html(data);
             }
         });
     };

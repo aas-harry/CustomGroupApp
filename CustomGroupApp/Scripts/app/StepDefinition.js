@@ -47,8 +47,9 @@ var StepCollection = (function () {
         step2.views.push(new ViewDefinition(GroupingMethod.Language, "LanguageClassConfigurationStep"));
         this.steps.push(step2);
         this.steps.push(new StepDefinition(3, true, "StudentGroupingOptionsStep"));
-        this.steps.push(new StepDefinition(4, true, "SaveCustomGroupStep"));
+        this.steps.push(new StepDefinition(4, true, "EnterCustomGroupNameStep"));
         this.steps.push(new StepDefinition(5, true, "GenerateCustomGroupStep"));
+        this.steps.push(new StepDefinition(6, true, "SaveCustomGroupStep"));
         this.stepCount = this.steps.length;
         this.lastStep = this.steps[this.stepCount - 1];
         this.firstStep = this.steps[0];

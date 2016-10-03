@@ -1009,7 +1009,7 @@
     <Content Include="Views\Shared\EditorTemplates\Url.cshtml" />
     <Content Include="Views\CustomGroup\ClassConfiguration.cshtml" />
     <Content Include="Views\CustomGroup\StudentGroupingOptions.cshtml" />
-    <Content Include="Views\CustomGroup\SaveCustomGroup.cshtml" />
+    <Content Include="Views\CustomGroup\EnterCustomGroupName.cshtml" />
     <Content Include="Views\CustomGroup\ClassDefinitionView.cshtml" />
     <Content Include="Views\CustomGroup\BandClassDefinitionView.cshtml" />
     <Content Include="Views\CustomGroup\BandClassConfiguration.cshtml" />
@@ -1017,6 +1017,7 @@
     <Content Include="Views\CustomGroup\TopMiddleLowestBandClassConfiguration.cshtml" />
     <Content Include="Views\CustomGroup\LanguageBandClassConfiguration.cshtml" />
     <Content Include="Views\CustomGroup\GenerateCustomGroup.cshtml" />
+    <Content Include="Views\CustomGroup\SaveCustomGroup.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

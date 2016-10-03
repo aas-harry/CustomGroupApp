@@ -10,9 +10,8 @@
     private groupingHelper = new GroupingHelper();
     private kendoHelper = new KendoHelper();
     private customClassGridCollection = new CustomClassGridCollection();
-
     private bandTableControl: BandTableControl;
-
+    private hiddenClasses : Array<string> = [];
 
     saveOptions(source: BandSet): boolean {
         return true;
@@ -24,6 +23,18 @@
         this.customClassGridCollection.initTable("#classes-settings-container", source.bands);
         return true;
     }
+
+    showAllClasses = () => {
+        this.hiddenClasses = [];
+        this.customClassGridCollection.initTable("#classes-settings-container", this.bandSet.bands);
+    }
+
+    hideClass = (uid: string) => {
+        this.hiddenClasses.push(uid);
+
+        this.customClassGridCollection.initTable("#classes-settings-container", this.bandSet.bands, this.hiddenClasses);
+    }
+
     getBandSet() {
         return this.bandSet;
     }
