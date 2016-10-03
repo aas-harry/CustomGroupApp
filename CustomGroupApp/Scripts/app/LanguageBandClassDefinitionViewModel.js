@@ -16,6 +16,8 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
         this.groupingHelper = new GroupingHelper();
         this.kendoHelper = new KendoHelper();
         this.hasBandSetInitialised = false;
+        this.genderChanged = function (gender, studentCount) {
+        };
         this.showStudentLanguageCaption = "View Students";
         this.showStudentLanguagePreferences = function () {
             _this.set("showStudentLanguageList", !_this.showStudentLanguageList);

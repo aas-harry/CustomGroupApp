@@ -28,6 +28,12 @@ var ClassDefinitionViewModel = (function (_super) {
                 onStudentCountChangedEvent(Enumerable.From(_this.bandSet.bands[0].classes).Sum(function (x) { return x.count; }));
             }
         };
+        this.genderChanged = function (gender, studentCount) {
+            _this.bandSet.studentCount = studentCount;
+            _this.bandSet.bands[0].studentCount = studentCount;
+            _this.studentCount = studentCount;
+            _this.onClassCountChanged();
+        };
         this.showStudentLanguagePreferences = function () { };
         _super.prototype.init.call(this, this);
         this.onStudentCountChangedEvent = onStudentCountChangedEvent;

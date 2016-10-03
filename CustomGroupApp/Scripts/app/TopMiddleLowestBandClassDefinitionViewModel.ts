@@ -18,7 +18,7 @@
     }
 
     loadOptions(source: BandSet): boolean {
-        this.bandSet = source;
+        this.bandSet = source as TopMiddleLowestBandSet;
         super.set("bandCount", source.bands.length);
         this.bandTableControl.init("classes-settings-container", source);
         return true;
@@ -26,6 +26,12 @@
 
     getBandSet(): BandSet {
         return this.bandSet;
+    }
+
+    genderChanged = (gender: Gender, studentCount: number) => {
+        this.studentCount = studentCount;
+        this.bandSet.setStudentCount(studentCount);
+        this.bandTableControl.init("classes-settings-container", this.bandSet);
     }
 
     showStudentLanguagePreferences = () => { };

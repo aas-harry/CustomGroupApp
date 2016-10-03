@@ -91,7 +91,7 @@ class TestFile {
         var enumerable = Enumerable.From(langPrefs);
 
         data.forEach((s: any) => {
-            let student = new Student(s);
+            const student = new Student(s);
             this.students.push(student);
             if (! this.hasBoys && s.Sex === "M") {
                 this.hasBoys = true;

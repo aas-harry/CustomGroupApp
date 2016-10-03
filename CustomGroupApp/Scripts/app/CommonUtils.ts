@@ -17,4 +17,7 @@
         return elementName.substr(elementName.indexOf("-") + 1);
     }
 
+    genderFromString = (gender: string): Gender => {
+        return gender === "Girls" ? Gender.Girls : (gender === "Boys" ? Gender.Boys : Gender.All);
+    }
 }

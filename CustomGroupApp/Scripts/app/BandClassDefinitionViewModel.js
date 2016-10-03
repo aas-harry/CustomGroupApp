@@ -18,6 +18,11 @@ var BandClassDefinitionViewModel = (function (_super) {
         };
         this.showStudentLanguagePreferences = function () { };
         this.importStudentLanguages = function () { };
+        this.genderChanged = function (gender, studentCount) {
+            _this.bandSet.studentCount = studentCount;
+            _this.studentCount = studentCount;
+            _this.onBandCountChange();
+        };
         this.callOnStudentCountChangedEvent = function () {
             var onStudentCountChangedEvent = _this.onStudentCountChangedEvent;
             if (onStudentCountChangedEvent != null) {

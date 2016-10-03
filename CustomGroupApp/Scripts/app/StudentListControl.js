@@ -91,7 +91,7 @@ var StudentSelector = (function () {
             cell.appendChild(container);
             var checkBox = document.createElement("input");
             checkBox.type = "checkbox";
-            checkBox.id = "studentid-" + student.studentId;
+            checkBox.id = "studentid-" + student.id;
             if (isSelected) {
                 checkBox.checked = true;
             }
@@ -139,7 +139,7 @@ var StudentSelector = (function () {
             };
             saveButton.onclick = function () {
                 previoustudents.splice(0, previoustudents.length);
-                var lookup = Enumerable.From(students).ToDictionary(function (x) { return x.studentId; }, function (x) { return x; });
+                var lookup = Enumerable.From(students).ToDictionary(function (x) { return x.id; }, function (x) { return x; });
                 Enumerable.From(_this.studentCheckboxes).Where(function (x) { return x.checked; }).ForEach(function (x) {
                     var studentid = parseInt(_this.commonUtils.getUid(x.id));
                     if (lookup.Contains(studentid)) {

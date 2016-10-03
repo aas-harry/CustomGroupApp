@@ -13,6 +13,11 @@ var GenerateCustomGroupViewModel = (function (_super) {
         this.groupingHelper = new GroupingHelper();
         this.kendoHelper = new KendoHelper();
         this.customClassGridCollection = new CustomClassGridCollection();
+        this.genderChanged = function (gender, studentCount) {
+            _this.studentCount = studentCount;
+            _this.bandSet.studentCount = studentCount;
+            _this.customClassGridCollection.initTable("#classes-settings-container", _this.bandSet.bands);
+        };
         this.showStudentLanguagePreferences = function () { };
         this.importStudentLanguages = function () { };
         this.callOnStudentCountChangedEvent = function () {

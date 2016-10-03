@@ -8,11 +8,13 @@ var CustomGroupViewModel = (function (_super) {
     function CustomGroupViewModel(studentCount, rootSite) {
         var _this = this;
         _super.call(this);
+        this.stepCollection = new StepCollection();
+        this.testInfo = new TestFile();
+        this._genderOption = "All";
         this.selectedGroupingOption = "MixedAbility";
         this.selectedStreamingOption = "OverallAbilty";
         this.selectedTopClassGroupingOption = "Streaming";
         this.selectedLowestClassGroupingOption = "Streaming";
-        this._genderOption = "All";
         this.mixGirlsBoysOption = false;
         this.currentGroupStep = 1;
         this.isLastStep = false;
@@ -24,8 +26,6 @@ var CustomGroupViewModel = (function (_super) {
         this.joinedStudents = [];
         this.separatedStudents = [];
         this.hasErrors = false;
-        this.stepCollection = new StepCollection();
-        this.testInfo = new TestFile();
         this.commonUtils = new CommonUtils();
         this.groupingHelper = new GroupingHelper();
         this.nextStep = function () {
@@ -73,8 +73,8 @@ var CustomGroupViewModel = (function (_super) {
             _this.customBandSet = _this.classesDefn.createBandSet("Band", _this.studentCount, 2);
             _this.languageBandSet = _this.classesDefn.createBandSet("Band", _this.studentCount, 1);
             _this.topMiddleLowestBandSet = _this.classesDefn.createTopMiddleBottomBandSet("class", _this.studentCount);
-            _this.pairedStudentsControl = new StudentSetListControl("Paired", _this.joinedStudents, testInfo.students, document.getElementById("popup-window-container"));
-            _this.separatedStudentsControl = new StudentSetListControl("Separated", _this.separatedStudents, testInfo.students, document.getElementById("popup-window-container"));
+            _this.pairedStudentsControl = new StudentSetListControl("Paired", _this.joinedStudents, _this.classesDefn.students, document.getElementById("popup-window-container"));
+            _this.separatedStudentsControl = new StudentSetListControl("Separated", _this.separatedStudents, _this.classesDefn.students, document.getElementById("popup-window-container"));
             _this.set("selectedClassDefinitionViewModel", _this.classDefinitionViewModel);
         };
         this.onStudentCountChanged = function (count) {
@@ -93,12 +93,16 @@ var CustomGroupViewModel = (function (_super) {
         this.studentCount = studentCount;
     }
     Object.defineProperty(CustomGroupViewModel.prototype, "selectedGenderOption", {
+        // ReSharper restore InconsistentNaming
         get: function () {
             return this._genderOption;
         },
         set: function (value) {
             this._genderOption = value;
-            console.log("Gender: " + value);
+            var gender = this.commonUtils.genderFromString(value);
+            this.set("studentCount", this.classesDefn.genderStudentCount(gender));
+            this.set("studentCountInAllClasses", this.studentCount);
+            this.selectedClassDefinitionViewModel.genderChanged(gender, this.studentCount);
         },
         enumerable: true,
         configurable: true
@@ -152,7 +156,6 @@ var CustomGroupViewModel = (function (_super) {
         configurable: true
     });
     Object.defineProperty(CustomGroupViewModel.prototype, "classDefinitionViewModel", {
-        // ReSharper restore InconsistentNaming
         get: function () {
             if (this._classDefinitionViewModel === undefined) {
                 this._classDefinitionViewModel = new ClassDefinitionViewModel(this.studentCount, this.onStudentCountChanged);
@@ -244,8 +247,8 @@ var CustomGroupViewModel = (function (_super) {
         }
     };
     CustomGroupViewModel.prototype.generateClasses = function () {
-        debugger;
         var bandSet = this.selectedClassDefinitionViewModel.getBandSet();
+        var students = this.classesDefn.genderStudents(this.genderOption);
         switch (this.groupingOption) {
             case GroupingMethod.Banding:
                 bandSet.groupType = GroupingMethod.Streaming;
@@ -257,7 +260,7 @@ var CustomGroupViewModel = (function (_super) {
                     band.streamType = this.streamType;
                     band.mixBoysGirls = this.mixGirlsBoysOption;
                 }
-                bandSet.prepare(!this.groupName || this.groupName === "" ? "Class" : this.groupName, this.classesDefn.students, this.joinedStudents, this.separatedStudents);
+                bandSet.prepare(!this.groupName || this.groupName === "" ? "Class" : this.groupName, students, this.joinedStudents, this.separatedStudents);
                 break;
             case GroupingMethod.TopMiddleLowest:
                 bandSet.groupType = GroupingMethod.Streaming;
@@ -269,7 +272,7 @@ var CustomGroupViewModel = (function (_super) {
                     band.streamType = this.streamType;
                     band.mixBoysGirls = this.mixGirlsBoysOption;
                 }
-                bandSet.prepare(!this.groupName || this.groupName === "" ? "Class" : this.groupName, this.classesDefn.students, this.joinedStudents, this.separatedStudents);
+                bandSet.prepare(!this.groupName || this.groupName === "" ? "Class" : this.groupName, students, this.joinedStudents, this.separatedStudents);
                 break;
             case GroupingMethod.Language:
                 for (var _d = 0, _e = bandSet.bands; _d < _e.length; _d++) {
@@ -286,7 +289,7 @@ var CustomGroupViewModel = (function (_super) {
                 bandSet.bands[0].groupType = this.groupingOption;
                 bandSet.bands[0].streamType = this.streamType;
                 bandSet.bands[0].mixBoysGirls = this.mixGirlsBoysOption;
-                bandSet.prepare(!this.groupName || this.groupName === "" ? "Class" : this.groupName, this.classesDefn.students, this.joinedStudents, this.separatedStudents);
+                bandSet.prepare(!this.groupName || this.groupName === "" ? "Class" : this.groupName, students, this.joinedStudents, this.separatedStudents);
                 break;
         }
         this.set("selectedClassDefinitionViewModel", this.generateCustomGroupViewModel);

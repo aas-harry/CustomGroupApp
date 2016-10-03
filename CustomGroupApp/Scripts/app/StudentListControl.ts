@@ -25,7 +25,7 @@ class StudentSelector {
     private commonUtils = new CommonUtils();
     private kendoHelper = new KendoHelper();
 
-    createTable = (element: HTMLElement, students: Array<Student>, previoustudents: Array<Student> = []) => {
+    createTable = (element: HTMLElement, students: Array<StudentClass>, previoustudents: Array<StudentClass> = []) => {
         var cnt = 0;
         var previousStudentRows = [];
         this.studentCheckboxes = [];
@@ -88,14 +88,14 @@ class StudentSelector {
     }
 
    
-    createStudentCell = (cell: HTMLTableCellElement, student: Student, isSelected: boolean = false) => {
+    createStudentCell = (cell: HTMLTableCellElement, student: StudentClass, isSelected: boolean = false) => {
         const container = document.createElement("div");
         container.setAttribute("style", "width: 220px");
         cell.appendChild(container);
 
         const checkBox = document.createElement("input");
         checkBox.type = "checkbox";
-        checkBox.id = "studentid-" + student.studentId;
+        checkBox.id = "studentid-" + student.id;
         if (isSelected) {
             checkBox.checked = true;
         }
@@ -108,9 +108,9 @@ class StudentSelector {
         container.appendChild(label);
     }
 
-    openDialog = (element: HTMLElement, students: Array<Student>,
-        previoustudents: Array<Student> = [],
-        callback: (students: Array<Student>) => any,
+    openDialog = (element: HTMLElement, students: Array<StudentClass>,
+        previoustudents: Array<StudentClass> = [],
+        callback: (students: Array<StudentClass>) => any,
         maxRows: number = null) => {
         if (maxRows) {
             this.maxRows = this.maxRows;
@@ -152,9 +152,9 @@ class StudentSelector {
             popupWindow.close();
         };
 
-        saveButton.onclick = () => {
+        saveButton.onclick = () => { 
             previoustudents.splice(0, previoustudents.length);
-            var lookup = Enumerable.From(students).ToDictionary(x => x.studentId, x => x);
+            var lookup = Enumerable.From(students).ToDictionary(x => x.id, x => x);
             Enumerable.From(this.studentCheckboxes).Where(x => x.checked).ForEach(x => {
                 var studentid = parseInt(this.commonUtils.getUid(x.id));
                 if (lookup.Contains(studentid)) {

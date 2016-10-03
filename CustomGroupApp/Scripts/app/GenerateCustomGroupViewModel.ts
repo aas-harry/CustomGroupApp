@@ -28,6 +28,12 @@
         return this.bandSet;
     }
 
+    genderChanged = (gender: Gender, studentCount: number) => {
+        this.studentCount = studentCount;
+        this.bandSet.studentCount = studentCount;
+        this.customClassGridCollection.initTable("#classes-settings-container", this.bandSet.bands);
+    }
+
     showStudentLanguagePreferences = () => { };
     importStudentLanguages = () => { };
 

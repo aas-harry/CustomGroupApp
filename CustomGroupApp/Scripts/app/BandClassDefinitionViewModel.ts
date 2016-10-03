@@ -12,6 +12,7 @@
     private bandSet: BandSet;
     private bandTableControl: BandTableControl;
 
+
     onBandCountChange = () => {
         this.bandSet.createBands("Band", this.studentCount, this.bandCount);
         this.bandTableControl.init("classes-settings-container", this.bandSet);
@@ -35,6 +36,11 @@
     showStudentLanguagePreferences = () => {};
     importStudentLanguages = () => { };
 
+    genderChanged = (gender: Gender, studentCount: number) => {
+        this.bandSet.studentCount = studentCount;
+        this.studentCount = studentCount;
+        this.onBandCountChange();
+    }
 
     onStudentCountChangedEvent: (classCount: number) => any;
     callOnStudentCountChangedEvent = () => {

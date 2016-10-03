@@ -2,7 +2,7 @@
     constructor(
         public name: string,
         public studentSets: Array<StudentSet>,
-        public students: Array<Student> = [],
+        public students: Array<StudentClass> = [],
         public popupWindowElement: HTMLElement) {
         this.uid = this.commonUtils.createUid();
     }

@@ -13,6 +13,11 @@ var TopMiddleLowestBandClassDefinitionViewModel = (function (_super) {
         this.bandCount = 3;
         this.classCount = 1;
         this.bandSet = new TopMiddleLowestBandSet(null, this.studentCount);
+        this.genderChanged = function (gender, studentCount) {
+            _this.studentCount = studentCount;
+            _this.bandSet.setStudentCount(studentCount);
+            _this.bandTableControl.init("classes-settings-container", _this.bandSet);
+        };
         this.showStudentLanguagePreferences = function () { };
         this.importStudentLanguages = function () { };
         this.callOnStudentCountChangedEvent = function () {

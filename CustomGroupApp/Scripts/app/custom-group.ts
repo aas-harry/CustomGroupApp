@@ -56,6 +56,7 @@ interface IBandClassSettings {
     getBandSet(): BandSet;
     showStudentLanguagePreferences();
     importStudentLanguages();
+    genderChanged(gender: Gender, studentCount: number);
 }
 
 class SummaryClass {
@@ -428,7 +429,7 @@ class GroupingHelper {
         separatedStudents: Array<StudentSet> = []) => {
 
         this.calculateTotalScore(students, streamType);
-
+        
         if (!mixBoysGirls) {
             this.groupByStreamingInternal(classes, students);
         } else {
@@ -468,7 +469,7 @@ class GroupingHelper {
         separatedStudents: Array<StudentSet> = []) => {
 
         this.calculateTotalScore(students, streamType);
-
+        
         if (!mixBoysGirls) {
             this.groupByMixAbilityInternal(classes, students);
         } else {
@@ -577,7 +578,7 @@ class StudentSet {
 
     private kendoHelper = new KendoHelper();
     studentSetId: string;
-    students: Array<Student> = [];
+    students: Array<StudentClass> = [];
     get studentList() {
         return Enumerable.From(this.students).Take(5).Select(x => x.name).ToString(",") + (this.students.length > 5 ? " and more..." : "");
     }
@@ -921,6 +922,11 @@ class TopMiddleLowestBandSet extends BandSet {
         this.bands[1].bandName = "Middle";
         this.bands[2].bandName = "Lowest";
     }
+
+    setStudentCount = (studentCount: number) => {
+        this.studentCount = studentCount;
+        this.createBands(this.name, studentCount, this.bandCount, this.bandType, this.streamType, this.groupType, this.mixBoysGirls);
+    }
 }
 
 class ClassesDefinition {
@@ -930,8 +936,16 @@ class ClassesDefinition {
             this.groupGender = testFile.isUnisex ? Gender.All : (testFile.hasBoys ? Gender.Boys : Gender.Girls);
             this.testFile = testFile;
 
-            for (let i = 0; i < testFile.students.length; i++) {
-                this.students.push(new StudentClass(testFile.students[i]));
+            this.boysCount = 0;
+            this.girlsCount = 0;
+            for(let s of testFile.students){
+                this.students.push(new StudentClass(s));
+                if (s.sex === "M") {
+                    this.boysCount++;
+                }
+                if (s.sex === "F") {
+                    this.girlsCount++;
+                }
             }
         }
     }
@@ -945,6 +959,32 @@ class ClassesDefinition {
     customBands: BandSet;
     spreadBoysGirlsEqually = false;
     excludeLeavingStudent = false;
+    boysCount: number;
+    girlsCount: number;
+
+    genderStudents = (gender: Gender): Array<StudentClass> => {
+        switch (gender) {
+            case Gender.Girls:
+                return Enumerable.From(this.students).Where(x => x.gender === "F").ToArray();
+
+            case Gender.Boys:
+                return Enumerable.From(this.students).Where(x => x.gender === "M").ToArray();
+        }
+        return this.students;
+    }
+
+    genderStudentCount = (gender: Gender): number => {
+        let studentCount = this.studentCount;
+        switch (gender) {
+            case Gender.Girls:
+                studentCount = this.girlsCount;
+                break;
+            case Gender.Boys:
+                studentCount = this.boysCount;
+                break;
+        }
+        return studentCount;
+    }
 
     get studentCount(): number {
         return this.students.length;

@@ -15,6 +15,9 @@ var CommonUtils = (function () {
         this.getUid = function (elementName) {
             return elementName.substr(elementName.indexOf("-") + 1);
         };
+        this.genderFromString = function (gender) {
+            return gender === "Girls" ? Gender.Girls : (gender === "Boys" ? Gender.Boys : Gender.All);
+        };
     }
     return CommonUtils;
 }());

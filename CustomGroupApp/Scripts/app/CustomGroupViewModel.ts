@@ -6,20 +6,36 @@
         this.studentCount = studentCount;
     }
 
-    selectedGroupingOption = "MixedAbility";
-    selectedStreamingOption = "OverallAbilty";
-    selectedTopClassGroupingOption = "Streaming";
-    selectedLowestClassGroupingOption = "Streaming";
-
+    private stepCollection = new StepCollection();
+    private testInfo = new TestFile();
+    private customBandSet: BandSet;
+    private topMiddleLowestBandSet: TopMiddleLowestBandSet;
+    private languageBandSet: BandSet;
+    private bandSet: BandSet;
+    private classesDefn: ClassesDefinition;
+    // ReSharper disable InconsistentNaming
+    private _classDefinitionViewModel: ClassDefinitionViewModel;
+    private _bandClassDefinitionViewModel: BandClassDefinitionViewModel;
+    private _topMiddleLowestBandClassDefinitionViewModel: TopMiddleLowestBandClassDefinitionViewModel;
+    private _languageBandClassDefinitionViewModel: LanguageBandClassDefinitionViewModel;
+    private _generateCustomGroupViewModel: GenerateCustomGroupViewModel;
     private _genderOption = "All";
+    // ReSharper restore InconsistentNaming
     get selectedGenderOption(): string {
         return this._genderOption;
     };
     set selectedGenderOption(value: string) {
         this._genderOption = value;
-        console.log("Gender: " + value);
+        const gender = this.commonUtils.genderFromString(value);
+        this.set("studentCount", this.classesDefn.genderStudentCount(gender));
+        this.set("studentCountInAllClasses", this.studentCount);
+        this.selectedClassDefinitionViewModel.genderChanged(gender, this.studentCount);
     };
 
+    selectedGroupingOption = "MixedAbility";
+    selectedStreamingOption = "OverallAbilty";
+    selectedTopClassGroupingOption = "Streaming";
+    selectedLowestClassGroupingOption = "Streaming";
     mixGirlsBoysOption = false;
     currentGroupStep = 1;
     isLastStep = false;
@@ -59,20 +75,7 @@
         return this.groupingHelper.convertGenderFromString(this.selectedGenderOption);
     }
 
-    private stepCollection = new StepCollection();
-    private testInfo = new TestFile();
-    private customBandSet: BandSet;
-    private topMiddleLowestBandSet: TopMiddleLowestBandSet;
-    private languageBandSet: BandSet;
-    private bandSet: BandSet;
-    private classesDefn: ClassesDefinition;
-    // ReSharper disable InconsistentNaming
-    private _classDefinitionViewModel: ClassDefinitionViewModel;
-    private _bandClassDefinitionViewModel: BandClassDefinitionViewModel;
-    private _topMiddleLowestBandClassDefinitionViewModel: TopMiddleLowestBandClassDefinitionViewModel;
-    private _languageBandClassDefinitionViewModel: LanguageBandClassDefinitionViewModel;
-    private _generateCustomGroupViewModel: GenerateCustomGroupViewModel;
-    // ReSharper restore InconsistentNaming
+   
 
     get classDefinitionViewModel(): ClassDefinitionViewModel {
         if (this._classDefinitionViewModel === undefined) {
@@ -186,6 +189,7 @@
         this.separatedStudentsControl.createStudentSetContainer(separatedStudentsCell, this.classesDefn.testFile.isUnisex);
     }
 
+
     addPairStudent = (e: any) => {
         if (!this.pairedStudentsControl.onAddPairStudent(e.target.id)) {
             this.separatedStudentsControl.onAddPairStudent(e.target.id);
@@ -205,8 +209,8 @@
     }
 
     generateClasses() {
-        debugger;
         var bandSet = this.selectedClassDefinitionViewModel.getBandSet();
+        var students = this.classesDefn.genderStudents(this.genderOption);
         switch (this.groupingOption) {
             case GroupingMethod.Banding:
                 bandSet.groupType = GroupingMethod.Streaming;
@@ -218,7 +222,7 @@
                     band.mixBoysGirls = this.mixGirlsBoysOption;
                 }
                 bandSet.prepare(!this.groupName || this.groupName === "" ? "Class" : this.groupName,
-                    this.classesDefn.students, this.joinedStudents, this.separatedStudents);
+                    students, this.joinedStudents, this.separatedStudents);
                 break;
 
             case GroupingMethod.TopMiddleLowest:
@@ -231,7 +235,7 @@
                     band.mixBoysGirls = this.mixGirlsBoysOption;
                 }
                 bandSet.prepare(!this.groupName || this.groupName === "" ? "Class" : this.groupName,
-                    this.classesDefn.students, this.joinedStudents, this.separatedStudents);
+                    students, this.joinedStudents, this.separatedStudents);
                 break;
 
             case GroupingMethod.Language:
@@ -250,7 +254,7 @@
                 bandSet.bands[0].streamType = this.streamType;
                 bandSet.bands[0].mixBoysGirls = this.mixGirlsBoysOption;
                 bandSet.prepare(!this.groupName || this.groupName === "" ? "Class" : this.groupName,
-                    this.classesDefn.students, this.joinedStudents, this.separatedStudents);
+                    students, this.joinedStudents, this.separatedStudents);
                 break;
         }
 
@@ -279,13 +283,13 @@
         this.pairedStudentsControl = new
             StudentSetListControl("Paired",
                 this.joinedStudents,
-                testInfo.students,
+                this.classesDefn.students,
                 document.getElementById("popup-window-container"));
 
         this.separatedStudentsControl = new
             StudentSetListControl("Separated",
             this.separatedStudents,
-            testInfo.students,
+            this.classesDefn.students,
             document.getElementById("popup-window-container"));
 
         this.set("selectedClassDefinitionViewModel", this.classDefinitionViewModel);

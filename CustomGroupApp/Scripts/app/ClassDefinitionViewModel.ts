@@ -53,6 +53,13 @@
         return this.bandSet;
     }
 
+    genderChanged = (gender: Gender, studentCount: number) => {
+        this.bandSet.studentCount = studentCount;
+        this.bandSet.bands[0].studentCount = studentCount;
+        this.studentCount = studentCount;
+        this.onClassCountChanged();
+    }
+
     showStudentLanguagePreferences = () => { };
 
 }

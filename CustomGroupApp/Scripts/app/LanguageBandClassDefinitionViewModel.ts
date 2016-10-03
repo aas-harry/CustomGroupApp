@@ -49,6 +49,9 @@
         return this.bandSet;
     }
 
+    genderChanged = (gender: Gender, studentCount: number) => {
+    }
+
     showStudentLanguageCaption = "View Students";
     showStudentLanguagePreferences = () => {
         this.set("showStudentLanguageList", ! this.showStudentLanguageList);
