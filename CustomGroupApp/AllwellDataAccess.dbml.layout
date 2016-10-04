@@ -20,5 +20,17 @@
         <elementListCompartment Id="cf5bc168-2ceb-41bb-adea-bed3198170bc" absoluteBounds="3.265, 8.46, 1.9700000000000002, 1.4031982421875" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
+    <classShape Id="9e56f6cc-0cb4-4faa-8ea8-80b48a5b9193" absoluteBounds="5.5, 2.125, 2, 1.5785953776041666">
+      <DataClassMoniker Name="/AllwellDataAccessDataContext/GroupSet" />
+      <nestedChildShapes>
+        <elementListCompartment Id="9047b955-b154-425a-a1f1-a39ba8188194" absoluteBounds="5.515, 2.585, 1.9700000000000002, 1.0185953776041665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="30aa1bf3-764a-47c8-a110-047acd20e689" absoluteBounds="5.625, 4.25, 2, 1.3862939453125">
+      <DataClassMoniker Name="/AllwellDataAccessDataContext/GroupSetStudent" />
+      <nestedChildShapes>
+        <elementListCompartment Id="10f95b62-608a-40ab-9c57-4b9f71cf43ad" absoluteBounds="5.64, 4.71, 1.9700000000000002, 0.8262939453125" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
   </nestedChildShapes>
 </ordesignerObjectsDiagram>

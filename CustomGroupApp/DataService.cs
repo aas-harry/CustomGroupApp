@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using CustomGroupApp.Models;
 
 namespace CustomGroupApp
 {
@@ -33,6 +34,21 @@ namespace CustomGroupApp
 
             _dataService.StudentLanguagePrefs.InsertAllOnSubmit(rows);
             _dataService.SubmitChanges();
+        }
+
+        public IEnumerable<CustomGroupSet> GetCustomGroupSet(int testnum)
+        {
+            from gs in _dataService.GroupSets
+            join s in _dataService.GroupSetStudents on gs.Id equals s.GroupSetId
+            where gs.Testnum == testnum
+            group gs by gs.Id into groupSet
+            select new {groupSet.Key, students = groupSet.Select(x=> new {})}
+
+        }
+
+        public IEnumerable<GroupSetStudent> GetCustomGroupSetStudent(int groupSetId)
+        {
+            return _dataService.GroupSetStudents.Where(x => x.GroupSetId == groupSetId).ToList();
         }
 
         public Test GetTest(int testnum)

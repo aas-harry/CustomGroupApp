@@ -26,4 +26,3 @@ var StudentClassRow = (function (_super) {
     }
     return StudentClassRow;
 }(kendo.data.ObservableObject));
-//# sourceMappingURL=StudentClassRow.js.map

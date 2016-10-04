@@ -40,6 +40,8 @@
 
         $(document)
             .ready(function() {
+                debugger;
+                var foo = @Model;
                 var customgroupListViewModel = new CustomGroupListViewModel(1);
                 kendo.bind($("#custom-group-view"), customgroupListViewModel);
             });

@@ -1047,6 +1047,7 @@
     <TypeScriptCompile Include="Scripts\app\BandClassDefinitionViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\BandTabControl.ts" />
     <TypeScriptCompile Include="Scripts\app\ClassBandInputContainer.ts" />
+    <TypeScriptCompile Include="Scripts\app\CustomGroupListControl.ts" />
     <TypeScriptCompile Include="Scripts\app\CustomGroupListViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\ClassTabControl.ts" />
     <TypeScriptCompile Include="Scripts\app\CustomClassGridCollection.ts" />

@@ -34,4 +34,3 @@ var ClassTableControl = (function () {
     };
     return ClassTableControl;
 }());
-//# sourceMappingURL=ClassTabControl.js.map
