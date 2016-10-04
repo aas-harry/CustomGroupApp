@@ -52,7 +52,8 @@
     errorMessage: string;
     hasErrors = false;
     rootSite: string;
-    hasHiddenClasses: boolean = false;
+    hasHiddenClasses = false;
+    hasCustomGroups = false;
 
     get testNumber(): number {
         return this.testInfo ? this.testInfo.fileNumber : 0;
@@ -77,8 +78,7 @@
     get genderOption(): Gender {
         return this.groupingHelper.convertGenderFromString(this.selectedGenderOption);
     }
-
-   
+    
     get classListControl(): ClassListControl {
         if (this._classListControl === undefined) {
             this._classListControl = new ClassListControl();
@@ -144,14 +144,16 @@
 
         var viewName = this.stepCollection.getStepView(this.groupingOption, stepNo);
         console.log("View: ", viewName);
+        var context = { 'context': { TestNumber: this.testNumber, GroupSetId: this.classListControl.groupSetId } };
 
-
+        debugger;
         if (!viewName) {
             return;
         }
         $.ajax({
             type: "POST",
             url: "Customgroup\\" + viewName,
+            data: JSON.stringify(context),
             dataType: "html",
             success(data) {
                 $(`#${containerElementName}`).html(data);
@@ -301,6 +303,7 @@
     hasDatasource = false;
     setDatasource = (test, results, languages, groupSets) => {
         this.hasDatasource = true;
+        this.hasCustomGroups = groupSets && groupSets.length > 0;
 
         var testInfo = new TestFile();
         testInfo.set(test, results, languages, groupSets);

@@ -28,6 +28,7 @@ var CustomGroupViewModel = (function (_super) {
         this.separatedStudents = [];
         this.hasErrors = false;
         this.hasHiddenClasses = false;
+        this.hasCustomGroups = false;
         this.commonUtils = new CommonUtils();
         this.groupingHelper = new GroupingHelper();
         this.nextStep = function () {
@@ -85,6 +86,7 @@ var CustomGroupViewModel = (function (_super) {
         this.hasDatasource = false;
         this.setDatasource = function (test, results, languages, groupSets) {
             _this.hasDatasource = true;
+            _this.hasCustomGroups = groupSets && groupSets.length > 0;
             var testInfo = new TestFile();
             testInfo.set(test, results, languages, groupSets);
             _this.isCoedSchool = testInfo.isUnisex;
@@ -243,12 +245,15 @@ var CustomGroupViewModel = (function (_super) {
         _super.prototype.set.call(this, "isLastStep", this.stepCollection.isLastStep(stepNo));
         var viewName = this.stepCollection.getStepView(this.groupingOption, stepNo);
         console.log("View: ", viewName);
+        var context = { 'context': { TestNumber: this.testNumber, GroupSetId: this.classListControl.groupSetId } };
+        debugger;
         if (!viewName) {
             return;
         }
         $.ajax({
             type: "POST",
             url: "Customgroup\\" + viewName,
+            data: JSON.stringify(context),
             dataType: "html",
             success: function (data) {
                 $("#" + containerElementName).html(data);
@@ -334,4 +339,3 @@ var CustomGroupViewModel = (function (_super) {
     ;
     return CustomGroupViewModel;
 }(kendo.data.ObservableObject));
-//# sourceMappingURL=CustomGroupViewModel.js.map

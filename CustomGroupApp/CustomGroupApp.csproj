@@ -146,6 +146,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\CustomGroupContext.cs" />
     <Compile Include="Models\StudentLanguage.cs" />
     <Compile Include="Models\CustomGroupViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

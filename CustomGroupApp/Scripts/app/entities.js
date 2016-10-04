@@ -58,6 +58,7 @@ var TestFile = (function () {
             for (var _i = 0, groupSets_1 = groupSets; _i < groupSets_1.length; _i++) {
                 var item = groupSets_1[_i];
                 var classItem = new ClassDefinition(null, 0, 0);
+                classItem.groupSetid = item.Id;
                 classItem.name = item.Name;
                 _this.customGroups.push(classItem);
             }
@@ -181,4 +182,3 @@ var Student = (function () {
     });
     return Student;
 }());
-//# sourceMappingURL=entities.js.map

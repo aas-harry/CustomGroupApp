@@ -29,6 +29,12 @@ namespace CustomGroupApp
             return _dataService.GroupSets.Where(x => x.Testnum == testnum).ToList();
         }
 
+        public IEnumerable<GroupSetStudent> GetCustomGroupSetStudent(int groupSetId)
+        {
+            return _dataService.GroupSetStudents.Where(x => x.GroupSetId == groupSetId).ToList();
+        }
+
+
         public void UpdateStudentLanguagePrefs(int testnum, IList<StudentLanguagePref> rows)
         {
             // Delete existing rows

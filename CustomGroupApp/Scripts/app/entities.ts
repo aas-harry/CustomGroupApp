@@ -72,6 +72,7 @@ class TestFile {
         this.setStudents(results, languages);    
         for (let item of groupSets) {
             var classItem = new ClassDefinition(null, 0, 0);
+            classItem.groupSetid = item.Id;
             classItem.name = item.Name;
             this.customGroups.push(classItem);
         }

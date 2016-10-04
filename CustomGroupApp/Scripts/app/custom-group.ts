@@ -588,7 +588,7 @@ class ClassDefinition {
     constructor(public parent: BandDefinition, public index: number, public count: number = 0, public notUsed = false) {
         this.uid = createUuid();
     }
-
+    groupSetid: number;
     uid: string;
     name: string;
     students: Array<StudentClass> = [];

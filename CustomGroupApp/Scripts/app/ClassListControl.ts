@@ -7,10 +7,18 @@ class ClassListControl {
         return this.gridControl ? this.gridControl.dataItem(this.gridControl.select()) : null;
     }
 
+    get groupSetId() {
+        const selectedItem = this.selectedItem;
+        if (!selectedItem) {
+            return 0;
+        }
+        return selectedItem.get("groupSetId");
+    }
+
     create = (
         parentElement: HTMLElement,
         classItems: Array<ClassDefinition>,
-        height = 500) => {
+        height = 300) => {
         var container = document.createElement("div") as HTMLDivElement;
         container.setAttribute("style", `width: 400px; height: ${height}px; margin: 5px 0 0 0;`);
         container.id = `class-list-container`;
@@ -39,7 +47,7 @@ class ClassListControl {
     createClassGrid = (element: string): kendo.ui.Grid => {
         $(`#${element}`)
             .kendoGrid({
-                columns: [{ field: "name", title: "Name", width: "300px", attributes: { 'class': "text-nowrap" } }],
+                columns: [{ field: "name", title: "Select a custom group", width: "300px", attributes: { 'class': "text-nowrap" } }],
                 sortable: {
                     mode: "single",
                     allowUnsort: true

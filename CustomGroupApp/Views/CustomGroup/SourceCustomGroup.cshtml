@@ -1,10 +1,12 @@
 ﻿<div class="step-title">
-    <span style="margin-right: 10px">Step 2:</span>Enter number of classes
+    <span style="margin-right: 10px">Step 2:</span>Enter the source for custom group
 </div>
 <div style="margin: 20px">
     <div>
-        <input type="checkbox" /><span>From test file</span>
-        <div data-bind="visible: isCoedSchool">
+        <input type="checkbox"/>
+        <span>Create custome group for test file</span>
+        <span data-bind="text: testNumber"></span>
+        <div style="margin-left: 20px" data-bind="visible: isCoedSchool">
             <div>Choose students to include option:</div>
             <div>
                 <input type="radio" value="All" data-bind="checked:selectedGenderOption" />
@@ -21,9 +23,10 @@
         </div>
     </div>
     
-    <div>
+    <div style="margin-top: 10px">
         <input type="checkbox" /><span>From existing custom groups</span>
-        <div id="custom-groups-container">
+        <div data-bind="invisible: hasCustomGroups">There are no custom groups.</div>
+        <div style="margin-left: 20px" id="custom-groups-container" data-bind="visible: hasCustomGroups">
             <div id="custom-groups-list"></div>
         </div>
     </div>
@@ -34,7 +37,7 @@
         .ready(function () {
             if (customGroupViewModel && customGroupViewModel.hasDataSource) {
                 customGroupViewModel.showExistingCustomGroup(document.getElementById("custom-groups-list"));
-                kendo.bind($("#custom-group-container"), customGroupViewModel);
             }
+            kendo.bind($("#custom-group-container"), customGroupViewModel);
         });
 </script>

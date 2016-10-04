@@ -105,52 +105,52 @@ namespace CustomGroupApp.Controllers
             return Json(studentLanguages);
         }
 
-        public ActionResult SelectGroupingTypeStep()
+        public ActionResult SelectGroupingTypeStep(CustomGroupContext context)
         {
             return PartialView("SelectGroupingType");
         }
 
-        public ActionResult ClassConfigurationStep()
+        public ActionResult ClassConfigurationStepCustomGroupContext(CustomGroupContext context)
         {
             return PartialView("ClassConfiguration");
         }
 
-        public ActionResult TopMiddleLowestClassConfigurationStep()
+        public ActionResult TopMiddleLowestClassConfigurationStep(CustomGroupContext context)
         {
             return PartialView("TopMiddleLowestBandClassConfiguration");
         }
 
-        public ActionResult LanguageClassConfigurationStep()
+        public ActionResult LanguageClassConfigurationStep(CustomGroupContext context)
         {
             return PartialView("LanguageBandClassConfiguration");
         }
 
 
-        public ActionResult BandClassConfigurationStep()
+        public ActionResult BandClassConfigurationStep(CustomGroupContext context)
         {
             return PartialView("BandClassConfiguration");
         }
 
-        public ActionResult EnterCustomGroupNameStep()
+        public ActionResult EnterCustomGroupNameStep(CustomGroupContext context)
         {
             return PartialView("EnterCustomGroupName");
         }
-        public ActionResult SaveCustomGroupStep()
+        public ActionResult SaveCustomGroupStep(CustomGroupContext context)
         {
             return PartialView("SaveCustomGroup");
         }
 
-        public ActionResult SourceCustomGroupStep()
+        public ActionResult SourceCustomGroupStep(CustomGroupContext context)
         {
             return PartialView("SourceCustomGroup");
         }
 
-        public ActionResult StudentGroupingOptionsStep()
+        public ActionResult StudentGroupingOptionsStep(CustomGroupContext context)
         {
             return PartialView("StudentGroupingOptions");
         }
 
-        public ActionResult GenerateCustomGroupStep()
+        public ActionResult GenerateCustomGroupStep(CustomGroupContext context)
         {
             return PartialView("GenerateCustomGroup");
         }
