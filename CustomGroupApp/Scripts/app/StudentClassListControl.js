@@ -90,7 +90,6 @@ var StudentClassListControl = (function () {
                 },
                 toolbar: [{
                         template: kendo.template(("Group Name: <input id='" + groupNameElementId + "' style='margin: 0 5px 0 5px' />") +
-                            ("<button " + btnClass + " id='class-" + classItem.uid + "' data-bind='click: splitClass' " + btnStyle + "'>Split</button>") +
                             ("<button " + btnClass + " id='class-" + classItem.uid + "' data-bind='click: hideClass' " + btnStyle + "'>Hide</button>"))
                     }],
                 selectable: "row",

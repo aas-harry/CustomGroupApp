@@ -38,10 +38,10 @@ var CustomGroupViewModel = (function (_super) {
             _super.prototype.set.call(_this, "currentGroupStep", _this.currentGroupStep - 1);
             _this.callGetViewStep(_this.currentGroupStep, _this.containerElementName);
         };
-        this.cancelStep = function () {
-            console.log("cancelStep");
-        };
-        this.showStep = function (data) {
+        this.startOver = function () {
+            _this.reset();
+            _super.prototype.set.call(_this, "currentGroupStep", 1);
+            _this.callGetViewStep(_this.currentGroupStep, _this.containerElementName);
         };
         this.showStudentGroupingOption = function (joinedStudentsCell, separatedStudentsCell) {
             _this.pairedStudentsControl.createStudentSetContainer(joinedStudentsCell, _this.classesDefn.testFile.isUnisex);
@@ -78,6 +78,14 @@ var CustomGroupViewModel = (function (_super) {
                 _this.separatedStudentsControl.onDeletePairStudent(e.target.id);
             }
         };
+        this.reset = function () {
+            _this.bandSet = _this.classesDefn.createBandSet("class", _this.studentCount);
+            _this.bandSet.bands[0].setClassCount(3);
+            _this.customBandSet = _this.classesDefn.createBandSet("Band", _this.studentCount, 2);
+            _this.languageBandSet = _this.classesDefn.createBandSet("Band", _this.studentCount, 1);
+            _this.topMiddleLowestBandSet = _this.classesDefn.createTopMiddleBottomBandSet("class", _this.studentCount);
+            _this.set("selectedClassDefinitionViewModel", _this.classDefinitionViewModel);
+        };
         //
         this.setDatasource = function (test, results, languages) {
             var testInfo = new TestFile();
@@ -86,14 +94,9 @@ var CustomGroupViewModel = (function (_super) {
             _this.studentCount = testInfo.studentCount;
             _this.studentCountInAllClasses = testInfo.studentCount;
             _this.classesDefn = new ClassesDefinition(testInfo);
-            _this.bandSet = _this.classesDefn.createBandSet("class", _this.studentCount);
-            _this.bandSet.bands[0].setClassCount(3);
-            _this.customBandSet = _this.classesDefn.createBandSet("Band", _this.studentCount, 2);
-            _this.languageBandSet = _this.classesDefn.createBandSet("Band", _this.studentCount, 1);
-            _this.topMiddleLowestBandSet = _this.classesDefn.createTopMiddleBottomBandSet("class", _this.studentCount);
             _this.pairedStudentsControl = new StudentSetListControl("Paired", _this.joinedStudents, _this.classesDefn.students, document.getElementById("popup-window-container"));
             _this.separatedStudentsControl = new StudentSetListControl("Separated", _this.separatedStudents, _this.classesDefn.students, document.getElementById("popup-window-container"));
-            _this.set("selectedClassDefinitionViewModel", _this.classDefinitionViewModel);
+            _this.reset();
         };
         this.onStudentCountChanged = function (count) {
             // set the total number students in all classes
@@ -263,6 +266,32 @@ var CustomGroupViewModel = (function (_super) {
                 this.set("selectedClassDefinitionViewModel", this.classDefinitionViewModel);
                 break;
         }
+    };
+    CustomGroupViewModel.prototype.saveClasses = function () {
+        var bandSet = this.selectedClassDefinitionViewModel.getBandSet();
+        var groupSet = {
+            'TestNumber': this.classesDefn.testFile.fileNumber,
+            'Name': this.groupName,
+            'Classes': []
+        };
+        for (var _i = 0, _a = bandSet.bands; _i < _a.length; _i++) {
+            var bandItem = _a[_i];
+            for (var _b = 0, _c = bandItem.classes; _b < _c.length; _b++) {
+                var classItem = _c[_b];
+                var classes = Enumerable.From(classItem.students).Select(function (x) { return x.id; }).ToArray();
+                groupSet.Classes.push(classes);
+            }
+        }
+        $.ajax({
+            type: "POST",
+            url: "Customgroup\\SaveClasses",
+            contentType: "application/json",
+            data: JSON.stringify({ 'groupSet': groupSet }),
+            success: function (data) {
+                var element = document.getElementById("message-text");
+                element.textContent = "Custom groups have been saved successfully.";
+            }
+        });
     };
     CustomGroupViewModel.prototype.generateClasses = function () {
         var bandSet = this.selectedClassDefinitionViewModel.getBandSet();

@@ -41,6 +41,12 @@ namespace CustomGroupApp.Controllers
             return Json(_dataService.GetStudentLanguagePrefs(testnum).ToList());
         }
 
+        [HttpPost]
+        public JsonResult SaveClasses(CustomGroupSet groupSet)
+        {
+            return Json(true);
+        }
+
         public ActionResult CustomGroupWizard(int testnum)
         {
             //return View("BandClassDefinitionView");
@@ -147,6 +153,11 @@ namespace CustomGroupApp.Controllers
         public ActionResult GenerateCustomGroupStep()
         {
             return PartialView("GenerateCustomGroup");
+        }
+
+        public ActionResult CustomGroupListView(int testnum)
+        {
+            return PartialView("CustomGroupListView", testnum);
         }
     }
 }

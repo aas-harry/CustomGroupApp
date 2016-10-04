@@ -36,9 +36,9 @@
         <div class="row">
             <hr />
             <div id="navigation-buttons" style="margin-left: 20px">
-                <button class="btn btn-default" data-bind="click: nextStep, disabled: isLastStep ">Next</button>
-                <button class="btn btn-default" data-bind="click: previousStep, disabled: isFirstStep">Previous</button>
-                <button class="btn btn-default" data-bind="click: cancelStep">Cancel</button>
+                <button class="btn btn-default" data-bind="click: nextStep, invisible: isLastStep ">Next</button>
+                <button class="btn btn-default" data-bind="click: previousStep, disabled: isFirstStep, invisible: isLastStep">Previous</button>
+                <button class="btn btn-default" data-bind="click: startOver, visible: isLastStep ">Create New Custom Group</button>
             </div>
         </div>
     </div>

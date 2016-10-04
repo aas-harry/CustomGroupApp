@@ -13,6 +13,7 @@
             <input id="test-number" style="width: 280px; margin-right: 5px; margin-left: 10px">
             <button class="btn btn-default" onClick="createClasses()">Create</button>
             <button class="btn btn-default" onClick="testControl()">Test</button>
+            <button class="btn btn-default" onClick="customGroupListView()">Custom Groups</button>
             @*<button class="btn btn-default" onClick="getResults()">Get Results</button>
             <button class="btn btn-default" onClick="createMixClasses()">Create Mix</button>
             <button class="btn btn-default" onClick="createStreamingClasses()">Create streaming</button>
@@ -149,7 +150,24 @@
             }
         });
     }
+    function customGroupListView() {
+        debugger;
+        var numericTextBox = $("#test-number").data("kendoComboBox");
+        var testnumber = parseInt(numericTextBox.value());
 
+        $.ajax({
+            url: '@Url.Action("CustomGroupListView", "CustomGroup")',
+            data: { testnum: testnumber },  // 1014181
+            type: 'POST',
+            cache: false,
+            success: function (html) {
+                $("#content").replaceWith(html);
+            },
+            fail: function (data) {
+
+            }
+        });
+    }
  
     function resetGrid() {
         for (var j = 1; j <= 6; j++) {

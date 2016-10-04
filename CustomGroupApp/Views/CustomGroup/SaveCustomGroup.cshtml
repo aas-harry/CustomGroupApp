@@ -1,21 +1,17 @@
 ﻿<div class="step-title">
-    <span style="margin-right: 10px">Step 6:</span>Save and Re-group Custom Groups
+    <span style="margin-right: 10px">Step 6:</span>Finished
 </div>
 <div style="margin: 20px">
-    <div id="custom-groups-container">
-        <div id="custom-groups-list">
-        </div>
+    <div id="message-text">
+        <span>Saving custom groups...</span>
     </div>
-    <input data-role="maskedtextbox"
-           data-mask=""
-           data-bind="value: groupName"
-           style="width: 500px">
 </div>
 
 
 <script>
     $(document)
         .ready(function () {
+            customGroupViewModel.saveClasses();
             kendo.bind($("#custom-group-container"), customGroupViewModel);
         });
 </script>

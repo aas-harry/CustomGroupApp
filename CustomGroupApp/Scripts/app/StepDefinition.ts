@@ -1,5 +1,5 @@
 ﻿class StepDefinition {
-    constructor(public stepNo: number, public isCommon = true, public viewName: string) {
+    constructor(public stepNo: number, public isCommon = true, public viewName: string, isLastStep = false) {
 
     }
     views: Array<ViewDefinition> = [];
@@ -23,7 +23,7 @@ class StepCollection {
         this.steps.push(new StepDefinition(3, true, "StudentGroupingOptionsStep"));
         this.steps.push(new StepDefinition(4, true, "EnterCustomGroupNameStep"));
         this.steps.push(new StepDefinition(5, true, "GenerateCustomGroupStep"));
-        this.steps.push(new StepDefinition(6, true, "SaveCustomGroupStep"));
+        this.steps.push(new StepDefinition(6, true, "SaveCustomGroupStep", true));
 
         this.stepCount = this.steps.length;
         this.lastStep = this.steps[this.stepCount - 1];

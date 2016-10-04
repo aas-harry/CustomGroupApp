@@ -51,6 +51,7 @@
     hasErrors = false;
     rootSite: string;
     hasHiddenClasses: boolean = false;
+    message: string;
 
     get testNumber(): number {
         return this.testInfo ? this.testInfo.fileNumber : 0;
@@ -75,8 +76,6 @@
     get genderOption(): Gender {
         return this.groupingHelper.convertGenderFromString(this.selectedGenderOption);
     }
-
-   
 
     get classDefinitionViewModel(): ClassDefinitionViewModel {
         if (this._classDefinitionViewModel === undefined) {
@@ -127,8 +126,11 @@
         super.set("currentGroupStep", this.currentGroupStep - 1);
         this.callGetViewStep(this.currentGroupStep, this.containerElementName);
     };
-    private cancelStep = () => {
-        console.log("cancelStep");
+    private startOver = () => {
+        this.reset();
+
+        super.set("currentGroupStep", 1);
+        this.callGetViewStep(this.currentGroupStep, this.containerElementName);
     };
     private callGetViewStep(stepNo: number, containerElementName: string) {
         super.set("isFirstStep", this.stepCollection.isFirstStep(stepNo));
@@ -150,9 +152,7 @@
             }
         });
     }
-    private showStep = (data) => {
-    }
-
+    
     loadGroupingViewModel() {
         switch (this.groupingOption) {
             case GroupingMethod.Banding: 
@@ -228,6 +228,35 @@
         }
     }
 
+    saveClasses() {
+        const bandSet = this.selectedClassDefinitionViewModel.getBandSet();
+        const groupSet = {
+            'TestNumber': this.classesDefn.testFile.fileNumber,
+            'Name': this.groupName,
+            'Classes': []
+        }
+
+        for (let bandItem of bandSet.bands) {
+            for (let classItem of bandItem.classes) {
+                var classes = Enumerable.From(classItem.students).Select(x => x.id).ToArray();
+                groupSet.Classes.push(classes);
+            }
+        }
+
+     
+        $.ajax({
+            type: "POST",
+            url: "Customgroup\\SaveClasses",
+            contentType: "application/json",
+            data: JSON.stringify({ 'groupSet': groupSet }),
+            success(data) {
+                const element = document.getElementById("message-text") as HTMLElement;
+                element.textContent = "Custom groups have been saved successfully.";
+            }
+        });
+
+  
+    }
     generateClasses() {
         var bandSet = this.selectedClassDefinitionViewModel.getBandSet();
         var students = this.classesDefn.genderStudents(this.genderOption);
@@ -282,15 +311,7 @@
         this.selectedClassDefinitionViewModel.loadOptions(bandSet);
     };
 
-    //
-    setDatasource = (test, results, languages) => {
-        var testInfo = new TestFile();
-        testInfo.set(test, results, languages);
-        this.isCoedSchool = testInfo.isUnisex;
-        this.studentCount = testInfo.studentCount;
-        this.studentCountInAllClasses = testInfo.studentCount;
-        this.classesDefn = new ClassesDefinition(testInfo);
-
+    reset = () => {
         this.bandSet = this.classesDefn.createBandSet("class", this.studentCount);
         this.bandSet.bands[0].setClassCount(3);
 
@@ -299,6 +320,18 @@
         this.languageBandSet = this.classesDefn.createBandSet("Band", this.studentCount, 1);
 
         this.topMiddleLowestBandSet = this.classesDefn.createTopMiddleBottomBandSet("class", this.studentCount);
+
+        this.set("selectedClassDefinitionViewModel", this.classDefinitionViewModel);
+    }
+
+    //
+    setDatasource = (test, results, languages) => {
+        var testInfo = new TestFile();
+        testInfo.set(test, results, languages);
+        this.isCoedSchool = testInfo.isUnisex;
+        this.studentCount = testInfo.studentCount;
+        this.studentCountInAllClasses = testInfo.studentCount;
+        this.classesDefn = new ClassesDefinition(testInfo);
 
         this.pairedStudentsControl = new
             StudentSetListControl("Paired",
@@ -312,7 +345,7 @@
             this.classesDefn.students,
             document.getElementById("popup-window-container"));
 
-        this.set("selectedClassDefinitionViewModel", this.classDefinitionViewModel);
+        this.reset();
     };
 
     onStudentCountChanged = (count: number) => {

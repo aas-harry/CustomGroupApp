@@ -1,0 +1,47 @@
+﻿<div style="font-size: 12px">
+    <style scoped>
+        input[type="radio"] {
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        .k-grid td {
+            padding-bottom: 2px;
+            padding-top: 2px;
+            white-space: nowrap;
+        }
+
+        .step-title {
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
+
+    <div class="container-fluid" id="custom-group-view">
+        <div>
+            <button class="btn btn-default" onClick="create()">Create</button>
+            <button class="btn btn-default" onClick="delete()">Delete</button>
+            <button class="btn btn-default" onClick="edit()">Edit</button>
+        </div>
+
+        <table>
+            <tr>
+                <td>Abc</td>
+                <td>Abc123</td>
+            </tr>
+        </table>
+    </div>
+    <script>
+
+        $(document)
+            .ready(function() {
+                var customgroupListViewModel = new CustomGroupListViewModel(1);
+                kendo.bind($("#custom-group-view"), customgroupListViewModel);
+            });
+    </script>
+</div>

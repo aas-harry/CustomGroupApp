@@ -146,6 +146,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\CustomGroupSet.cs" />
     <Compile Include="Models\CustomGroupContext.cs" />
     <Compile Include="Models\StudentLanguage.cs" />
     <Compile Include="Models\CustomGroupViewModel.cs" />
@@ -1019,6 +1020,7 @@
     <Content Include="Views\CustomGroup\LanguageBandClassConfiguration.cshtml" />
     <Content Include="Views\CustomGroup\GenerateCustomGroup.cshtml" />
     <Content Include="Views\CustomGroup\SaveCustomGroup.cshtml" />
+    <Content Include="Views\CustomGroup\CustomGroupListView.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1045,6 +1047,7 @@
     <TypeScriptCompile Include="Scripts\app\BandClassDefinitionViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\BandTabControl.ts" />
     <TypeScriptCompile Include="Scripts\app\ClassBandInputContainer.ts" />
+    <TypeScriptCompile Include="Scripts\app\CustomGroupListViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\ClassTabControl.ts" />
     <TypeScriptCompile Include="Scripts\app\CustomClassGridCollection.ts" />
     <TypeScriptCompile Include="Scripts\app\GenerateCustomGroupViewModel.ts" />

@@ -1,6 +1,7 @@
 var StepDefinition = (function () {
-    function StepDefinition(stepNo, isCommon, viewName) {
+    function StepDefinition(stepNo, isCommon, viewName, isLastStep) {
         if (isCommon === void 0) { isCommon = true; }
+        if (isLastStep === void 0) { isLastStep = false; }
         this.stepNo = stepNo;
         this.isCommon = isCommon;
         this.viewName = viewName;
@@ -49,7 +50,7 @@ var StepCollection = (function () {
         this.steps.push(new StepDefinition(3, true, "StudentGroupingOptionsStep"));
         this.steps.push(new StepDefinition(4, true, "EnterCustomGroupNameStep"));
         this.steps.push(new StepDefinition(5, true, "GenerateCustomGroupStep"));
-        this.steps.push(new StepDefinition(6, true, "SaveCustomGroupStep"));
+        this.steps.push(new StepDefinition(6, true, "SaveCustomGroupStep", true));
         this.stepCount = this.steps.length;
         this.lastStep = this.steps[this.stepCount - 1];
         this.firstStep = this.steps[0];
