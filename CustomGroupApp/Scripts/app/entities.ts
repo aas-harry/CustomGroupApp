@@ -50,7 +50,6 @@ class TestFile {
     published: Date;
     subjectTypes: Array<Subject> = [];
     students: Array<Student> = [];
-    customGroups: Array<ClassDefinition> = [];
     isUnisex: boolean;
     hasBoys: boolean = false;
     hasGirls: boolean = false;
@@ -64,18 +63,12 @@ class TestFile {
         return this.fileNumber + " " + this.category;
     };
 
-    set = (test: any, results: any, languages: any, groupSets: any) => {
+    set = (test: any, results: any, languages: any) => {
         this.fileNumber = test.Testnum;
         this.grade = test.Grade;
         this.category = test.Category;
         this.testDate = test.Testdate;
         this.setStudents(results, languages);    
-        for (let item of groupSets) {
-            var classItem = new ClassDefinition(null, 0, 0);
-            classItem.groupSetid = item.Id;
-            classItem.name = item.Name;
-            this.customGroups.push(classItem);
-        }
     }
 
     clear = () => {

@@ -48,8 +48,7 @@ namespace CustomGroupApp.Controllers
             {
                 Test = _dataService.GetTest(testnum),
                 Results = _dataService.GetResults(testnum).ToList(),
-                StudentLanguages = _dataService.GetStudentLanguagePrefs(testnum).ToList(),
-                GroupSets = _dataService.GetCustomGroupSet(testnum).ToList()
+                StudentLanguages = _dataService.GetStudentLanguagePrefs(testnum).ToList()
             });
         }
 
@@ -105,52 +104,47 @@ namespace CustomGroupApp.Controllers
             return Json(studentLanguages);
         }
 
-        public ActionResult SelectGroupingTypeStep(CustomGroupContext context)
+        public ActionResult SelectGroupingTypeStep()
         {
             return PartialView("SelectGroupingType");
         }
 
-        public ActionResult ClassConfigurationStepCustomGroupContext(CustomGroupContext context)
+        public ActionResult ClassConfigurationStep()
         {
             return PartialView("ClassConfiguration");
         }
 
-        public ActionResult TopMiddleLowestClassConfigurationStep(CustomGroupContext context)
+        public ActionResult TopMiddleLowestClassConfigurationStep()
         {
             return PartialView("TopMiddleLowestBandClassConfiguration");
         }
 
-        public ActionResult LanguageClassConfigurationStep(CustomGroupContext context)
+        public ActionResult LanguageClassConfigurationStep()
         {
             return PartialView("LanguageBandClassConfiguration");
         }
 
 
-        public ActionResult BandClassConfigurationStep(CustomGroupContext context)
+        public ActionResult BandClassConfigurationStep()
         {
             return PartialView("BandClassConfiguration");
         }
 
-        public ActionResult EnterCustomGroupNameStep(CustomGroupContext context)
+        public ActionResult EnterCustomGroupNameStep()
         {
             return PartialView("EnterCustomGroupName");
         }
-        public ActionResult SaveCustomGroupStep(CustomGroupContext context)
+        public ActionResult SaveCustomGroupStep()
         {
             return PartialView("SaveCustomGroup");
         }
 
-        public ActionResult SourceCustomGroupStep(CustomGroupContext context)
-        {
-            return PartialView("SourceCustomGroup");
-        }
-
-        public ActionResult StudentGroupingOptionsStep(CustomGroupContext context)
+        public ActionResult StudentGroupingOptionsStep()
         {
             return PartialView("StudentGroupingOptions");
         }
 
-        public ActionResult GenerateCustomGroupStep(CustomGroupContext context)
+        public ActionResult GenerateCustomGroupStep()
         {
             return PartialView("GenerateCustomGroup");
         }

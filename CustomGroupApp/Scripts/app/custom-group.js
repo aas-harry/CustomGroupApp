@@ -863,7 +863,6 @@ var ClassesDefinition = (function () {
         if (testFile === void 0) { testFile = null; }
         this.testFile = testFile;
         this.students = [];
-        this.customGroups = [];
         this.spreadBoysGirlsEqually = false;
         this.excludeLeavingStudent = false;
         this.genderStudents = function (gender) {
@@ -923,7 +922,6 @@ var ClassesDefinition = (function () {
                     this.girlsCount++;
                 }
             }
-            this.customGroups = this.testFile.customGroups;
         }
     }
     Object.defineProperty(ClassesDefinition.prototype, "studentCount", {

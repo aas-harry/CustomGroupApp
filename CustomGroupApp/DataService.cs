@@ -24,17 +24,6 @@ namespace CustomGroupApp
             return _dataService.StudentLanguagePrefs.Where(x => x.Testnum == tesnum).ToList();
         }
 
-        public IEnumerable<GroupSet> GetCustomGroupSet(int testnum)
-        {
-            return _dataService.GroupSets.Where(x => x.Testnum == testnum).ToList();
-        }
-
-        public IEnumerable<GroupSetStudent> GetCustomGroupSetStudent(int groupSetId)
-        {
-            return _dataService.GroupSetStudents.Where(x => x.GroupSetId == groupSetId).ToList();
-        }
-
-
         public void UpdateStudentLanguagePrefs(int testnum, IList<StudentLanguagePref> rows)
         {
             // Delete existing rows
@@ -50,6 +39,5 @@ namespace CustomGroupApp
         {
             return _dataService.Tests.FirstOrDefault(x => x.Testnum == testnum);
         }
-
     }
 }

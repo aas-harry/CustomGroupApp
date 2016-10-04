@@ -19,8 +19,6 @@
     private _topMiddleLowestBandClassDefinitionViewModel: TopMiddleLowestBandClassDefinitionViewModel;
     private _languageBandClassDefinitionViewModel: LanguageBandClassDefinitionViewModel;
     private _generateCustomGroupViewModel: GenerateCustomGroupViewModel;
-    private _classListControl: ClassListControl;
-
     private _genderOption = "All";
     // ReSharper restore InconsistentNaming
     get selectedGenderOption(): string {
@@ -31,7 +29,7 @@
         const gender = this.commonUtils.genderFromString(value);
         this.set("studentCount", this.classesDefn.genderStudentCount(gender));
         this.set("studentCountInAllClasses", this.studentCount);
-        // this.selectedClassDefinitionViewModel.genderChanged(gender, this.studentCount);
+        this.selectedClassDefinitionViewModel.genderChanged(gender, this.studentCount);
     };
 
     selectedGroupingOption = "MixedAbility";
@@ -52,8 +50,7 @@
     errorMessage: string;
     hasErrors = false;
     rootSite: string;
-    hasHiddenClasses = false;
-    hasCustomGroups = false;
+    hasHiddenClasses: boolean = false;
 
     get testNumber(): number {
         return this.testInfo ? this.testInfo.fileNumber : 0;
@@ -78,13 +75,8 @@
     get genderOption(): Gender {
         return this.groupingHelper.convertGenderFromString(this.selectedGenderOption);
     }
-    
-    get classListControl(): ClassListControl {
-        if (this._classListControl === undefined) {
-            this._classListControl = new ClassListControl();
-        }
-        return this._classListControl;
-    }
+
+   
 
     get classDefinitionViewModel(): ClassDefinitionViewModel {
         if (this._classDefinitionViewModel === undefined) {
@@ -143,10 +135,8 @@
         super.set("isLastStep", this.stepCollection.isLastStep(stepNo));
 
         var viewName = this.stepCollection.getStepView(this.groupingOption, stepNo);
-        debugger;
-
         console.log("View: ", viewName);
-        var context = { 'context': { TestNumber: this.testNumber, GroupSetId: this.classListControl.groupSetId } };
+
 
         if (!viewName) {
             return;
@@ -154,7 +144,6 @@
         $.ajax({
             type: "POST",
             url: "Customgroup\\" + viewName,
-            data: JSON.stringify(context),
             dataType: "html",
             success(data) {
                 $(`#${containerElementName}`).html(data);
@@ -166,14 +155,12 @@
 
     loadGroupingViewModel() {
         switch (this.groupingOption) {
-            case GroupingMethod.Banding:
-                this.customBandSet.studentCount = this.studentCount;
+            case GroupingMethod.Banding: 
                 this.bandClassDefinitionViewModel.loadOptions(this.customBandSet);
                 this.set("selectedClassDefinitionViewModel", this.bandClassDefinitionViewModel);
                 break;
 
            case GroupingMethod.TopMiddleLowest:
-                this.topMiddleLowestBandSet.studentCount = this.studentCount;
                 this.topMiddleLowestBandClassDefinitionViewModel.loadOptions(this.topMiddleLowestBandSet);
                 this.set("selectedClassDefinitionViewModel", this.topMiddleLowestBandClassDefinitionViewModel);
                 break;
@@ -188,16 +175,11 @@
                 this.set("selectedClassDefinitionViewModel", this.languageBandClassDefinitionViewModel);
                 break;
 
-           default:
-                this.bandSet.studentCount = this.studentCount;
+            default:
                 this.classDefinitionViewModel.loadOptions(this.bandSet);
                 this.set("selectedClassDefinitionViewModel", this.classDefinitionViewModel);
                 break;
         }
-    }
-
-    showExistingCustomGroup = (parentElement: HTMLElement) => {
-        this.classListControl.create(parentElement, this.classesDefn.customGroups);
     }
 
     showStudentGroupingOption = (
@@ -301,17 +283,13 @@
     };
 
     //
-    hasDatasource = false;
-    setDatasource = (test, results, languages, groupSets) => {
-        this.hasDatasource = true;
-        this.hasCustomGroups = groupSets && groupSets.length > 0;
-
-        this.testInfo = new TestFile();
-        this.testInfo.set(test, results, languages, groupSets);
-        this.isCoedSchool = this.testInfo.isUnisex;
-        this.studentCount = this.testInfo.studentCount;
-        this.studentCountInAllClasses = this.testInfo.studentCount;
-        this.classesDefn = new ClassesDefinition(this.testInfo);
+    setDatasource = (test, results, languages) => {
+        var testInfo = new TestFile();
+        testInfo.set(test, results, languages);
+        this.isCoedSchool = testInfo.isUnisex;
+        this.studentCount = testInfo.studentCount;
+        this.studentCountInAllClasses = testInfo.studentCount;
+        this.classesDefn = new ClassesDefinition(testInfo);
 
         this.bandSet = this.classesDefn.createBandSet("class", this.studentCount);
         this.bandSet.bands[0].setClassCount(3);

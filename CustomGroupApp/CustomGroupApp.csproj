@@ -1019,7 +1019,6 @@
     <Content Include="Views\CustomGroup\LanguageBandClassConfiguration.cshtml" />
     <Content Include="Views\CustomGroup\GenerateCustomGroup.cshtml" />
     <Content Include="Views\CustomGroup\SaveCustomGroup.cshtml" />
-    <Content Include="Views\CustomGroup\SourceCustomGroup.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1064,7 +1063,6 @@
     <TypeScriptCompile Include="Scripts\app\StudentClassInputContainer.ts" />
     <TypeScriptCompile Include="Scripts\app\StudentClassListControl.ts" />
     <TypeScriptCompile Include="Scripts\app\StudentClassRow.ts" />
-    <TypeScriptCompile Include="Scripts\app\ClassListControl.ts" />
     <TypeScriptCompile Include="Scripts\app\StudentListControl.ts" />
     <TypeScriptCompile Include="Scripts\app\StudentSetListControl.ts" />
     <TypeScriptCompile Include="Scripts\app\TopMiddleLowestBandClassDefinitionViewModel.ts" />
