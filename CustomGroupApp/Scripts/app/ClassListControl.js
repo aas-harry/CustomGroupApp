@@ -57,10 +57,11 @@ var ClassListControl = (function () {
             if (!selectedItem) {
                 return 0;
             }
-            return selectedItem.get("groupSetId");
+            return selectedItem.get("groupSetid");
         },
         enumerable: true,
         configurable: true
     });
     return ClassListControl;
 }());
+//# sourceMappingURL=ClassListControl.js.map

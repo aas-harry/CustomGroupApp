@@ -12,7 +12,7 @@ class ClassListControl {
         if (!selectedItem) {
             return 0;
         }
-        return selectedItem.get("groupSetId");
+        return selectedItem.get("groupSetid");
     }
 
     create = (

@@ -143,10 +143,11 @@
         super.set("isLastStep", this.stepCollection.isLastStep(stepNo));
 
         var viewName = this.stepCollection.getStepView(this.groupingOption, stepNo);
+        debugger;
+
         console.log("View: ", viewName);
         var context = { 'context': { TestNumber: this.testNumber, GroupSetId: this.classListControl.groupSetId } };
 
-        debugger;
         if (!viewName) {
             return;
         }
@@ -305,12 +306,12 @@
         this.hasDatasource = true;
         this.hasCustomGroups = groupSets && groupSets.length > 0;
 
-        var testInfo = new TestFile();
-        testInfo.set(test, results, languages, groupSets);
-        this.isCoedSchool = testInfo.isUnisex;
-        this.studentCount = testInfo.studentCount;
-        this.studentCountInAllClasses = testInfo.studentCount;
-        this.classesDefn = new ClassesDefinition(testInfo);
+        this.testInfo = new TestFile();
+        this.testInfo.set(test, results, languages, groupSets);
+        this.isCoedSchool = this.testInfo.isUnisex;
+        this.studentCount = this.testInfo.studentCount;
+        this.studentCountInAllClasses = this.testInfo.studentCount;
+        this.classesDefn = new ClassesDefinition(this.testInfo);
 
         this.bandSet = this.classesDefn.createBandSet("class", this.studentCount);
         this.bandSet.bands[0].setClassCount(3);

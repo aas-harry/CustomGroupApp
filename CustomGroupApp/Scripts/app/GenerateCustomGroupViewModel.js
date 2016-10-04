@@ -52,3 +52,4 @@ var GenerateCustomGroupViewModel = (function (_super) {
     };
     return GenerateCustomGroupViewModel;
 }(kendo.data.ObservableObject));
+//# sourceMappingURL=GenerateCustomGroupViewModel.js.map

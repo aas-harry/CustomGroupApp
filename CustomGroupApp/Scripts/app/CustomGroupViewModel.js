@@ -87,12 +87,12 @@ var CustomGroupViewModel = (function (_super) {
         this.setDatasource = function (test, results, languages, groupSets) {
             _this.hasDatasource = true;
             _this.hasCustomGroups = groupSets && groupSets.length > 0;
-            var testInfo = new TestFile();
-            testInfo.set(test, results, languages, groupSets);
-            _this.isCoedSchool = testInfo.isUnisex;
-            _this.studentCount = testInfo.studentCount;
-            _this.studentCountInAllClasses = testInfo.studentCount;
-            _this.classesDefn = new ClassesDefinition(testInfo);
+            _this.testInfo = new TestFile();
+            _this.testInfo.set(test, results, languages, groupSets);
+            _this.isCoedSchool = _this.testInfo.isUnisex;
+            _this.studentCount = _this.testInfo.studentCount;
+            _this.studentCountInAllClasses = _this.testInfo.studentCount;
+            _this.classesDefn = new ClassesDefinition(_this.testInfo);
             _this.bandSet = _this.classesDefn.createBandSet("class", _this.studentCount);
             _this.bandSet.bands[0].setClassCount(3);
             _this.customBandSet = _this.classesDefn.createBandSet("Band", _this.studentCount, 2);
@@ -244,9 +244,9 @@ var CustomGroupViewModel = (function (_super) {
         _super.prototype.set.call(this, "isFirstStep", this.stepCollection.isFirstStep(stepNo));
         _super.prototype.set.call(this, "isLastStep", this.stepCollection.isLastStep(stepNo));
         var viewName = this.stepCollection.getStepView(this.groupingOption, stepNo);
+        debugger;
         console.log("View: ", viewName);
         var context = { 'context': { TestNumber: this.testNumber, GroupSetId: this.classListControl.groupSetId } };
-        debugger;
         if (!viewName) {
             return;
         }
@@ -339,3 +339,4 @@ var CustomGroupViewModel = (function (_super) {
     ;
     return CustomGroupViewModel;
 }(kendo.data.ObservableObject));
+//# sourceMappingURL=CustomGroupViewModel.js.map
