@@ -81,6 +81,7 @@ var TestFile = (function () {
                     }
                 }
                 classItem.count = classItem.students.length;
+                classItem.name = item.Name;
                 _this.customGroups.push(classItem);
             }
         };

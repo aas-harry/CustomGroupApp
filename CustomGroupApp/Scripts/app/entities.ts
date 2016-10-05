@@ -94,6 +94,7 @@ class TestFile {
                 }
             }
             classItem.count = classItem.students.length;
+            classItem.name = item.Name;
             this.customGroups.push(classItem);
         }
     }

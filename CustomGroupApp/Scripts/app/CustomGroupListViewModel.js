@@ -9,6 +9,33 @@ var CustomGroupListViewModel = (function (_super) {
         var _this = this;
         _super.call(this);
         this.testNumber = testNumber;
+        this.customGroupLisdtContol = new CustomGroupListControl();
+        this.create = function () {
+            var myself = _this;
+            $.ajax({
+                type: "POST",
+                url: "Customgroup\\CustomGroupWizard",
+                contentType: "application/json",
+                data: JSON.stringify({ 'testNumber': myself.testNumber }),
+                success: function (html) {
+                    debugger;
+                    var content = document.createElement("div");
+                    content.id = "custom-goup-wizard";
+                    myself.contentElement.appendChild(content);
+                    $("#custom-group-wizard").html(html);
+                },
+                error: function (e) {
+                }
+            });
+        };
+        this.regroup = function () {
+        };
+        this.edit = function () {
+        };
+        this.delete = function () {
+        };
+        this.showMenuPanel = function () {
+        };
         this.initMenuPanel = function (callback) {
             var myself = _this;
             $.ajax({
@@ -22,6 +49,7 @@ var CustomGroupListViewModel = (function (_super) {
                     if (tmpCallback) {
                         callback(true);
                     }
+                    myself.customGroupLisdtContol.create(myself.menuPanelElement, myself.testInfo.customGroups);
                 },
                 error: function (e) {
                     var tmpCallback = callback;
@@ -32,13 +60,23 @@ var CustomGroupListViewModel = (function (_super) {
             });
         };
         this.setDatasource = function (test, results, languages, customGroups) {
-            var testInfo = new TestFile();
-            testInfo.set(test, results, languages, customGroups);
+            _this.testInfo = new TestFile();
+            _this.testInfo.set(test, results, languages, customGroups);
         };
         _super.prototype.init.call(this, this);
         this.menuPanelElement = menuPanelElement;
         this.contentElement = contentElement;
     }
+    Object.defineProperty(CustomGroupListViewModel.prototype, "customGroupViewMdel", {
+        get: function () {
+            if (!this._customGroupViewModel) {
+                this._customGroupViewModel = new CustomGroupViewModel("", 80, "");
+            }
+            return this._customGroupViewModel;
+        },
+        enumerable: true,
+        configurable: true
+    });
     return CustomGroupListViewModel;
 }(kendo.data.ObservableObject));
 //# sourceMappingURL=CustomGroupListViewModel.js.map
