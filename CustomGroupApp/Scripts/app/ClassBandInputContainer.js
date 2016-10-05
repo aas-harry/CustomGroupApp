@@ -34,3 +34,4 @@ var ClassBandInputContainer = (function () {
     }
     return ClassBandInputContainer;
 }());
+//# sourceMappingURL=ClassBandInputContainer.js.map

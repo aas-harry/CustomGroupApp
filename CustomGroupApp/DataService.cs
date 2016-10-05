@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc.Html;
 using CustomGroupApp.Models;
+using Kendo.Mvc.Extensions;
 
 namespace CustomGroupApp
 {
@@ -38,12 +40,21 @@ namespace CustomGroupApp
 
         public IEnumerable<CustomGroupSet> GetCustomGroupSet(int testnum)
         {
-            from gs in _dataService.GroupSets
-            join s in _dataService.GroupSetStudents on gs.Id equals s.GroupSetId
-            where gs.Testnum == testnum
-            group gs by gs.Id into groupSet
-            select new {groupSet.Key, students = groupSet.Select(x=> new {})}
+           var students = (from gs in _dataService.GroupSets
+                join s in _dataService.GroupSetStudents on gs.Id equals s.GroupSetId
+                where gs.Testnum == testnum
+                select new {s.GroupSetId, gs.Name, s.StudentId}).ToList();
 
+            var classes = from s in students
+                group s by new {s.GroupSetId, s.Name}
+                into g
+                select new CustomGroupSet {Name = g.Key.Name, Classes = };
+             
+                var customGroupSet = new CustomGroupSet();
+                customGroupSet.Name = item.Key.Name;
+                customGroupSet.Classes.Add(item.Select(x=> x.));
+              
+            return null;
         }
 
         public IEnumerable<GroupSetStudent> GetCustomGroupSetStudent(int groupSetId)

@@ -12,3 +12,4 @@ var CustomGroupListViewModel = (function (_super) {
     }
     return CustomGroupListViewModel;
 }(kendo.data.ObservableObject));
+//# sourceMappingURL=CustomGroupListViewModel.js.map
