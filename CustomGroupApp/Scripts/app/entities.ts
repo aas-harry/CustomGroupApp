@@ -54,7 +54,7 @@ class TestFile {
     hasBoys: boolean = false;
     hasGirls: boolean = false;
     isCoopSchoolTest: boolean;
-
+    customGroups: Array<ClassDefinition> = [];
 
     description = () => {
         if (this.fileNumber === 1015049) {
@@ -63,12 +63,13 @@ class TestFile {
         return this.fileNumber + " " + this.category;
     };
 
-    set = (test: any, results: any, languages: any) => {
+    set = (test: any, results: any, languages: any, customGroupSets: any = []) => {
         this.fileNumber = test.Testnum;
         this.grade = test.Grade;
         this.category = test.Category;
         this.testDate = test.Testdate;
-        this.setStudents(results, languages);    
+        this.setStudents(results, languages);
+        this.setCustomGroups(customGroupSets, this.students);
     }
 
     clear = () => {
@@ -82,6 +83,20 @@ class TestFile {
         this.subjectTypes = [];
         this.students = [];
     };
+
+    setCustomGroups = (data: any, students: Array<Student>) => {
+        var studentDict = Enumerable.From(students).ToDictionary(x => x.studentId, x => x);
+        for (let item of data) {
+            const classItem = new ClassDefinition(null, 0, 0);
+            for (let id of item.Students) {
+                if (studentDict.Contains(id)) {
+                    classItem.students.push(new StudentClass(studentDict.Get(id)));
+                }
+            }
+            classItem.count = classItem.students.length;
+            this.customGroups.push(classItem);
+        }
+    }
 
     setStudents = (data: Array<any>, langPrefs: Array<any> = []) => {
         this.students = [];

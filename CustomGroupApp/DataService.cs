@@ -38,7 +38,7 @@ namespace CustomGroupApp
             _dataService.SubmitChanges();
         }
 
-        public IEnumerable<CustomGroupSet> GetCustomGroupSet(int testnum)
+        public IEnumerable<CustomGroupSet> GetCustomGroupSets(int testnum)
         {
            var students = (from gs in _dataService.GroupSets
                 join s in _dataService.GroupSetStudents on gs.Id equals s.GroupSetId
@@ -48,13 +48,9 @@ namespace CustomGroupApp
             var classes = from s in students
                 group s by new {s.GroupSetId, s.Name}
                 into g
-                select new CustomGroupSet {Name = g.Key.Name, Classes = };
+                select new CustomGroupSet {Name = g.Key.Name, GroupSetId = g.Key.GroupSetId, Students = g.Select(x=> x.StudentId).ToArray() };
              
-                var customGroupSet = new CustomGroupSet();
-                customGroupSet.Name = item.Key.Name;
-                customGroupSet.Classes.Add(item.Select(x=> x.));
-              
-            return null;
+            return classes;
         }
 
         public IEnumerable<GroupSetStudent> GetCustomGroupSetStudent(int groupSetId)

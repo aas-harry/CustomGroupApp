@@ -47,6 +47,18 @@ namespace CustomGroupApp.Controllers
             return Json(true);
         }
 
+        [HttpPost]
+        public JsonResult GetCustomGroupListViewData(int testNumber)
+        {
+            return Json(new CustomGroupViewModel
+            {
+                Test = _dataService.GetTest(testNumber),
+                Results = _dataService.GetResults(testNumber).ToList(),
+                CustomGroupSets = _dataService.GetCustomGroupSets(testNumber).ToList(),
+                StudentLanguages = _dataService.GetStudentLanguagePrefs(testNumber).ToList()
+            });
+        }
+
         public ActionResult CustomGroupWizard(int testnum)
         {
             //return View("BandClassDefinitionView");

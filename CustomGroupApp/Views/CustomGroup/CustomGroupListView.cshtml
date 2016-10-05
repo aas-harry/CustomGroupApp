@@ -1,4 +1,6 @@
-﻿<div style="font-size: 12px">
+﻿@model int
+
+<div style="font-size: 12px">
     <style scoped>
         input[type="radio"] {
             margin-right: 5px;
@@ -23,7 +25,8 @@
     </style>
 
     <div class="container-fluid" id="custom-group-view">
-        <div>
+        <div id="loading-panel">Loading...</div>
+        <div id="custom-group-container"data-binding="visible: isReady">
             <button class="btn btn-default" onClick="create()">Create</button>
             <button class="btn btn-default" onClick="delete()">Delete</button>
             <button class="btn btn-default" onClick="edit()">Edit</button>
@@ -31,19 +34,30 @@
 
         <table>
             <tr>
-                <td>Abc</td>
-                <td>Abc123</td>
+                <td>
+                    <div id="custom-group-menu-panel"></div></td>
+                <td>
+                    <div id="custom-group-content"></div></td>
             </tr>
         </table>
     </div>
     <script>
-
+        var customgroupListViewModel;
         $(document)
             .ready(function() {
-                debugger;
-                var foo = @Model;
-                var customgroupListViewModel = new CustomGroupListViewModel(1);
-                kendo.bind($("#custom-group-view"), customgroupListViewModel);
+                customgroupListViewModel = new CustomGroupListViewModel(@Model,
+                    document.getElementById("custom-group-menu-panel"),
+                    document.getElementById("custom-group-content"));
+                $("#custom-group-container").hide();
+
+                customgroupListViewModel.initMenuPanel(function(flag, e) {
+                    $("#loading-panel").hide();
+                    $("#custom-group-container").show();
+
+                    if (flag) {
+                        kendo.bind($("#custom-group-view"), customgroupListViewModel);
+                    }
+                });
             });
     </script>
 </div>

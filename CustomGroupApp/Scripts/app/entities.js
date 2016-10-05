@@ -42,18 +42,21 @@ var TestFile = (function () {
         this.students = [];
         this.hasBoys = false;
         this.hasGirls = false;
+        this.customGroups = [];
         this.description = function () {
             if (_this.fileNumber === 1015049) {
                 return _this.fileNumber + " " + _this.category + " Ravens";
             }
             return _this.fileNumber + " " + _this.category;
         };
-        this.set = function (test, results, languages) {
+        this.set = function (test, results, languages, customGroupSets) {
+            if (customGroupSets === void 0) { customGroupSets = []; }
             _this.fileNumber = test.Testnum;
             _this.grade = test.Grade;
             _this.category = test.Category;
             _this.testDate = test.Testdate;
             _this.setStudents(results, languages);
+            _this.setCustomGroups(customGroupSets, _this.students);
         };
         this.clear = function () {
             _this.fileNumber = undefined;
@@ -65,6 +68,21 @@ var TestFile = (function () {
             _this.published = undefined;
             _this.subjectTypes = [];
             _this.students = [];
+        };
+        this.setCustomGroups = function (data, students) {
+            var studentDict = Enumerable.From(students).ToDictionary(function (x) { return x.studentId; }, function (x) { return x; });
+            for (var _i = 0, data_1 = data; _i < data_1.length; _i++) {
+                var item = data_1[_i];
+                var classItem = new ClassDefinition(null, 0, 0);
+                for (var _a = 0, _b = item.Students; _a < _b.length; _a++) {
+                    var id = _b[_a];
+                    if (studentDict.Contains(id)) {
+                        classItem.students.push(new StudentClass(studentDict.Get(id)));
+                    }
+                }
+                classItem.count = classItem.students.length;
+                _this.customGroups.push(classItem);
+            }
         };
         this.setStudents = function (data, langPrefs) {
             if (langPrefs === void 0) { langPrefs = []; }
