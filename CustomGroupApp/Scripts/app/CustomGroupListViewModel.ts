@@ -25,13 +25,12 @@
         const myself = this;
         $.ajax({
             type: "POST",
-            url: "Customgroup\\CustomGroupWizard",
+            url: "CustomGroup\\CustomGroupWizard",
             contentType: "application/json",
             data: JSON.stringify({ 'testNumber': myself.testNumber }),
             success(html) {
-                debugger;
-                var content = document.createElement("div");
-                content.id = "custom-goup-wizard";
+                const content = document.createElement("div");
+                content.id = "custom-group-wizard";
                 myself.contentElement.appendChild(content);
                 $("#custom-group-wizard").html(html);
             },

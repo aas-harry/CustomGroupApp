@@ -14,13 +14,12 @@ var CustomGroupListViewModel = (function (_super) {
             var myself = _this;
             $.ajax({
                 type: "POST",
-                url: "Customgroup\\CustomGroupWizard",
+                url: "CustomGroup\\CustomGroupWizard",
                 contentType: "application/json",
                 data: JSON.stringify({ 'testNumber': myself.testNumber }),
                 success: function (html) {
-                    debugger;
                     var content = document.createElement("div");
-                    content.id = "custom-goup-wizard";
+                    content.id = "custom-group-wizard";
                     myself.contentElement.appendChild(content);
                     $("#custom-group-wizard").html(html);
                 },

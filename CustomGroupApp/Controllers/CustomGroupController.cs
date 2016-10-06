@@ -59,14 +59,14 @@ namespace CustomGroupApp.Controllers
             });
         }
 
-        public ActionResult CustomGroupWizard(int testnum)
+        public ActionResult CustomGroupWizard(int testNumber)
         {
             //return View("BandClassDefinitionView");
             return View("CustomGroupWizard", new CustomGroupViewModel
             {
-                Test = _dataService.GetTest(testnum),
-                Results = _dataService.GetResults(testnum).ToList(),
-                StudentLanguages = _dataService.GetStudentLanguagePrefs(testnum).ToList()
+                Test = _dataService.GetTest(testNumber),
+                Results = _dataService.GetResults(testNumber).ToList(),
+                StudentLanguages = _dataService.GetStudentLanguagePrefs(testNumber).ToList()
             });
         }
 
