@@ -34,7 +34,7 @@
     }
 
     showStudentLanguagePreferences = () => {};
-    importStudentLanguages = () => { };
+    importStudents = () => { };
 
     genderChanged = (gender: Gender, studentCount: number) => {
         this.bandSet.studentCount = studentCount;

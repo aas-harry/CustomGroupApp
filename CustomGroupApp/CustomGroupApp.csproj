@@ -146,9 +146,11 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\ClassDefinition.cs" />
     <Compile Include="Models\CustomGroupListViewModel.cs" />
     <Compile Include="Models\CustomGroupSet.cs" />
     <Compile Include="Models\CustomGroupContext.cs" />
+    <Compile Include="Models\PreallocatedClassStudent.cs" />
     <Compile Include="Models\StudentLanguage.cs" />
     <Compile Include="Models\CustomGroupViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -1022,6 +1024,7 @@
     <Content Include="Views\CustomGroup\GenerateCustomGroup.cshtml" />
     <Content Include="Views\CustomGroup\SaveCustomGroup.cshtml" />
     <Content Include="Views\CustomGroup\CustomGroupListView.cshtml" />
+    <Content Include="Views\CustomGroup\PreallocatedClassConfiguration.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1061,6 +1064,7 @@
     <TypeScriptCompile Include="Scripts\app\entities.ts" />
     <TypeScriptCompile Include="Scripts\app\IndividualStudentTestResult.ts" />
     <TypeScriptCompile Include="Scripts\app\KendoHelper.ts" />
+    <TypeScriptCompile Include="Scripts\app\PreallocatedClassDefinitionViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\repository.ts" />
     <TypeScriptCompile Include="Scripts\app\LanguageBandClassDefinitionViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\StepDefinition.ts" />

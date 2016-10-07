@@ -1,0 +1,53 @@
+﻿<div class="step-title">
+    <span style="margin-right: 10px">Step 2:</span>Enter number of classes
+</div>
+<div style="margin: 20px">
+    <div style="margin-top: 20px;">Number of students in this test: <span data-bind="text: studentCount"></span></div>
+    <div style="margin-bottom: 5px">Number of students in all classes: <span data-bind="text: studentCountInAllClasses"></span></div>
+    <div style="margin-top: 10px; margin-bottom: 5px">
+        <span>Number of imported pre-allocated students: </span>
+        <span data-bind="text: selectedClassDefinitionViewModel.preAllocatedStudentsCount, visible: selectedClassDefinitionViewModel.showPreallocatedStudentsList"></span>
+        <span style="margin-left: 5px" data-bind="invisible: selectedClassDefinitionViewModel.showPreallocatedStudentsList">None</span>
+        <span style="margin-left: 5px" data-bind="visible: selectedClassDefinitionViewModel.showPreallocatedStudentsList">(</span>
+        <span data-bind="text: selectedClassDefinitionViewModel.preAllocatedStudentsMatchedCount, visible: selectedClassDefinitionViewModel.showPreallocatedStudentsList"></span>
+        <span style="margin-left:5px" data-bind="visible: selectedClassDefinitionViewModel.showPreallocatedStudentsList">matched)</span>
+        <button id="showStudent" class="btn btn-default" style="margin-left: 10px"
+                data-bind="text: selectedClassDefinitionViewModel.showStudentCaption,
+                click: selectedClassDefinitionViewModel.showPreallocatedStudents,
+                enabled: selectedClassDefinitionViewModel.hasPreallocatedStudents">
+            View
+        </button>
+        <button class="btn btn-default" style="margin-left: 10px" data-bind="click: selectedClassDefinitionViewModel.importStudents">Import</button>
+        <div style="width: 400px; margin-top: 10px" id="import-preallocated-classes">
+            <input type="file" id="files" name="files" />
+        </div>
+
+    </div>
+    <div style="margin-top: 10px;" id="preallocated-classes-container">
+        <div id="preallocated-students-list" style="width: 700px; height: 400px"
+             data-bind="visible: selectedClassDefinitionViewModel.showPreallocatedStudentsList">
+        </div>
+    </div>
+
+    <div id="class-definition-container" style="margin-bottom: 20px; margin-top: 10px">
+        <p>You can adjust the number of students in each classes below:</p>
+        <div id="classes-settings-container" style="width: 540px"></div>
+
+        <div data-bind="visible: isCoedSchool">
+            <input type="checkbox" name="mixGirlsBoys" value="0" data-bind="checked: mixGirlsBoysOption"> Mix girls and boys equally.
+        </div>
+
+        <div>
+            <input type="checkbox" value="0" data-bind="checked: checkboxChecked, events: { change: checkboxCheckedEvent }">
+            <span>Exclude students who are leaving school at the end of the year.</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document)
+        .ready(function () {
+            customGroupViewModel.loadGroupingViewModel();
+            kendo.bind($("#custom-group-container"), customGroupViewModel);
+        });
+</script>

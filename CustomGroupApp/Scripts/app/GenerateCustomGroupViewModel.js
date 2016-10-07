@@ -28,7 +28,7 @@ var GenerateCustomGroupViewModel = (function (_super) {
             _this.customClassGridCollection.initTable("#classes-settings-container", _this.bandSet.bands);
         };
         this.showStudentLanguagePreferences = function () { };
-        this.importStudentLanguages = function () { };
+        this.importStudents = function () { };
         this.callOnStudentCountChangedEvent = function () {
             var onStudentCountChangedEvent = _this.onStudentCountChangedEvent;
             if (onStudentCountChangedEvent != null) {

@@ -13,7 +13,7 @@ var ClassDefinitionViewModel = (function (_super) {
         this.classCount = 1;
         this.groupingHelper = new GroupingHelper();
         this.kendoHelper = new KendoHelper();
-        this.importStudentLanguages = function () { };
+        this.importStudents = function () { };
         this.onClassCountChanged = function () {
             _this.bandSet.bands[0].setClassCount(_this.classCount);
             _this.classTableControl.init("classes-settings-container", _this.bandSet);

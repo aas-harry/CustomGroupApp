@@ -67,7 +67,7 @@ var StudentClassListControl = (function () {
             if (isUniSex) {
                 columns = [
                     { field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" } },
-                    { field: "id", title: "Id", width: "0px", attributes: { 'class': "text-nowrap" } },
+                    { field: "id", title: "", width: "0px", attributes: { 'class': "text-nowrap" } },
                     { field: "gender", title: "Sex", width: "80px", attributes: { 'class': "text-center" } },
                     { field: "score", title: "Score", width: "80px", attributes: { 'class': "text-center" } }
                 ];
@@ -75,7 +75,7 @@ var StudentClassListControl = (function () {
             else {
                 columns = [
                     { field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" } },
-                    { field: "id", title: "Id", width: "0px", attributes: { 'class': "text-nowrap" } },
+                    { field: "id", title: "", width: "0px", attributes: { 'class': "text-nowrap" } },
                     { field: "score", title: "Score", width: "80px", attributes: { 'class': "text-center" } }
                 ];
             }

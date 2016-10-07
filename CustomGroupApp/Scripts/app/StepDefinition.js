@@ -46,6 +46,7 @@ var StepCollection = (function () {
         step2.views.push(new ViewDefinition(GroupingMethod.Banding, "BandClassConfigurationStep"));
         step2.views.push(new ViewDefinition(GroupingMethod.TopMiddleLowest, "TopMiddleLowestClassConfigurationStep"));
         step2.views.push(new ViewDefinition(GroupingMethod.Language, "LanguageClassConfigurationStep"));
+        step2.views.push(new ViewDefinition(GroupingMethod.Preallocated, "PreallocatedClassConfigurationStep"));
         this.steps.push(step2);
         this.steps.push(new StepDefinition(3, true, "StudentGroupingOptionsStep"));
         this.steps.push(new StepDefinition(4, true, "EnterCustomGroupNameStep"));

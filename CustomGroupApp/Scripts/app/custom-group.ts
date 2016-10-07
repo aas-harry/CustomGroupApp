@@ -26,7 +26,8 @@ enum GroupingMethod {
     Banding,
     TopMiddleLowest,
     Language,
-    CustomGroup
+    CustomGroup,
+    Preallocated
 }
 
 enum StreamType {
@@ -55,7 +56,7 @@ interface IBandClassSettings {
     loadOptions(source: BandSet): boolean;
     getBandSet(): BandSet;
     showStudentLanguagePreferences();
-    importStudentLanguages();
+    importStudents();
     genderChanged(gender: Gender, studentCount: number);
 }
 
@@ -76,6 +77,7 @@ class LanguageSet {
 
     public count = 0;
     public students: Array<StudentClass> = [];
+    public nolanguagePrefs = false;
 
     get description(): string {
         if (! this.isNoPrefs(this.language1) && ! this.isNoPrefs(this.language2)) {
@@ -87,6 +89,7 @@ class LanguageSet {
         if (this.language2 && !this.isNoPrefs(this.language1)) {
             return this.language2;
         }
+        this.nolanguagePrefs = true;
         return "No Prefs";
     }
 
@@ -116,6 +119,23 @@ class LanguageSet {
         this.count++;
         this.students.push(student);
     };
+}
+
+class PreAllocatedStudent {
+    name: string;
+    studentId: number;
+    className: string;
+
+    get tested(): string {
+        return this.studentId && this.studentId > 0 ? "Yes" : "No";
+    }
+
+    constructor(student: any) {
+        this.name = student.Name;
+        this.studentId = student.StudentId;
+        this.className = student.Class;
+    }
+
 }
 
 class StudentClass {
@@ -202,6 +222,8 @@ class GroupingHelper {
                 return GroupingMethod.TopMiddleLowest;
             case "Language":
                 return GroupingMethod.Language;
+            case "Preallocated":
+                return GroupingMethod.Preallocated;
             case "Unknown":
             case "None":
                 return GroupingMethod.Unknown;
@@ -690,6 +712,9 @@ class BandDefinition {
     uid: string;
     students: Array<StudentClass> = [];
     classes: Array<ClassDefinition> = [];
+    // true if the band is used as a bucket for students which are not in other bands and later need to be split to those bands.
+    // E.g. language preferences classes, student who don't have language preference will be added to other language bands
+    commonBand = false; 
 
     private groupHelper = new GroupingHelper();
 
@@ -707,14 +732,17 @@ class BandDefinition {
     prepare = (name: string,
         students: Array<StudentClass> = null,
         joinedStudents: Array<StudentSet> = [],
-        separatedStudents: Array<StudentSet> = []) => {
+        separatedStudents: Array<StudentSet> = [],
+        resetClasses = true) => {
         if (students) {
             this.students = students;
         }
 
         // Reset the students list
-        for (let classItem of this.classes) {
-            classItem.students = [];
+        if (resetClasses) {
+            for (let classItem of this.classes) {
+                classItem.students = [];
+            }
         }
 
         switch (this.groupType) {
@@ -791,18 +819,21 @@ class BandSet {
     prepare = (name: string,
         students: Array<StudentClass>,
         joinedStudents: Array<StudentSet> = [],
-        separatedStudents: Array<StudentSet> = []) => {
+        separatedStudents: Array<StudentSet> = [],
+        resetClasses = true) => {
         this.students = students;
 
         if (this.bandCount === 1) {
             this.bands[0].students = this.students;
-            this.bands[0].prepare(name, this.students, joinedStudents, separatedStudents);
+            this.bands[0].prepare(name, this.students, joinedStudents, separatedStudents, resetClasses);
             return;
         }
         var classes = this.convertToClasses(this);
         // Reset the students list
-        for (let classItem of classes) {
-            classItem.students = [];
+        if (resetClasses) {
+            for (let classItem of classes) {
+                classItem.students = [];
+            }
         }
         if (this.bandStreamType === BandStreamType.Streaming) {
             this.groupingHelper.groupByStreaming(classes,

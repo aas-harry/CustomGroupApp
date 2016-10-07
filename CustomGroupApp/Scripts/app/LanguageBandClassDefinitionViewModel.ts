@@ -33,6 +33,7 @@
                 this.bandSet.bands[i].studentCount = item.count;
                 this.bandSet.bands[i].students = item.students;
                 this.bandSet.bands[i].setClassCount(1);
+                this.bandSet.bands[i].commonBand = item.nolanguagePrefs;
                 i++;
 
                 this.hasBandSetInitialised = true;
@@ -63,7 +64,7 @@
         }
     }
 
-    importStudentLanguages = () => {
+    importStudents = () => {
         this.kendoHelper.createUploadControl("files", "Customgroup\\ImportStudentLanguages?id=1014181", this.onUploadCompleted);    
         $("#import-language-preferences").show();
         this.set("showStudentLanguageList", false);
@@ -84,6 +85,7 @@
         this._students = value;
         this.studentWithLanguagePrefCount = Enumerable.From(value).Count(x => x.hasLanguagePreferences);
         this.languageSets = [];
+        debugger;
         for (let s of this._students) {
             let matched = Enumerable.From(this.languageSets)
                 .FirstOrDefault(null, x => x.isEqual(s.langPref1, s.langPref2));

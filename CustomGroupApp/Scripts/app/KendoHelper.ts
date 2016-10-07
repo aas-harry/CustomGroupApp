@@ -222,6 +222,51 @@
         return $(`#${element}`).data("kendoGrid");
     }
 
+    createPreAllocatedStudentGrid = (element: string = "preallocated-students-list",
+        students: Array<PreAllocatedStudent>): kendo.ui.Grid => {
+        var columns = [
+            {
+                field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" },
+               
+            },
+            {
+                field: "className", title: "Class", width: "80px" 
+                //aggregates: ["count"] 
+            },
+                { field: "tested", title: "Tested", width: "80px" }
+            ];
+
+        $(`#${element}`)
+            .kendoGrid({
+                dataSource: {
+                    schema: {
+                        model: {
+                            fields: {
+                                name: { type: "string" },
+                                className: { type: "string" },
+                                tested: { type: "string" }
+                            }
+                        }
+                    },
+                    //group: {
+                    //    field: "className", aggregates: [
+                    //        { field: "className", aggregate: "count" }
+                    //    ]
+                    //},
+                    data: students
+                },
+                columns: columns,
+                sortable: {
+                    mode: "single",
+                    allowUnsort: true
+                },
+                groupable: true,
+                selectable: "row"
+
+            });
+
+        return $(`#${element}`).data("kendoGrid");
+    }
 
     createUploadControl = (
         element: string,

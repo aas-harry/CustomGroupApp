@@ -12,9 +12,11 @@
     private topMiddleLowestBandSet: TopMiddleLowestBandSet;
     private languageBandSet: BandSet;
     private bandSet: BandSet;
+    private preAllocatedBandset: BandSet;
     private classesDefn: ClassesDefinition;
     // ReSharper disable InconsistentNaming
     private _classDefinitionViewModel: ClassDefinitionViewModel;
+    private _preAllocatedClassDefinitionViewModel: PreallocatedClassDefinitionViewModel;
     private _bandClassDefinitionViewModel: BandClassDefinitionViewModel;
     private _topMiddleLowestBandClassDefinitionViewModel: TopMiddleLowestBandClassDefinitionViewModel;
     private _languageBandClassDefinitionViewModel: LanguageBandClassDefinitionViewModel;
@@ -83,6 +85,13 @@
                 ClassDefinitionViewModel(this.studentCount, this.onStudentCountChanged);
         }
         return this._classDefinitionViewModel;
+    }
+    get preAllocatedClassDefinitionViewModel(): PreallocatedClassDefinitionViewModel {
+        if (this._preAllocatedClassDefinitionViewModel === undefined) {
+            this._preAllocatedClassDefinitionViewModel = new
+                PreallocatedClassDefinitionViewModel(this.studentCount, this.onStudentCountChanged);
+        }
+        return this._preAllocatedClassDefinitionViewModel;
     }
     get topMiddleLowestBandClassDefinitionViewModel(): TopMiddleLowestBandClassDefinitionViewModel {
         if (this._topMiddleLowestBandClassDefinitionViewModel === undefined) {
@@ -173,6 +182,11 @@
                 this.languageBandClassDefinitionViewModel.loadOptions(this.languageBandSet);
 
                 this.set("selectedClassDefinitionViewModel", this.languageBandClassDefinitionViewModel);
+                break;
+
+           case GroupingMethod.Preallocated:
+                this.preAllocatedClassDefinitionViewModel.loadOptions(this.preAllocatedBandset);
+                this.set("selectedClassDefinitionViewModel", this.preAllocatedClassDefinitionViewModel);
                 break;
 
             default:
@@ -296,6 +310,18 @@
                     band.prepare(band.bandName, band.students, this.joinedStudents, this.separatedStudents);
                 }
                 break;
+            case GroupingMethod.Preallocated:
+                bandSet.groupType = GroupingMethod.MixedAbility;
+                bandSet.bands[0].groupType = GroupingMethod.MixedAbility;
+                bandSet.bands[0].streamType = this.streamType;
+                bandSet.bands[0].mixBoysGirls = this.mixGirlsBoysOption;
+
+                for (let classItem of bandSet.bands[0].classes) {
+                    this.groupingHelper.calculateTotalScore(classItem.students, this.streamType);
+                }
+                bandSet.prepare(!this.groupName || this.groupName === "" ? "Class" : this.groupName,
+                    bandSet.bands[0].students, this.joinedStudents, this.separatedStudents, false);
+                break;
 
             default:
                 bandSet.groupType = GroupingMethod.Streaming;
@@ -314,6 +340,8 @@
     reset = () => {
         this.bandSet = this.classesDefn.createBandSet("class", this.studentCount);
         this.bandSet.bands[0].setClassCount(3);
+        this.preAllocatedBandset = this.classesDefn.createBandSet("class", this.studentCount);
+        this.bandSet.bands[0].setClassCount(1);
 
         this.customBandSet = this.classesDefn.createBandSet("Band", this.studentCount, 2);
 

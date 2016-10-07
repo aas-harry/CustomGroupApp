@@ -18,7 +18,7 @@
     private classTableControl : ClassTableControl;
 
     onStudentCountChangedEvent: (classCount: number) => any;
-    importStudentLanguages = () => { };
+    importStudents = () => { };
 
     onClassCountChanged = () => {
         this.bandSet.bands[0].setClassCount(this.classCount);

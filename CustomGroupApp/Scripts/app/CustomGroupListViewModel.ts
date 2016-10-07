@@ -30,9 +30,9 @@
             data: JSON.stringify({ 'testNumber': myself.testNumber }),
             success(html) {
                 const content = document.createElement("div");
-                content.id = "custom-group-wizard";
+                content.id = "custom-group-container";
                 myself.contentElement.appendChild(content);
-                $("#custom-group-wizard").html(html);
+                $("#custom-group-container").html(html);
             },
             error(e) {
                 

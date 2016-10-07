@@ -29,7 +29,7 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
                 _this.set("showStudentLanguageCaption", "Show Students");
             }
         };
-        this.importStudentLanguages = function () {
+        this.importStudents = function () {
             _this.kendoHelper.createUploadControl("files", "Customgroup\\ImportStudentLanguages?id=1014181", _this.onUploadCompleted);
             $("#import-language-preferences").show();
             _this.set("showStudentLanguageList", false);
@@ -70,6 +70,7 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
                 this.bandSet.bands[i].studentCount = item.count;
                 this.bandSet.bands[i].students = item.students;
                 this.bandSet.bands[i].setClassCount(1);
+                this.bandSet.bands[i].commonBand = item.nolanguagePrefs;
                 i++;
                 this.hasBandSetInitialised = true;
             }
@@ -86,6 +87,7 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
             this._students = value;
             this.studentWithLanguagePrefCount = Enumerable.From(value).Count(function (x) { return x.hasLanguagePreferences; });
             this.languageSets = [];
+            debugger;
             var _loop_1 = function(s) {
                 var matched = Enumerable.From(this_1.languageSets)
                     .FirstOrDefault(null, function (x) { return x.isEqual(s.langPref1, s.langPref2); });

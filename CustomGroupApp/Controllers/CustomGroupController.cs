@@ -70,6 +70,55 @@ namespace CustomGroupApp.Controllers
             });
         }
 
+        public JsonResult ImportPreallocatedClasses(IEnumerable<HttpPostedFileBase> files, string id)
+        {
+            var testNumber = int.Parse(id);
+            var studentClasses = new List<PreallocatedClassStudent>();
+
+            if (files != null)
+                foreach (var file in files)
+                    try
+                    {
+                        using (var sr = new StreamReader(file.InputStream))
+                        {
+                            var testnumber = testNumber;
+                            var results =
+                                _dataService.GetResults(testnumber)
+                                    .Select(x => new {x.Name, x.Id})
+                                    .OrderBy(x => x.Name)
+                                    .ToList();
+                            var csvReader = new CsvReader(sr);
+                            csvReader.Configuration.SkipEmptyRecords = true;
+                            csvReader.Configuration.IgnoreBlankLines = true;
+                            csvReader.Configuration.TrimFields = true;
+                            csvReader.Configuration.TrimHeaders = true;
+                            csvReader.Configuration.WillThrowOnMissingField = false;
+                            studentClasses =
+                                csvReader.GetRecords<PreallocatedClassStudent>().ToList();
+
+                            foreach (var s in studentClasses)
+                            {
+                                int classNo;
+                                if (!int.TryParse(s.Class, out classNo))
+                                {
+                                    s.Class = string.Empty;
+                                }
+                                var lpn = results.FirstOrDefault(
+                                    x => x.Name.Equals(s.Name, StringComparison.InvariantCultureIgnoreCase));
+                                if (lpn == null) continue;
+                                s.StudentId = lpn.Id;
+                            }
+                        }
+                        // only can process one file 
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        
+                    }
+
+            return Json(studentClasses);
+        }
         public JsonResult ImportStudentLanguages(IEnumerable<HttpPostedFileBase> files, string id)
         {
             var testNumber = int.Parse(id);
@@ -114,10 +163,7 @@ namespace CustomGroupApp.Controllers
                         // only can process one file 
                         break;
                     }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
+                    catch (Exception){}
 
             return Json(studentLanguages);
         }
@@ -142,6 +188,10 @@ namespace CustomGroupApp.Controllers
             return PartialView("LanguageBandClassConfiguration");
         }
 
+        public ActionResult PreallocatedClassConfigurationStep()
+        {
+            return PartialView("PreallocatedClassConfiguration");
+        }
 
         public ActionResult BandClassConfigurationStep()
         {

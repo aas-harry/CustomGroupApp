@@ -19,9 +19,9 @@ var CustomGroupListViewModel = (function (_super) {
                 data: JSON.stringify({ 'testNumber': myself.testNumber }),
                 success: function (html) {
                     var content = document.createElement("div");
-                    content.id = "custom-group-wizard";
+                    content.id = "custom-group-container";
                     myself.contentElement.appendChild(content);
-                    $("#custom-group-wizard").html(html);
+                    $("#custom-group-container").html(html);
                 },
                 error: function (e) {
                 }

@@ -149,6 +149,46 @@ var KendoHelper = (function () {
             });
             return $("#" + element).data("kendoGrid");
         };
+        this.createPreAllocatedStudentGrid = function (element, students) {
+            if (element === void 0) { element = "preallocated-students-list"; }
+            var columns = [
+                {
+                    field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" },
+                },
+                {
+                    field: "className", title: "Class", width: "80px"
+                },
+                { field: "tested", title: "Tested", width: "80px" }
+            ];
+            $("#" + element)
+                .kendoGrid({
+                dataSource: {
+                    schema: {
+                        model: {
+                            fields: {
+                                name: { type: "string" },
+                                className: { type: "string" },
+                                tested: { type: "string" }
+                            }
+                        }
+                    },
+                    //group: {
+                    //    field: "className", aggregates: [
+                    //        { field: "className", aggregate: "count" }
+                    //    ]
+                    //},
+                    data: students
+                },
+                columns: columns,
+                sortable: {
+                    mode: "single",
+                    allowUnsort: true
+                },
+                groupable: true,
+                selectable: "row"
+            });
+            return $("#" + element).data("kendoGrid");
+        };
         this.createUploadControl = function (element, saveUrl, completeCallback) {
             $("#" + element)
                 .kendoUpload({

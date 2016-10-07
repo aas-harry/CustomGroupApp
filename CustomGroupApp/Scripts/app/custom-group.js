@@ -33,6 +33,7 @@ var GroupingMethod;
     GroupingMethod[GroupingMethod["TopMiddleLowest"] = 4] = "TopMiddleLowest";
     GroupingMethod[GroupingMethod["Language"] = 5] = "Language";
     GroupingMethod[GroupingMethod["CustomGroup"] = 6] = "CustomGroup";
+    GroupingMethod[GroupingMethod["Preallocated"] = 7] = "Preallocated";
 })(GroupingMethod || (GroupingMethod = {}));
 var StreamType;
 (function (StreamType) {
@@ -64,6 +65,7 @@ var LanguageSet = (function () {
         this.language2 = language2;
         this.count = 0;
         this.students = [];
+        this.nolanguagePrefs = false;
         this.isNoPrefs = function (language) {
             if (!language) {
                 return true;
@@ -85,6 +87,7 @@ var LanguageSet = (function () {
             if (this.language2 && !this.isNoPrefs(this.language1)) {
                 return this.language2;
             }
+            this.nolanguagePrefs = true;
             return "No Prefs";
         },
         enumerable: true,
@@ -109,6 +112,21 @@ var LanguageSet = (function () {
     };
     ;
     return LanguageSet;
+}());
+var PreAllocatedStudent = (function () {
+    function PreAllocatedStudent(student) {
+        this.name = student.Name;
+        this.studentId = student.StudentId;
+        this.className = student.Class;
+    }
+    Object.defineProperty(PreAllocatedStudent.prototype, "tested", {
+        get: function () {
+            return this.studentId && this.studentId > 0 ? "Yes" : "No";
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return PreAllocatedStudent;
 }());
 var StudentClass = (function () {
     function StudentClass(s) {
@@ -205,6 +223,8 @@ var GroupingHelper = (function () {
                     return GroupingMethod.TopMiddleLowest;
                 case "Language":
                     return GroupingMethod.Language;
+                case "Preallocated":
+                    return GroupingMethod.Preallocated;
                 case "Unknown":
                 case "None":
                     return GroupingMethod.Unknown;
@@ -660,6 +680,9 @@ var BandDefinition = (function () {
         this.mixBoysGirls = mixBoysGirls;
         this.students = [];
         this.classes = [];
+        // true if the band is used as a bucket for students which are not in other bands and later need to be split to those bands.
+        // E.g. language preferences classes, student who don't have language preference will be added to other language bands
+        this.commonBand = false;
         this.groupHelper = new GroupingHelper();
         this.setClassCount = function (classCount) {
             _this.classCount = classCount;
@@ -671,17 +694,20 @@ var BandDefinition = (function () {
                 classDefn.calculateClassesAverage();
             }
         };
-        this.prepare = function (name, students, joinedStudents, separatedStudents) {
+        this.prepare = function (name, students, joinedStudents, separatedStudents, resetClasses) {
             if (students === void 0) { students = null; }
             if (joinedStudents === void 0) { joinedStudents = []; }
             if (separatedStudents === void 0) { separatedStudents = []; }
+            if (resetClasses === void 0) { resetClasses = true; }
             if (students) {
                 _this.students = students;
             }
             // Reset the students list
-            for (var _i = 0, _a = _this.classes; _i < _a.length; _i++) {
-                var classItem = _a[_i];
-                classItem.students = [];
+            if (resetClasses) {
+                for (var _i = 0, _a = _this.classes; _i < _a.length; _i++) {
+                    var classItem = _a[_i];
+                    classItem.students = [];
+                }
             }
             switch (_this.groupType) {
                 case GroupingMethod.MixedAbility:
@@ -739,20 +765,23 @@ var BandSet = (function () {
         this.mixBoysGirls = mixBoysGirls;
         this.students = [];
         this.groupingHelper = new GroupingHelper();
-        this.prepare = function (name, students, joinedStudents, separatedStudents) {
+        this.prepare = function (name, students, joinedStudents, separatedStudents, resetClasses) {
             if (joinedStudents === void 0) { joinedStudents = []; }
             if (separatedStudents === void 0) { separatedStudents = []; }
+            if (resetClasses === void 0) { resetClasses = true; }
             _this.students = students;
             if (_this.bandCount === 1) {
                 _this.bands[0].students = _this.students;
-                _this.bands[0].prepare(name, _this.students, joinedStudents, separatedStudents);
+                _this.bands[0].prepare(name, _this.students, joinedStudents, separatedStudents, resetClasses);
                 return;
             }
             var classes = _this.convertToClasses(_this);
             // Reset the students list
-            for (var _i = 0, classes_1 = classes; _i < classes_1.length; _i++) {
-                var classItem = classes_1[_i];
-                classItem.students = [];
+            if (resetClasses) {
+                for (var _i = 0, classes_1 = classes; _i < classes_1.length; _i++) {
+                    var classItem = classes_1[_i];
+                    classItem.students = [];
+                }
             }
             if (_this.bandStreamType === BandStreamType.Streaming) {
                 _this.groupingHelper.groupByStreaming(classes, _this.students, _this.streamType, _this.mixBoysGirls);

@@ -81,6 +81,8 @@ var CustomGroupViewModel = (function (_super) {
         this.reset = function () {
             _this.bandSet = _this.classesDefn.createBandSet("class", _this.studentCount);
             _this.bandSet.bands[0].setClassCount(3);
+            _this.preAllocatedBandset = _this.classesDefn.createBandSet("class", _this.studentCount);
+            _this.bandSet.bands[0].setClassCount(1);
             _this.customBandSet = _this.classesDefn.createBandSet("Band", _this.studentCount, 2);
             _this.languageBandSet = _this.classesDefn.createBandSet("Band", _this.studentCount, 1);
             _this.topMiddleLowestBandSet = _this.classesDefn.createTopMiddleBottomBandSet("class", _this.studentCount);
@@ -186,6 +188,16 @@ var CustomGroupViewModel = (function (_super) {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(CustomGroupViewModel.prototype, "preAllocatedClassDefinitionViewModel", {
+        get: function () {
+            if (this._preAllocatedClassDefinitionViewModel === undefined) {
+                this._preAllocatedClassDefinitionViewModel = new PreallocatedClassDefinitionViewModel(this.studentCount, this.onStudentCountChanged);
+            }
+            return this._preAllocatedClassDefinitionViewModel;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(CustomGroupViewModel.prototype, "topMiddleLowestBandClassDefinitionViewModel", {
         get: function () {
             if (this._topMiddleLowestBandClassDefinitionViewModel === undefined) {
@@ -261,6 +273,10 @@ var CustomGroupViewModel = (function (_super) {
                 this.languageBandClassDefinitionViewModel.loadOptions(this.languageBandSet);
                 this.set("selectedClassDefinitionViewModel", this.languageBandClassDefinitionViewModel);
                 break;
+            case GroupingMethod.Preallocated:
+                this.preAllocatedClassDefinitionViewModel.loadOptions(this.preAllocatedBandset);
+                this.set("selectedClassDefinitionViewModel", this.preAllocatedClassDefinitionViewModel);
+                break;
             default:
                 this.classDefinitionViewModel.loadOptions(this.bandSet);
                 this.set("selectedClassDefinitionViewModel", this.classDefinitionViewModel);
@@ -330,6 +346,17 @@ var CustomGroupViewModel = (function (_super) {
                     band.mixBoysGirls = this.mixGirlsBoysOption;
                     band.prepare(band.bandName, band.students, this.joinedStudents, this.separatedStudents);
                 }
+                break;
+            case GroupingMethod.Preallocated:
+                bandSet.groupType = GroupingMethod.MixedAbility;
+                bandSet.bands[0].groupType = GroupingMethod.MixedAbility;
+                bandSet.bands[0].streamType = this.streamType;
+                bandSet.bands[0].mixBoysGirls = this.mixGirlsBoysOption;
+                for (var _f = 0, _g = bandSet.bands[0].classes; _f < _g.length; _f++) {
+                    var classItem = _g[_f];
+                    this.groupingHelper.calculateTotalScore(classItem.students, this.streamType);
+                }
+                bandSet.prepare(!this.groupName || this.groupName === "" ? "Class" : this.groupName, bandSet.bands[0].students, this.joinedStudents, this.separatedStudents, false);
                 break;
             default:
                 bandSet.groupType = GroupingMethod.Streaming;
