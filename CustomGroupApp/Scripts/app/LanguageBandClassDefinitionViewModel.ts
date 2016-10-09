@@ -60,7 +60,11 @@
         this.set("showStudentLanguageList", ! this.showStudentLanguageList);
         if (this.showStudentLanguageList) {
             this.set("showStudentLanguageCaption", "Hide Students");
-            this.kendoHelper.createStudentLanguageGrid("student-language-preferences-list", this._students, true);
+            
+            const  students = Enumerable.From(this.classesDefn.testFile.students)
+                .Select(x => new StudentClass(x))
+                .ToArray();
+            this.kendoHelper.createStudentLanguageGrid("student-language-preferences-list", students, true);
         } else {
             this.set("showStudentLanguageCaption", "Show Students");
         }
@@ -74,10 +78,10 @@
 
     onUploadCompleted = (e: any): any => {
         if (e && e.response) {
-            debugger;
             this.classesDefn.testFile.setStudentLanguagePrefs(e.response);
             this.createLanguageSet();
             this.addBandsAndClassesControl();
+            this.showStudentLanguagePreferences();
             this.set("showStudentLanguageList", true);
             this.set("showStudentLanguageCaption", "Hide Students");
         }
@@ -135,7 +139,6 @@
             this.bandSet.bands[i].commonBand = item.nolanguagePrefs;
             i++;
         }
-
         this.bandTableControl.init("classes-settings-container", this.bandSet);
     };
 }

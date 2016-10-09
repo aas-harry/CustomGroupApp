@@ -55,7 +55,6 @@ var CustomGroupViewModel = (function (_super) {
                 .createStudentSetContainer(separatedStudentsCell, _this.classesDefn.testFile.isUnisex);
         };
         this.showAllClasses = function (e) {
-            debugger;
             _this.generateCustomGroupViewModel.showAllClasses();
             _this.set("hasHiddenClasses", false);
             kendo.bind($("#custom-group-container"), _this);

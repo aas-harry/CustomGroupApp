@@ -219,7 +219,6 @@
     }
 
     showAllClasses = (e: any) => {
-        debugger;
         this.generateCustomGroupViewModel.showAllClasses();
         this.set("hasHiddenClasses", false);
         kendo.bind($("#custom-group-container"), this);

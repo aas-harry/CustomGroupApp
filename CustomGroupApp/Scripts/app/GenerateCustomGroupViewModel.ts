@@ -12,7 +12,6 @@ class GenerateCustomGroupViewModel extends kendo.data.ObservableObject{
     private hiddenClasses : Array<string> = [];
     
     showClasses(source: BandSet): boolean {
-        debugger;
         this.bandSet = source;
         this.customClassGridCollection.initTable("#classes-settings-container", source.bands);
         return true;

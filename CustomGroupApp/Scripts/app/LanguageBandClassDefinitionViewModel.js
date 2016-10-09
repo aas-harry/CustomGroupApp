@@ -24,7 +24,10 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
             _this.set("showStudentLanguageList", !_this.showStudentLanguageList);
             if (_this.showStudentLanguageList) {
                 _this.set("showStudentLanguageCaption", "Hide Students");
-                _this.kendoHelper.createStudentLanguageGrid("student-language-preferences-list", _this._students, true);
+                var students = Enumerable.From(_this.classesDefn.testFile.students)
+                    .Select(function (x) { return new StudentClass(x); })
+                    .ToArray();
+                _this.kendoHelper.createStudentLanguageGrid("student-language-preferences-list", students, true);
             }
             else {
                 _this.set("showStudentLanguageCaption", "Show Students");
@@ -37,10 +40,10 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
         };
         this.onUploadCompleted = function (e) {
             if (e && e.response) {
-                debugger;
                 _this.classesDefn.testFile.setStudentLanguagePrefs(e.response);
                 _this.createLanguageSet();
                 _this.addBandsAndClassesControl();
+                _this.showStudentLanguagePreferences();
                 _this.set("showStudentLanguageList", true);
                 _this.set("showStudentLanguageCaption", "Hide Students");
             }
