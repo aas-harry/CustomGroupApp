@@ -1,47 +1,44 @@
-﻿class TopMiddleLowestBandClassDefinitionViewModel extends kendo.data.ObservableObject
-    implements IBandClassSettings {
-    constructor(public studentCount: number = 0, onStudentCountChangedEvent: (classCount: number) => any) {
-        super();
-        this.onStudentCountChangedEvent = onStudentCountChangedEvent;
+﻿
+class TopMiddleLowestBandClassDefinitionViewModel extends CustomGroupBaseViewModel
+     {
+    constructor(classesDefn: ClassesDefinition, onStudentCountChangedEvent: (classCount: number) => any) {
+        super(classesDefn, onStudentCountChangedEvent);
+    
+
+        this.bandSet = classesDefn.createTopMiddleBottomBandSet("class", classesDefn.studentCount);
+        this.studentCount = classesDefn.studentCount;
+        
         this.bandTableControl = new BandTableControl(this.callOnStudentCountChangedEvent);
     }
 
     bandCount = 3;
     classCount = 1;
 
-    private bandSet = new TopMiddleLowestBandSet(null, this.studentCount);
+ 
+    protected studentCountChanged(value: number) {
+        this.bandSet.studentCount = value;
+    }
+    
     private bandTableControl: BandTableControl;
 
 
-    saveOptions(source: BandSet): boolean {
-        return true;
-    }
+    get studentInAllClassesCount(): number {
+        return Enumerable.From(this.bandSet.bands).SelectMany(b => b.classes).Sum(x => x.count);
+    } 
 
-    loadOptions(source: BandSet): boolean {
-        this.bandSet = source as TopMiddleLowestBandSet;
-        super.set("bandCount", source.bands.length);
-        this.bandTableControl.init("classes-settings-container", source);
+    loadOptions(): boolean {
+        this.bandTableControl.init("classes-settings-container", this.bandSet);
         return true;
-    }
-
-    getBandSet(): BandSet {
-        return this.bandSet;
     }
 
     genderChanged = (gender: Gender, studentCount: number) => {
         this.studentCount = studentCount;
-        this.bandSet.setStudentCount(studentCount);
-        this.bandTableControl.init("classes-settings-container", this.bandSet);
+        this.bandSet.studentCount = studentCount;
+        this.addBandsAndClassesControl();
     }
 
-    showStudentLanguagePreferences = () => { };
-    importStudents = () => {};
-
-    onStudentCountChangedEvent: (classCount: number) => any;
-    callOnStudentCountChangedEvent = () => {
-        const onStudentCountChangedEvent = this.onStudentCountChangedEvent;
-        if (onStudentCountChangedEvent != null) {
-            onStudentCountChangedEvent(Enumerable.From(this.bandSet.bands).SelectMany(b => b.classes).Sum(x => x.count));
-        }
+    addBandsAndClassesControl = () => {
+        this.bandSet.createBands("Band", this.studentCount, this.bandCount);
+        this.bandTableControl.init("classes-settings-container", this.bandSet);
     };
 }

@@ -5,42 +5,38 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var TopMiddleLowestBandClassDefinitionViewModel = (function (_super) {
     __extends(TopMiddleLowestBandClassDefinitionViewModel, _super);
-    function TopMiddleLowestBandClassDefinitionViewModel(studentCount, onStudentCountChangedEvent) {
+    function TopMiddleLowestBandClassDefinitionViewModel(classesDefn, onStudentCountChangedEvent) {
         var _this = this;
-        if (studentCount === void 0) { studentCount = 0; }
-        _super.call(this);
-        this.studentCount = studentCount;
+        _super.call(this, classesDefn, onStudentCountChangedEvent);
         this.bandCount = 3;
         this.classCount = 1;
-        this.bandSet = new TopMiddleLowestBandSet(null, this.studentCount);
         this.genderChanged = function (gender, studentCount) {
             _this.studentCount = studentCount;
-            _this.bandSet.setStudentCount(studentCount);
+            _this.bandSet.studentCount = studentCount;
+            _this.addBandsAndClassesControl();
+        };
+        this.addBandsAndClassesControl = function () {
+            _this.bandSet.createBands("Band", _this.studentCount, _this.bandCount);
             _this.bandTableControl.init("classes-settings-container", _this.bandSet);
         };
-        this.showStudentLanguagePreferences = function () { };
-        this.importStudents = function () { };
-        this.callOnStudentCountChangedEvent = function () {
-            var onStudentCountChangedEvent = _this.onStudentCountChangedEvent;
-            if (onStudentCountChangedEvent != null) {
-                onStudentCountChangedEvent(Enumerable.From(_this.bandSet.bands).SelectMany(function (b) { return b.classes; }).Sum(function (x) { return x.count; }));
-            }
-        };
-        this.onStudentCountChangedEvent = onStudentCountChangedEvent;
+        this.bandSet = classesDefn.createTopMiddleBottomBandSet("class", classesDefn.studentCount);
+        this.studentCount = classesDefn.studentCount;
         this.bandTableControl = new BandTableControl(this.callOnStudentCountChangedEvent);
     }
-    TopMiddleLowestBandClassDefinitionViewModel.prototype.saveOptions = function (source) {
-        return true;
+    TopMiddleLowestBandClassDefinitionViewModel.prototype.studentCountChanged = function (value) {
+        this.bandSet.studentCount = value;
     };
-    TopMiddleLowestBandClassDefinitionViewModel.prototype.loadOptions = function (source) {
-        this.bandSet = source;
-        _super.prototype.set.call(this, "bandCount", source.bands.length);
-        this.bandTableControl.init("classes-settings-container", source);
+    Object.defineProperty(TopMiddleLowestBandClassDefinitionViewModel.prototype, "studentInAllClassesCount", {
+        get: function () {
+            return Enumerable.From(this.bandSet.bands).SelectMany(function (b) { return b.classes; }).Sum(function (x) { return x.count; });
+        },
+        enumerable: true,
+        configurable: true
+    });
+    TopMiddleLowestBandClassDefinitionViewModel.prototype.loadOptions = function () {
+        this.bandTableControl.init("classes-settings-container", this.bandSet);
         return true;
-    };
-    TopMiddleLowestBandClassDefinitionViewModel.prototype.getBandSet = function () {
-        return this.bandSet;
     };
     return TopMiddleLowestBandClassDefinitionViewModel;
-}(kendo.data.ObservableObject));
+}(CustomGroupBaseViewModel));
 //# sourceMappingURL=TopMiddleLowestBandClassDefinitionViewModel.js.map

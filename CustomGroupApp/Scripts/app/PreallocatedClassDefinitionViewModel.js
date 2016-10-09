@@ -5,11 +5,13 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var PreallocatedClassDefinitionViewModel = (function (_super) {
     __extends(PreallocatedClassDefinitionViewModel, _super);
-    function PreallocatedClassDefinitionViewModel(studentCount, onStudentCountChangedEvent) {
+    function PreallocatedClassDefinitionViewModel(classesDefn, onStudentCountChangedEvent) {
         var _this = this;
-        if (studentCount === void 0) { studentCount = 0; }
         _super.call(this);
-        this.studentCount = studentCount;
+        this.classesDefn = classesDefn;
+        // ReSharper disable once InconsistentNaming
+        this._studentCount = 0;
+        this.addBandsAndClassesControl = function () { };
         this.classCount = 1;
         this.showStudentCaption = "Show Students";
         this.preallocatedStudents = new Array();
@@ -84,7 +86,6 @@ var PreallocatedClassDefinitionViewModel = (function (_super) {
                     }
                     classNo++;
                 }
-                debugger;
                 _this.bandSet.students = Enumerable.From(_this.bandSet.parent.testFile.students)
                     .Except(_this.preallocatedStudents, function (x) { return x.studentId; })
                     .Select(function (x) { return new StudentClass(x); }).ToArray();
@@ -110,16 +111,36 @@ var PreallocatedClassDefinitionViewModel = (function (_super) {
             _this.onClassCountChanged();
         };
         this.showStudentLanguagePreferences = function () { };
-        _super.prototype.init.call(this, this);
+        this.bandSet = classesDefn.createBandSet("class", classesDefn.studentCount);
+        this.studentCount = classesDefn.studentCount;
         this.onStudentCountChangedEvent = onStudentCountChangedEvent;
         this.classTableControl = new ClassTableControl(this.callOnStudentCountChangedEvent);
     }
-    PreallocatedClassDefinitionViewModel.prototype.saveOptions = function (source) {
+    Object.defineProperty(PreallocatedClassDefinitionViewModel.prototype, "studentCount", {
+        get: function () {
+            return this._studentCount;
+        },
+        set: function (value) {
+            this.bandSet.studentCount = value;
+            this.bandSet.bands[0].studentCount = value;
+            this._studentCount = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(PreallocatedClassDefinitionViewModel.prototype, "studentInAllClassesCount", {
+        get: function () {
+            return 0;
+        },
+        set: function (value) {
+        },
+        enumerable: true,
+        configurable: true
+    });
+    PreallocatedClassDefinitionViewModel.prototype.saveOptions = function () {
         return true;
     };
-    PreallocatedClassDefinitionViewModel.prototype.loadOptions = function (source) {
-        this.bandSet = source;
-        _super.prototype.set.call(this, "classCount", source.bands[0].classes.length);
+    PreallocatedClassDefinitionViewModel.prototype.loadOptions = function () {
         this.classTableControl.init("classes-settings-container", this.bandSet);
         $("#import-preallocated-classes").hide();
         return true;

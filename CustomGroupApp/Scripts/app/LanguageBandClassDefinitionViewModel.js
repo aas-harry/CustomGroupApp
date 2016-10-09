@@ -5,14 +5,15 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var LanguageBandClassDefinitionViewModel = (function (_super) {
     __extends(LanguageBandClassDefinitionViewModel, _super);
-    function LanguageBandClassDefinitionViewModel(studentCount, onStudentCountChangedEvent) {
+    function LanguageBandClassDefinitionViewModel(classesDefn, onStudentCountChangedEvent) {
         var _this = this;
-        if (studentCount === void 0) { studentCount = 0; }
         _super.call(this);
-        this.studentCount = studentCount;
+        this.classesDefn = classesDefn;
         this.bandCount = 3;
         this.classCount = 1;
         this.languageSets = [];
+        // ReSharper disable once InconsistentNaming
+        this._studentCount = 0;
         this.groupingHelper = new GroupingHelper();
         this.kendoHelper = new KendoHelper();
         this.hasBandSetInitialised = false;
@@ -30,16 +31,38 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
             }
         };
         this.importStudents = function () {
-            _this.kendoHelper.createUploadControl("files", "Customgroup\\ImportStudentLanguages?id=1014181", _this.onUploadCompleted);
-            $("#import-language-preferences").show();
+            _this.kendoHelper.createUploadControl("files", "Customgroup\\ImportStudentLanguages?id=" + _this.classesDefn.testFile.fileNumber, _this.onUploadCompleted);
+            $("#upload-language-upload-control").show();
             _this.set("showStudentLanguageList", false);
         };
         this.onUploadCompleted = function (e) {
             if (e && e.response) {
+                debugger;
+                _this.classesDefn.testFile.setStudentLanguagePrefs(e.response);
+                _this.createLanguageSet();
+                _this.addBandsAndClassesControl();
+                _this.set("showStudentLanguageList", true);
+                _this.set("showStudentLanguageCaption", "Hide Students");
             }
-            $("#import-language-preferences").hide();
-            _this.set("showStudentLanguageList", true);
-            _this.set("showStudentLanguageCaption", "Hide Students");
+            $("#upload-language-upload-control").hide();
+        };
+        this.createLanguageSet = function () {
+            _this.studentWithLanguagePrefCount = Enumerable.From(_this.classesDefn.students).Count(function (x) { return x.hasLanguagePreferences; });
+            _this.languageSets = [];
+            var _loop_1 = function(s) {
+                var matched = Enumerable.From(_this.languageSets)
+                    .FirstOrDefault(null, function (x) { return x.isEqual(s.langPref1, s.langPref2); });
+                if (matched == null) {
+                    matched = new LanguageSet(s.langPref1, s.langPref2);
+                    _this.languageSets.push(matched);
+                }
+                matched.addStudent(s);
+            };
+            for (var _i = 0, _a = _this.classesDefn.students; _i < _a.length; _i++) {
+                var s = _a[_i];
+                _loop_1(s);
+            }
+            _this.set("hasStudentLanguagePreferences", _this.studentWithLanguagePrefCount > 0);
         };
         this.hasStudentLanguagePreferences = false;
         this.showStudentLanguageList = false;
@@ -49,34 +72,55 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
         this.callOnStudentCountChangedEvent = function () {
             var onStudentCountChangedEvent = _this.onStudentCountChangedEvent;
             if (onStudentCountChangedEvent != null) {
-                onStudentCountChangedEvent(Enumerable.From(_this.bandSet.bands).SelectMany(function (b) { return b.classes; }).Sum(function (x) { return x.count; }));
+                onStudentCountChangedEvent(_this.studentInAllClassesCount);
             }
         };
+        this.addBandsAndClassesControl = function () {
+            _this.bandSet.createBands("language", _this.studentCount, _this.languageSets.length);
+            var i = 0;
+            for (var _i = 0, _a = _this.languageSets; _i < _a.length; _i++) {
+                var item = _a[_i];
+                _this.bandSet.bands[i].bandName = item.description;
+                _this.bandSet.bands[i].studentCount = item.count;
+                _this.bandSet.bands[i].students = item.students;
+                _this.bandSet.bands[i].setClassCount(1);
+                _this.bandSet.bands[i].commonBand = item.nolanguagePrefs;
+                i++;
+            }
+            _this.bandTableControl.init("classes-settings-container", _this.bandSet);
+        };
+        this.bandSet = classesDefn.createBandSet("Band", classesDefn.studentCount, 1);
+        this.studentCount = classesDefn.studentCount;
         this.onStudentCountChangedEvent = onStudentCountChangedEvent;
         this.bandTableControl = new BandTableControl(this.callOnStudentCountChangedEvent);
     }
-    LanguageBandClassDefinitionViewModel.prototype.saveOptions = function (source) {
+    Object.defineProperty(LanguageBandClassDefinitionViewModel.prototype, "studentCount", {
+        get: function () {
+            return this._studentCount;
+        },
+        set: function (value) {
+            this.bandSet.studentCount = value;
+            this._studentCount = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(LanguageBandClassDefinitionViewModel.prototype, "studentInAllClassesCount", {
+        get: function () {
+            return Enumerable.From(this.bandSet.bands).SelectMany(function (b) { return b.classes; }).Sum(function (x) { return x.count; });
+        },
+        set: function (value) {
+        },
+        enumerable: true,
+        configurable: true
+    });
+    LanguageBandClassDefinitionViewModel.prototype.saveOptions = function () {
         return true;
     };
-    LanguageBandClassDefinitionViewModel.prototype.loadOptions = function (source) {
-        this.bandSet = source;
-        _super.prototype.set.call(this, "bandCount", source.bands.length);
-        if (this.hasBandSetInitialised === false) {
-            this.bandSet.createBands("language", this.studentCount, this.languageSets.length);
-            var i = 0;
-            for (var _i = 0, _a = this.languageSets; _i < _a.length; _i++) {
-                var item = _a[_i];
-                this.bandSet.bands[i].bandName = item.description;
-                this.bandSet.bands[i].studentCount = item.count;
-                this.bandSet.bands[i].students = item.students;
-                this.bandSet.bands[i].setClassCount(1);
-                this.bandSet.bands[i].commonBand = item.nolanguagePrefs;
-                i++;
-                this.hasBandSetInitialised = true;
-            }
-        }
-        this.bandTableControl.init("classes-settings-container", source);
-        $("#import-language-preferences").hide();
+    LanguageBandClassDefinitionViewModel.prototype.loadOptions = function () {
+        this.createLanguageSet();
+        this.addBandsAndClassesControl();
+        $("#upload-language-upload-control").hide();
         return true;
     };
     LanguageBandClassDefinitionViewModel.prototype.getBandSet = function () {
@@ -85,24 +129,7 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
     Object.defineProperty(LanguageBandClassDefinitionViewModel.prototype, "students", {
         set: function (value) {
             this._students = value;
-            this.studentWithLanguagePrefCount = Enumerable.From(value).Count(function (x) { return x.hasLanguagePreferences; });
-            this.languageSets = [];
-            debugger;
-            var _loop_1 = function(s) {
-                var matched = Enumerable.From(this_1.languageSets)
-                    .FirstOrDefault(null, function (x) { return x.isEqual(s.langPref1, s.langPref2); });
-                if (matched == null) {
-                    matched = new LanguageSet(s.langPref1, s.langPref2);
-                    this_1.languageSets.push(matched);
-                }
-                matched.addStudent(s);
-            };
-            var this_1 = this;
-            for (var _i = 0, _a = this._students; _i < _a.length; _i++) {
-                var s = _a[_i];
-                _loop_1(s);
-            }
-            this.set("hasStudentLanguagePreferences", this.studentWithLanguagePrefCount > 0);
+            this.createLanguageSet();
         },
         enumerable: true,
         configurable: true

@@ -1,13 +1,34 @@
 ﻿class PreallocatedClassDefinitionViewModel extends kendo.data.ObservableObject
-    implements IBandClassSettings {
+    implements ICustomGroupViewModel {
 
-    constructor(public studentCount: number = 0, onStudentCountChangedEvent: (classCount: number) => any) {
+    constructor(public classesDefn: ClassesDefinition, onStudentCountChangedEvent: (classCount: number) => any) {
         super();
-        super.init(this);
+
+        this.bandSet = classesDefn.createBandSet("class", classesDefn.studentCount);
+        this.studentCount = classesDefn.studentCount;
 
         this.onStudentCountChangedEvent = onStudentCountChangedEvent;
         this.classTableControl = new ClassTableControl(this.callOnStudentCountChangedEvent);
     }
+
+    // ReSharper disable once InconsistentNaming
+    private _studentCount = 0;
+    get studentCount(): number {
+        return this._studentCount;
+    }
+    set studentCount(value: number) {
+
+        this.bandSet.studentCount = value;
+        this.bandSet.bands[0].studentCount = value;
+        this._studentCount = value;
+    }
+
+    get studentInAllClassesCount(): number {
+        return 0;
+    }
+    set studentInAllClassesCount(value: number) {
+    }
+    addBandsAndClassesControl = () => { };
 
     bandSet: BandSet;
     classCount = 1;
@@ -38,15 +59,13 @@
         }
     };
 
-    saveOptions(source: BandSet): boolean {
+    saveOptions(): boolean {
 
         return true;
     }
 
-    loadOptions(source: BandSet): boolean {
-        this.bandSet = source;
-        super.set("classCount", source.bands[0].classes.length);
-        this.classTableControl.init("classes-settings-container", this.bandSet);
+    loadOptions(): boolean {
+       this.classTableControl.init("classes-settings-container", this.bandSet);
         $("#import-preallocated-classes").hide();
         return true;
     }
@@ -107,7 +126,7 @@
                 }
                 classNo++;
             }
-            debugger;
+            
             this.bandSet.students = Enumerable.From(this.bandSet.parent.testFile.students)
                 .Except(this.preallocatedStudents, x => x.studentId)
                 .Select(x=> new StudentClass(x)).ToArray();

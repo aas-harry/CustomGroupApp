@@ -29,7 +29,7 @@
                    data-format="n0"
                    data-min="1"
                    data-max="30"
-                   data-bind="value: selectedClassDefinitionViewModel.bandCount, events: { change: selectedClassDefinitionViewModel.onBandCountChange  }">
+                   data-bind="value: bandCount, events: { change: onBandCountChanged  }">
             <span>(Max 30 Classes)</span>
         </div>
         <p>You can adjust the number of students in each classes below:</p>
@@ -38,20 +38,23 @@
         </div>
     </div>
 
-    <div data-bind="visible: isCoedSchool" style="margin-top: 20px">
-        <input type="checkbox" name="mixGirlsBoys" value="0" data-bind="checked: checkboxMixChecked, events: { change: checkboxMixCheckedEvent }"> Mix girls and boys equally.
+    <div data-bind="visible: isCoedSchool">
+        <input type="checkbox" name="mixGirlsBoys" value="0" data-bind="checked: mixGirlsBoysOption"> Mix girls and boys equally.
     </div>
 
     <div>
-        <input type="checkbox" value="0" data-bind="checked: checkboxChecked, events: { change: checkboxCheckedEvent }">
+        <input type="checkbox" value="0" data-bind="checked: studentLeavingOption, events: { change: studentLeavingOptionChanged }">
         <span>Exclude students who are leaving school at the end of the year.</span>
+        <span style="margin-left: 5px;" data-bind="text: leavingStudentsCount, visible: studentLeavingOption">students</span>
+        <span style="margin-left: 5px; margin-right: 5px" data-bind="visible: studentLeavingOption">students</span>
+        <button class="btn btn-sm" data-bind="click: editLeavingStudents, , visible: studentLeavingOption">Edit</button>
     </div>
 </div>
 
 <script>
     $(document)
         .ready(function () {
-            kendo.bind($("#custom-group-container"), customGroupViewModel);
             customGroupViewModel.loadGroupingViewModel();
+            kendo.bind($("#custom-group-container"), customGroupViewModel);
         });
 </script>

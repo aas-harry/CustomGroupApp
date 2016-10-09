@@ -51,13 +51,24 @@ function createUuid() {
     return uuid;
 }
 
-interface IBandClassSettings {
-    saveOptions(source: BandSet) : boolean;
-    loadOptions(source: BandSet): boolean;
+interface IClassSetting {
+    onClassCountChanged: (count: number) => any;
+}
+
+interface IBandSetting {
+    onBandCountChanged: (count: number) => any;
+}
+
+interface ICustomGroupViewModel {
+    classesDefn: ClassesDefinition;
+    bandSet: BandSet;
+    studentCount: number;
+    saveOptions() : boolean;
+    loadOptions();
     getBandSet(): BandSet;
-    showStudentLanguagePreferences();
-    importStudents();
-    genderChanged(gender: Gender, studentCount: number);
+    genderChanged: (gender: Gender, studentCount: number) => any;
+    studentInAllClassesCount: number;
+    addBandsAndClassesControl: () => any;
 }
 
 class SummaryClass {
@@ -139,16 +150,18 @@ class PreAllocatedStudent {
 }
 
 class StudentClass {
-    constructor(public s: Student) {
+    constructor(s: Student) {
         this.source = s;
         this.name = s.name;
         this.gender = s.sex;
-        this.id = s.studentId;
+        this.id = s.studentId;  
+        this.studentId = s.studentId; // I need to have this studentid to generate the classes
         this.languagePrefs = s.languagePrefs;
         this.uid = createUuid();
     }
 
     id: number;
+    studentId: number;
     uid: string;
     source: Student;
     private class: ClassDefinition;

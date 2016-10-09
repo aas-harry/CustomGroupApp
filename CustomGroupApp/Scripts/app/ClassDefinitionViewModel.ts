@@ -1,65 +1,45 @@
-﻿class ClassDefinitionViewModel extends kendo.data.ObservableObject
-    implements IBandClassSettings {
+﻿class ClassDefinitionViewModel extends CustomGroupBaseViewModel {
 
-    constructor(public studentCount: number = 0, onStudentCountChangedEvent: (classCount: number) => any) {
-        super();
-        super.init(this);
-
-        this.onStudentCountChangedEvent = onStudentCountChangedEvent;
+    constructor(classesDefn: ClassesDefinition, onStudentCountChangedEvent: (classCount: number) => any) {
+        super(classesDefn, onStudentCountChangedEvent);
+    
+        this.bandSet = classesDefn.createBandSet("class", classesDefn.studentCount);
+        this.bandSet.bands[0].setClassCount(3);
+        this.studentCount = classesDefn.studentCount;
         this.classTableControl = new ClassTableControl(this.callOnStudentCountChangedEvent);
     }
+  
+    protected studentCountChanged(value: number) {
+        this.bandSet.studentCount = value;
+        this.bandSet.bands[0].studentCount = value;
+    }
 
-    bandSet: BandSet;
-    classCount = 1;
+    classCount = 3;
 
-    private parentContainer: CustomGroupViewModel;
     private groupingHelper = new GroupingHelper();
     private kendoHelper = new KendoHelper();
     private classTableControl : ClassTableControl;
 
-    onStudentCountChangedEvent: (classCount: number) => any;
-    importStudents = () => { };
-
-    onClassCountChanged = () => {
-        this.bandSet.bands[0].setClassCount(this.classCount);
-        this.classTableControl.init("classes-settings-container", this.bandSet);
-
-        const onStudentCountChangedEvent = this.onStudentCountChangedEvent;
-        if (onStudentCountChangedEvent != null) {
-            onStudentCountChangedEvent(Enumerable.From(this.bandSet.bands[0].classes).Sum(x=> x.count));
-        }
-    }
-
-    callOnStudentCountChangedEvent = () => {
-        const onStudentCountChangedEvent = this.onStudentCountChangedEvent;
-        if (onStudentCountChangedEvent != null) {
-            onStudentCountChangedEvent(Enumerable.From(this.bandSet.bands[0].classes).Sum(x => x.count));
-        }
-    };
-
-    saveOptions(source: BandSet): boolean {
-
-        return true;
-    }
-
-    loadOptions(source: BandSet): boolean {
-        this.bandSet = source;
-        super.set("classCount", source.bands[0].classes.length);
-        this.classTableControl.init("classes-settings-container", this.bandSet);
-        return true;
-    }
-
-    getBandSet(): BandSet {
-        return this.bandSet;
+    get studentInAllClassesCount(): number {
+        return Enumerable.From(this.bandSet.bands[0].classes).Sum(x => x.count);
     }
 
     genderChanged = (gender: Gender, studentCount: number) => {
-        this.bandSet.studentCount = studentCount;
-        this.bandSet.bands[0].studentCount = studentCount;
         this.studentCount = studentCount;
-        this.onClassCountChanged();
+        this.addBandsAndClassesControl();
+    }
+    onClassCountChanged = (count: number) => {
+        this.classCount = count;
+        this.addBandsAndClassesControl();
     }
 
-    showStudentLanguagePreferences = () => { };
+   loadOptions() {
+        this.classTableControl.init("classes-settings-container", this.bandSet);
+    }
+
+   addBandsAndClassesControl = () => {
+       this.bandSet.bands[0].setClassCount(this.classCount);
+       this.classTableControl.init("classes-settings-container", this.bandSet);
+   };
 
 }

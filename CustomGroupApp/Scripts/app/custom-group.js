@@ -131,7 +131,6 @@ var PreAllocatedStudent = (function () {
 var StudentClass = (function () {
     function StudentClass(s) {
         var _this = this;
-        this.s = s;
         this.languagePrefs = [];
         this.canMoveToOtherClass = true;
         this.setClass = function (classItem) {
@@ -149,6 +148,7 @@ var StudentClass = (function () {
         this.name = s.name;
         this.gender = s.sex;
         this.id = s.studentId;
+        this.studentId = s.studentId; // I need to have this studentid to generate the classes
         this.languagePrefs = s.languagePrefs;
         this.uid = createUuid();
     }

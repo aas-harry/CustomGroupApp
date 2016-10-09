@@ -2,22 +2,7 @@
     <span style="margin-right: 10px">Step 2:</span>Enter number of classes
 </div>
 <div style="margin: 20px">
-    <div data-bind="visible: isCoedSchool">
-        <div>Choose students to include option:</div>
-        <div>
-            <input type="radio" value="All" data-bind="checked:selectedGenderOption" />
-            <span>All Students</span>
-        </div>
-        <div>
-            <input type="radio" value="Girls" data-bind="checked:selectedGenderOption" />
-            <span>Girls Only</span>
-        </div>
-        <div>
-            <input type="radio" value="Boys" data-bind="checked:selectedGenderOption" />
-            <span>Boys Only</span>
-        </div>
-    </div>
-
+  
     <div style="margin-top: 20px;">Number of students in this test: <span data-bind="text: studentCount"></span></div>
     <div style="margin-top: 10px; margin-bottom: 5px">
         <span>Number of students who has language preferences: </span>
@@ -29,7 +14,7 @@
             View
         </button>
         <button class="btn btn-default" style="margin-left: 10px" data-bind="click: selectedClassDefinitionViewModel.importStudents">Import</button>
-        <div style="width: 400px; margin-top: 10px" id="import-language-preferences">
+        <div style="width: 400px; margin-top: 10px" id="upload-language-upload-control">
             <input type="file" id="files" name="files"  />
         </div>
 
@@ -47,21 +32,22 @@
     </div>
 
     <div data-bind="visible: isCoedSchool">
-        <input type="checkbox" name="mixGirlsBoys" value="0" data-bind="checked: checkboxMixChecked, events: { change: checkboxMixCheckedEvent }"> Mix girls and boys equally.
+        <input type="checkbox" name="mixGirlsBoys" value="0" data-bind="checked: mixGirlsBoysOption"> Mix girls and boys equally.
     </div>
 
     <div>
-        <input type="checkbox" value="0" data-bind="checked: checkboxChecked, events: { change: checkboxCheckedEvent }">
+        <input type="checkbox" value="0" data-bind="checked: studentLeavingOption, events: { change: studentLeavingOptionChanged }">
         <span>Exclude students who are leaving school at the end of the year.</span>
+        <span style="margin-left: 5px;" data-bind="text: leavingStudentsCount, visible: studentLeavingOption">students</span>
+        <span style="margin-left: 5px; margin-right: 5px" data-bind="visible: studentLeavingOption">students</span>
+        <button class="btn btn-sm" data-bind="click: editLeavingStudents, , visible: studentLeavingOption">Edit</button>
     </div>
 </div>
 
 <script>
     $(document)
         .ready(function () {
-            kendo.bind($("#custom-group-container"), customGroupViewModel);
             customGroupViewModel.loadGroupingViewModel();
-
-
+            kendo.bind($("#custom-group-container"), customGroupViewModel);
         });
 </script>

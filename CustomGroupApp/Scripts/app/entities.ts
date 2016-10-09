@@ -69,6 +69,7 @@ class TestFile {
         this.category = test.Category;
         this.testDate = test.Testdate;
         this.setStudents(results, languages);
+        this.setStudentLanguagePrefs(languages, this.students);
         this.setCustomGroups(customGroupSets, this.students);
     }
 
@@ -97,6 +98,33 @@ class TestFile {
             classItem.name = item.Name;
             this.customGroups.push(classItem);
         }
+    }
+
+    setStudentLanguagePrefs = (langPrefs: Array<any>, students: Array<Student> = null) => {
+        if (!langPrefs || langPrefs.length === 0) {
+            return;
+        }
+        if (!students) {
+            students = this.students;
+        }
+        var enumerable = Enumerable.From(langPrefs);
+
+        students.forEach((student: Student) => {
+            
+            var languagePrefs = enumerable.FirstOrDefault(null, s => s.StudentId === student.studentId);
+            if (languagePrefs != null) {
+                if (languagePrefs.Pref1) {
+                    student.languagePrefs.push(languagePrefs.Pref1);
+                }
+                if (languagePrefs.Pref2) {
+                    student.languagePrefs.push(languagePrefs.Pref2);
+                }
+                if (languagePrefs.Pref3) {
+                    student.languagePrefs.push(languagePrefs.Pref3);
+                }
+            }
+            
+        });
     }
 
     setStudents = (data: Array<any>, langPrefs: Array<any> = []) => {
@@ -131,6 +159,7 @@ class TestFile {
             }
         });
 
+     
         this.studentCount = this.students.length;
         this.isUnisex = this.hasGirls && this.hasBoys;
     };

@@ -5,52 +5,43 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var ClassDefinitionViewModel = (function (_super) {
     __extends(ClassDefinitionViewModel, _super);
-    function ClassDefinitionViewModel(studentCount, onStudentCountChangedEvent) {
+    function ClassDefinitionViewModel(classesDefn, onStudentCountChangedEvent) {
         var _this = this;
-        if (studentCount === void 0) { studentCount = 0; }
-        _super.call(this);
-        this.studentCount = studentCount;
-        this.classCount = 1;
+        _super.call(this, classesDefn, onStudentCountChangedEvent);
+        this.classCount = 3;
         this.groupingHelper = new GroupingHelper();
         this.kendoHelper = new KendoHelper();
-        this.importStudents = function () { };
-        this.onClassCountChanged = function () {
+        this.genderChanged = function (gender, studentCount) {
+            _this.studentCount = studentCount;
+            _this.addBandsAndClassesControl();
+        };
+        this.onClassCountChanged = function (count) {
+            _this.classCount = count;
+            _this.addBandsAndClassesControl();
+        };
+        this.addBandsAndClassesControl = function () {
             _this.bandSet.bands[0].setClassCount(_this.classCount);
             _this.classTableControl.init("classes-settings-container", _this.bandSet);
-            var onStudentCountChangedEvent = _this.onStudentCountChangedEvent;
-            if (onStudentCountChangedEvent != null) {
-                onStudentCountChangedEvent(Enumerable.From(_this.bandSet.bands[0].classes).Sum(function (x) { return x.count; }));
-            }
         };
-        this.callOnStudentCountChangedEvent = function () {
-            var onStudentCountChangedEvent = _this.onStudentCountChangedEvent;
-            if (onStudentCountChangedEvent != null) {
-                onStudentCountChangedEvent(Enumerable.From(_this.bandSet.bands[0].classes).Sum(function (x) { return x.count; }));
-            }
-        };
-        this.genderChanged = function (gender, studentCount) {
-            _this.bandSet.studentCount = studentCount;
-            _this.bandSet.bands[0].studentCount = studentCount;
-            _this.studentCount = studentCount;
-            _this.onClassCountChanged();
-        };
-        this.showStudentLanguagePreferences = function () { };
-        _super.prototype.init.call(this, this);
-        this.onStudentCountChangedEvent = onStudentCountChangedEvent;
+        this.bandSet = classesDefn.createBandSet("class", classesDefn.studentCount);
+        this.bandSet.bands[0].setClassCount(3);
+        this.studentCount = classesDefn.studentCount;
         this.classTableControl = new ClassTableControl(this.callOnStudentCountChangedEvent);
     }
-    ClassDefinitionViewModel.prototype.saveOptions = function (source) {
-        return true;
+    ClassDefinitionViewModel.prototype.studentCountChanged = function (value) {
+        this.bandSet.studentCount = value;
+        this.bandSet.bands[0].studentCount = value;
     };
-    ClassDefinitionViewModel.prototype.loadOptions = function (source) {
-        this.bandSet = source;
-        _super.prototype.set.call(this, "classCount", source.bands[0].classes.length);
+    Object.defineProperty(ClassDefinitionViewModel.prototype, "studentInAllClassesCount", {
+        get: function () {
+            return Enumerable.From(this.bandSet.bands[0].classes).Sum(function (x) { return x.count; });
+        },
+        enumerable: true,
+        configurable: true
+    });
+    ClassDefinitionViewModel.prototype.loadOptions = function () {
         this.classTableControl.init("classes-settings-container", this.bandSet);
-        return true;
-    };
-    ClassDefinitionViewModel.prototype.getBandSet = function () {
-        return this.bandSet;
     };
     return ClassDefinitionViewModel;
-}(kendo.data.ObservableObject));
+}(CustomGroupBaseViewModel));
 //# sourceMappingURL=ClassDefinitionViewModel.js.map

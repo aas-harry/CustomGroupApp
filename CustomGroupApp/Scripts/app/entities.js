@@ -56,6 +56,7 @@ var TestFile = (function () {
             _this.category = test.Category;
             _this.testDate = test.Testdate;
             _this.setStudents(results, languages);
+            _this.setStudentLanguagePrefs(languages, _this.students);
             _this.setCustomGroups(customGroupSets, _this.students);
         };
         this.clear = function () {
@@ -84,6 +85,30 @@ var TestFile = (function () {
                 classItem.name = item.Name;
                 _this.customGroups.push(classItem);
             }
+        };
+        this.setStudentLanguagePrefs = function (langPrefs, students) {
+            if (students === void 0) { students = null; }
+            if (!langPrefs || langPrefs.length === 0) {
+                return;
+            }
+            if (!students) {
+                students = _this.students;
+            }
+            var enumerable = Enumerable.From(langPrefs);
+            students.forEach(function (student) {
+                var languagePrefs = enumerable.FirstOrDefault(null, function (s) { return s.StudentId === student.studentId; });
+                if (languagePrefs != null) {
+                    if (languagePrefs.Pref1) {
+                        student.languagePrefs.push(languagePrefs.Pref1);
+                    }
+                    if (languagePrefs.Pref2) {
+                        student.languagePrefs.push(languagePrefs.Pref2);
+                    }
+                    if (languagePrefs.Pref3) {
+                        student.languagePrefs.push(languagePrefs.Pref3);
+                    }
+                }
+            });
         };
         this.setStudents = function (data, langPrefs) {
             if (langPrefs === void 0) { langPrefs = []; }
