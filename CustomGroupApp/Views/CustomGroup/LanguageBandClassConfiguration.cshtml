@@ -14,8 +14,25 @@
             View
         </button>
         <button class="btn btn-default" style="margin-left: 10px" data-bind="click: selectedClassDefinitionViewModel.importStudents">Import</button>
-        <div style="width: 400px; margin-top: 10px" id="upload-language-upload-control">
-            <input type="file" id="files" name="files"  />
+        <div style="width: 500px; margin-top: 10px" id="upload-language-upload-control">
+            <div style="margin-top: 5px">The imported file must be as follows:</div>
+            <div>- It must use comma delimited field separator.</div>
+            <div>- It must have column header name row.</div>
+            <div>- The column header names must be Firstname, Lastname, Pref1, Pref2, Pref2.</div>
+            <div style="margin-left: 5px">where Pref1 is student 1st language preference.</div>
+            <div style="margin-left: 45px">Pref2 is student 2nd language preference.</div>
+            <div style="margin-left: 45px">Pref3 is student 3rd language preference.</div>
+            <div style="margin-left: 5px">Leave the student preferences blank if he/she does not have one.</div>
+            <div style="margin-top: 5px">For example:</div>
+            <div style="margin: 10px">
+                <div>Firstname,Lastname,Pref1,Pref2,Pref3</div>
+                <div>Michael,Smith,Italian,French,Chinese</div>
+                <div>George,Harris,Italian,Chinese</div>
+                <div>David,West,Italian,French</div>
+                <div>...</div>
+            </div>
+            <div style="margin-top: 10px; margin-bottom: 5px">Click 'Select File' button below to select the students language preferences file</div>
+            <input type="file" id="files" name="files" />
         </div>
 
     </div>

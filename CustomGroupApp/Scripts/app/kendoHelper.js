@@ -197,6 +197,10 @@ var KendoHelper = (function () {
                     'autoUpload': true
                 },
                 showFileList: false,
+                localization: {
+                    select: "Select File"
+                },
+                multiple: false,
                 success: completeCallback
             });
             var uploadCtrl = $("#" + element).data("kendoUpload");
