@@ -152,23 +152,32 @@ class PreAllocatedStudent {
 class StudentClass {
     constructor(s: Student) {
         this.source = s;
-        this.name = s.name;
-        this.gender = s.sex;
-        this.id = s.studentId;  
-        this.studentId = s.studentId; // I need to have this studentid to generate the classes
-        this.languagePrefs = s.languagePrefs;
         this.uid = createUuid();
     }
 
-    id: number;
-    studentId: number;
-    uid: string;
-    source: Student;
+    private source: Student;
     private class: ClassDefinition;
-    gender: string;
+
+    uid: string;
     score: number;
-    name: string;
-    languagePrefs: Array<string> = [];
+
+    get name() {
+        return this.source.name;
+    }
+    get gender() {
+        return this.source.sex;
+    }
+    get studentId() { // I need to have this studentid to generate the classes
+        return this.source.studentId;
+    }
+    get id() {
+        return this.source.studentId;
+    }
+
+    get languagePrefs() {
+        return this.source.languagePrefs;
+    }
+
     get hasLanguagePreferences(): boolean {
         return this.languagePrefs && this.languagePrefs.length > 0;
     }
@@ -185,6 +194,19 @@ class StudentClass {
     get langPref3(): string {
         return this.languagePrefs && this.languagePrefs.length > 2 ? this.languagePrefs[2] : "";
     }
+
+    overallAbilityScore = (): number => {
+        return this.source.overallAbilityScore();
+    }
+
+    mathsAchievementScore = (): number => {
+        return this.source.mathsAchievementScore();
+    }
+
+    englishScore = (): number => {
+        return this.source.englishScore();
+    }
+
 
     bandNo: number;
     flag: number;
@@ -300,19 +322,19 @@ class GroupingHelper {
 
     setOveralAbilityScore = (students: Array<StudentClass>) => {
         for (let i = 0; i < students.length; i++) {
-            students[i].score = students[i].source.overallAbilityScore();
+            students[i].score = students[i].overallAbilityScore();
         }
     };
 
     setEnglishScore = (students: Array<StudentClass>) => {
         for (let i = 0; i < students.length; i++) {
-            students[i].score = students[i].source.englishScore();
+            students[i].score = students[i].englishScore();
         }
     };
 
     setMathAchievementScore = (students: Array<StudentClass>) => {
         for (let i = 0; i < students.length; i++) {
-            students[i].score = students[i].source.mathsAchievementScore();
+            students[i].score = students[i].mathsAchievementScore();
         }
     };
 
@@ -605,7 +627,7 @@ class GroupingHelper {
         return classes;
     };
 
-    private saveClasses = (bandSet: BandSet) => {
+    saveClasses = (bandSet: BandSet) => {
         // ReSharper disable InconsistentNaming
         var groupsets = Array<{'GroupSetId': number, 'TestNumber': number, 'Name': string, 'Students': Array<number>, 'Streaming': number}>();
         // ReSharper restore InconsistentNaming
@@ -622,6 +644,18 @@ class GroupingHelper {
                 });
             }
         }
+
+
+        $.ajax({
+            type: "POST",
+            url: "Customgroup\\SaveCustomGroupSets",
+            contentType: "application/json",
+            data: JSON.stringify({ 'groupSets': groupsets, 'testNumber': bandSet.parent.testFile.fileNumber}),
+            success(data) {
+                const element = document.getElementById("message-text") as HTMLElement;
+                element.textContent = "Custom groups have been saved successfully.";
+            }
+        });
     }
 }
 

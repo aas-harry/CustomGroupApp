@@ -39,7 +39,7 @@
     addBandsAndClassesControl = () => {};
 
     saveOptions(): boolean {
-        debugger;
+        
         // ReSharper disable InconsistentNaming
         let groupsets = Array<{ 'GroupSetId': number, 'TestNumber': number, 'Name': string, 'Students': Array<number>, 'Streaming': number }>();
         // ReSharper restore InconsistentNaming

@@ -1,4 +1,4 @@
-﻿class LanguageBandClassDefinitionViewModel extends kendo.data.ObservableObject
+﻿class LanguageClassDefinitionViewModel extends kendo.data.ObservableObject
     implements ICustomGroupViewModel {
     constructor(public classesDefn: ClassesDefinition, onStudentCountChangedEvent: (classCount: number) => any) {
         super();
@@ -41,6 +41,7 @@
     }
 
     loadOptions(): boolean {
+        
         this.createLanguageSet();
         this.addBandsAndClassesControl();
 
@@ -60,7 +61,7 @@
         this.set("showStudentLanguageList", ! this.showStudentLanguageList);
         if (this.showStudentLanguageList) {
             this.set("showStudentLanguageCaption", "Hide Students");
-            this.kendoHelper.createStudentLanguageGrid("student-language-preferences-list", this._students, true);
+            this.kendoHelper.createStudentLanguageGrid("student-language-preferences-list", this.classesDefn.students, true);
         } else {
             this.set("showStudentLanguageCaption", "Show Students");
         }
@@ -74,7 +75,6 @@
 
     onUploadCompleted = (e: any): any => {
         if (e && e.response) {
-            debugger;
             this.classesDefn.testFile.setStudentLanguagePrefs(e.response);
             this.createLanguageSet();
             this.addBandsAndClassesControl();
@@ -103,18 +103,11 @@
 
     hasStudentLanguagePreferences = false;
 
-    set students(value: Array<StudentClass>) {
-        this._students = value;
-        this.createLanguageSet();
-    }
-
    
     showStudentLanguageList = false;
     studentWithLanguagePrefCount = 0;
     // ReSharper disable once InconsistentNaming
-    _students: Array<StudentClass> = [];
-
-  
+   
 
     onStudentCountChangedEvent: (classCount: number) => any;
     callOnStudentCountChangedEvent = () => {

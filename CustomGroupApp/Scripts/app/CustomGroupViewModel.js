@@ -10,6 +10,8 @@ var CustomGroupViewModel = (function (_super) {
         _super.call(this);
         this.containerElementName = containerElementName;
         this.studentCount = studentCount;
+        this.commonUtils = new CommonUtils();
+        this.groupingHelper = new GroupingHelper();
         this.stepCollection = new StepCollection();
         this.testInfo = new TestFile();
         this._genderOption = "All";
@@ -34,8 +36,6 @@ var CustomGroupViewModel = (function (_super) {
         this.studentLeavingOption = false;
         this.leavingStudents = [];
         this.leavingStudentsCount = 0;
-        this.commonUtils = new CommonUtils();
-        this.groupingHelper = new GroupingHelper();
         this.nextStep = function () {
             _super.prototype.set.call(_this, "currentGroupStep", _this.currentGroupStep + 1);
             _this.callGetViewStep(_this.currentGroupStep, _this.containerElementName);
@@ -55,7 +55,6 @@ var CustomGroupViewModel = (function (_super) {
                 .createStudentSetContainer(separatedStudentsCell, _this.classesDefn.testFile.isUnisex);
         };
         this.showAllClasses = function (e) {
-            debugger;
             _this.generateCustomGroupViewModel.showAllClasses();
             _this.set("hasHiddenClasses", false);
             kendo.bind($("#custom-group-container"), _this);
@@ -255,12 +254,12 @@ var CustomGroupViewModel = (function (_super) {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(CustomGroupViewModel.prototype, "languageBandClassDefinitionViewModel", {
+    Object.defineProperty(CustomGroupViewModel.prototype, "languageClassDefinitionViewModel", {
         get: function () {
-            if (this._languageBandClassDefinitionViewModel === undefined) {
-                this._languageBandClassDefinitionViewModel = new LanguageBandClassDefinitionViewModel(this.classesDefn, this.onStudentCountInAllClassesChanged);
+            if (this._languageClassDefinitionViewModel === undefined) {
+                this._languageClassDefinitionViewModel = new LanguageClassDefinitionViewModel(this.classesDefn, this.onStudentCountInAllClassesChanged);
             }
-            return this._languageBandClassDefinitionViewModel;
+            return this._languageClassDefinitionViewModel;
         },
         enumerable: true,
         configurable: true
@@ -301,7 +300,7 @@ var CustomGroupViewModel = (function (_super) {
                 this.set("selectedClassDefinitionViewModel", this.topMiddleLowestBandClassDefinitionViewModel);
                 break;
             case GroupingMethod.Language:
-                this.set("selectedClassDefinitionViewModel", this.languageBandClassDefinitionViewModel);
+                this.set("selectedClassDefinitionViewModel", this.languageClassDefinitionViewModel);
                 break;
             case GroupingMethod.Preallocated:
                 this.set("selectedClassDefinitionViewModel", this.preAllocatedClassDefinitionViewModel);
@@ -314,29 +313,7 @@ var CustomGroupViewModel = (function (_super) {
     };
     CustomGroupViewModel.prototype.saveClasses = function () {
         var bandSet = this.selectedClassDefinitionViewModel.getBandSet();
-        var groupSet = {
-            'TestNumber': this.classesDefn.testFile.fileNumber,
-            'Name': this.groupName,
-            'Classes': []
-        };
-        for (var _i = 0, _a = bandSet.bands; _i < _a.length; _i++) {
-            var bandItem = _a[_i];
-            for (var _b = 0, _c = bandItem.classes; _b < _c.length; _b++) {
-                var classItem = _c[_b];
-                var classes = Enumerable.From(classItem.students).Select(function (x) { return x.id; }).ToArray();
-                groupSet.Classes.push(classes);
-            }
-        }
-        $.ajax({
-            type: "POST",
-            url: "Customgroup\\SaveClasses",
-            contentType: "application/json",
-            data: JSON.stringify({ 'groupSet': groupSet }),
-            success: function (data) {
-                var element = document.getElementById("message-text");
-                element.textContent = "Custom groups have been saved successfully.";
-            }
-        });
+        this.groupingHelper.saveClasses(bandSet);
     };
     CustomGroupViewModel.prototype.generateClasses = function () {
         var bandSet = this.selectedClassDefinitionViewModel.getBandSet();

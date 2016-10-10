@@ -3,9 +3,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var LanguageBandClassDefinitionViewModel = (function (_super) {
-    __extends(LanguageBandClassDefinitionViewModel, _super);
-    function LanguageBandClassDefinitionViewModel(classesDefn, onStudentCountChangedEvent) {
+var LanguageClassDefinitionViewModel = (function (_super) {
+    __extends(LanguageClassDefinitionViewModel, _super);
+    function LanguageClassDefinitionViewModel(classesDefn, onStudentCountChangedEvent) {
         var _this = this;
         _super.call(this);
         this.classesDefn = classesDefn;
@@ -24,7 +24,7 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
             _this.set("showStudentLanguageList", !_this.showStudentLanguageList);
             if (_this.showStudentLanguageList) {
                 _this.set("showStudentLanguageCaption", "Hide Students");
-                _this.kendoHelper.createStudentLanguageGrid("student-language-preferences-list", _this._students, true);
+                _this.kendoHelper.createStudentLanguageGrid("student-language-preferences-list", _this.classesDefn.students, true);
             }
             else {
                 _this.set("showStudentLanguageCaption", "Show Students");
@@ -66,8 +66,6 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
         this.hasStudentLanguagePreferences = false;
         this.showStudentLanguageList = false;
         this.studentWithLanguagePrefCount = 0;
-        // ReSharper disable once InconsistentNaming
-        this._students = [];
         this.callOnStudentCountChangedEvent = function () {
             var onStudentCountChangedEvent = _this.onStudentCountChangedEvent;
             if (onStudentCountChangedEvent != null) {
@@ -93,7 +91,7 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
         this.onStudentCountChangedEvent = onStudentCountChangedEvent;
         this.bandTableControl = new BandTableControl(this.callOnStudentCountChangedEvent);
     }
-    Object.defineProperty(LanguageBandClassDefinitionViewModel.prototype, "studentCount", {
+    Object.defineProperty(LanguageClassDefinitionViewModel.prototype, "studentCount", {
         get: function () {
             return this._studentCount;
         },
@@ -104,7 +102,7 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(LanguageBandClassDefinitionViewModel.prototype, "studentInAllClassesCount", {
+    Object.defineProperty(LanguageClassDefinitionViewModel.prototype, "studentInAllClassesCount", {
         get: function () {
             return Enumerable.From(this.bandSet.bands).SelectMany(function (b) { return b.classes; }).Sum(function (x) { return x.count; });
         },
@@ -113,26 +111,18 @@ var LanguageBandClassDefinitionViewModel = (function (_super) {
         enumerable: true,
         configurable: true
     });
-    LanguageBandClassDefinitionViewModel.prototype.saveOptions = function () {
+    LanguageClassDefinitionViewModel.prototype.saveOptions = function () {
         return true;
     };
-    LanguageBandClassDefinitionViewModel.prototype.loadOptions = function () {
+    LanguageClassDefinitionViewModel.prototype.loadOptions = function () {
         this.createLanguageSet();
         this.addBandsAndClassesControl();
         $("#upload-language-upload-control").hide();
         return true;
     };
-    LanguageBandClassDefinitionViewModel.prototype.getBandSet = function () {
+    LanguageClassDefinitionViewModel.prototype.getBandSet = function () {
         return this.bandSet;
     };
-    Object.defineProperty(LanguageBandClassDefinitionViewModel.prototype, "students", {
-        set: function (value) {
-            this._students = value;
-            this.createLanguageSet();
-        },
-        enumerable: true,
-        configurable: true
-    });
-    return LanguageBandClassDefinitionViewModel;
+    return LanguageClassDefinitionViewModel;
 }(kendo.data.ObservableObject));
-//# sourceMappingURL=LanguageBandClassDefinitionViewModel.js.map
+//# sourceMappingURL=LanguageClassDefinitionViewModel.js.map

@@ -48,7 +48,6 @@ var CustomGroupBaseViewModel = (function (_super) {
     CustomGroupBaseViewModel.prototype.studentCountChanged = function (value) {
     };
     CustomGroupBaseViewModel.prototype.saveOptions = function () {
-        debugger;
         // ReSharper disable InconsistentNaming
         var groupsets = Array();
         // ReSharper restore InconsistentNaming

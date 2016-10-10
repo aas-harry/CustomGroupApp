@@ -6,6 +6,11 @@
         this.studentCount = studentCount;
     }
 
+    private commonUtils = new CommonUtils();
+    private groupingHelper = new GroupingHelper();
+    private pairedStudentsControl: StudentSetListControl;
+    private separatedStudentsControl: StudentSetListControl;
+    private leavingStudentsControl: StudentSetListControl;
     private stepCollection = new StepCollection();
     private testInfo = new TestFile();
     private topMiddleLowestBandSet: TopMiddleLowestBandSet;
@@ -17,12 +22,12 @@
     private _preAllocatedClassDefinitionViewModel: PreallocatedClassDefinitionViewModel;
     private _bandClassDefinitionViewModel: BandClassDefinitionViewModel;
     private _topMiddleLowestBandClassDefinitionViewModel: TopMiddleLowestBandClassDefinitionViewModel;
-    private _languageBandClassDefinitionViewModel: LanguageBandClassDefinitionViewModel;
+    private _languageClassDefinitionViewModel: LanguageClassDefinitionViewModel;
     private _generateCustomGroupViewModel: GenerateCustomGroupViewModel;
     private _genderOption = "All";
     private gender = Gender.All;
-
     // ReSharper restore InconsistentNaming
+
     get selectedGenderOption(): string {
         return this._genderOption;
     };
@@ -126,12 +131,12 @@
         return this._bandClassDefinitionViewModel;
     }
 
-    get languageBandClassDefinitionViewModel(): LanguageBandClassDefinitionViewModel {
-        if (this._languageBandClassDefinitionViewModel === undefined) {
-            this._languageBandClassDefinitionViewModel = new
-                LanguageBandClassDefinitionViewModel(this.classesDefn, this.onStudentCountInAllClassesChanged);
+    get languageClassDefinitionViewModel(): LanguageClassDefinitionViewModel {
+        if (this._languageClassDefinitionViewModel === undefined) {
+            this._languageClassDefinitionViewModel = new
+                LanguageClassDefinitionViewModel(this.classesDefn, this.onStudentCountInAllClassesChanged);
         }
-        return this._languageBandClassDefinitionViewModel;
+        return this._languageClassDefinitionViewModel;
     }
 
     get generateCustomGroupViewModel(): GenerateCustomGroupViewModel {
@@ -140,12 +145,6 @@
         }
         return this._generateCustomGroupViewModel;
     }
-
-    private commonUtils = new CommonUtils();
-    private groupingHelper = new GroupingHelper();
-    private pairedStudentsControl: StudentSetListControl;
-    private separatedStudentsControl: StudentSetListControl;
-    private leavingStudentsControl: StudentSetListControl;
 
     private nextStep = () => {
         super.set("currentGroupStep", this.currentGroupStep + 1);
@@ -166,7 +165,7 @@
         super.set("isFirstStep", this.stepCollection.isFirstStep(stepNo));
         super.set("isLastStep", this.stepCollection.isLastStep(stepNo));
 
-        var viewName = this.stepCollection.getStepView(this.groupingOption, stepNo);
+        const viewName = this.stepCollection.getStepView(this.groupingOption, stepNo);
         console.log("View: ", viewName);
 
 
@@ -194,7 +193,7 @@
             break;
 
         case GroupingMethod.Language:
-            this.set("selectedClassDefinitionViewModel", this.languageBandClassDefinitionViewModel);
+            this.set("selectedClassDefinitionViewModel", this.languageClassDefinitionViewModel);
             break;
 
         case GroupingMethod.Preallocated:
@@ -219,7 +218,6 @@
     }
 
     showAllClasses = (e: any) => {
-        debugger;
         this.generateCustomGroupViewModel.showAllClasses();
         this.set("hasHiddenClasses", false);
         kendo.bind($("#custom-group-container"), this);
@@ -282,36 +280,10 @@
 
     saveClasses() {
         const bandSet = this.selectedClassDefinitionViewModel.getBandSet();
-        const groupSet = {
-            'TestNumber': this.classesDefn.testFile.fileNumber,
-            'Name': this.groupName,
-            'Classes': []
-        }
-
-        for (let bandItem of bandSet.bands) {
-            for (let classItem of bandItem.classes) {
-                var classes = Enumerable.From(classItem.students).Select(x => x.id).ToArray();
-                groupSet.Classes.push(classes);
-            }
-        }
-
-
-        $.ajax({
-            type: "POST",
-            url: "Customgroup\\SaveClasses",
-            contentType: "application/json",
-            data: JSON.stringify({ 'groupSet': groupSet }),
-            success(data) {
-                const element = document.getElementById("message-text") as HTMLElement;
-                element.textContent = "Custom groups have been saved successfully.";
-            }
-        });
-
-
+        this.groupingHelper.saveClasses(bandSet);
     }
 
     generateClasses() {
-        
         var bandSet = this.selectedClassDefinitionViewModel.getBandSet();
         const students = Enumerable.From(this.classesDefn.genderStudents(this.genderOption))
                 .Except(this.leavingStudents, x => x.studentId)
@@ -357,6 +329,7 @@
                 band.prepare(band.bandName, band.students, this.joinedStudents, this.separatedStudents);
             }
             break;
+
         case GroupingMethod.Preallocated:
             bandSet.groupType = GroupingMethod.MixedAbility;
             bandSet.bands[0].groupType = GroupingMethod.MixedAbility;

@@ -65,6 +65,7 @@ namespace CustomGroupApp
                 if (existingGs == null)
                 {
                     existingGs = new GroupSet();
+                    _dataService.GroupSets.InsertOnSubmit(existingGs);
                 }
                 existingGs.Testnum = testnum;
                 existingGs.Name = gs.Name;
