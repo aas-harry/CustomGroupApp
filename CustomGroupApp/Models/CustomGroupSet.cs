@@ -8,5 +8,6 @@ namespace CustomGroupApp.Models
         public int TestNumber { get; set; }
         public string Name { get; set; }
         public int[] Students { get; set; }
+        public int Streaming { get; set; }
     }
 }

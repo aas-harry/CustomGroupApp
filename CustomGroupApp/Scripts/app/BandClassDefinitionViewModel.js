@@ -47,7 +47,39 @@ var CustomGroupBaseViewModel = (function (_super) {
     });
     CustomGroupBaseViewModel.prototype.studentCountChanged = function (value) {
     };
-    CustomGroupBaseViewModel.prototype.saveOptions = function () { return true; };
+    CustomGroupBaseViewModel.prototype.saveOptions = function () {
+        debugger;
+        // ReSharper disable InconsistentNaming
+        var groupsets = Array();
+        // ReSharper restore InconsistentNaming
+        for (var _i = 0, _a = this.bandSet.bands; _i < _a.length; _i++) {
+            var bandItem = _a[_i];
+            for (var _b = 0, _c = bandItem.classes; _b < _c.length; _b++) {
+                var classItem = _c[_b];
+                groupsets.push({
+                    GroupSetId: 0,
+                    TestNumber: this.bandSet.parent.testFile.fileNumber,
+                    Name: classItem.name,
+                    Students: Enumerable.From(classItem.students).Select(function (x) { return x.studentId; }).ToArray(),
+                    Streaming: bandItem.streamType
+                });
+            }
+        }
+        $.ajax({
+            type: "POST",
+            url: "CustomGroup\\SaveCustomGroupSets",
+            contentType: "application/json",
+            data: JSON.stringify({
+                'groupSets': groupsets,
+                'testNumber': this.bandSet.parent.testFile.fileNumber
+            }),
+            success: function (html) {
+            },
+            error: function (e) {
+            }
+        });
+        return true;
+    };
     CustomGroupBaseViewModel.prototype.loadOptions = function () { };
     CustomGroupBaseViewModel.prototype.getBandSet = function () { return this.bandSet; };
     return CustomGroupBaseViewModel;

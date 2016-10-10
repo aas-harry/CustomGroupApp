@@ -554,6 +554,24 @@ var GroupingHelper = (function () {
             }
             return classes;
         };
+        this.saveClasses = function (bandSet) {
+            // ReSharper disable InconsistentNaming
+            var groupsets = Array();
+            // ReSharper restore InconsistentNaming
+            for (var _i = 0, _a = bandSet.bands; _i < _a.length; _i++) {
+                var bandItem = _a[_i];
+                for (var _b = 0, _c = bandItem.classes; _b < _c.length; _b++) {
+                    var classItem = _c[_b];
+                    groupsets.push({
+                        GroupSetId: 0,
+                        TestNumber: bandSet.parent.testFile.fileNumber,
+                        Name: classItem.name,
+                        Students: Enumerable.From(classItem.students).Select(function (x) { return x.studentId; }).ToArray(),
+                        Streaming: bandItem.streamType
+                    });
+                }
+            }
+        };
     }
     return GroupingHelper;
 }());

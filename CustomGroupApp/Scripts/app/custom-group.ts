@@ -604,6 +604,25 @@ class GroupingHelper {
         }
         return classes;
     };
+
+    private saveClasses = (bandSet: BandSet) => {
+        // ReSharper disable InconsistentNaming
+        var groupsets = Array<{'GroupSetId': number, 'TestNumber': number, 'Name': string, 'Students': Array<number>, 'Streaming': number}>();
+        // ReSharper restore InconsistentNaming
+
+        for (let bandItem of bandSet.bands) {
+            for (let classItem of bandItem.classes) {
+                groupsets.push(
+                {
+                    GroupSetId: 0,
+                    TestNumber: bandSet.parent.testFile.fileNumber,
+                    Name: classItem.name,
+                    Students: Enumerable.From(classItem.students).Select(x => x.studentId).ToArray(),
+                    Streaming: bandItem.streamType
+                });
+            }
+        }
+    }
 }
 
 class StudentSet {
