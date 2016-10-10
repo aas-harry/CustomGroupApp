@@ -59,6 +59,13 @@ namespace CustomGroupApp.Controllers
             });
         }
 
+        [HttpPost]
+        public JsonResult SaveCustomGroupSets(IEnumerable<CustomGroupSet> groupSets, int testNumber)
+        {
+            _dataService.UpdateCustomGroupSets(groupSets, testNumber);
+            return Json(true);
+        }
+
         public ActionResult CustomGroupWizard(int testNumber)
         {
             //return View("BandClassDefinitionView");

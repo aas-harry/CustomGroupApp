@@ -1067,7 +1067,7 @@
     <TypeScriptCompile Include="Scripts\app\KendoHelper.ts" />
     <TypeScriptCompile Include="Scripts\app\PreallocatedClassDefinitionViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\repository.ts" />
-    <TypeScriptCompile Include="Scripts\app\LanguageBandClassDefinitionViewModel.ts" />
+    <TypeScriptCompile Include="Scripts\app\LanguageClassDefinitionViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\StepDefinition.ts" />
     <TypeScriptCompile Include="Scripts\app\StudentBandInputContainer.ts" />
     <TypeScriptCompile Include="Scripts\app\StudentClassInputContainer.ts" />

@@ -53,6 +53,42 @@ namespace CustomGroupApp
             return classes;
         }
 
+        public void UpdateCustomGroupSets(IEnumerable<CustomGroupSet> groupSets, int testnum)
+        {
+            foreach (var gs in groupSets)
+            {
+                GroupSet existingGs = null;
+                if (gs.GroupSetId > 0)
+                {
+                    existingGs = _dataService.GroupSets.FirstOrDefault(x => x.Id == gs.GroupSetId);
+                }
+                if (existingGs == null)
+                {
+                    existingGs = new GroupSet();
+                    _dataService.GroupSets.InsertOnSubmit(existingGs);
+                }
+                existingGs.Testnum = testnum;
+                existingGs.Name = gs.Name;
+                existingGs.Streaming = gs.Streaming;
+
+                _dataService.SubmitChanges();
+
+                UpdateGroupSetStudents(existingGs.Id, gs.Students);
+            }
+        }
+
+        public void UpdateGroupSetStudents(int groupSetId, int[] students)
+        {
+            _dataService.GroupSetStudents.DeleteAllOnSubmit(_dataService.GroupSetStudents.Where(x=> x.GroupSetId == groupSetId));
+            _dataService.SubmitChanges();
+
+            foreach (var s in students)
+            {
+                _dataService.GroupSetStudents.InsertOnSubmit(new GroupSetStudent {GroupSetId = groupSetId, StudentId = s});
+            }
+            _dataService.SubmitChanges();
+        }
+
         public IEnumerable<GroupSetStudent> GetCustomGroupSetStudent(int groupSetId)
         {
             return _dataService.GroupSetStudents.Where(x => x.GroupSetId == groupSetId).ToList();

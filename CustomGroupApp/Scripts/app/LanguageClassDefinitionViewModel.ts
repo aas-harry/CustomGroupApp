@@ -1,4 +1,4 @@
-﻿class LanguageBandClassDefinitionViewModel extends kendo.data.ObservableObject
+﻿class LanguageClassDefinitionViewModel extends kendo.data.ObservableObject
     implements ICustomGroupViewModel {
     constructor(public classesDefn: ClassesDefinition, onStudentCountChangedEvent: (classCount: number) => any) {
         super();
@@ -41,6 +41,7 @@
     }
 
     loadOptions(): boolean {
+        
         this.createLanguageSet();
         this.addBandsAndClassesControl();
 
@@ -60,11 +61,7 @@
         this.set("showStudentLanguageList", ! this.showStudentLanguageList);
         if (this.showStudentLanguageList) {
             this.set("showStudentLanguageCaption", "Hide Students");
-            
-            const  students = Enumerable.From(this.classesDefn.testFile.students)
-                .Select(x => new StudentClass(x))
-                .ToArray();
-            this.kendoHelper.createStudentLanguageGrid("student-language-preferences-list", students, true);
+            this.kendoHelper.createStudentLanguageGrid("student-language-preferences-list", this.classesDefn.students, true);
         } else {
             this.set("showStudentLanguageCaption", "Show Students");
         }
@@ -81,7 +78,6 @@
             this.classesDefn.testFile.setStudentLanguagePrefs(e.response);
             this.createLanguageSet();
             this.addBandsAndClassesControl();
-            this.showStudentLanguagePreferences();
             this.set("showStudentLanguageList", true);
             this.set("showStudentLanguageCaption", "Hide Students");
         }
@@ -107,18 +103,11 @@
 
     hasStudentLanguagePreferences = false;
 
-    set students(value: Array<StudentClass>) {
-        this._students = value;
-        this.createLanguageSet();
-    }
-
    
     showStudentLanguageList = false;
     studentWithLanguagePrefCount = 0;
     // ReSharper disable once InconsistentNaming
-    _students: Array<StudentClass> = [];
-
-  
+   
 
     onStudentCountChangedEvent: (classCount: number) => any;
     callOnStudentCountChangedEvent = () => {
@@ -139,6 +128,7 @@
             this.bandSet.bands[i].commonBand = item.nolanguagePrefs;
             i++;
         }
+
         this.bandTableControl.init("classes-settings-container", this.bandSet);
     };
 }

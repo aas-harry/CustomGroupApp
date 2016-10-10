@@ -131,7 +131,15 @@ var PreAllocatedStudent = (function () {
 var StudentClass = (function () {
     function StudentClass(s) {
         var _this = this;
-        this.languagePrefs = [];
+        this.overallAbilityScore = function () {
+            return _this.source.overallAbilityScore();
+        };
+        this.mathsAchievementScore = function () {
+            return _this.source.mathsAchievementScore();
+        };
+        this.englishScore = function () {
+            return _this.source.englishScore();
+        };
         this.canMoveToOtherClass = true;
         this.setClass = function (classItem) {
             _this.class = classItem;
@@ -145,13 +153,43 @@ var StudentClass = (function () {
             fromClass.addStudent(studentTo);
         };
         this.source = s;
-        this.name = s.name;
-        this.gender = s.sex;
-        this.id = s.studentId;
-        this.studentId = s.studentId; // I need to have this studentid to generate the classes
-        this.languagePrefs = s.languagePrefs;
         this.uid = createUuid();
     }
+    Object.defineProperty(StudentClass.prototype, "name", {
+        get: function () {
+            return this.source.name;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(StudentClass.prototype, "gender", {
+        get: function () {
+            return this.source.sex;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(StudentClass.prototype, "studentId", {
+        get: function () {
+            return this.source.studentId;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(StudentClass.prototype, "id", {
+        get: function () {
+            return this.source.studentId;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(StudentClass.prototype, "languagePrefs", {
+        get: function () {
+            return this.source.languagePrefs;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(StudentClass.prototype, "hasLanguagePreferences", {
         get: function () {
             return this.languagePrefs && this.languagePrefs.length > 0;
@@ -281,17 +319,17 @@ var GroupingHelper = (function () {
         };
         this.setOveralAbilityScore = function (students) {
             for (var i = 0; i < students.length; i++) {
-                students[i].score = students[i].source.overallAbilityScore();
+                students[i].score = students[i].overallAbilityScore();
             }
         };
         this.setEnglishScore = function (students) {
             for (var i = 0; i < students.length; i++) {
-                students[i].score = students[i].source.englishScore();
+                students[i].score = students[i].englishScore();
             }
         };
         this.setMathAchievementScore = function (students) {
             for (var i = 0; i < students.length; i++) {
-                students[i].score = students[i].source.mathsAchievementScore();
+                students[i].score = students[i].mathsAchievementScore();
             }
         };
         this.calculateTotalScore = function (students, streamType) {
@@ -553,6 +591,34 @@ var GroupingHelper = (function () {
                 }
             }
             return classes;
+        };
+        this.saveClasses = function (bandSet) {
+            // ReSharper disable InconsistentNaming
+            var groupsets = Array();
+            // ReSharper restore InconsistentNaming
+            for (var _i = 0, _a = bandSet.bands; _i < _a.length; _i++) {
+                var bandItem = _a[_i];
+                for (var _b = 0, _c = bandItem.classes; _b < _c.length; _b++) {
+                    var classItem = _c[_b];
+                    groupsets.push({
+                        GroupSetId: 0,
+                        TestNumber: bandSet.parent.testFile.fileNumber,
+                        Name: classItem.name,
+                        Students: Enumerable.From(classItem.students).Select(function (x) { return x.studentId; }).ToArray(),
+                        Streaming: bandItem.streamType
+                    });
+                }
+            }
+            $.ajax({
+                type: "POST",
+                url: "Customgroup\\SaveCustomGroupSets",
+                contentType: "application/json",
+                data: JSON.stringify({ 'groupSets': groupsets, 'testNumber': bandSet.parent.testFile.fileNumber }),
+                success: function (data) {
+                    var element = document.getElementById("message-text");
+                    element.textContent = "Custom groups have been saved successfully.";
+                }
+            });
         };
     }
     return GroupingHelper;

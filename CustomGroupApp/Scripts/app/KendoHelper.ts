@@ -279,10 +279,15 @@
                     'autoUpload': true
                 },
                 showFileList: false,
+                localization: {
+                    select: "Select File"
+                },
+                multiple: false,
                 success: completeCallback
             });
 
         const uploadCtrl = $(`#${element}`).data("kendoUpload") as kendo.ui.Upload;
+       
         return uploadCtrl;
     };
 

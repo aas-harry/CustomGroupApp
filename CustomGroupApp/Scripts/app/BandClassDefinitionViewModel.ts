@@ -38,7 +38,41 @@
 
     addBandsAndClassesControl = () => {};
 
-    saveOptions(): boolean { return true; }
+    saveOptions(): boolean {
+        
+        // ReSharper disable InconsistentNaming
+        let groupsets = Array<{ 'GroupSetId': number, 'TestNumber': number, 'Name': string, 'Students': Array<number>, 'Streaming': number }>();
+        // ReSharper restore InconsistentNaming
+
+        for (let bandItem of this.bandSet.bands) {
+            for (let classItem of bandItem.classes) {
+                groupsets.push(
+                    {
+                        GroupSetId: 0,
+                        TestNumber: this.bandSet.parent.testFile.fileNumber,
+                        Name: classItem.name,
+                        Students: Enumerable.From(classItem.students).Select(x => x.studentId).ToArray(),
+                        Streaming: bandItem.streamType
+                    });
+            }
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "CustomGroup\\SaveCustomGroupSets",
+            contentType: "application/json",
+            data: JSON.stringify({
+                'groupSets': groupsets,
+                 'testNumber': this.bandSet.parent.testFile.fileNumber
+            }),
+            success(html) {
+            },
+            error(e) {
+            }
+        });
+
+        return true;
+    }
 
     loadOptions() { }
 
