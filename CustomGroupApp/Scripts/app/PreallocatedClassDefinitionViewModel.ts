@@ -59,11 +59,6 @@
         }
     };
 
-    saveOptions(): boolean {
-
-        return true;
-    }
-
     loadOptions(): boolean {
        this.classTableControl.init("classes-settings-container", this.bandSet);
         $("#import-preallocated-classes").hide();

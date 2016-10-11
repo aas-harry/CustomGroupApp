@@ -36,10 +36,6 @@
     private bandTableControl: BandTableControl;
     private hasBandSetInitialised = false;
 
-    saveOptions(): boolean {
-        return true;
-    }
-
     loadOptions(): boolean {
         
         this.createLanguageSet();
@@ -75,17 +71,18 @@
 
     onUploadCompleted = (e: any): any => {
         if (e && e.response) {
+            debugger;
             this.classesDefn.testFile.setStudentLanguagePrefs(e.response);
             this.createLanguageSet();
             this.addBandsAndClassesControl();
-            this.set("showStudentLanguageList", true);
-            this.set("showStudentLanguageCaption", "Hide Students");
+            this.showStudentLanguagePreferences();
         }
         $("#upload-language-upload-control").hide();
     }
 
     private createLanguageSet = () => {
-        this.studentWithLanguagePrefCount = Enumerable.From(this.classesDefn.students).Count(x => x.hasLanguagePreferences);
+        this.set("studentWithLanguagePrefCount",
+            Enumerable.From(this.classesDefn.students).Count(x => x.hasLanguagePreferences));
         this.languageSets = [];
 
         for (let s of this.classesDefn.students) {

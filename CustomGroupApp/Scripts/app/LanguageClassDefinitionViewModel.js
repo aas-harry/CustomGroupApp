@@ -37,16 +37,16 @@ var LanguageClassDefinitionViewModel = (function (_super) {
         };
         this.onUploadCompleted = function (e) {
             if (e && e.response) {
+                debugger;
                 _this.classesDefn.testFile.setStudentLanguagePrefs(e.response);
                 _this.createLanguageSet();
                 _this.addBandsAndClassesControl();
-                _this.set("showStudentLanguageList", true);
-                _this.set("showStudentLanguageCaption", "Hide Students");
+                _this.showStudentLanguagePreferences();
             }
             $("#upload-language-upload-control").hide();
         };
         this.createLanguageSet = function () {
-            _this.studentWithLanguagePrefCount = Enumerable.From(_this.classesDefn.students).Count(function (x) { return x.hasLanguagePreferences; });
+            _this.set("studentWithLanguagePrefCount", Enumerable.From(_this.classesDefn.students).Count(function (x) { return x.hasLanguagePreferences; }));
             _this.languageSets = [];
             var _loop_1 = function(s) {
                 var matched = Enumerable.From(_this.languageSets)
@@ -111,9 +111,6 @@ var LanguageClassDefinitionViewModel = (function (_super) {
         enumerable: true,
         configurable: true
     });
-    LanguageClassDefinitionViewModel.prototype.saveOptions = function () {
-        return true;
-    };
     LanguageClassDefinitionViewModel.prototype.loadOptions = function () {
         this.createLanguageSet();
         this.addBandsAndClassesControl();

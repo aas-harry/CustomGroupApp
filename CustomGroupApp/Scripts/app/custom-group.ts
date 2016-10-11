@@ -63,7 +63,6 @@ interface ICustomGroupViewModel {
     classesDefn: ClassesDefinition;
     bandSet: BandSet;
     studentCount: number;
-    saveOptions() : boolean;
     loadOptions();
     getBandSet(): BandSet;
     genderChanged: (gender: Gender, studentCount: number) => any;
@@ -654,6 +653,9 @@ class GroupingHelper {
             success(data) {
                 const element = document.getElementById("message-text") as HTMLElement;
                 element.textContent = "Custom groups have been saved successfully.";
+            },
+            error(e) {
+                
             }
         });
     }

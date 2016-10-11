@@ -137,9 +137,6 @@ var PreallocatedClassDefinitionViewModel = (function (_super) {
         enumerable: true,
         configurable: true
     });
-    PreallocatedClassDefinitionViewModel.prototype.saveOptions = function () {
-        return true;
-    };
     PreallocatedClassDefinitionViewModel.prototype.loadOptions = function () {
         this.classTableControl.init("classes-settings-container", this.bandSet);
         $("#import-preallocated-classes").hide();

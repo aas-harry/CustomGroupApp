@@ -168,7 +168,7 @@
         const viewName = this.stepCollection.getStepView(this.groupingOption, stepNo);
         console.log("View: ", viewName);
 
-
+  
         if (!viewName) {
             return;
         }
@@ -179,6 +179,7 @@
             success(data) {
                 $(`#${containerElementName}`).html(data);
             }
+            
         });
     }
 

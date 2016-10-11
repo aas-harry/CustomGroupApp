@@ -617,6 +617,8 @@ var GroupingHelper = (function () {
                 success: function (data) {
                     var element = document.getElementById("message-text");
                     element.textContent = "Custom groups have been saved successfully.";
+                },
+                error: function (e) {
                 }
             });
         };
