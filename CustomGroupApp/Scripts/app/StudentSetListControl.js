@@ -115,7 +115,15 @@ var StudentSetListControl = (function () {
             return null;
         };
         this.setDataSource = function () {
-            _this.gridControl.dataSource.data(_this.studentSets);
+            var data = [];
+            for (var _i = 0, _a = _this.studentSets; _i < _a.length; _i++) {
+                var s = _a[_i];
+                data.push({
+                    'studentSetId': s.studentSetId,
+                    'studentList': s.studentList
+                });
+            }
+            _this.gridControl.dataSource.data(data);
             _this.gridControl.refresh();
         };
         this.uid = this.commonUtils.createUid();

@@ -147,7 +147,14 @@
         return null;
     }
     private setDataSource = () => {
-        this.gridControl.dataSource.data(this.studentSets);
+        var data = [];
+        for (let s of this.studentSets) {
+            data.push({
+                'studentSetId': s.studentSetId,
+                 'studentList': s.studentList
+            });
+        }
+        this.gridControl.dataSource.data(data);
         this.gridControl.refresh();
       
     };

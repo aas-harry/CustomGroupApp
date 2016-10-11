@@ -35,7 +35,7 @@ var StudentSelector = (function () {
             if (previoustudents.length > 0) {
                 // Create the table
                 var label_1 = document.createElement("div");
-                label_1.textContent = "Previously selected students, un-check to remove student from the list.";
+                label_1.textContent = "Previously selected students, un-check the checkbox to remove students from the list.";
                 label_1.setAttribute("style", "margin-right: 5px; margin-bottom: 5px; font-weight: bold");
                 _this.container.appendChild(label_1);
                 var previousStudentsTable = document.createElement("table");
@@ -126,7 +126,7 @@ var StudentSelector = (function () {
             window.appendChild(buttonContainer);
             _this.createTable(window, students, previoustudents);
             var popupWindow = $("#" + window.id).kendoWindow({
-                width: "670x",
+                width: "690px",
                 height: "705px",
                 modal: true,
                 scrollable: true,

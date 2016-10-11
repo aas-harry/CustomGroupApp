@@ -633,7 +633,7 @@ var StudentSet = (function () {
     }
     Object.defineProperty(StudentSet.prototype, "studentList", {
         get: function () {
-            return Enumerable.From(this.students).Take(5).Select(function (x) { return x.name; }).ToString(",") + (this.students.length > 5 ? " and more..." : "");
+            return Enumerable.From(this.students).Take(4).Select(function (x) { return x.name; }).ToString(",") + (this.students.length > 4 ? " and " + (this.students.length - 4) + " more..." : "");
         },
         enumerable: true,
         configurable: true

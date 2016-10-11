@@ -670,7 +670,8 @@ class StudentSet {
     studentSetId: string;
     students: Array<StudentClass> = [];
     get studentList() {
-        return Enumerable.From(this.students).Take(5).Select(x => x.name).ToString(",") + (this.students.length > 5 ? " and more..." : "");
+        
+        return Enumerable.From(this.students).Take(4).Select(x => x.name).ToString(",") + (this.students.length > 4 ? ` and ${this.students.length - 4} more...` : "");
     }
 }
 
