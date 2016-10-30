@@ -1,7 +1,4 @@
 ﻿/// <autosync enabled="true" />
-/// <reference path="app/entities.js" />
-/// <reference path="app/custom-group.js" />
-/// <reference path="app/CustomGroupBaseViewModel.js" />
 /// <reference path="bootstrap.js" />
 /// <reference path="jquery.jqGrid.js" />
 /// <reference path="jquery-2.2.4.js" />
