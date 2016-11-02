@@ -109,7 +109,7 @@ var CustomGroupViewModel = (function (_super) {
         //
         this.setDatasource = function (test, results, languages) {
             var testInfo = new TestFile();
-            testInfo.set(test, results, languages);
+            testInfo.set(test, null, results, languages);
             _this.isCoedSchool = testInfo.isUnisex;
             _this.studentCount = testInfo.studentCount - _this.leavingStudentsCount;
             _this.studentCountInAllClasses = testInfo.studentCount - _this.leavingStudentsCount;

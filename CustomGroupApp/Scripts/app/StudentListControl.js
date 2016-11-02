@@ -159,9 +159,9 @@ var StudentSelector = (function () {
     return StudentSelector;
 }());
 var StudentListControl = (function () {
-    function StudentListControl(hostElement) {
+    function StudentListControl(elementName) {
         var _this = this;
-        this.hostElement = hostElement;
+        this.elementName = elementName;
         this.commonUtils = new CommonUtils();
         this.self = this;
         this.setColumns = function (isCoedSchool) {
@@ -188,7 +188,7 @@ var StudentListControl = (function () {
             _this.gridControl.setOptions(options);
             return _this.self;
         };
-        this.create = function (name, width, height) {
+        this.create = function (name, studentSelectedCallback, width, height) {
             if (name === void 0) { name = "students"; }
             if (width === void 0) { width = 300; }
             if (height === void 0) { height = 500; }
@@ -206,6 +206,7 @@ var StudentListControl = (function () {
             gridElement.id = name + "-" + _this.commonUtils.createUid() + "-list";
             container.appendChild(gridElement);
             _this.hostElement.appendChild(container);
+            var self = _this;
             $("#" + gridElement.id)
                 .kendoGrid({
                 columns: [
@@ -216,13 +217,30 @@ var StudentListControl = (function () {
                     allowUnsort: true
                 },
                 selectable: "row",
-                dataSource: []
+                dataSource: [],
+                change: function (e) {
+                    var gridControl = e.sender;
+                    var row = gridControl.select().closest("tr");
+                    var studentRow = gridControl.dataItem(row);
+                    var student = Enumerable.From(self.students).FirstOrDefault(null, function (x) { return x.studentId === studentRow.id; });
+                    var tmpCallback = studentSelectedCallback;
+                    if (tmpCallback != null) {
+                        tmpCallback(student);
+                    }
+                },
+                dataBound: function (e) {
+                    var grid = e.sender;
+                    if (grid) {
+                        grid.select("tr:eq(0)");
+                    }
+                }
             });
             _this.gridControl = $("#" + gridElement.id).data("kendoGrid");
             return _this.self;
         };
         this.setDatasource = function (students) {
             // Populate the grid
+            _this.students = students;
             var studentRows = [];
             Enumerable.From(students).ForEach(function (x) { return studentRows.push(new StudentRow(x)); });
             _this.gridControl.dataSource.data(studentRows);
@@ -230,6 +248,7 @@ var StudentListControl = (function () {
             _this.gridControl.resize();
             return _this.self;
         };
+        this.hostElement = document.getElementById(elementName);
     }
     return StudentListControl;
 }());

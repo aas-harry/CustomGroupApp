@@ -191,4 +191,38 @@
       <Column Name="StudentId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
     </Type>
   </Table>
+  <Table Name="dbo.Schools" Member="Schools">
+    <Type Name="School">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="VarChar(64) NOT NULL" CanBeNull="false" />
+      <Column Name="Shortname" Type="System.String" DbType="VarChar(30)" CanBeNull="true" />
+      <Column Name="Address" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="Suburb" Type="System.String" DbType="VarChar(20)" CanBeNull="true" />
+      <Column Name="Pcode" Type="System.String" DbType="VarChar(4)" CanBeNull="true" />
+      <Column Name="Scode" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="State" Type="System.String" DbType="VarChar(3)" CanBeNull="true" />
+      <Column Name="Reportid" Type="System.String" DbType="VarChar(2)" CanBeNull="true" />
+      <Column Name="Email1" Type="System.String" DbType="VarChar(60)" CanBeNull="true" />
+      <Column Name="Email2" Type="System.String" DbType="VarChar(60)" CanBeNull="true" />
+      <Column Name="Email3" Type="System.String" DbType="VarChar(60)" CanBeNull="true" />
+      <Column Name="Email4" Type="System.String" DbType="VarChar(60)" CanBeNull="true" />
+      <Column Name="Coverpage" Type="System.String" DbType="VarChar(60)" CanBeNull="true" />
+      <Column Name="Coverpage2" Type="System.String" DbType="VarChar(60)" CanBeNull="true" />
+      <Column Name="Placement" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Scholarship" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Notes" Type="System.String" DbType="Text" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="Password" Type="System.String" DbType="VarChar(32)" CanBeNull="true" />
+      <Column Name="ScholarshipSchoolId" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="IsActive" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="IsMainSchool" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.SchoolCodes" Member="SchoolCodes">
+    <Type Name="SchoolCode">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="Scode" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="SchoolId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
 </Database>

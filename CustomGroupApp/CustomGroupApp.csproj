@@ -156,6 +156,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\CustomGroupController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\ReportController.cs" />
     <Compile Include="DataService.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -1038,10 +1039,13 @@
     <Content Include="Views\CustomGroup\SaveCustomGroup.cshtml" />
     <Content Include="Views\CustomGroup\CustomGroupListView.cshtml" />
     <Content Include="Views\CustomGroup\PreallocatedClassConfiguration.cshtml" />
+    <Content Include="Views\Report\SchoolStudentRecord.cshtml" />
+    <Content Include="Views\Report\StudentPortolio.cshtml" />
+    <Content Include="Views\Report\StudentPortfolioList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\Reports\" />
+    <Folder Include="Views\StudentPortfolio\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
@@ -1082,6 +1086,10 @@
     <TypeScriptCompile Include="Scripts\app\PreallocatedClassDefinitionViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\repository.ts" />
     <TypeScriptCompile Include="Scripts\app\LanguageClassDefinitionViewModel.ts" />
+    <TypeScriptCompile Include="Scripts\app\ResultHelper.ts" />
+    <TypeScriptCompile Include="Scripts\app\StudentPortfolioListViewModel.ts" />
+    <TypeScriptCompile Include="Scripts\app\StudentPortfolioViewModel.ts" />
+    <TypeScriptCompile Include="Scripts\app\SchoolStudentRecordViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\StepDefinition.ts" />
     <TypeScriptCompile Include="Scripts\app\StudentBandInputContainer.ts" />
     <TypeScriptCompile Include="Scripts\app\StudentClassInputContainer.ts" />

@@ -98,5 +98,14 @@ namespace CustomGroupApp
         {
             return _dataService.Tests.FirstOrDefault(x => x.Testnum == testnum);
         }
+
+        public School GetSchool(int testnum)
+        {
+            return
+            (from t in _dataService.Tests
+                join sc in _dataService.SchoolCodes on t.Scode equals sc.Scode
+                join s in _dataService.Schools on sc.SchoolId equals s.Id
+                select s).FirstOrDefault();
+        }
     }
 }

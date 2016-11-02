@@ -372,7 +372,7 @@
     //
     setDatasource = (test, results, languages) => {
         var testInfo = new TestFile();
-        testInfo.set(test, results, languages);
+        testInfo.set(test, null, results, languages);
         this.isCoedSchool = testInfo.isUnisex;
         this.studentCount = testInfo.studentCount - this.leavingStudentsCount;
 

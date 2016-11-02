@@ -176,12 +176,16 @@ class StudentSelector {
     }
 }
 class StudentListControl {
-    constructor(public hostElement: HTMLTableCellElement) {
+    constructor(public elementName: string) {
+        this.hostElement = document.getElementById(elementName);
     }
+
+    private students: Array<Student>;
     private commonUtils = new CommonUtils();
     private gridControl: kendo.ui.Grid;
     private self = this;
 
+    hostElement: HTMLElement;
     setColumns = (isCoedSchool: boolean): StudentListControl => {
         var columns: { field: string; title: string; width: string; attributes: { class: string } }[];
         if (isCoedSchool) {
@@ -210,6 +214,7 @@ class StudentListControl {
 
     create = (
         name = "students",
+        studentSelectedCallback: (student: Student) => any,
         width = 300,
         height = 500) => {
 
@@ -231,6 +236,8 @@ class StudentListControl {
         container.appendChild(gridElement);
         this.hostElement.appendChild(container);
 
+        var self = this;
+
         $(`#${gridElement.id}`)
             .kendoGrid({
                 columns: [
@@ -241,7 +248,25 @@ class StudentListControl {
                     allowUnsort: true
                 },
                 selectable: "row",
-                dataSource: []
+                dataSource: [],
+                change: e => {
+
+                    var gridControl = e.sender as kendo.ui.Grid;
+                    const row = gridControl.select().closest("tr");
+                    const studentRow = gridControl.dataItem(row) as StudentRow;
+         
+                    var student = Enumerable.From(self.students).FirstOrDefault(null, x => x.studentId === studentRow.id);
+                    const tmpCallback = studentSelectedCallback;
+                    if (tmpCallback != null) {
+                        tmpCallback(student);
+                    }
+                },
+                dataBound(e) {
+                    const grid = e.sender;
+                    if (grid) {
+                        grid.select("tr:eq(0)");
+                    }
+                }
             });
 
         this.gridControl = $(`#${gridElement.id}`).data("kendoGrid");
@@ -250,6 +275,8 @@ class StudentListControl {
 
     setDatasource = (students: Array<Student>): StudentListControl => {
         // Populate the grid
+        this.students = students;
+
         var studentRows: Array<StudentRow> = [];
         Enumerable.From(students).ForEach(x => studentRows.push(new StudentRow(x)));
         this.gridControl.dataSource.data(studentRows);

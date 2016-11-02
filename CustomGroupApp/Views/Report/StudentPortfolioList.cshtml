@@ -1,0 +1,36 @@
+﻿<div id="student-portfolio-list-container">
+    <table>
+        <tr>
+            <td>
+                <div id="student-list-container"></div>
+            </td>
+            <td>
+                <div id="student-report" style="vertical-align: top">
+                    @Html.Partial("SchoolStudentRecord")
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<script>
+
+    var studentPortfolioViewModel;
+    $(document).ready(function () {
+
+        studentPortfolioViewModel = new StudentPortfolioViewModel();
+        studentPortfolioViewModel.setDatasource(testFile);
+
+        var studentListControl = new StudentListControl("student-list-container");
+        studentListControl.create("Students",
+            function(student) {
+                studentPortfolioViewModel.showStudentReport(student);
+                kendo.unbind("#student-report");
+                kendo.bind($("#student-report"), studentPortfolioViewModel);
+            },
+            300, 600);
+
+      
+        studentListControl.setDatasource(testFile.students);
+    });
+</script>

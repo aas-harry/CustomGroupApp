@@ -31,8 +31,10 @@ namespace CustomGroupApp.Controllers
             // var testnum = 10000040;
             var results = _dataService.GetResults(testnum).ToList();
             var test = _dataService.GetTest(testnum);
+            var school = _dataService.GetSchool(testnum);
 
-            return Json(new {Test = test, Results = results});
+
+            return Json(new {Test = test, Results = results, School = school});
         }
 
         [HttpPost]

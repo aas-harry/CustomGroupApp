@@ -56,6 +56,12 @@ class TestFile {
     isCoopSchoolTest: boolean;
     customGroups: Array<ClassDefinition> = [];
 
+    displayTestDate: string;
+
+    get yearLevel(): string {
+        return `${this.grade} / ${this.testYear}`;
+    }
+
     description = () => {
         if (this.fileNumber === 1015049) {
             return this.fileNumber + " " + this.category + " Ravens";
@@ -63,14 +69,22 @@ class TestFile {
         return this.fileNumber + " " + this.category;
     };
 
-    set = (test: any, results: any, languages: any, customGroupSets: any = []) => {
+    set = (test: any, school: any, results: any, languages: any, customGroupSets: any = []) => {
         this.fileNumber = test.Testnum;
         this.grade = test.Grade;
         this.category = test.Category;
-        this.testDate = test.Testdate;
+        this.testDate = new Date(parseInt(test.Testdate.substr(6)));
+        this.testYear = this.testDate.getFullYear();
         this.setStudents(results, languages);
         this.setStudentLanguagePrefs(languages, this.students);
         this.setCustomGroups(customGroupSets, this.students);
+
+        if (school) {
+            this.school.name = school.Name;
+            this.school.id = school.Id;
+            this.school.scode = test.Scode;
+            this.school.isMainSchool = school.IsMainSchool;
+        }
     }
 
     clear = () => {
@@ -180,10 +194,12 @@ class Score {
 
 class Student {
     studentId: number;
+    schoolStudentId: string;
     commonId: number;
     name: string;
     sex: string;
     dob: Date;
+   
     speak: string;
     liveInAus: string;
     ca: number;
@@ -203,13 +219,18 @@ class Student {
     get hasLanguagePrefs(): boolean {
         return this.languagePrefs && this.languagePrefs.length > 0;
     }
+    get hasSchoolStudentId(): boolean {
+        return this.schoolStudentId && this.schoolStudentId !== "";
+    }
 
     constructor(r: any) {
         this.studentId = r.Id;
         this.commonId = r.GlobalStudentId;
+        this.schoolStudentId = r.Student_id;
         this.name = r.Name;
         this.sex = r.Sex;
-        this.dob = r.Dob;
+        this.dob = new Date(parseInt(r.Dob.substr(6)));
+     
         this.speak = r.Speak;
         this.liveInAus = r.Live_in_as;
         this.ca = r.Ca;
@@ -224,6 +245,10 @@ class Student {
         this.raven = new Score(r.Raven, r.Iqs2, r.Tmst, null, new RangeScore(r.Iq12, r.Iq22), null);
 
         this.serialno = r.snow;
+    }
+
+    get dobString(): string {
+        return kendo.toString(this.dob, "d");
     }
 
     overallAbilityScore = (): number => {

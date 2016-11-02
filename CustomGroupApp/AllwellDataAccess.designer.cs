@@ -45,6 +45,12 @@ namespace CustomGroupApp
     partial void InsertGroupSetStudent(GroupSetStudent instance);
     partial void UpdateGroupSetStudent(GroupSetStudent instance);
     partial void DeleteGroupSetStudent(GroupSetStudent instance);
+    partial void InsertSchool(School instance);
+    partial void UpdateSchool(School instance);
+    partial void DeleteSchool(School instance);
+    partial void InsertSchoolCode(SchoolCode instance);
+    partial void UpdateSchoolCode(SchoolCode instance);
+    partial void DeleteSchoolCode(SchoolCode instance);
     #endregion
 		
 		public AllwellDataAccessDataContext() : 
@@ -114,6 +120,22 @@ namespace CustomGroupApp
 			get
 			{
 				return this.GetTable<GroupSetStudent>();
+			}
+		}
+		
+		public System.Data.Linq.Table<School> Schools
+		{
+			get
+			{
+				return this.GetTable<School>();
+			}
+		}
+		
+		public System.Data.Linq.Table<SchoolCode> SchoolCodes
+		{
+			get
+			{
+				return this.GetTable<SchoolCode>();
 			}
 		}
 	}
@@ -4387,6 +4409,706 @@ namespace CustomGroupApp
 					this._StudentId = value;
 					this.SendPropertyChanged("StudentId");
 					this.OnStudentIdChanged();
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Schools")]
+	public partial class School : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _Id;
+		
+		private string _Name;
+		
+		private string _Shortname;
+		
+		private string _Address;
+		
+		private string _Suburb;
+		
+		private string _Pcode;
+		
+		private System.Nullable<int> _Scode;
+		
+		private string _State;
+		
+		private string _Reportid;
+		
+		private string _Email1;
+		
+		private string _Email2;
+		
+		private string _Email3;
+		
+		private string _Email4;
+		
+		private string _Coverpage;
+		
+		private string _Coverpage2;
+		
+		private System.Nullable<int> _Placement;
+		
+		private System.Nullable<int> _Scholarship;
+		
+		private string _Notes;
+		
+		private string _Password;
+		
+		private System.Nullable<int> _ScholarshipSchoolId;
+		
+		private bool _IsActive;
+		
+		private bool _IsMainSchool;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnIdChanging(int value);
+    partial void OnIdChanged();
+    partial void OnNameChanging(string value);
+    partial void OnNameChanged();
+    partial void OnShortnameChanging(string value);
+    partial void OnShortnameChanged();
+    partial void OnAddressChanging(string value);
+    partial void OnAddressChanged();
+    partial void OnSuburbChanging(string value);
+    partial void OnSuburbChanged();
+    partial void OnPcodeChanging(string value);
+    partial void OnPcodeChanged();
+    partial void OnScodeChanging(System.Nullable<int> value);
+    partial void OnScodeChanged();
+    partial void OnStateChanging(string value);
+    partial void OnStateChanged();
+    partial void OnReportidChanging(string value);
+    partial void OnReportidChanged();
+    partial void OnEmail1Changing(string value);
+    partial void OnEmail1Changed();
+    partial void OnEmail2Changing(string value);
+    partial void OnEmail2Changed();
+    partial void OnEmail3Changing(string value);
+    partial void OnEmail3Changed();
+    partial void OnEmail4Changing(string value);
+    partial void OnEmail4Changed();
+    partial void OnCoverpageChanging(string value);
+    partial void OnCoverpageChanged();
+    partial void OnCoverpage2Changing(string value);
+    partial void OnCoverpage2Changed();
+    partial void OnPlacementChanging(System.Nullable<int> value);
+    partial void OnPlacementChanged();
+    partial void OnScholarshipChanging(System.Nullable<int> value);
+    partial void OnScholarshipChanged();
+    partial void OnNotesChanging(string value);
+    partial void OnNotesChanged();
+    partial void OnPasswordChanging(string value);
+    partial void OnPasswordChanged();
+    partial void OnScholarshipSchoolIdChanging(System.Nullable<int> value);
+    partial void OnScholarshipSchoolIdChanged();
+    partial void OnIsActiveChanging(bool value);
+    partial void OnIsActiveChanged();
+    partial void OnIsMainSchoolChanging(bool value);
+    partial void OnIsMainSchoolChanged();
+    #endregion
+		
+		public School()
+		{
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int Id
+		{
+			get
+			{
+				return this._Id;
+			}
+			set
+			{
+				if ((this._Id != value))
+				{
+					this.OnIdChanging(value);
+					this.SendPropertyChanging();
+					this._Id = value;
+					this.SendPropertyChanged("Id");
+					this.OnIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Name", DbType="VarChar(64) NOT NULL", CanBeNull=false)]
+		public string Name
+		{
+			get
+			{
+				return this._Name;
+			}
+			set
+			{
+				if ((this._Name != value))
+				{
+					this.OnNameChanging(value);
+					this.SendPropertyChanging();
+					this._Name = value;
+					this.SendPropertyChanged("Name");
+					this.OnNameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Shortname", DbType="VarChar(30)")]
+		public string Shortname
+		{
+			get
+			{
+				return this._Shortname;
+			}
+			set
+			{
+				if ((this._Shortname != value))
+				{
+					this.OnShortnameChanging(value);
+					this.SendPropertyChanging();
+					this._Shortname = value;
+					this.SendPropertyChanged("Shortname");
+					this.OnShortnameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Address", DbType="VarChar(50)")]
+		public string Address
+		{
+			get
+			{
+				return this._Address;
+			}
+			set
+			{
+				if ((this._Address != value))
+				{
+					this.OnAddressChanging(value);
+					this.SendPropertyChanging();
+					this._Address = value;
+					this.SendPropertyChanged("Address");
+					this.OnAddressChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Suburb", DbType="VarChar(20)")]
+		public string Suburb
+		{
+			get
+			{
+				return this._Suburb;
+			}
+			set
+			{
+				if ((this._Suburb != value))
+				{
+					this.OnSuburbChanging(value);
+					this.SendPropertyChanging();
+					this._Suburb = value;
+					this.SendPropertyChanged("Suburb");
+					this.OnSuburbChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Pcode", DbType="VarChar(4)")]
+		public string Pcode
+		{
+			get
+			{
+				return this._Pcode;
+			}
+			set
+			{
+				if ((this._Pcode != value))
+				{
+					this.OnPcodeChanging(value);
+					this.SendPropertyChanging();
+					this._Pcode = value;
+					this.SendPropertyChanged("Pcode");
+					this.OnPcodeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Scode", DbType="Int")]
+		public System.Nullable<int> Scode
+		{
+			get
+			{
+				return this._Scode;
+			}
+			set
+			{
+				if ((this._Scode != value))
+				{
+					this.OnScodeChanging(value);
+					this.SendPropertyChanging();
+					this._Scode = value;
+					this.SendPropertyChanged("Scode");
+					this.OnScodeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_State", DbType="VarChar(3)")]
+		public string State
+		{
+			get
+			{
+				return this._State;
+			}
+			set
+			{
+				if ((this._State != value))
+				{
+					this.OnStateChanging(value);
+					this.SendPropertyChanging();
+					this._State = value;
+					this.SendPropertyChanged("State");
+					this.OnStateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Reportid", DbType="VarChar(2)")]
+		public string Reportid
+		{
+			get
+			{
+				return this._Reportid;
+			}
+			set
+			{
+				if ((this._Reportid != value))
+				{
+					this.OnReportidChanging(value);
+					this.SendPropertyChanging();
+					this._Reportid = value;
+					this.SendPropertyChanged("Reportid");
+					this.OnReportidChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Email1", DbType="VarChar(60)")]
+		public string Email1
+		{
+			get
+			{
+				return this._Email1;
+			}
+			set
+			{
+				if ((this._Email1 != value))
+				{
+					this.OnEmail1Changing(value);
+					this.SendPropertyChanging();
+					this._Email1 = value;
+					this.SendPropertyChanged("Email1");
+					this.OnEmail1Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Email2", DbType="VarChar(60)")]
+		public string Email2
+		{
+			get
+			{
+				return this._Email2;
+			}
+			set
+			{
+				if ((this._Email2 != value))
+				{
+					this.OnEmail2Changing(value);
+					this.SendPropertyChanging();
+					this._Email2 = value;
+					this.SendPropertyChanged("Email2");
+					this.OnEmail2Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Email3", DbType="VarChar(60)")]
+		public string Email3
+		{
+			get
+			{
+				return this._Email3;
+			}
+			set
+			{
+				if ((this._Email3 != value))
+				{
+					this.OnEmail3Changing(value);
+					this.SendPropertyChanging();
+					this._Email3 = value;
+					this.SendPropertyChanged("Email3");
+					this.OnEmail3Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Email4", DbType="VarChar(60)")]
+		public string Email4
+		{
+			get
+			{
+				return this._Email4;
+			}
+			set
+			{
+				if ((this._Email4 != value))
+				{
+					this.OnEmail4Changing(value);
+					this.SendPropertyChanging();
+					this._Email4 = value;
+					this.SendPropertyChanged("Email4");
+					this.OnEmail4Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Coverpage", DbType="VarChar(60)")]
+		public string Coverpage
+		{
+			get
+			{
+				return this._Coverpage;
+			}
+			set
+			{
+				if ((this._Coverpage != value))
+				{
+					this.OnCoverpageChanging(value);
+					this.SendPropertyChanging();
+					this._Coverpage = value;
+					this.SendPropertyChanged("Coverpage");
+					this.OnCoverpageChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Coverpage2", DbType="VarChar(60)")]
+		public string Coverpage2
+		{
+			get
+			{
+				return this._Coverpage2;
+			}
+			set
+			{
+				if ((this._Coverpage2 != value))
+				{
+					this.OnCoverpage2Changing(value);
+					this.SendPropertyChanging();
+					this._Coverpage2 = value;
+					this.SendPropertyChanged("Coverpage2");
+					this.OnCoverpage2Changed();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Placement", DbType="Int")]
+		public System.Nullable<int> Placement
+		{
+			get
+			{
+				return this._Placement;
+			}
+			set
+			{
+				if ((this._Placement != value))
+				{
+					this.OnPlacementChanging(value);
+					this.SendPropertyChanging();
+					this._Placement = value;
+					this.SendPropertyChanged("Placement");
+					this.OnPlacementChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Scholarship", DbType="Int")]
+		public System.Nullable<int> Scholarship
+		{
+			get
+			{
+				return this._Scholarship;
+			}
+			set
+			{
+				if ((this._Scholarship != value))
+				{
+					this.OnScholarshipChanging(value);
+					this.SendPropertyChanging();
+					this._Scholarship = value;
+					this.SendPropertyChanged("Scholarship");
+					this.OnScholarshipChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Notes", DbType="Text", UpdateCheck=UpdateCheck.Never)]
+		public string Notes
+		{
+			get
+			{
+				return this._Notes;
+			}
+			set
+			{
+				if ((this._Notes != value))
+				{
+					this.OnNotesChanging(value);
+					this.SendPropertyChanging();
+					this._Notes = value;
+					this.SendPropertyChanged("Notes");
+					this.OnNotesChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Password", DbType="VarChar(32)")]
+		public string Password
+		{
+			get
+			{
+				return this._Password;
+			}
+			set
+			{
+				if ((this._Password != value))
+				{
+					this.OnPasswordChanging(value);
+					this.SendPropertyChanging();
+					this._Password = value;
+					this.SendPropertyChanged("Password");
+					this.OnPasswordChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ScholarshipSchoolId", DbType="Int")]
+		public System.Nullable<int> ScholarshipSchoolId
+		{
+			get
+			{
+				return this._ScholarshipSchoolId;
+			}
+			set
+			{
+				if ((this._ScholarshipSchoolId != value))
+				{
+					this.OnScholarshipSchoolIdChanging(value);
+					this.SendPropertyChanging();
+					this._ScholarshipSchoolId = value;
+					this.SendPropertyChanged("ScholarshipSchoolId");
+					this.OnScholarshipSchoolIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IsActive", DbType="Bit NOT NULL")]
+		public bool IsActive
+		{
+			get
+			{
+				return this._IsActive;
+			}
+			set
+			{
+				if ((this._IsActive != value))
+				{
+					this.OnIsActiveChanging(value);
+					this.SendPropertyChanging();
+					this._IsActive = value;
+					this.SendPropertyChanged("IsActive");
+					this.OnIsActiveChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IsMainSchool", DbType="Bit NOT NULL")]
+		public bool IsMainSchool
+		{
+			get
+			{
+				return this._IsMainSchool;
+			}
+			set
+			{
+				if ((this._IsMainSchool != value))
+				{
+					this.OnIsMainSchoolChanging(value);
+					this.SendPropertyChanging();
+					this._IsMainSchool = value;
+					this.SendPropertyChanged("IsMainSchool");
+					this.OnIsMainSchoolChanged();
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.SchoolCodes")]
+	public partial class SchoolCode : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _Id;
+		
+		private string _Name;
+		
+		private int _Scode;
+		
+		private int _SchoolId;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnIdChanging(int value);
+    partial void OnIdChanged();
+    partial void OnNameChanging(string value);
+    partial void OnNameChanged();
+    partial void OnScodeChanging(int value);
+    partial void OnScodeChanged();
+    partial void OnSchoolIdChanging(int value);
+    partial void OnSchoolIdChanged();
+    #endregion
+		
+		public SchoolCode()
+		{
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int Id
+		{
+			get
+			{
+				return this._Id;
+			}
+			set
+			{
+				if ((this._Id != value))
+				{
+					this.OnIdChanging(value);
+					this.SendPropertyChanging();
+					this._Id = value;
+					this.SendPropertyChanged("Id");
+					this.OnIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Name", DbType="VarChar(50) NOT NULL", CanBeNull=false)]
+		public string Name
+		{
+			get
+			{
+				return this._Name;
+			}
+			set
+			{
+				if ((this._Name != value))
+				{
+					this.OnNameChanging(value);
+					this.SendPropertyChanging();
+					this._Name = value;
+					this.SendPropertyChanged("Name");
+					this.OnNameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Scode", DbType="Int NOT NULL")]
+		public int Scode
+		{
+			get
+			{
+				return this._Scode;
+			}
+			set
+			{
+				if ((this._Scode != value))
+				{
+					this.OnScodeChanging(value);
+					this.SendPropertyChanging();
+					this._Scode = value;
+					this.SendPropertyChanged("Scode");
+					this.OnScodeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SchoolId", DbType="Int NOT NULL")]
+		public int SchoolId
+		{
+			get
+			{
+				return this._SchoolId;
+			}
+			set
+			{
+				if ((this._SchoolId != value))
+				{
+					this.OnSchoolIdChanging(value);
+					this.SendPropertyChanging();
+					this._SchoolId = value;
+					this.SendPropertyChanged("SchoolId");
+					this.OnSchoolIdChanged();
 				}
 			}
 		}

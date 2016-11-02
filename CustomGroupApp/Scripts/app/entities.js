@@ -49,15 +49,22 @@ var TestFile = (function () {
             }
             return _this.fileNumber + " " + _this.category;
         };
-        this.set = function (test, results, languages, customGroupSets) {
+        this.set = function (test, school, results, languages, customGroupSets) {
             if (customGroupSets === void 0) { customGroupSets = []; }
             _this.fileNumber = test.Testnum;
             _this.grade = test.Grade;
             _this.category = test.Category;
-            _this.testDate = test.Testdate;
+            _this.testDate = new Date(parseInt(test.Testdate.substr(6)));
+            _this.testYear = _this.testDate.getFullYear();
             _this.setStudents(results, languages);
             _this.setStudentLanguagePrefs(languages, _this.students);
             _this.setCustomGroups(customGroupSets, _this.students);
+            if (school) {
+                _this.school.name = school.Name;
+                _this.school.id = school.Id;
+                _this.school.scode = test.Scode;
+                _this.school.isMainSchool = school.IsMainSchool;
+            }
         };
         this.clear = function () {
             _this.fileNumber = undefined;
@@ -145,6 +152,13 @@ var TestFile = (function () {
             _this.isUnisex = _this.hasGirls && _this.hasBoys;
         };
     }
+    Object.defineProperty(TestFile.prototype, "yearLevel", {
+        get: function () {
+            return this.grade + " / " + this.testYear;
+        },
+        enumerable: true,
+        configurable: true
+    });
     return TestFile;
 }());
 var RangeScore = (function () {
@@ -193,9 +207,10 @@ var Student = (function () {
         };
         this.studentId = r.Id;
         this.commonId = r.GlobalStudentId;
+        this.schoolStudentId = r.Student_id;
         this.name = r.Name;
         this.sex = r.Sex;
-        this.dob = r.Dob;
+        this.dob = new Date(parseInt(r.Dob.substr(6)));
         this.speak = r.Speak;
         this.liveInAus = r.Live_in_as;
         this.ca = r.Ca;
@@ -212,6 +227,20 @@ var Student = (function () {
     Object.defineProperty(Student.prototype, "hasLanguagePrefs", {
         get: function () {
             return this.languagePrefs && this.languagePrefs.length > 0;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Student.prototype, "hasSchoolStudentId", {
+        get: function () {
+            return this.schoolStudentId && this.schoolStudentId !== "";
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Student.prototype, "dobString", {
+        get: function () {
+            return kendo.toString(this.dob, "d");
         },
         enumerable: true,
         configurable: true

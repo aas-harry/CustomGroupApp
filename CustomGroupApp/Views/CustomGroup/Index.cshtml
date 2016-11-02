@@ -12,17 +12,16 @@
         <div class="row">
             <input id="test-number" style="width: 280px; margin-right: 5px; margin-left: 10px">
             <button class="btn btn-default" onClick="getResults()">Get</button>
-            <button class="btn btn-default" onClick="createSchoolStudentRecord()">School Student Record</button>
+            <button class="btn btn-default" onClick="openStudentPortfolioList()">Student Portfolios</button>
+            <div id="message-text"></div>
         </div>
         
-        <div id="student-list-container" class="pull-left"></div>
+     
     </div>
 </div>
 <script>
     var testFile = new TestFile();
-    var studentListControl = new StudentListControl(document.getElementById("student-list-container"));
-    studentListControl.create("Students");
-
+   
     $(document)
         .ready(function() {
             $("#test-number")
@@ -47,11 +46,11 @@
             type: 'POST',
             cache: false,
             success: function (data) {
-                debugger;
+                
                 testFile.clear();
-                testFile.set(data.Test, data.Results);
-
-                studentListControl.setDatasource(testFile.students);
+                testFile.set(data.Test, data.School, data.Results);
+                $("#message-text").replaceWith("Rows: " + data.Results.length);
+             
             },
             fail: function(data) {
 
@@ -59,4 +58,20 @@
         });
     }
     
+    function openStudentPortfolioList() {
+        $.ajax({
+            url: '@Url.Action("StudentPortfolioView", "Report")',
+            type: 'POST',
+            cache: false,
+            success: function (html) {
+                $("#content").replaceWith(html);
+
+
+            },
+            fail: function (data) {
+
+            }
+        });
+    }
+
 </script>
