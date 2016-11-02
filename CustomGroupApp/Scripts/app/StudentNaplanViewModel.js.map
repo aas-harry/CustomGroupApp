@@ -1,0 +1,1 @@
+{"version":3,"file":"StudentNaplanViewModel.js","sourceRoot":"","sources":["StudentNaplanViewModel.ts"],"names":[],"mappings":";;;;;AAAA;IAAqC,0CAAgB;IAEjD,gCAAY,WAAmB;QAC3B,kBAAM,WAAW,CAAC,CAAC;QAOvB,4BAAuB,GAAG,UAAC,OAAgB;QAC3C,CAAC,CAAA;QANG,IAAI,CAAC,OAAO,GAAG,mBAAmB,CAAC;QACnC,IAAI,CAAC,UAAU,GAAG,uBAAuB,CAAC;IAE9C,CAAC;IAIL,6BAAC;AAAD,CAAC,AAZD,CAAqC,gBAAgB,GAYpD"}

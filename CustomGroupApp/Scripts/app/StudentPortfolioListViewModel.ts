@@ -1,10 +1,11 @@
 ﻿class StudentPortfolioListViewModel extends kendo.data.ObservableObject {
     constructor() {
         super();
-
+        
         this.studentPortfolioViewModel = new StudentPortfolioViewModel("student-portfolio-details");
     }
 
+    
     studentPortfolioViewModel: StudentPortfolioViewModel;
     private testFile: TestFile;
 

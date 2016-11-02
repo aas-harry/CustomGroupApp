@@ -1042,6 +1042,7 @@
     <Content Include="Views\Report\SchoolStudentRecord.cshtml" />
     <Content Include="Views\Report\StudentPortolio.cshtml" />
     <Content Include="Views\Report\StudentPortfolioList.cshtml" />
+    <Content Include="Views\Report\StudentNaplanReport.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1082,11 +1083,13 @@
     <TypeScriptCompile Include="Scripts\app\CustomGroupViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\entities.ts" />
     <TypeScriptCompile Include="Scripts\app\IndividualStudentTestResult.ts" />
+    <TypeScriptCompile Include="Scripts\app\IStudentPortfolio.ts" />
     <TypeScriptCompile Include="Scripts\app\KendoHelper.ts" />
     <TypeScriptCompile Include="Scripts\app\PreallocatedClassDefinitionViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\repository.ts" />
     <TypeScriptCompile Include="Scripts\app\LanguageClassDefinitionViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\ResultHelper.ts" />
+    <TypeScriptCompile Include="Scripts\app\StudentNaplanViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\StudentPortfolioListViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\StudentPortfolioViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\SchoolStudentRecordViewModel.ts" />

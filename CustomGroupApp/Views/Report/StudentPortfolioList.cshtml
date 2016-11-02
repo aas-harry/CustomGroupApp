@@ -5,8 +5,13 @@
                 <div id="student-list-container"></div>
             </td>
             <td>
+                <div>
+                    <button class="btn btn-default" onClick="schoolStudentRecord()">School Student Record</button>
+                    <button class="btn btn-default" onClick="studentNaplanReport()">Student Naplan</button>
+                </div>
+
                 <div id="student-report" style="vertical-align: top">
-                    @Html.Partial("SchoolStudentRecord")
+                    <p>Select a report</p>
                 </div>
             </td>
         </tr>
@@ -17,20 +22,26 @@
 
     var studentPortfolioViewModel;
     $(document).ready(function () {
-
-        studentPortfolioViewModel = new StudentPortfolioViewModel();
-        studentPortfolioViewModel.setDatasource(testFile);
-
         var studentListControl = new StudentListControl("student-list-container");
         studentListControl.create("Students",
-            function(student) {
+            function (student) {
                 studentPortfolioViewModel.showStudentReport(student);
-                kendo.unbind("#student-report");
-                kendo.bind($("#student-report"), studentPortfolioViewModel);
+
             },
             300, 600);
 
-      
+        studentPortfolioViewModel = new StudentPortfolioViewModel();
+        studentPortfolioViewModel.setDatasource(testFile);
         studentListControl.setDatasource(testFile.students);
+
     });
+
+    function schoolStudentRecord() {
+        studentPortfolioViewModel.setReport(studentPortfolioViewModel.studentReports[0]);
+    }
+
+    function studentNaplanReport() {
+       
+        studentPortfolioViewModel.setReport(studentPortfolioViewModel.studentReports[1]);
+    }
 </script>

@@ -1,48 +1,20 @@
-﻿<div id="school-student-record-container" style="overflow: auto;">
-    <div id="school-student-details" style="overflow: hidden; width: 850px;">
+﻿<div id="student-naplan-container" style="overflow: auto;">
+    <div id="student-naplan-details" style="overflow: hidden; width: 850px;">
    
         <table style="margin-left: 20px">
             <tr>
                 <td colspan="2">
                     <div style="text-align: center; font-size: 14px; font-weight: bold">
-                        School Student Record
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="2">
-                    <div style="text-align: center;">
-                        (for school use only)
+                        Student Naplan Report
                     </div>
                 </td>
             </tr>
             <tr>
                 <td colspan="2">
                     <div style="font-size: 14px; font-weight: bold">
-                        <span data-bind="text: schoolName"></span>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="2">
-                    <div style="margin-top: 20px; margin-bottom: 10px; font-size: 14px; font-weight: bold; text-align: left">
                         <span data-bind="text: name"></span>
                     </div>
                 </td>
-            </tr>
-            <tr>
-                <td style="width: 300px" id="student-personal-details">
-                    <div>
-                        <div> Year Level: <span data-bind="text: yearLevel"></span></div>
-                        <div>D.O.B: <span data-bind="text: dob"></span></div>
-                        <div>Age: <span data-bind="text: age"></span></div>
-                        <div>Born in Australia: <span data-bind="text: bornInAus"></span> </div>
-                        <div>Time in Australia: <span data-bind="text: timeInAus"></span> </div>
-                        <div>2nd Language: <span data-bind="text: secondLanguage"></span> </div>
-                        <div data-bind="visible: hasSchoolStudentId"> Student ID: <span data-bind="text: schoolStudentId"></span> </div>
-                    </div>
-                </td>
-                <td style="width: 500px" id="student-raw-scores-container"></td>
             </tr>
             <tr>
                 <td colspan="2" style="width: 800px" id="student-scaled-scores-container"></td>

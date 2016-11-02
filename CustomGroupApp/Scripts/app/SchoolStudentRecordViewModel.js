@@ -7,32 +7,14 @@ var SchoolStudentRecordViewModel = (function (_super) {
     __extends(SchoolStudentRecordViewModel, _super);
     function SchoolStudentRecordViewModel(elementName) {
         var _this = this;
-        _super.call(this);
-        // ReSharper restore InconsistentNaming
-        this.setDatasource = function (testFile) {
-            _this.testFile = testFile;
+        _super.call(this, elementName);
+        this.setAdditionalProperties = function (student) {
+            _this.set("bornInAus", student.liveInAus);
+            _this.set("secondLanguage", student.speak);
         };
-        this.updateStudentPersonalDetails = function () {
-        };
-        this.elementName = elementName;
+        this.urlLink = "SchoolStudentRecordView";
+        this.reportName = "School Student Record";
     }
-    SchoolStudentRecordViewModel.prototype.setStudent = function (student) {
-        if (!student) {
-            return;
-        }
-        if (this.student && student.studentId === this.student.studentId) {
-            return;
-        }
-        this.student = student;
-        this.set("name", student.name);
-        this.set("dob", student.dobString);
-        this.set("age", student.ca);
-        this.set("bornInAus", student.liveInAus);
-        this.set("secondLanguage", student.speak);
-        this.set("hasSchoolStudentId", student.hasSchoolStudentId);
-        this.set("yearLevel", this.testFile.yearLevel);
-        this.set("schoolName", this.testFile.school.name);
-    };
     return SchoolStudentRecordViewModel;
-}(kendo.data.ObservableObject));
+}(StudentPortfolio));
 //# sourceMappingURL=SchoolStudentRecordViewModel.js.map
