@@ -229,11 +229,26 @@ var KendoHelper = (function () {
             numericTextBox.min(min);
             return numericTextBox;
         };
+        this.createKendoButton = function (elementName, clickCallback, margin) {
+            if (margin === void 0) { margin = "margin: 5px;"; }
+            $("#" + elementName)
+                .kendoButton({
+                click: function (e) {
+                    var tmpCallback = clickCallback;
+                    if (tmpCallback) {
+                        tmpCallback(e);
+                    }
+                }
+            });
+            var kendoButton = $("#" + elementName).data("kendoButton");
+            return kendoButton;
+        };
         this.createButton = function (caption, size, type, margin) {
             if (size === void 0) { size = "btn"; }
             if (type === void 0) { type = "btn-default"; }
             if (margin === void 0) { margin = "margin: 5px;"; }
             var button = document.createElement("button");
+            button.id = createUuid();
             button.textContent = caption;
             button.setAttribute("class", size + " " + type);
             button.setAttribute("style", "" + margin);

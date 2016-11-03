@@ -2,16 +2,18 @@
     <table>
         <tr>
             <td>
-                <div id="student-list-container"></div>
+                <span id="student-list-container"></span>
+                <button class="btn btn-default" onClick="schoolStudentRecord()">School Student Record</button>
+                <button class="btn btn-default" onClick="studentNaplanReport()">Student Naplan</button>
             </td>
+        </tr>
+        <tr>
             <td>
                 <div>
-                    <button class="btn btn-default" onClick="schoolStudentRecord()">School Student Record</button>
-                    <button class="btn btn-default" onClick="studentNaplanReport()">Student Naplan</button>
                 </div>
 
                 <div id="student-report" style="vertical-align: top">
-                    <p>Select a report</p>
+                    <p>Select a report..</p>
                 </div>
             </td>
         </tr>
@@ -22,8 +24,8 @@
 
     var studentPortfolioViewModel;
     $(document).ready(function () {
-        var studentListControl = new StudentListControl("student-list-container");
-        studentListControl.create("Students",
+        var studentNavigationControl = new StudentNavigationControl("student-list-container");
+        studentNavigationControl.create("Students",
             function (student) {
                 studentPortfolioViewModel.showStudentReport(student);
 
@@ -32,7 +34,7 @@
 
         studentPortfolioViewModel = new StudentPortfolioViewModel();
         studentPortfolioViewModel.setDatasource(testFile);
-        studentListControl.setDatasource(testFile.students);
+        studentNavigationControl.setDatasource(testFile.students);
 
     });
 

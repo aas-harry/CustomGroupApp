@@ -124,7 +124,7 @@ var TestFile = (function () {
             _this.hasBoys = false;
             var hasStudentLangPrefs = langPrefs && langPrefs.length > 0;
             var enumerable = Enumerable.From(langPrefs);
-            data.forEach(function (s) {
+            Enumerable.From(data).OrderBy(function (x) { return x.Name; }).ForEach(function (s) {
                 var student = new Student(s);
                 _this.students.push(student);
                 if (!_this.hasBoys && s.Sex === "M") {

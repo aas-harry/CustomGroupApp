@@ -325,13 +325,30 @@
             return numericTextBox;
         };
 
-    createButton = (caption: string, size ="btn", type = "btn-default", margin = "margin: 5px;"): HTMLButtonElement => {
+    createKendoButton = (elementName: string, clickCallback: (e: any) => any, margin = "margin: 5px;"): kendo.ui.Button => {
+        $(`#${elementName}`)
+            .kendoButton({
+                click: (e) => {
+                    const tmpCallback = clickCallback;
+                    if (tmpCallback) {
+                        tmpCallback(e);
+                    }
+                }
+            });
+
+        const kendoButton = $(`#${elementName}`).data("kendoButton");
+        return kendoButton;
+    }
+
+    createButton = (caption: string, size = "btn", type = "btn-default", margin = "margin: 5px;"): HTMLButtonElement => {
         const button = document.createElement("button");
+        button.id = createUuid();
         button.textContent = caption;
         button.setAttribute("class", `${size} ${type}`);
         button.setAttribute("style", `${margin}`);
         return button;
     }
+
 
     createUuid = () => {
         const s = [];

@@ -148,7 +148,7 @@ class TestFile {
         var hasStudentLangPrefs = langPrefs && langPrefs.length > 0;
         var enumerable = Enumerable.From(langPrefs);
 
-        data.forEach((s: any) => {
+        Enumerable.From(data).OrderBy(x=>x.Name).ForEach((s: any) => {
             const student = new Student(s);
             this.students.push(student);
             if (! this.hasBoys && s.Sex === "M") {
