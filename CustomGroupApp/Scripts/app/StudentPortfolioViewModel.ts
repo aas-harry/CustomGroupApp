@@ -5,12 +5,13 @@
         this.registerReports();
         this.selectedReportViewModel = this.studentReports[0];
     }
-
+    private kendoHelper = new KendoHelper();
     private registerReports = () => {
         this.studentReports.push(new SchoolStudentRecordViewModel("school-student-record"));
         this.studentReports.push(new StudentNaplanViewModel("student-naplan-report"));
     }
 
+    private reportControls: kendo.ui.DropDownList;
     private selectedReportViewModel: IStudentPortfolio;
     studentReports = new Array<IStudentPortfolio>();
     private student: Student;
@@ -24,6 +25,27 @@
             report.setDatasource(testFile);
         }
     }
+
+    createReportList = (element: string) => {
+        $(`#${element}`)
+            .kendoDropDownList({
+                dataSource: this.studentReports,
+                dataTextField: "reportName",
+                change: (e: kendo.ui.DropDownListChangeEvent) => {
+                    const control = e.sender as kendo.ui.DropDownList;
+                    const report = control.dataItem() as IStudentPortfolio;
+                    if (report) {
+                        this.setReport(report);
+                    }
+                }
+            } as kendo.ui.DropDownListOptions);
+
+        this.reportControls = $(`#${element}`).data("kendoDropDownList");
+
+        this.reportControls.trigger("change");
+    }
+
+    
 
     setReport = (reportViewModel: IStudentPortfolio) => {
         var self = this;

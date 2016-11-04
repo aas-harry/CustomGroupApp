@@ -3,8 +3,7 @@
         <tr>
             <td>
                 <span id="student-list-container"></span>
-                <button class="btn btn-default" onClick="schoolStudentRecord()">School Student Record</button>
-                <button class="btn btn-default" onClick="studentNaplanReport()">Student Naplan</button>
+                <span style="margin-left: 5px; width: 200px" id="report-list-container"></span>
             </td>
         </tr>
         <tr>
@@ -33,17 +32,11 @@
             300, 600);
 
         studentPortfolioViewModel = new StudentPortfolioViewModel();
+        studentPortfolioViewModel.createReportList("report-list-container");
         studentPortfolioViewModel.setDatasource(testFile);
         studentNavigationControl.setDatasource(testFile.students);
 
     });
 
-    function schoolStudentRecord() {
-        studentPortfolioViewModel.setReport(studentPortfolioViewModel.studentReports[0]);
-    }
-
-    function studentNaplanReport() {
-       
-        studentPortfolioViewModel.setReport(studentPortfolioViewModel.studentReports[1]);
-    }
+ 
 </script>

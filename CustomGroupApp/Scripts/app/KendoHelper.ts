@@ -325,18 +325,43 @@
             return numericTextBox;
         };
 
-    createKendoButton = (elementName: string, clickCallback: (e: any) => any, margin = "margin: 5px;"): kendo.ui.Button => {
-        $(`#${elementName}`)
+    createDropDownList = (element: string, dataSource: { displayField: string, valueField: any },
+        dataTextField: string, dataValueField: string,
+        changeCallback: (e: any) => any): kendo.ui.DropDownList => {
+        $(`#${element}`)
+            .kendoDropDownList({
+                dataSource: dataSource,
+                dataTextField: dataTextField,
+                dataValueField: dataValueField,
+                change: (e: kendo.ui.DropDownListChangeEvent) => {
+                    const tmpCallback = changeCallback;
+                    if (tmpCallback) {
+                        const control = e.sender as kendo.ui.DropDownList;
+
+                        tmpCallback(control.value());
+                    }
+                }
+            } as kendo.ui.DropDownListOptions);
+
+        const dropdownList = $(`#${element}`).data("kendoDropDownList");
+
+        return dropdownList;
+    }
+
+    createKendoButton = (element: string, clickCallback: (e: any) => any, icon: string = null): kendo.ui.Button => {
+        $(`#${element}`)
             .kendoButton({
-                click: (e) => {
+                icon: icon,
+                click: (e: kendo.ui.ButtonClickEvent) => {
                     const tmpCallback = clickCallback;
                     if (tmpCallback) {
                         tmpCallback(e);
                     }
                 }
-            });
+            } as kendo.ui.ButtonOptions);
 
-        const kendoButton = $(`#${elementName}`).data("kendoButton");
+        const kendoButton = $(`#${element}`).data("kendoButton");
+    
         return kendoButton;
     }
 

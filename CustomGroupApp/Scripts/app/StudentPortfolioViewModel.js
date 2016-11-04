@@ -8,6 +8,7 @@ var StudentPortfolioViewModel = (function (_super) {
     function StudentPortfolioViewModel(elementName) {
         var _this = this;
         _super.call(this);
+        this.kendoHelper = new KendoHelper();
         this.registerReports = function () {
             _this.studentReports.push(new SchoolStudentRecordViewModel("school-student-record"));
             _this.studentReports.push(new StudentNaplanViewModel("student-naplan-report"));
@@ -19,6 +20,22 @@ var StudentPortfolioViewModel = (function (_super) {
                 var report = _a[_i];
                 report.setDatasource(testFile);
             }
+        };
+        this.createReportList = function (element) {
+            $("#" + element)
+                .kendoDropDownList({
+                dataSource: _this.studentReports,
+                dataTextField: "reportName",
+                change: function (e) {
+                    var control = e.sender;
+                    var report = control.dataItem();
+                    if (report) {
+                        _this.setReport(report);
+                    }
+                }
+            });
+            _this.reportControls = $("#" + element).data("kendoDropDownList");
+            _this.reportControls.trigger("change");
         };
         this.setReport = function (reportViewModel) {
             var self = _this;

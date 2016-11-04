@@ -229,10 +229,28 @@ var KendoHelper = (function () {
             numericTextBox.min(min);
             return numericTextBox;
         };
-        this.createKendoButton = function (elementName, clickCallback, margin) {
-            if (margin === void 0) { margin = "margin: 5px;"; }
-            $("#" + elementName)
+        this.createDropDownList = function (element, dataSource, dataTextField, dataValueField, changeCallback) {
+            $("#" + element)
+                .kendoDropDownList({
+                dataSource: dataSource,
+                dataTextField: dataTextField,
+                dataValueField: dataValueField,
+                change: function (e) {
+                    var tmpCallback = changeCallback;
+                    if (tmpCallback) {
+                        var control = e.sender;
+                        tmpCallback(control.value());
+                    }
+                }
+            });
+            var dropdownList = $("#" + element).data("kendoDropDownList");
+            return dropdownList;
+        };
+        this.createKendoButton = function (element, clickCallback, icon) {
+            if (icon === void 0) { icon = null; }
+            $("#" + element)
                 .kendoButton({
+                icon: icon,
                 click: function (e) {
                     var tmpCallback = clickCallback;
                     if (tmpCallback) {
@@ -240,7 +258,7 @@ var KendoHelper = (function () {
                     }
                 }
             });
-            var kendoButton = $("#" + elementName).data("kendoButton");
+            var kendoButton = $("#" + element).data("kendoButton");
             return kendoButton;
         };
         this.createButton = function (caption, size, type, margin) {

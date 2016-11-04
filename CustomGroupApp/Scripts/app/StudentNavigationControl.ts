@@ -11,6 +11,7 @@
     private nextButton : kendo.ui.Button;
     hostElement: HTMLElement;
     comboBoxControl: kendo.ui.ComboBox;
+
     studentSelectedCallback: (student: Student) => any;
    
 
@@ -36,17 +37,25 @@
         comboBoxElement.setAttribute("style", "width: 300px;");
         comboBoxElement.id = `${name}-${this.commonUtils.createUid()}-list`;
 
-        const prevButton = this.kendoHelper.createButton("Previous");
-        const nextButton = this.kendoHelper.createButton("Next");
+     
+        const prevButton = document.createElement("div") as HTMLDivElement;
+        prevButton.setAttribute("style", "margin-left: 2px; margin-right: 2px");
+        prevButton.id = "buttonPrev";
+        prevButton.textContent = "Previous";
+        const nextButton = document.createElement("div") as HTMLDivElement;
+        nextButton.setAttribute("style", "margin-left: 2px; margin-right: 2px");
+        nextButton.id = "buttonNext";
+        nextButton.textContent = "Next";
         
-        this.prevButton = this.kendoHelper.createKendoButton(prevButton.id, this.showPreviousStudent);
-        this.nextButton = this.kendoHelper.createKendoButton(nextButton.id, this.showNextStudent);
-  
-
+       
     //    container.appendChild(comboBoxElement);
         this.hostElement.appendChild(prevButton);
-        this.hostElement.appendChild(comboBoxElement);
+        this.hostElement.appendChild(comboBoxElement);  
         this.hostElement.appendChild(nextButton);
+
+        this.prevButton = this.kendoHelper.createKendoButton(prevButton.id, this.showPreviousStudent,"arrow-w");
+        this.nextButton = this.kendoHelper.createKendoButton(nextButton.id, this.showNextStudent, "arrow-e");
+        this.prevButton.enable(false);
 
 
         $(`#${comboBoxElement.id}`)

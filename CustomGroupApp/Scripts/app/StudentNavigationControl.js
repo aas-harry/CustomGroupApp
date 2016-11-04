@@ -21,14 +21,21 @@ var StudentNavigationControl = (function () {
             var comboBoxElement = document.createElement("div");
             comboBoxElement.setAttribute("style", "width: 300px;");
             comboBoxElement.id = name + "-" + _this.commonUtils.createUid() + "-list";
-            var prevButton = _this.kendoHelper.createButton("Previous");
-            var nextButton = _this.kendoHelper.createButton("Next");
-            _this.prevButton = _this.kendoHelper.createKendoButton(prevButton.id, _this.showPreviousStudent);
-            _this.nextButton = _this.kendoHelper.createKendoButton(nextButton.id, _this.showNextStudent);
+            var prevButton = document.createElement("div");
+            prevButton.setAttribute("style", "margin-left: 2px; margin-right: 2px");
+            prevButton.id = "buttonPrev";
+            prevButton.textContent = "Previous";
+            var nextButton = document.createElement("div");
+            nextButton.setAttribute("style", "margin-left: 2px; margin-right: 2px");
+            nextButton.id = "buttonNext";
+            nextButton.textContent = "Next";
             //    container.appendChild(comboBoxElement);
             _this.hostElement.appendChild(prevButton);
             _this.hostElement.appendChild(comboBoxElement);
             _this.hostElement.appendChild(nextButton);
+            _this.prevButton = _this.kendoHelper.createKendoButton(prevButton.id, _this.showPreviousStudent, "arrow-w");
+            _this.nextButton = _this.kendoHelper.createKendoButton(nextButton.id, _this.showNextStudent, "arrow-e");
+            _this.prevButton.enable(false);
             $("#" + comboBoxElement.id)
                 .kendoComboBox({
                 options: {},
