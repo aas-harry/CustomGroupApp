@@ -13,9 +13,9 @@ var CustomGroupListViewModel = (function (_super) {
             var myself = _this;
             $.ajax({
                 type: "POST",
-                url: "CustomGroup\\CustomGroupWizard",
+                url: "CustomGroup\\SplitCustomGroupView",
+                data: { testnum: _this.selectedClass.groupSetid },
                 contentType: "application/json",
-                data: JSON.stringify({ 'testNumber': 101481 }),
                 success: function (html) {
                     var content = document.createElement("div");
                     content.id = "custom-group-container";
@@ -33,7 +33,7 @@ var CustomGroupListViewModel = (function (_super) {
         this.delete = function () {
         };
         this.showMenuPanel = function () {
-            _this.customGroupListControl.create(_this.menuPanelElement, _this.testInfo.customGroups, 800);
+            _this.customGroupListControl.create(_this.menuPanelElement, _this.testInfo.customGroups, function (classDefn) { _this.selectedClass = classDefn; }, 800);
         };
         this.setDatasource = function (testFile) {
             _this.testInfo = testFile;
@@ -42,16 +42,6 @@ var CustomGroupListViewModel = (function (_super) {
         this.menuPanelElement = menuPanelElement;
         this.contentElement = contentElement;
     }
-    Object.defineProperty(CustomGroupListViewModel.prototype, "customGroupViewMdel", {
-        get: function () {
-            if (!this._customGroupViewModel) {
-                this._customGroupViewModel = new CustomGroupViewModel("", 80, "");
-            }
-            return this._customGroupViewModel;
-        },
-        enumerable: true,
-        configurable: true
-    });
     return CustomGroupListViewModel;
 }(kendo.data.ObservableObject));
 //# sourceMappingURL=CustomGroupListViewModel.js.map

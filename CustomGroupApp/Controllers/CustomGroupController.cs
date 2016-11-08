@@ -69,26 +69,15 @@ namespace CustomGroupApp.Controllers
             return Json(true);
         }
 
-        public ActionResult CustomGroupWizard(int groupSetId)
+        public ActionResult SplitCustomGroupView(int groupSetId)
         {
-            //return View("BandClassDefinitionView");
-            return View("SplitCustomGroup", new 
-            {
-                Students = _dataService.GetCustomGroupSetStudent(groupSetId)
-               
-            });
+            return View("CustomGroupWizard", groupSetId);
         }
 
 
-        public ActionResult CustomGroupWizard(int testNumber)
+        public ActionResult CustomGroupWizard()
         {
-            //return View("BandClassDefinitionView");
-            return View("CustomGroupWizard", new CustomGroupViewModel
-            {
-                Test = _dataService.GetTest(testNumber),
-                Results = _dataService.GetResults(testNumber).ToList(),
-                StudentLanguages = _dataService.GetStudentLanguagePrefs(testNumber).ToList()
-            });
+            return View("CustomGroupWizard", 0);
         }
 
         public JsonResult ImportPreallocatedClasses(IEnumerable<HttpPostedFileBase> files, string id)

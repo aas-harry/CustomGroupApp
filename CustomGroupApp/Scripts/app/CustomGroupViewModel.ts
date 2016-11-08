@@ -1,9 +1,9 @@
 ﻿class CustomGroupViewModel extends kendo.data.ObservableObject {
-    constructor(public containerElementName, public studentCount: number, rootSite: string) {
+    constructor(public containerElementName, rootSite: string) {
         super();
 
+        debugger;
         this.rootSite = rootSite;
-        this.studentCount = studentCount;
     }
 
     private commonUtils = new CommonUtils();
@@ -26,6 +26,7 @@
     private _generateCustomGroupViewModel: GenerateCustomGroupViewModel;
     private _genderOption = "All";
     private gender = Gender.All;
+
     // ReSharper restore InconsistentNaming
 
     get selectedGenderOption(): string {
@@ -55,6 +56,7 @@
     isCoedSchool = true;
     studentCountInAllClasses = 0;
     classCount = 3;
+    studentCount = 0;
     bandCount = 2;
     groupName: string;
     selectedClassDefinitionViewModel: CustomGroupBaseViewModel;
@@ -63,7 +65,7 @@
     errorMessage: string;
     hasErrors = false;
     rootSite: string;
-    hasHiddenClasses: boolean = false;
+    hasHiddenClasses = false;
     message: string;
 
     // leaving students properties
@@ -168,18 +170,18 @@
         const viewName = this.stepCollection.getStepView(this.groupingOption, stepNo);
         console.log("View: ", viewName);
 
-  
+
         if (!viewName) {
             return;
         }
         $.ajax({
             type: "POST",
-            url: "Customgroup\\" + viewName,
+            url: `Customgroup\\${viewName}`,
             dataType: "html",
             success(data) {
                 $(`#${containerElementName}`).html(data);
             }
-            
+
         });
     }
 
@@ -216,38 +218,32 @@
         this.pairedStudentsControl.createStudentSetContainer(joinedStudentsCell, this.classesDefn.testFile.isUnisex);
         this.separatedStudentsControl
             .createStudentSetContainer(separatedStudentsCell, this.classesDefn.testFile.isUnisex);
-    }
-
+    };
     showAllClasses = (e: any) => {
         this.generateCustomGroupViewModel.showAllClasses();
         this.set("hasHiddenClasses", false);
         kendo.bind($("#custom-group-container"), this);
-    }
-
+    };
     hideClass = (e: any) => {
         this.generateCustomGroupViewModel.hideClass(this.commonUtils.getUid(e.target.id));
         this.set("hasHiddenClasses", true);
         kendo.bind($("#custom-group-container"), this);
-    }
-
+    };
     addPairStudent = (e: any) => {
         if (!this.pairedStudentsControl.onAddPairStudent(e.target.id)) {
             this.separatedStudentsControl.onAddPairStudent(e.target.id);
         }
-    }
-
+    };
     editPairStudent = (e: any) => {
         if (! this.pairedStudentsControl.onEditPairStudent(e.target.id)) {
             this.separatedStudentsControl.onEditPairStudent(e.target.id);
         }
-    }
-
+    };
     deletePairStudent = (e: any) => {
         if (!this.pairedStudentsControl.onDeletePairStudent(e.target.id)) {
             this.separatedStudentsControl.onDeletePairStudent(e.target.id);
         }
-    }
-
+    };
     studentLeavingOptionChanged = (e: any) => {
         if (this.studentLeavingOption) {
             this.editLeavingStudents();
@@ -255,29 +251,26 @@
             this.set("leavingStudentCount", 0);
             this.setStudentCount();
         }
-    }
-
-
+    };
     private setStudentCount = () => {
         var value = this.classesDefn.genderStudentCount(this.gender) - this.leavingStudentsCount;
         this.set("studentCount", value);
         this.selectedClassDefinitionViewModel.studentCount = value;
         this.validateStudentCount();
-    }
-
+    };
     editLeavingStudents = () => {
         const studentSelector = new StudentSelector(20);
         studentSelector.openDialog(document.getElementById("popup-window-container"),
             this.classesDefn.genderStudents(this.gender),
             this.leavingStudents,
             (students) => {
-                
+
                 this.leavingStudents = students;
                 this.set("leavingStudentsCount", this.leavingStudents.length);
                 this.setStudentCount();
             },
             30);
-    }
+    };
 
     saveClasses() {
         const bandSet = this.selectedClassDefinitionViewModel.getBandSet();
@@ -287,9 +280,9 @@
     generateClasses() {
         var bandSet = this.selectedClassDefinitionViewModel.getBandSet();
         const students = Enumerable.From(this.classesDefn.genderStudents(this.genderOption))
-                .Except(this.leavingStudents, x => x.studentId)
-                .ToArray();
-        
+            .Except(this.leavingStudents, x => x.studentId)
+            .ToArray();
+
         switch (this.groupingOption) {
         case GroupingMethod.Banding:
             bandSet.groupType = GroupingMethod.Streaming;
@@ -364,20 +357,43 @@
 
     reset = () => {
         this.preAllocatedBandset = this.classesDefn.createBandSet("class", this.studentCount);
-    
 
-       // this.set("selectedClassDefinitionViewModel", this.classDefinitionViewModel);
-    }
+
+        // this.set("selectedClassDefinitionViewModel", this.classDefinitionViewModel);
+    };
 
     //
-    setDatasource = (test, results, languages) => {
-        var testInfo = new TestFile();
-        testInfo.set(test, null, results, languages);
-        this.isCoedSchool = testInfo.isUnisex;
-        this.studentCount = testInfo.studentCount - this.leavingStudentsCount;
+    setDatasource = (testFile: TestFile, groupSetId: number = 0) => {
+        var testInfo = testFile;
 
-        this.studentCountInAllClasses = testInfo.studentCount - this.leavingStudentsCount;
-        this.classesDefn = new ClassesDefinition(testInfo);
+        this.isCoedSchool = testInfo.isUnisex;
+
+        const groupSetStudents = new Array<Student>();
+        if (groupSetId && groupSetId > 0) {
+
+            // Get the students in the class
+            const groupSet = Enumerable.From(testFile.customGroups)
+                .FirstOrDefault(null, x => x.groupSetid === groupSetId);
+            if (groupSet) {
+                const studentLookup = Enumerable.From(groupSet.students).ToDictionary(x => x.studentId, x => x);
+                for (let s of testFile.students) {
+                    if (studentLookup.Contains(s.studentId)) {
+                        groupSetStudents.push(s);
+                    }
+                }
+            }
+
+            this.studentCount = groupSetStudents.length;
+            this.studentCountInAllClasses = groupSetStudents.length;
+
+
+        } else {
+            this.studentCount = testInfo.studentCount - this.leavingStudentsCount;
+            this.studentCountInAllClasses = testInfo.studentCount - this.leavingStudentsCount;
+        }
+
+
+        this.classesDefn = new ClassesDefinition(testInfo, groupSetId ? groupSetStudents : null);
 
         this.pairedStudentsControl = new
             StudentSetListControl("Paired",
@@ -399,22 +415,19 @@
         if (vm) {
             vm.onClassCountChanged(this.classCount);
         }
-    }
-
+    };
     onBandCountChanged = () => {
         var vm = this.selectedClassDefinitionViewModel as IBandSetting;
         if (vm) {
             vm.onBandCountChanged(this.bandCount);
         }
-    }
-
+    };
     onStudentCountInAllClassesChanged = (count: number) => {
         // set the total number students in all classes
         this.set("studentCountInAllClasses", count);
         this.validateStudentCount();
 
-    }
-
+    };
     validateStudentCount = (): boolean => {
         if (this.studentCount !== this.studentCountInAllClasses) {
             this.set("hasErrors", true);
@@ -426,5 +439,5 @@
         this.set("hasErrors", false);
         this.set("errorMessage", "");
         return true;
-    }
+    };
 }

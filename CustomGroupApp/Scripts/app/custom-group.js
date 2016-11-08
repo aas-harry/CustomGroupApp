@@ -955,9 +955,10 @@ var TopMiddleLowestBandSet = (function (_super) {
     return TopMiddleLowestBandSet;
 }(BandSet));
 var ClassesDefinition = (function () {
-    function ClassesDefinition(testFile) {
+    function ClassesDefinition(testFile, students) {
         var _this = this;
         if (testFile === void 0) { testFile = null; }
+        if (students === void 0) { students = null; }
         this.testFile = testFile;
         this.students = [];
         this.spreadBoysGirlsEqually = false;
@@ -1009,8 +1010,11 @@ var ClassesDefinition = (function () {
             this.testFile = testFile;
             this.boysCount = 0;
             this.girlsCount = 0;
-            for (var _i = 0, _a = testFile.students; _i < _a.length; _i++) {
-                var s = _a[_i];
+            if (!students) {
+                students = testFile.students;
+            }
+            for (var _i = 0, students_1 = students; _i < students_1.length; _i++) {
+                var s = students_1[_i];
                 this.students.push(new StudentClass(s));
                 if (s.sex === "M") {
                     this.boysCount++;

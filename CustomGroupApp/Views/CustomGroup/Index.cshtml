@@ -12,6 +12,7 @@
         <div class="row">
             <input id="test-number" style="width: 280px; margin-right: 5px; margin-left: 10px">
             <button class="btn btn-default" onClick="getResults()">Get</button>
+            <button class="btn btn-default" onClick="createClasses()">Create Group</button>
             <button class="btn btn-default" onClick="editCustomGroup()">Edit Group</button>
             <button class="btn btn-default" onClick="openStudentPortfolioList()">Student Portfolios</button>
             <div id="message-text"></div>
@@ -41,9 +42,12 @@
         });
 
     function getResults() {
+        var numericTextBox = $("#test-number").data("kendoComboBox");
+        var testnumber = parseInt(numericTextBox.value());
+
         $.ajax({
             url: '@Url.Action("GetResults", "CustomGroup")',
-            data: { testnum: 1000050 },
+            data: { testnum: testnumber },
             type: 'POST',
             cache: false,
             success: function (data) {
@@ -54,6 +58,21 @@
              
             },
             fail: function(data) {
+
+            }
+        });
+    }
+
+    function createClasses() {
+        $.ajax({
+            url: '@Url.Action("CustomGroupWizard", "CustomGroup")',
+            type: 'POST',
+            cache: false,
+            success: function (html) {
+                $("#content").replaceWith("<div id='content'></div>");
+                $("#content").append(html);
+            },
+            fail: function (data) {
 
             }
         });
@@ -77,7 +96,6 @@
         $.ajax({
             url: '@Url.Action("CustomGroupListView", "CustomGroup")',
             type: 'POST',
-            data: { testnum: 1014181 },
             cache: false,
             success: function (html) {
                 $("#content").replaceWith("<div id='content'></div>");

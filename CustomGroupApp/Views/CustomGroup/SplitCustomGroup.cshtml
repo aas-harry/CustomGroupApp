@@ -1,4 +1,4 @@
-﻿@model IEnumerable<int>
+﻿@model int
 <div style="font-size: 12px">
     <style scoped>
         input[type="radio"] {
@@ -43,11 +43,11 @@
         </div>
     </div>
     <script>
-        var customGroupViewModel = new CustomGroupViewModel("custom-group-content", @Html.Raw(Json.Encode(Model.Results.Count())), '@Url.Action("CustomGroupWizard", "CustomGroup")');
+        var customGroupViewModel = new CustomGroupViewModel("custom-group-content", '@Url.Action("CustomGroupWizard", "CustomGroup")');
 
         $(document)
             .ready(function() {
-                customGroupViewModel.setDatasource(test, studentResults, studentLanguages);
+                customGroupViewModel.setDatasource(test, @Model);
                 kendo.bind($("#custom-group-container"), customGroupViewModel);
             });
 

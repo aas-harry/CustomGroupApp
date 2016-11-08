@@ -5,11 +5,10 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var CustomGroupViewModel = (function (_super) {
     __extends(CustomGroupViewModel, _super);
-    function CustomGroupViewModel(containerElementName, studentCount, rootSite) {
+    function CustomGroupViewModel(containerElementName, rootSite) {
         var _this = this;
         _super.call(this);
         this.containerElementName = containerElementName;
-        this.studentCount = studentCount;
         this.commonUtils = new CommonUtils();
         this.groupingHelper = new GroupingHelper();
         this.stepCollection = new StepCollection();
@@ -27,6 +26,7 @@ var CustomGroupViewModel = (function (_super) {
         this.isCoedSchool = true;
         this.studentCountInAllClasses = 0;
         this.classCount = 3;
+        this.studentCount = 0;
         this.bandCount = 2;
         this.joinedStudents = [];
         this.separatedStudents = [];
@@ -107,13 +107,32 @@ var CustomGroupViewModel = (function (_super) {
             // this.set("selectedClassDefinitionViewModel", this.classDefinitionViewModel);
         };
         //
-        this.setDatasource = function (test, results, languages) {
-            var testInfo = new TestFile();
-            testInfo.set(test, null, results, languages);
+        this.setDatasource = function (testFile, groupSetId) {
+            if (groupSetId === void 0) { groupSetId = 0; }
+            var testInfo = testFile;
             _this.isCoedSchool = testInfo.isUnisex;
-            _this.studentCount = testInfo.studentCount - _this.leavingStudentsCount;
-            _this.studentCountInAllClasses = testInfo.studentCount - _this.leavingStudentsCount;
-            _this.classesDefn = new ClassesDefinition(testInfo);
+            var groupSetStudents = new Array();
+            if (groupSetId && groupSetId > 0) {
+                // Get the students in the class
+                var groupSet = Enumerable.From(testFile.customGroups)
+                    .FirstOrDefault(null, function (x) { return x.groupSetid === groupSetId; });
+                if (groupSet) {
+                    var studentLookup = Enumerable.From(groupSet.students).ToDictionary(function (x) { return x.studentId; }, function (x) { return x; });
+                    for (var _i = 0, _a = testFile.students; _i < _a.length; _i++) {
+                        var s = _a[_i];
+                        if (studentLookup.Contains(s.studentId)) {
+                            groupSetStudents.push(s);
+                        }
+                    }
+                }
+                _this.studentCount = groupSetStudents.length;
+                _this.studentCountInAllClasses = groupSetStudents.length;
+            }
+            else {
+                _this.studentCount = testInfo.studentCount - _this.leavingStudentsCount;
+                _this.studentCountInAllClasses = testInfo.studentCount - _this.leavingStudentsCount;
+            }
+            _this.classesDefn = new ClassesDefinition(testInfo, groupSetId ? groupSetStudents : null);
             _this.pairedStudentsControl = new StudentSetListControl("Paired", _this.joinedStudents, _this.classesDefn.students, document.getElementById("popup-window-container"));
             _this.separatedStudentsControl = new StudentSetListControl("Separated", _this.separatedStudents, _this.classesDefn.students, document.getElementById("popup-window-container"));
             _this.reset();
@@ -145,8 +164,8 @@ var CustomGroupViewModel = (function (_super) {
             _this.set("errorMessage", "");
             return true;
         };
+        debugger;
         this.rootSite = rootSite;
-        this.studentCount = studentCount;
     }
     Object.defineProperty(CustomGroupViewModel.prototype, "selectedGenderOption", {
         // ReSharper restore InconsistentNaming

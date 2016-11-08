@@ -1030,7 +1030,7 @@ class TopMiddleLowestBandSet extends BandSet {
 }
 
 class ClassesDefinition {
-    constructor(public testFile: TestFile = null) {
+    constructor(public testFile: TestFile = null, students: Array<Student> = null) {
         this.uid = createUuid();
         if (testFile != null) {
             this.groupGender = testFile.isUnisex ? Gender.All : (testFile.hasBoys ? Gender.Boys : Gender.Girls);
@@ -1038,7 +1038,10 @@ class ClassesDefinition {
 
             this.boysCount = 0;
             this.girlsCount = 0;
-            for(let s of testFile.students){
+            if (!students) {
+                students = testFile.students;
+            }
+            for(let s of students){
                 this.students.push(new StudentClass(s));
                 if (s.sex === "M") {
                     this.boysCount++;

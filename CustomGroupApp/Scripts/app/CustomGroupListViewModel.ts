@@ -4,14 +4,7 @@
     private contentElement: HTMLElement;
     private testInfo: TestFile;
     private customGroupListControl = new CustomGroupListControl();
-    private _customGroupViewModel;
-
-    get customGroupViewMdel(): CustomGroupViewModel {
-        if (!this._customGroupViewModel) {
-            this._customGroupViewModel = new CustomGroupViewModel("", 80, "");
-        }
-        return this._customGroupViewModel;
-    }
+    private selectedClass: ClassDefinition;
 
     constructor(menuPanelElement: HTMLElement, contentElement: HTMLElement) {
         super();
@@ -25,9 +18,9 @@
         const myself = this;
         $.ajax({
             type: "POST",
-            url: "CustomGroup\\CustomGroupWizard",
+            url: "CustomGroup\\SplitCustomGroupView",
+            data: { testnum: this.selectedClass.groupSetid },
             contentType: "application/json",
-            data: JSON.stringify({ 'testNumber': 101481 }),
             success(html) {
                 const content = document.createElement("div");
                 content.id = "custom-group-container";
@@ -50,7 +43,8 @@
     }
 
     showMenuPanel = () => {
-        this.customGroupListControl.create(this.menuPanelElement, this.testInfo.customGroups, 800);
+        this.customGroupListControl.create(this.menuPanelElement, this.testInfo.customGroups,
+            (classDefn) => { this.selectedClass = classDefn; }, 800);
     }
 
    
