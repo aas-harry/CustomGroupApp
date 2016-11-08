@@ -35,9 +35,11 @@
         <table>
             <tr>
                 <td>
-                    <div id="custom-group-menu-panel"></div></td>
+                    <div id="custom-group-menu-panel"></div>
+                </td>
                 <td>
-                    <div id="custom-group-content"></div></td>
+                    <div id="custom-group-content"></div>
+                </td>
             </tr>
         </table>
     </div>
@@ -45,19 +47,15 @@
         var customgroupListViewModel;
         $(document)
             .ready(function() {
-                customgroupListViewModel = new CustomGroupListViewModel(@Model,
+                customgroupListViewModel = new CustomGroupListViewModel(
                     document.getElementById("custom-group-menu-panel"),
                     document.getElementById("custom-group-content"));
                 $("#custom-group-container").hide();
-
-                customgroupListViewModel.initMenuPanel(function(flag, e) {
-                    $("#loading-panel").hide();
-                    $("#custom-group-container").show();
-         
-                    if (flag) {
-                        kendo.bind($("#custom-group-view"), customgroupListViewModel);
-                    }
-                });
+                customgroupListViewModel.setDatasource(testFile);
+                customgroupListViewModel.showMenuPanel();
+                $("#loading-panel").hide();
+                $("#custom-group-container").show();
+                kendo.bind($("#custom-group-view"), customgroupListViewModel);
             });
     </script>
 </div>

@@ -40,11 +40,11 @@ namespace CustomGroupApp
 
         public IEnumerable<CustomGroupSet> GetCustomGroupSets(int testnum)
         {
-           var students = (from gs in _dataService.GroupSets
+            var students = (from gs in _dataService.GroupSets
                 join s in _dataService.GroupSetStudents on gs.Id equals s.GroupSetId
                 where gs.Testnum == testnum
-                select new {s.GroupSetId, gs.Name, s.StudentId}).ToList();
-
+                select new { GroupSetId = gs.Id, gs.Name, s.StudentId}).ToList();
+       
             var classes = from s in students
                 group s by new {s.GroupSetId, s.Name}
                 into g
@@ -89,9 +89,9 @@ namespace CustomGroupApp
             _dataService.SubmitChanges();
         }
 
-        public IEnumerable<GroupSetStudent> GetCustomGroupSetStudent(int groupSetId)
+        public IEnumerable<int> GetCustomGroupSetStudent(int groupSetId)
         {
-            return _dataService.GroupSetStudents.Where(x => x.GroupSetId == groupSetId).ToList();
+            return _dataService.GroupSetStudents.Where(x => x.GroupSetId == groupSetId).Select(x=> x.StudentId).ToList();
         }
 
         public Test GetTest(int testnum)

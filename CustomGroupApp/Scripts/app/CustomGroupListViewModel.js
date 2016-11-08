@@ -5,18 +5,17 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var CustomGroupListViewModel = (function (_super) {
     __extends(CustomGroupListViewModel, _super);
-    function CustomGroupListViewModel(testNumber, menuPanelElement, contentElement) {
+    function CustomGroupListViewModel(menuPanelElement, contentElement) {
         var _this = this;
         _super.call(this);
-        this.testNumber = testNumber;
-        this.customGroupLisdtContol = new CustomGroupListControl();
+        this.customGroupListControl = new CustomGroupListControl();
         this.create = function () {
             var myself = _this;
             $.ajax({
                 type: "POST",
                 url: "CustomGroup\\CustomGroupWizard",
                 contentType: "application/json",
-                data: JSON.stringify({ 'testNumber': myself.testNumber }),
+                data: JSON.stringify({ 'testNumber': 101481 }),
                 success: function (html) {
                     var content = document.createElement("div");
                     content.id = "custom-group-container";
@@ -34,33 +33,10 @@ var CustomGroupListViewModel = (function (_super) {
         this.delete = function () {
         };
         this.showMenuPanel = function () {
+            _this.customGroupListControl.create(_this.menuPanelElement, _this.testInfo.customGroups, 800);
         };
-        this.initMenuPanel = function (callback) {
-            var myself = _this;
-            $.ajax({
-                type: "POST",
-                url: "Customgroup\\GetCustomGroupListViewData",
-                contentType: "application/json",
-                data: JSON.stringify({ 'testNumber': _this.testNumber }),
-                success: function (data) {
-                    myself.setDatasource(data.Test, data.Results, data.StudentLanguages, data.CustomGroupSets);
-                    var tmpCallback = callback;
-                    if (tmpCallback) {
-                        callback(true);
-                    }
-                    myself.customGroupLisdtContol.create(myself.menuPanelElement, myself.testInfo.customGroups);
-                },
-                error: function (e) {
-                    var tmpCallback = callback;
-                    if (tmpCallback) {
-                        callback(false, e);
-                    }
-                }
-            });
-        };
-        this.setDatasource = function (test, results, languages, customGroups) {
-            _this.testInfo = new TestFile();
-            _this.testInfo.set(test, results, languages, customGroups);
+        this.setDatasource = function (testFile) {
+            _this.testInfo = testFile;
         };
         _super.prototype.init.call(this, this);
         this.menuPanelElement = menuPanelElement;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Web;
 using System.Web.Mvc;
 using CsvHelper;
@@ -32,9 +33,9 @@ namespace CustomGroupApp.Controllers
             var results = _dataService.GetResults(testnum).ToList();
             var test = _dataService.GetTest(testnum);
             var school = _dataService.GetSchool(testnum);
+            var customGroupSets = _dataService.GetCustomGroupSets(testnum).ToList();
 
-
-            return Json(new {Test = test, Results = results, School = school});
+            return Json(new {Test = test, Results = results, School = school, CustomGroups = customGroupSets });
         }
 
         [HttpPost]
@@ -67,6 +68,17 @@ namespace CustomGroupApp.Controllers
             _dataService.UpdateCustomGroupSets(groupSets, testNumber);
             return Json(true);
         }
+
+        public ActionResult CustomGroupWizard(int groupSetId)
+        {
+            //return View("BandClassDefinitionView");
+            return View("SplitCustomGroup", new 
+            {
+                Students = _dataService.GetCustomGroupSetStudent(groupSetId)
+               
+            });
+        }
+
 
         public ActionResult CustomGroupWizard(int testNumber)
         {

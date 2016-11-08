@@ -1043,6 +1043,7 @@
     <Content Include="Views\Report\StudentPortolio.cshtml" />
     <Content Include="Views\Report\StudentPortfolioList.cshtml" />
     <Content Include="Views\Report\StudentNaplanReport.cshtml" />
+    <Content Include="Views\CustomGroup\SplitCustomGroup.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
