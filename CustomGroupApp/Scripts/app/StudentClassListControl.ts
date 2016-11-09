@@ -1,12 +1,29 @@
 ﻿class StudentClassListControl {
     private kendoHelper = new KendoHelper();
+    private groupHelper = new GroupingHelper();
+    private editGroupNameCallback: (classItem: ClassDefinition, status: boolean) => any;
+    private updateStudentsCallback: (classItem: ClassDefinition, status: boolean) => any;
+    private hideClassCallback: (classItem: ClassDefinition) => any;
+    private dragdropCallback: (targetUid: string, sourceUid: string, studentId: number) => any;
+    private editClassMode = false;
+    private classItem: ClassDefinition;
 
     createStudentClassInputContainer = (
         cell: HTMLTableCellElement,
         classItem: ClassDefinition,
-        editGroupNameCallback: any,
-        dropCallback: (targetUid: string, sourceUid: string, studentId: number) => any
+        editGroupNameCallback: (classItem: ClassDefinition, status: boolean) => any,
+        updateStudentsCallback: (classItem: ClassDefinition, status: boolean) => any,
+        hideClassCallback: (classItem: ClassDefinition) => any,
+        dragdropCallback: (targetUid: string, sourceUid: string, studentId: number) => any,
+        editClassMode = false
     ) => {
+        this.editGroupNameCallback = editGroupNameCallback;
+        this.updateStudentsCallback = updateStudentsCallback;
+        this.dragdropCallback = dragdropCallback;
+        this.editClassMode = editClassMode;
+        this.hideClassCallback = hideClassCallback;
+        this.classItem = classItem;
+
         var classGridHeight = classItem.parent.classes.length > 3 && classItem.parent.bandType === BandType.None ? "500px" : "700px";
         var classGridWidth = classItem.parent.parent.parent.testFile.isUnisex ? "400px" : "300px";
         var container = document.createElement("div") as HTMLDivElement;
@@ -21,15 +38,11 @@
         cell.appendChild(container);
         cell.appendChild(summaryElement);
 
-        return this.createStudentClassGrid(gridElement.id, classItem, editGroupNameCallback, dropCallback);;
+        return this.createStudentClassGrid(gridElement.id, classItem);;
     };
 
-    createStudentClassGrid = (
-        element: string,
-        classItem: ClassDefinition,
-        editGroupNameCallback: any,
-        dropCallback: (targetUid: string, sourceUid: string, studentId: number) => any): kendo.ui.Grid => {
-        var grid = this.createClassGrid(element, classItem, editGroupNameCallback);
+    createStudentClassGrid = (element: string, classItem: ClassDefinition): kendo.ui.Grid => {
+        var grid = this.createClassGrid(element, classItem);
 
         $(`#${element}`).kendoDraggable({
             filter: "tr",
@@ -42,18 +55,18 @@
             group: "classGroup"
         });
 
-
+        var dropCallback = this.dragdropCallback;
         grid.table.kendoDropTarget({
             drop(e) {
                 const targetObject = (Object)(e.draggable.currentTarget[0]);
                 const studentId = parseInt(targetObject.cells[1].textContent);
                 const sourceClass = $(e.draggable.element).attr('id');
                 if (dropCallback(`class-${classItem.uid}`, sourceClass, studentId)) {
-                    let sourceGrid = $(`#${sourceClass}`).data("kendoGrid");
-                    let targetGrid = $(`#class-${classItem.uid}`).data("kendoGrid");
-                    var sourceDatasource = sourceGrid.dataSource.view();
+                    const sourceGrid = $(`#${sourceClass}`).data("kendoGrid");
+                    const targetGrid = $(`#class-${classItem.uid}`).data("kendoGrid");
+                    const sourceDatasource = sourceGrid.dataSource.view();
 
-                    var targetDatasource = targetGrid.dataSource.view();
+                    const targetDatasource = targetGrid.dataSource.view();
                     for (let i = 0; i < sourceDatasource.length; i++) {
                         if (sourceDatasource[i].id === studentId) {
                             let student = sourceDatasource[i];
@@ -77,10 +90,14 @@
         return grid;
     }
 
-    createClassGrid = (element: string, classItem: ClassDefinition, editGroupCallback: any): kendo.ui.Grid => {
+    createClassGrid = (element: string, classItem: ClassDefinition): kendo.ui.Grid => {
+        const self = this;
         const groupNameElementId = "groupname-" + classItem.uid;
-        var isUniSex = classItem.parent.parent.parent.testFile.isUnisex;
-        var columns: { field: string; title: string; width: string; attributes: { class: string } }[];
+        const updateClassElementId = "updateclass" + classItem.uid;
+        const hideClassElementId = "hideclass" + classItem.uid;
+        const isUniSex = classItem.parent.parent.parent.testFile.isUnisex;
+
+        let columns: { field: string; title: string; width: string; attributes: { class: string } }[];
         if (isUniSex) {
             columns = [
                 { field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" } },
@@ -96,8 +113,7 @@
             ];
         }
 
-        var btnStyle = "style = 'margin-right: 5px'";
-        var btnClass = "class='btn-xs btn-default pull-right'";
+        const btnStyle = "style = 'margin-right: 5px'";
         $(`#${element}`)
             .kendoGrid({
                 columns: columns,
@@ -105,20 +121,49 @@
                     mode: "single",
                     allowUnsort: true
                 },
-                toolbar: [{
+                toolbar: [
+                {
                     template: kendo.template(
-                        `Group Name: <input id='${groupNameElementId}' style='margin: 0 5px 0 5px' />` +
-                        `<button ${btnClass} id='class-${classItem.uid}' data-bind='click: hideClass' ${btnStyle}'>Hide</button>`
+                        `Group: <input id='${groupNameElementId}' style='margin: 0 5px 0 5px' />` +
+                        (this.editClassMode ?
+                             `<button id='${updateClassElementId}' ${btnStyle}'>Edit</button>`
+                            : `<button id='${hideClassElementId}' ${btnStyle}'>Hide</button>`)
                     )
                 }],
                 selectable: "row",
                 dataSource: []
             });
 
+        this.kendoHelper.createKendoButton(updateClassElementId, (e) => {
+            self.groupHelper.updateStudentsInClass(classItem, (status) => {
+                const callback = self.updateStudentsCallback;
+                if (callback) {
+                    callback(classItem, status);
+                }
+            });
+        });
+
+        this.kendoHelper.createKendoButton(hideClassElementId, (e) => {
+            const callback = self.hideClassCallback;
+            if (callback) {
+                callback(classItem);
+            }
+        });
+
         $(`#${groupNameElementId}`)
             .kendoMaskedTextBox({
                 value: classItem.name,
-                change: editGroupCallback
+                change: (e) => {
+                    var inputControl = e.sender as kendo.ui.MaskedTextBox;
+               
+                    classItem.name = inputControl.value();
+                    if (self.editClassMode) {
+                        self.groupHelper.updateGroupName(classItem,
+                            (status) => self.editGroupNameCallback(classItem, status));
+                    } else {
+                        self.editGroupNameCallback(classItem, true);
+                    }
+                }
             });
 
         // Create name tooltip

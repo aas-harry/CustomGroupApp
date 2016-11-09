@@ -4,15 +4,20 @@ var CustomClassGridCollection = (function () {
         this.groupingHelper = new GroupingHelper();
         this.studentClassListControls = new StudentClassListControl();
         this.kendoHelper = new KendoHelper();
+        this.hiddenClasses = [];
         this.me = this;
         this.classes = [];
         this.classCount = 0;
-        this.initTable = function (elementName, bands, hiddenClasses) {
-            if (hiddenClasses === void 0) { hiddenClasses = []; }
+        this.editClassMode = false;
+        this.initTable = function (elementName, bands, editClassMode) {
+            if (editClassMode === void 0) { editClassMode = false; }
+            _this.elementName = elementName;
+            _this.bands = bands;
+            _this.editClassMode = editClassMode;
             $(elementName).html("<table id='custom-classes-table'></table>");
             _this.table = document.getElementById("custom-classes-table");
             _this.header = _this.table.createTBody();
-            var hiddenClassLookup = Enumerable.From(hiddenClasses).ToDictionary(function (x) { return x; }, function (x) { return x; });
+            var hiddenClassLookup = Enumerable.From(_this.hiddenClasses).ToDictionary(function (x) { return x; }, function (x) { return x; });
             if (bands.length === 1) {
                 _this.classRow = _this.header.insertRow();
                 _this.classes = Enumerable.From(bands).SelectMany(function (b) { return b.classes; }).ToArray();
@@ -29,7 +34,7 @@ var CustomClassGridCollection = (function () {
                     }
                     cnt++;
                     _this.studentClassListControls
-                        .createStudentClassInputContainer(_this.classRow.insertCell(), classItem, _this.onEditGroupName, _this.onDropItem);
+                        .createStudentClassInputContainer(_this.classRow.insertCell(), classItem, _this.onEditGroupName, _this.onUpdateStudentsInClass, _this.onHideClass, _this.onDropItem, editClassMode);
                 }
             }
             else {
@@ -44,9 +49,22 @@ var CustomClassGridCollection = (function () {
                             continue;
                         }
                         _this.studentClassListControls
-                            .createStudentClassInputContainer(_this.classRow.insertCell(), classItem, _this.onEditGroupName, _this.onDropItem);
+                            .createStudentClassInputContainer(_this.classRow.insertCell(), classItem, _this.onEditGroupName, _this.onUpdateStudentsInClass, _this.onHideClass, _this.onDropItem, editClassMode);
                     }
                 }
+            }
+        };
+        this.showAllClasses = function () {
+            _this.hiddenClasses = [];
+            _this.initTable(_this.elementName, _this.bands, _this.editClassMode);
+        };
+        // Remove the selected class from the screen  
+        this.onHideClass = function (classItem) {
+            _this.hiddenClasses.push(classItem.uid);
+            _this.initTable(_this.elementName, _this.bands, _this.editClassMode);
+            var tmpCallback = _this.hideClassCallback;
+            if (tmpCallback) {
+                tmpCallback(classItem);
             }
         };
         this.onDropItem = function (targetUid, sourceUid, studentId) {
@@ -60,16 +78,36 @@ var CustomClassGridCollection = (function () {
                 targetClass.calculateClassesAverage();
                 _this.studentClassListControls.updateClassSummaryContent(sourceClass);
                 _this.studentClassListControls.updateClassSummaryContent(targetClass);
+                // save the changes in database
+                if (_this.editClassMode) {
+                    _this.groupingHelper.addDeleteStudentsInClass(targetClass.groupSetid, [student.studentId], sourceClass.groupSetid, [student.studentId], function (status) {
+                        //
+                    });
+                }
+                // Notify the caller the affected classes
+                var callback = _this.classChangedCallback;
+                if (callback) {
+                    callback(sourceClass);
+                    callback(targetClass);
+                }
                 return true;
             }
             return false;
         };
-        this.onEditGroupName = function (e) {
-            var uid = _this.getUid(e.sender.element[0].id);
-            var classItem = Enumerable.From(_this.classes).FirstOrDefault(undefined, function (x) { return x.uid === uid; });
-            var inputField = e.sender;
-            if (classItem && inputField) {
-                classItem.name = inputField.value();
+        this.onUpdateStudentsInClass = function (classItem, status) {
+            // Use this callback function to notify the user
+            // Notify the caller the affected classes
+            var callback = _this.classChangedCallback;
+            if (callback) {
+                callback(classItem);
+            }
+        };
+        this.onEditGroupName = function (classItem, status) {
+            // Use this callback function to notify the user
+            // Notify the caller the affected classes
+            var callback = _this.classChangedCallback;
+            if (callback) {
+                callback(classItem);
             }
         };
         this.clear = function () {

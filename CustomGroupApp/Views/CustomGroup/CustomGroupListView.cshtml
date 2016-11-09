@@ -10,6 +10,10 @@
             margin-bottom: 5px;
         }
 
+        .table td {
+            vertical-align: top;
+        }
+
         .k-grid td {
             padding-bottom: 2px;
             padding-top: 2px;
@@ -23,7 +27,7 @@
     </style>
 
     <div class="container-fluid" id="custom-group-view">
-        <div id="loading-panel">Loading...</div>
+       
         <div id="custom-group-action"data-binding="visible: isReady">
             <button class="btn btn-default" data-bind="click: create">Create</button>
             <button class="btn btn-default" data-bind="click: delete">Delete</button>
@@ -32,11 +36,15 @@
 
         <table>
             <tr>
-                <td>
-                    <div id="custom-group-menu-panel"></div>
+                <td style="vertical-align: top">
+                    <div id="custom-group-menu-panel" style="height: 100%;"></div>
                 </td>
-                <td>
-                    <div id="custom-group-content"></div>
+                <td style="vertical-align: top">
+                    <div id="custom-group-content">
+                        <div id="classes-settings-container" style="width: 600px">
+                            <table id="custom-classes-table"></table>
+                        </div>
+                    </div>
                 </td>
             </tr>
         </table>
@@ -44,15 +52,11 @@
     <script>
         var customgroupListViewModel;
         $(document)
-            .ready(function() {
-                customgroupListViewModel = new CustomGroupListViewModel(
-                    document.getElementById("custom-group-menu-panel"),
-                    document.getElementById("custom-group-content"));
-                $("#custom-group-container").hide();
+            .ready(function () {
+                customgroupListViewModel = new CustomGroupListViewModel();
                 customgroupListViewModel.setDatasource(testFile);
-                customgroupListViewModel.showMenuPanel();
-                $("#loading-panel").hide();
-                $("#custom-group-container").show();
+                customgroupListViewModel.showCustomGroups("custom-group-menu-panel");
+              
                 kendo.bind($("#custom-group-view"), customgroupListViewModel);
             });
     </script>

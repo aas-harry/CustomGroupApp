@@ -592,6 +592,74 @@ var GroupingHelper = (function () {
             }
             return classes;
         };
+        this.updateGroupName = function (classDefn, callback) {
+            $.ajax({
+                type: "POST",
+                url: "Customgroup\\UpdateGroupSetName",
+                contentType: "application/json",
+                data: JSON.stringify({ 'groupSetId': classDefn.groupSetid, 'groupName': classDefn.name }),
+                success: function (data) {
+                    var tmpCallback = callback;
+                    if (tmpCallback) {
+                        tmpCallback(true);
+                    }
+                },
+                error: function (e) {
+                    var tmpCallback = callback;
+                    if (tmpCallback) {
+                        tmpCallback(false);
+                    }
+                }
+            });
+        };
+        this.updateStudentsInClass = function (classDefn, callback) {
+            $.ajax({
+                type: "POST",
+                url: "Customgroup\\UpdateStudentsInClass",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    'groupSetId': classDefn.groupSetid,
+                    'students': Enumerable.From(classDefn.students).Select(function (s) { return s.studentId; }).ToArray()
+                }),
+                success: function (data) {
+                    var tmpCallback = callback;
+                    if (tmpCallback) {
+                        tmpCallback(true);
+                    }
+                },
+                error: function (e) {
+                    var tmpCallback = callback;
+                    if (tmpCallback) {
+                        tmpCallback(false);
+                    }
+                }
+            });
+        };
+        this.addDeleteStudentsInClass = function (addIntoClassId, addStudents, deleteFromClassId, deleteStudents, callback) {
+            $.ajax({
+                type: "POST",
+                url: "Customgroup\\AddDeleteStudentsInClass",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    'addIntoClassId': addIntoClassId,
+                    'addStudents': addStudents,
+                    'deleteFromClassId': deleteFromClassId,
+                    'deleteStudents': deleteStudents
+                }),
+                success: function (data) {
+                    var tmpCallback = callback;
+                    if (tmpCallback) {
+                        tmpCallback(true);
+                    }
+                },
+                error: function (e) {
+                    var tmpCallback = callback;
+                    if (tmpCallback) {
+                        tmpCallback(false);
+                    }
+                }
+            });
+        };
         this.saveClasses = function (bandSet) {
             // ReSharper disable InconsistentNaming
             var groupsets = Array();
@@ -666,6 +734,17 @@ var ClassDefinition = (function () {
                 }
             }
         };
+        this.copy = function (source) {
+            _this.groupSetid = source.groupSetid;
+            _this.name = source.name;
+            _this.streamType = source.streamType;
+            for (var _i = 0, _a = source.students; _i < _a.length; _i++) {
+                var s = _a[_i];
+                _this.addStudent(s);
+            }
+            _this.calculateScore(_this.streamType);
+            _this.calculateClassesAverage();
+        };
         this.prepare = function (name) {
             switch (_this.parent.bandType) {
                 case BandType.None:
@@ -691,6 +770,19 @@ var ClassDefinition = (function () {
                     break;
             }
         };
+        this.calculateScore = function (streamType) {
+            switch (streamType) {
+                case StreamType.English:
+                    Enumerable.From(_this.students).ForEach(function (s) { return s.score = s.englishScore(); });
+                    break;
+                case StreamType.MathsAchievement:
+                    Enumerable.From(_this.students).ForEach(function (s) { return s.score = s.mathsAchievementScore(); });
+                    break;
+                default:
+                    Enumerable.From(_this.students).ForEach(function (s) { return s.score = s.overallAbilityScore(); });
+                    break;
+            }
+        };
         this.calculateClassesAverage = function () {
             _this.average = Enumerable.From(_this.students).Average(function (x) { return x.score; });
             _this.count = _this.students.length;
@@ -711,8 +803,31 @@ var ClassDefinition = (function () {
                 _this.girlsAverage = Enumerable.From(girls).Average(function (x) { return x.score; });
             }
         };
+        this.saveGroupName = function (callback) {
+            if (!_this.name || _this.name === "") {
+                var tmpCallback = callback;
+                if (tmpCallback) {
+                    tmpCallback(false);
+                }
+                return;
+            }
+        };
         this.uid = createUuid();
     }
+    Object.defineProperty(ClassDefinition.prototype, "streamType", {
+        get: function () {
+            return this._streamType;
+        },
+        set: function (value) {
+            this._streamType = value;
+            if (this.students && this.students.length > 0) {
+                this.calculateScore(value);
+                this.calculateClassesAverage();
+            }
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(ClassDefinition.prototype, "freeStudentCount", {
         get: function () {
             return Enumerable.From(this.students).Count(function (x) { return x.canMoveToOtherClass; });

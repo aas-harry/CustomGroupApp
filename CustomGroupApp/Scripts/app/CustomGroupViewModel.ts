@@ -2,7 +2,7 @@
     constructor(public containerElementName, rootSite: string) {
         super();
 
-        debugger;
+        
         this.rootSite = rootSite;
     }
 
@@ -143,7 +143,7 @@
 
     get generateCustomGroupViewModel(): GenerateCustomGroupViewModel {
         if (this._generateCustomGroupViewModel === undefined) {
-            this._generateCustomGroupViewModel = new GenerateCustomGroupViewModel();
+            this._generateCustomGroupViewModel = new GenerateCustomGroupViewModel(this);
         }
         return this._generateCustomGroupViewModel;
     }
@@ -224,11 +224,7 @@
         this.set("hasHiddenClasses", false);
         kendo.bind($("#custom-group-container"), this);
     };
-    hideClass = (e: any) => {
-        this.generateCustomGroupViewModel.hideClass(this.commonUtils.getUid(e.target.id));
-        this.set("hasHiddenClasses", true);
-        kendo.bind($("#custom-group-container"), this);
-    };
+   
     addPairStudent = (e: any) => {
         if (!this.pairedStudentsControl.onAddPairStudent(e.target.id)) {
             this.separatedStudentsControl.onAddPairStudent(e.target.id);

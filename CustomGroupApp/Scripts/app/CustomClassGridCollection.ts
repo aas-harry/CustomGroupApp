@@ -3,6 +3,9 @@
     private groupingHelper = new GroupingHelper();
     private studentClassListControls = new StudentClassListControl();
     private kendoHelper = new KendoHelper();
+    private hiddenClasses: Array<string> = [];
+    private elementName: string;
+    private bands: Array<BandDefinition>;
     private me = this;
     table: HTMLTableElement;
     header: HTMLTableSectionElement;
@@ -11,13 +14,18 @@
     footerRow: HTMLTableRowElement;
     classes: Array<ClassDefinition> = [];
     classCount = 0;
+    editClassMode = false;
 
-    initTable = (elementName: string, bands: Array<BandDefinition>, hiddenClasses: Array<string> = []) => {
+    initTable = (elementName: string, bands: Array<BandDefinition>, editClassMode = false) => {
+        this.elementName = elementName;
+        this.bands = bands;
+        this.editClassMode = editClassMode;
+
         $(elementName).html("<table id='custom-classes-table'></table>");
         this.table = document.getElementById("custom-classes-table") as HTMLTableElement;
         this.header = this.table.createTBody();
 
-        const hiddenClassLookup = Enumerable.From(hiddenClasses).ToDictionary(x => x, x => x);
+        const hiddenClassLookup = Enumerable.From(this.hiddenClasses).ToDictionary(x => x, x => x);
 
         if (bands.length === 1) {
             this.classRow = this.header.insertRow();
@@ -39,7 +47,9 @@
                     .createStudentClassInputContainer(this.classRow.insertCell(),
                         classItem,
                         this.onEditGroupName,
-                        this.onDropItem);
+                        this.onUpdateStudentsInClass,
+                        this.onHideClass,
+                        this.onDropItem, editClassMode);
             }
         } else {
             for (let band of bands) {
@@ -56,11 +66,32 @@
                         .createStudentClassInputContainer(this.classRow.insertCell(),
                         classItem,
                         this.onEditGroupName,
-                        this.onDropItem);
+                        this.onUpdateStudentsInClass,
+                        this.onHideClass,
+                        this.onDropItem, editClassMode);
                 }
             }
         }
     };
+
+    showAllClasses = () => {
+        this.hiddenClasses = [];
+        this.initTable(this.elementName, this.bands, this.editClassMode);
+    }
+
+    hideClassCallback: (classItem: ClassDefinition) => any;
+    classChangedCallback: (classItem: ClassDefinition) => any;
+
+    // Remove the selected class from the screen  
+    onHideClass = (classItem: ClassDefinition) => {
+        this.hiddenClasses.push(classItem.uid);
+        this.initTable(this.elementName, this.bands, this.editClassMode);
+
+        const tmpCallback = this.hideClassCallback;
+        if (tmpCallback) {
+            tmpCallback(classItem);
+        }
+    }
 
     onDropItem = (targetUid: string, sourceUid: string, studentId: number) : boolean => {
         var targetClass = Enumerable.From(this.classes).FirstOrDefault(undefined, x => x.uid === this.getUid(targetUid));
@@ -77,17 +108,43 @@
             this.studentClassListControls.updateClassSummaryContent(sourceClass);
             this.studentClassListControls.updateClassSummaryContent(targetClass);
 
+            // save the changes in database
+            if (this.editClassMode) {
+                this.groupingHelper.addDeleteStudentsInClass(targetClass.groupSetid,
+                    [student.studentId],
+                    sourceClass.groupSetid,
+                    [student.studentId],
+                    (status) => {
+                        //
+                    });
+            }
+
+            // Notify the caller the affected classes
+            const callback = this.classChangedCallback;
+            if (callback) {
+                callback(sourceClass);
+                callback(targetClass);
+            }
             return true;
         }
         return false;
     }
 
-    onEditGroupName = (e: any) => {
-        var uid = this.getUid(e.sender.element[0].id);
-        var classItem = Enumerable.From(this.classes).FirstOrDefault(undefined, x => x.uid === uid);
-        var inputField = e.sender as kendo.ui.MaskedTextBox;
-        if (classItem && inputField) {
-            classItem.name = inputField.value();
+    onUpdateStudentsInClass = (classItem: ClassDefinition, status: boolean) => {
+        // Use this callback function to notify the user
+        // Notify the caller the affected classes
+        const callback = this.classChangedCallback;
+        if(callback) {
+            callback(classItem);
+        }
+    }
+
+    onEditGroupName = (classItem: ClassDefinition, status: boolean) => {
+        // Use this callback function to notify the user
+        // Notify the caller the affected classes
+        const callback = this.classChangedCallback;
+        if (callback) {
+            callback(classItem);
         }
     }
 

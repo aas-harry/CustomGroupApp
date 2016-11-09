@@ -2,7 +2,16 @@ var StudentClassListControl = (function () {
     function StudentClassListControl() {
         var _this = this;
         this.kendoHelper = new KendoHelper();
-        this.createStudentClassInputContainer = function (cell, classItem, editGroupNameCallback, dropCallback) {
+        this.groupHelper = new GroupingHelper();
+        this.editClassMode = false;
+        this.createStudentClassInputContainer = function (cell, classItem, editGroupNameCallback, updateStudentsCallback, hideClassCallback, dragdropCallback, editClassMode) {
+            if (editClassMode === void 0) { editClassMode = false; }
+            _this.editGroupNameCallback = editGroupNameCallback;
+            _this.updateStudentsCallback = updateStudentsCallback;
+            _this.dragdropCallback = dragdropCallback;
+            _this.editClassMode = editClassMode;
+            _this.hideClassCallback = hideClassCallback;
+            _this.classItem = classItem;
             var classGridHeight = classItem.parent.classes.length > 3 && classItem.parent.bandType === BandType.None ? "500px" : "700px";
             var classGridWidth = classItem.parent.parent.parent.testFile.isUnisex ? "400px" : "300px";
             var container = document.createElement("div");
@@ -15,11 +24,11 @@ var StudentClassListControl = (function () {
             container.appendChild(gridElement);
             cell.appendChild(container);
             cell.appendChild(summaryElement);
-            return _this.createStudentClassGrid(gridElement.id, classItem, editGroupNameCallback, dropCallback);
+            return _this.createStudentClassGrid(gridElement.id, classItem);
             ;
         };
-        this.createStudentClassGrid = function (element, classItem, editGroupNameCallback, dropCallback) {
-            var grid = _this.createClassGrid(element, classItem, editGroupNameCallback);
+        this.createStudentClassGrid = function (element, classItem) {
+            var grid = _this.createClassGrid(element, classItem);
             $("#" + element).kendoDraggable({
                 filter: "tr",
                 hint: function (e) {
@@ -29,6 +38,7 @@ var StudentClassListControl = (function () {
                 },
                 group: "classGroup"
             });
+            var dropCallback = _this.dragdropCallback;
             grid.table.kendoDropTarget({
                 drop: function (e) {
                     var targetObject = (Object)(e.draggable.currentTarget[0]);
@@ -60,8 +70,11 @@ var StudentClassListControl = (function () {
             grid.resize();
             return grid;
         };
-        this.createClassGrid = function (element, classItem, editGroupCallback) {
+        this.createClassGrid = function (element, classItem) {
+            var self = _this;
             var groupNameElementId = "groupname-" + classItem.uid;
+            var updateClassElementId = "updateclass" + classItem.uid;
+            var hideClassElementId = "hideclass" + classItem.uid;
             var isUniSex = classItem.parent.parent.parent.testFile.isUnisex;
             var columns;
             if (isUniSex) {
@@ -80,7 +93,6 @@ var StudentClassListControl = (function () {
                 ];
             }
             var btnStyle = "style = 'margin-right: 5px'";
-            var btnClass = "class='btn-xs btn-default pull-right'";
             $("#" + element)
                 .kendoGrid({
                 columns: columns,
@@ -88,17 +100,43 @@ var StudentClassListControl = (function () {
                     mode: "single",
                     allowUnsort: true
                 },
-                toolbar: [{
-                        template: kendo.template(("Group Name: <input id='" + groupNameElementId + "' style='margin: 0 5px 0 5px' />") +
-                            ("<button " + btnClass + " id='class-" + classItem.uid + "' data-bind='click: hideClass' " + btnStyle + "'>Hide</button>"))
+                toolbar: [
+                    {
+                        template: kendo.template(("Group: <input id='" + groupNameElementId + "' style='margin: 0 5px 0 5px' />") +
+                            (_this.editClassMode ?
+                                "<button id='" + updateClassElementId + "' " + btnStyle + "'>Edit</button>"
+                                : "<button id='" + hideClassElementId + "' " + btnStyle + "'>Hide</button>"))
                     }],
                 selectable: "row",
                 dataSource: []
             });
+            _this.kendoHelper.createKendoButton(updateClassElementId, function (e) {
+                self.groupHelper.updateStudentsInClass(classItem, function (status) {
+                    var callback = self.updateStudentsCallback;
+                    if (callback) {
+                        callback(classItem, status);
+                    }
+                });
+            });
+            _this.kendoHelper.createKendoButton(hideClassElementId, function (e) {
+                var callback = self.hideClassCallback;
+                if (callback) {
+                    callback(classItem);
+                }
+            });
             $("#" + groupNameElementId)
                 .kendoMaskedTextBox({
                 value: classItem.name,
-                change: editGroupCallback
+                change: function (e) {
+                    var inputControl = e.sender;
+                    classItem.name = inputControl.value();
+                    if (self.editClassMode) {
+                        self.groupHelper.updateGroupName(classItem, function (status) { return self.editGroupNameCallback(classItem, status); });
+                    }
+                    else {
+                        self.editGroupNameCallback(classItem, true);
+                    }
+                }
             });
             // Create name tooltip
             $("#" + element).kendoTooltip({

@@ -626,6 +626,84 @@ class GroupingHelper {
         return classes;
     };
 
+    updateGroupName = (classDefn: ClassDefinition, callback: (boolean) => any) => {
+        $.ajax({
+            type: "POST",
+            url: "Customgroup\\UpdateGroupSetName",
+            contentType: "application/json",
+            data: JSON.stringify({ 'groupSetId': classDefn.groupSetid, 'groupName': classDefn.name }),
+            success(data) {
+                const tmpCallback = callback;
+                if (tmpCallback) {
+                    tmpCallback(true);
+                }
+            },
+            error(e) {
+                const tmpCallback = callback;
+                if (tmpCallback) {
+                    tmpCallback(false);
+                }
+            }
+        });
+    }
+
+    updateStudentsInClass = (classDefn: ClassDefinition, callback: (boolean) => any) => {
+        $.ajax({
+            type: "POST",
+            url: "Customgroup\\UpdateStudentsInClass",
+            contentType: "application/json",
+            data: JSON.stringify(
+                {
+                    'groupSetId': classDefn.groupSetid,
+                    'students': Enumerable.From(classDefn.students).Select(s => s.studentId).ToArray()
+                }),
+            success(data) {
+                const tmpCallback = callback;
+                if (tmpCallback) {
+                    tmpCallback(true);
+                }
+            },
+            error(e) {
+                const tmpCallback = callback;
+                if (tmpCallback) {
+                    tmpCallback(false);
+                }
+            }
+        });
+    }
+
+    addDeleteStudentsInClass = (addIntoClassId: number,
+        addStudents: Array<number>,
+        deleteFromClassId: number,
+        deleteStudents: Array<number>,
+        callback: (boolean) => any) => {
+        $.ajax({
+            type: "POST",
+            url: "Customgroup\\AddDeleteStudentsInClass",
+            contentType: "application/json",
+            data: JSON.stringify(
+                {
+                    'addIntoClassId': addIntoClassId,
+                    'addStudents': addStudents,
+                    'deleteFromClassId': deleteFromClassId,
+                    'deleteStudents': deleteStudents
+                }),
+            success(data) {
+                const tmpCallback = callback;
+                if (tmpCallback) {
+                    tmpCallback(true);
+                }
+            },
+            error(e) {
+                const tmpCallback = callback;
+                if (tmpCallback) {
+                    tmpCallback(false);
+                }
+            }
+        });
+    }
+
+   
     saveClasses = (bandSet: BandSet) => {
         // ReSharper disable InconsistentNaming
         var groupsets = Array<{'GroupSetId': number, 'TestNumber': number, 'Name': string, 'Students': Array<number>, 'Streaming': number}>();
@@ -679,6 +757,10 @@ class ClassDefinition {
     constructor(public parent: BandDefinition, public index: number, public count: number = 0, public notUsed = false) {
         this.uid = createUuid();
     }
+    // ReSharper disable InconsistentNaming
+    _streamType: StreamType;
+    // ReSharper restore InconsistentNaming
+
     groupSetid: number;
     uid: string;
     name: string;
@@ -688,6 +770,18 @@ class ClassDefinition {
     girlsCount: number;
     boysAverage: number;
     girlsAverage: number;
+    isSelected: boolean;
+
+    get streamType(): StreamType {
+        return this._streamType;
+    }
+    set streamType(value: StreamType) {
+        this._streamType = value;
+        if (this.students && this.students.length > 0) {
+            this.calculateScore(value);
+            this.calculateClassesAverage();
+        }
+    }
 
     get freeStudentCount(): number {
         return Enumerable.From(this.students).Count(x => x.canMoveToOtherClass);
@@ -713,6 +807,17 @@ class ClassDefinition {
                 return;
             }
         }
+    }
+
+    copy = (source: ClassDefinition) => {
+        this.groupSetid = source.groupSetid;
+        this.name = source.name;
+        this.streamType = source.streamType;
+        for (const s of source.students) {
+            this.addStudent(s);
+        }
+        this.calculateScore(this.streamType);
+        this.calculateClassesAverage();
     }
 
     prepare = (name: string) => {
@@ -741,6 +846,23 @@ class ClassDefinition {
         }
     }
 
+    calculateScore = (streamType: StreamType) => {
+        switch (streamType) {
+            case StreamType.English:
+                Enumerable.From(this.students).ForEach(s=> s.score = s.englishScore());
+                break;
+
+            case StreamType.MathsAchievement:
+                Enumerable.From(this.students).ForEach(s => s.score = s.mathsAchievementScore());
+                break;
+
+            default:
+                Enumerable.From(this.students).ForEach(s => s.score = s.overallAbilityScore());
+                break;
+
+        }
+    }
+
     calculateClassesAverage = () => {
         this.average = Enumerable.From(this.students).Average(x => x.score);
         this.count = this.students.length;
@@ -761,6 +883,18 @@ class ClassDefinition {
             this.girlsAverage = Enumerable.From(girls).Average(x => x.score);
         }
     };
+
+    saveGroupName = (callback: (boolean) => any) => {
+        if (!this.name || this.name === "") {
+            const tmpCallback = callback;
+            if (tmpCallback) {
+                tmpCallback(false);
+            }
+            return;
+        }
+
+
+    }
 }
 
 class BandDefinition {

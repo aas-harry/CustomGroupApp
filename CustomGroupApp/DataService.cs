@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using System.Web.Mvc.Html;
 using CustomGroupApp.Models;
-using Kendo.Mvc.Extensions;
 
 namespace CustomGroupApp
 {
@@ -43,14 +39,31 @@ namespace CustomGroupApp
             var students = (from gs in _dataService.GroupSets
                 join s in _dataService.GroupSetStudents on gs.Id equals s.GroupSetId
                 where gs.Testnum == testnum
-                select new { GroupSetId = gs.Id, gs.Name, s.StudentId}).ToList();
+                select new { GroupSetId = gs.Id, gs.Name, s.StudentId, Streaming = gs.Streaming.GetValueOrDefault()}).ToList();
        
             var classes = from s in students
-                group s by new {s.GroupSetId, s.Name}
+                group s by new {s.GroupSetId, s.Name, s.Streaming}
                 into g
-                select new CustomGroupSet {Name = g.Key.Name, GroupSetId = g.Key.GroupSetId, Students = g.Select(x=> x.StudentId).ToArray() };
+                select new CustomGroupSet
+                {
+                    Name = g.Key.Name,
+                    GroupSetId = g.Key.GroupSetId,
+                    Streaming = g.Key.Streaming,
+                    Students = g.Select(x=> x.StudentId).ToArray()
+                };
              
             return classes;
+        }
+
+        public void UpdateGroupSetName(int groupSetId, string name)
+        {
+            var groupSet = _dataService.GroupSets.FirstOrDefault(x => x.Id == groupSetId);
+            if (groupSet == null)
+            {
+                return;
+            }
+            groupSet.Name = name;
+            _dataService.SubmitChanges();
         }
 
         public void UpdateCustomGroupSets(IEnumerable<CustomGroupSet> groupSets, int testnum)
@@ -106,6 +119,56 @@ namespace CustomGroupApp
                 join sc in _dataService.SchoolCodes on t.Scode equals sc.Scode
                 join s in _dataService.Schools on sc.SchoolId equals s.Id
                 select s).FirstOrDefault();
+        }
+
+        public void UpdateStudentsInClass(int groupSetId, IEnumerable<int> students)
+        {
+            var existingStudents = _dataService.GroupSetStudents.Where(s => s.GroupSetId == groupSetId).ToList();
+            _dataService.GroupSetStudents.DeleteAllOnSubmit(existingStudents);
+            foreach(var studentId in students)
+            {
+                _dataService.GroupSetStudents.InsertOnSubmit(new GroupSetStudent {GroupSetId = groupSetId, StudentId = studentId});
+            }
+            _dataService.SubmitChanges();
+        }
+
+        public void AddDeleteStudentsInClass(int addIntoClassId, IEnumerable<int> addStudents, 
+            int deleteFromClassId, IEnumerable<int> deleteStudents)
+        {
+            var tmpStudents = addStudents as int[] ?? addStudents.ToArray();
+            if (addIntoClassId > 0 && tmpStudents.Any())
+            {
+                var students = _dataService.GroupSetStudents.Where(s => s.GroupSetId == addIntoClassId)
+                    .ToDictionary(x => x.StudentId);
+
+                foreach (var studentId in tmpStudents)
+                {
+                    if (!students.ContainsKey(studentId))
+                    {
+                        _dataService.GroupSetStudents.InsertOnSubmit(new GroupSetStudent
+                        {
+                            GroupSetId = addIntoClassId,
+                            StudentId = studentId
+                        });
+                    }
+                }
+            }
+
+            tmpStudents = deleteStudents as int[] ?? deleteStudents.ToArray();
+            if (deleteFromClassId > 0 && tmpStudents.Any())
+            {
+                var students = _dataService.GroupSetStudents.Where(s => s.GroupSetId == deleteFromClassId)
+                    .ToDictionary(x => x.StudentId);
+
+                foreach (var studentId in tmpStudents)
+                {
+                    if (students.ContainsKey(studentId))
+                    {
+                        _dataService.GroupSetStudents.DeleteOnSubmit(students[studentId]);
+                    }
+                }
+            }
+            _dataService.SubmitChanges();
         }
     }
 }

@@ -63,11 +63,36 @@ namespace CustomGroupApp.Controllers
         }
 
         [HttpPost]
+        public JsonResult UpdateStudentsInClass(int groupSetId, IEnumerable<int> students)
+        {
+            _dataService.UpdateStudentsInClass(groupSetId, students);
+            return Json(true);
+        }
+
+        [HttpPost]
+        public JsonResult AddDeleteStudentsInClass(int addIntoClassId, 
+            IEnumerable<int> addStudents, int deleteFromClassId, IEnumerable<int> deleteStudents)
+        {
+            _dataService.AddDeleteStudentsInClass(addIntoClassId, addStudents, 
+                deleteFromClassId,  deleteStudents);
+            return Json(true);
+        }
+
+      
+        [HttpPost]
+        public JsonResult UpdateGroupSetName(int groupSetId, string groupName)
+        {
+            _dataService.UpdateGroupSetName(groupSetId, groupName);
+            return Json(true);
+        }
+
+        [HttpPost]
         public JsonResult SaveCustomGroupSets(IEnumerable<CustomGroupSet> groupSets, int testNumber)
         {
             _dataService.UpdateCustomGroupSets(groupSets, testNumber);
             return Json(true);
         }
+
 
         public ActionResult SplitCustomGroupView(int groupSetId)
         {
@@ -227,9 +252,9 @@ namespace CustomGroupApp.Controllers
             return PartialView("GenerateCustomGroup");
         }
 
-        public ActionResult CustomGroupListView(int testnum)
+        public ActionResult CustomGroupListView()
         {
-            return PartialView("CustomGroupListView", testnum);
+            return PartialView("CustomGroupListView");
         }
     }
 }

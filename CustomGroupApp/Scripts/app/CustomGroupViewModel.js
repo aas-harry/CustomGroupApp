@@ -59,11 +59,6 @@ var CustomGroupViewModel = (function (_super) {
             _this.set("hasHiddenClasses", false);
             kendo.bind($("#custom-group-container"), _this);
         };
-        this.hideClass = function (e) {
-            _this.generateCustomGroupViewModel.hideClass(_this.commonUtils.getUid(e.target.id));
-            _this.set("hasHiddenClasses", true);
-            kendo.bind($("#custom-group-container"), _this);
-        };
         this.addPairStudent = function (e) {
             if (!_this.pairedStudentsControl.onAddPairStudent(e.target.id)) {
                 _this.separatedStudentsControl.onAddPairStudent(e.target.id);
@@ -164,7 +159,6 @@ var CustomGroupViewModel = (function (_super) {
             _this.set("errorMessage", "");
             return true;
         };
-        debugger;
         this.rootSite = rootSite;
     }
     Object.defineProperty(CustomGroupViewModel.prototype, "selectedGenderOption", {
@@ -286,7 +280,7 @@ var CustomGroupViewModel = (function (_super) {
     Object.defineProperty(CustomGroupViewModel.prototype, "generateCustomGroupViewModel", {
         get: function () {
             if (this._generateCustomGroupViewModel === undefined) {
-                this._generateCustomGroupViewModel = new GenerateCustomGroupViewModel();
+                this._generateCustomGroupViewModel = new GenerateCustomGroupViewModel(this);
             }
             return this._generateCustomGroupViewModel;
         },

@@ -37,7 +37,6 @@ var LanguageClassDefinitionViewModel = (function (_super) {
         };
         this.onUploadCompleted = function (e) {
             if (e && e.response) {
-                debugger;
                 _this.classesDefn.testFile.setStudentLanguagePrefs(e.response);
                 _this.createLanguageSet();
                 _this.addBandsAndClassesControl();

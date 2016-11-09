@@ -71,7 +71,7 @@
 
     onUploadCompleted = (e: any): any => {
         if (e && e.response) {
-            debugger;
+            
             this.classesDefn.testFile.setStudentLanguagePrefs(e.response);
             this.createLanguageSet();
             this.addBandsAndClassesControl();

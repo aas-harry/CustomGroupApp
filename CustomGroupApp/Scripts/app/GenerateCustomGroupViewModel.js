@@ -5,21 +5,24 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var GenerateCustomGroupViewModel = (function (_super) {
     __extends(GenerateCustomGroupViewModel, _super);
-    function GenerateCustomGroupViewModel() {
+    function GenerateCustomGroupViewModel(parentViewModel) {
         var _this = this;
         _super.call(this);
         this.groupingHelper = new GroupingHelper();
         this.kendoHelper = new KendoHelper();
-        this.customClassGridCollection = new CustomClassGridCollection();
-        this.hiddenClasses = [];
+        this.onHideClass = function (classItem) {
+            _this.parentViewModel.set("hasHiddenClasses", true);
+        };
+        this.onClassChanged = function (classItem) {
+            console.log("onClassChanged: " + classItem.groupSetid, classItem.name);
+        };
         this.showAllClasses = function () {
-            _this.hiddenClasses = [];
-            _this.customClassGridCollection.initTable("#classes-settings-container", _this.bandSet.bands);
+            _this.customClassGridCollection.showAllClasses();
         };
-        this.hideClass = function (uid) {
-            _this.hiddenClasses.push(uid);
-            _this.customClassGridCollection.initTable("#classes-settings-container", _this.bandSet.bands, _this.hiddenClasses);
-        };
+        this.parentViewModel = parentViewModel;
+        this.customClassGridCollection = new CustomClassGridCollection();
+        this.customClassGridCollection.hideClassCallback = this.onHideClass;
+        this.customClassGridCollection.classChangedCallback = this.onClassChanged;
     }
     GenerateCustomGroupViewModel.prototype.showClasses = function (source) {
         this.bandSet = source;

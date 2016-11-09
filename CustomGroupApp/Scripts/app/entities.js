@@ -90,6 +90,8 @@ var TestFile = (function () {
                 }
                 classItem.count = classItem.students.length;
                 classItem.name = item.Name;
+                classItem.groupSetid = item.GroupSetId;
+                classItem.streamType = item.Streaming;
                 _this.customGroups.push(classItem);
             }
         };
