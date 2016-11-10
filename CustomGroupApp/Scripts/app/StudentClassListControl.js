@@ -12,7 +12,9 @@ var StudentClassListControl = (function () {
             _this.editClassMode = editClassMode;
             _this.hideClassCallback = hideClassCallback;
             _this.classItem = classItem;
-            var classGridHeight = classItem.parent.classes.length > 3 && classItem.parent.bandType === BandType.None ? "500px" : "700px";
+            var classGridHeight = classItem.parent.classes.length > 3 && classItem.parent.bandType === BandType.None
+                ? "500px"
+                : "700px";
             var classGridWidth = classItem.parent.parent.parent.testFile.isUnisex ? "400px" : "300px";
             var container = document.createElement("div");
             container.setAttribute("style", "width: " + classGridWidth + "; height: " + classGridHeight + "; margin: 5px 0 0 0;");
@@ -29,7 +31,8 @@ var StudentClassListControl = (function () {
         };
         this.createStudentClassGrid = function (element, classItem) {
             var grid = _this.createClassGrid(element, classItem);
-            $("#" + element).kendoDraggable({
+            $("#" + element)
+                .kendoDraggable({
                 filter: "tr",
                 hint: function (e) {
                     var studentId = e[0].cells[1].textContent;
@@ -103,27 +106,29 @@ var StudentClassListControl = (function () {
                 toolbar: [
                     {
                         template: kendo.template(("Group: <input id='" + groupNameElementId + "' style='margin: 0 5px 0 5px' />") +
-                            (_this.editClassMode ?
-                                "<button id='" + updateClassElementId + "' " + btnStyle + "'>Edit</button>"
+                            (_this.editClassMode
+                                ? "<button id='" + updateClassElementId + "' " + btnStyle + "'>Edit</button>"
                                 : "<button id='" + hideClassElementId + "' " + btnStyle + "'>Hide</button>"))
-                    }],
+                    }
+                ],
                 selectable: "row",
                 dataSource: []
             });
+            // create edit button to add and remove students
             _this.kendoHelper.createKendoButton(updateClassElementId, function (e) {
-                self.groupHelper.updateStudentsInClass(classItem, function (status) {
-                    var callback = self.updateStudentsCallback;
-                    if (callback) {
-                        callback(classItem, status);
-                    }
-                });
+                var callback = self.updateStudentsCallback;
+                if (callback) {
+                    callback(classItem, true);
+                }
             });
+            // Crerate hide button
             _this.kendoHelper.createKendoButton(hideClassElementId, function (e) {
                 var callback = self.hideClassCallback;
                 if (callback) {
                     callback(classItem);
                 }
             });
+            // create group name field
             $("#" + groupNameElementId)
                 .kendoMaskedTextBox({
                 value: classItem.name,
@@ -139,13 +144,15 @@ var StudentClassListControl = (function () {
                 }
             });
             // Create name tooltip
-            $("#" + element).kendoTooltip({
+            $("#" + element)
+                .kendoTooltip({
                 filter: "td:nth-child(1)",
                 position: "center",
                 content: function (e) {
                     var dataItem = $("#" + element).data("kendoGrid").dataItem(e.target.closest("tr"));
                     var student = dataItem;
-                    var tooltipText = "<strong>" + student.name + "</strong><br>Gender: " + student.gender + "<br>Composite Score: " + student.score;
+                    var tooltipText = "<strong>" + student
+                        .name + "</strong><br>Gender: " + student.gender + "<br>Composite Score: " + student.score;
                     if (student.hasLanguagePrefs) {
                         tooltipText += "<br><br>1st Language Pref: " + (student.langPref1 === "" ? "None" : student.langPref1);
                         tooltipText += "<br>2nd Language Pref: " + (student.langPref2 === "" ? "None" : student.langPref2);
@@ -153,7 +160,8 @@ var StudentClassListControl = (function () {
                     }
                     return "<div style='background-color: lightgoldenrodyellow'><div style='text-align: left; padding: 15px;'>" + tooltipText + "</div></div>";
                 }
-            }).data("kendoTooltip");
+            })
+                .data("kendoTooltip");
             return $("#" + element).data("kendoGrid");
         };
         this.createClassSummary = function (classItem) {

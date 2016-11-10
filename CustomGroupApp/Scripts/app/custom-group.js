@@ -734,6 +734,13 @@ var ClassDefinition = (function () {
                 }
             }
         };
+        this.cleaAddStudents = function (students) {
+            _this.students = [];
+            for (var _i = 0, students_1 = students; _i < students_1.length; _i++) {
+                var s = students_1[_i];
+                _this.addStudent(s);
+            }
+        };
         this.copy = function (source) {
             _this.groupSetid = source.groupSetid;
             _this.name = source.name;
@@ -1128,8 +1135,8 @@ var ClassesDefinition = (function () {
             if (!students) {
                 students = testFile.students;
             }
-            for (var _i = 0, students_1 = students; _i < students_1.length; _i++) {
-                var s = students_1[_i];
+            for (var _i = 0, students_2 = students; _i < students_2.length; _i++) {
+                var s = students_2[_i];
                 this.students.push(new StudentClass(s));
                 if (s.sex === "M") {
                     this.boysCount++;

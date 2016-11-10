@@ -24,7 +24,9 @@
         this.hideClassCallback = hideClassCallback;
         this.classItem = classItem;
 
-        var classGridHeight = classItem.parent.classes.length > 3 && classItem.parent.bandType === BandType.None ? "500px" : "700px";
+        var classGridHeight = classItem.parent.classes.length > 3 && classItem.parent.bandType === BandType.None
+            ? "500px"
+            : "700px";
         var classGridWidth = classItem.parent.parent.parent.testFile.isUnisex ? "400px" : "300px";
         var container = document.createElement("div") as HTMLDivElement;
         container.setAttribute("style", `width: ${classGridWidth}; height: ${classGridHeight}; margin: 5px 0 0 0;`);
@@ -44,16 +46,18 @@
     createStudentClassGrid = (element: string, classItem: ClassDefinition): kendo.ui.Grid => {
         var grid = this.createClassGrid(element, classItem);
 
-        $(`#${element}`).kendoDraggable({
-            filter: "tr",
-            hint(e) {
-                const studentId = e[0].cells[1].textContent;
-                const studentName = e[0].cells[0].textContent;
-                return $(`<div id="student-${studentId}" style="background-color: DarkOrange; color: black"><div class="k-grid k-widget" style="padding=15px">${
-                    studentName}</div></div>`);
-            },
-            group: "classGroup"
-        });
+        $(`#${element}`)
+            .kendoDraggable({
+                filter: "tr",
+                hint(e) {
+                    const studentId = e[0].cells[1].textContent;
+                    const studentName = e[0].cells[0].textContent;
+                    return $(`<div id="student-${studentId
+                        }" style="background-color: DarkOrange; color: black"><div class="k-grid k-widget" style="padding=15px">${
+                        studentName}</div></div>`);
+                },
+                group: "classGroup"
+            });
 
         var dropCallback = this.dragdropCallback;
         grid.table.kendoDropTarget({
@@ -122,40 +126,47 @@
                     allowUnsort: true
                 },
                 toolbar: [
-                {
-                    template: kendo.template(
-                        `Group: <input id='${groupNameElementId}' style='margin: 0 5px 0 5px' />` +
-                        (this.editClassMode ?
-                             `<button id='${updateClassElementId}' ${btnStyle}'>Edit</button>`
-                            : `<button id='${hideClassElementId}' ${btnStyle}'>Hide</button>`)
-                    )
-                }],
+                    {
+                        template: kendo.template(
+                            `Group: <input id='${groupNameElementId}' style='margin: 0 5px 0 5px' />` +
+                            (this.editClassMode
+                                ? `<button id='${updateClassElementId}' ${btnStyle}'>Edit</button>`
+                                : `<button id='${hideClassElementId}' ${btnStyle}'>Hide</button>`)
+                        )
+                    }
+                ],
                 selectable: "row",
                 dataSource: []
             });
 
-        this.kendoHelper.createKendoButton(updateClassElementId, (e) => {
-            self.groupHelper.updateStudentsInClass(classItem, (status) => {
+        // create edit button to add and remove students
+        this.kendoHelper.createKendoButton(updateClassElementId,
+            (e) => {
+
                 const callback = self.updateStudentsCallback;
                 if (callback) {
-                    callback(classItem, status);
+                    callback(classItem, true);
+
+
                 }
             });
-        });
 
-        this.kendoHelper.createKendoButton(hideClassElementId, (e) => {
-            const callback = self.hideClassCallback;
-            if (callback) {
-                callback(classItem);
-            }
-        });
+        // Crerate hide button
+        this.kendoHelper.createKendoButton(hideClassElementId,
+            (e) => {
+                const callback = self.hideClassCallback;
+                if (callback) {
+                    callback(classItem);
+                }
+            });
 
+        // create group name field
         $(`#${groupNameElementId}`)
             .kendoMaskedTextBox({
                 value: classItem.name,
                 change: (e) => {
                     var inputControl = e.sender as kendo.ui.MaskedTextBox;
-               
+
                     classItem.name = inputControl.value();
                     if (self.editClassMode) {
                         self.groupHelper.updateGroupName(classItem,
@@ -167,23 +178,30 @@
             });
 
         // Create name tooltip
-        $(`#${element}`).kendoTooltip({
-            filter: "td:nth-child(1)", //this filter selects the first column cells
-            position: "center",
-            content(e) {
-                const dataItem = $(`#${element}`).data("kendoGrid").dataItem(e.target.closest("tr"));
-                const student = dataItem as StudentClassRow;
-                let tooltipText = `<strong>${student.name}</strong><br>Gender: ${student.gender}<br>Composite Score: ${student.score}`;
+        $(`#${element}`)
+            .kendoTooltip({
+                filter: "td:nth-child(1)", //this filter selects the first column cells
+                position: "center",
+                content(e) {
+                    const dataItem = $(`#${element}`).data("kendoGrid").dataItem(e.target.closest("tr"));
+                    const student = dataItem as StudentClassRow;
+                    let tooltipText = `<strong>${student
+                        .name}</strong><br>Gender: ${student.gender}<br>Composite Score: ${student.score}`;
 
-                if (student.hasLanguagePrefs) {
-                    tooltipText += `<br><br>1st Language Pref: ${student.langPref1 === "" ? "None" : student.langPref1}`;
-                    tooltipText += `<br>2nd Language Pref: ${student.langPref2 === "" ? "None" : student.langPref2}`;
-                    tooltipText += `<br>3rd Language Pref: ${student.langPref3 === "" ? "None" : student.langPref3}`;
+                    if (student.hasLanguagePrefs) {
+                        tooltipText += `<br><br>1st Language Pref: ${
+                            student.langPref1 === "" ? "None" : student.langPref1
+                            }`;
+                        tooltipText += `<br>2nd Language Pref: ${student.langPref2 === "" ? "None" : student.langPref2
+                            }`;
+                        tooltipText += `<br>3rd Language Pref: ${student.langPref3 === "" ? "None" : student.langPref3
+                            }`;
+                    }
+
+                    return "<div style='background-color: lightgoldenrodyellow'><div style='text-align: left; padding: 15px;'>" + tooltipText + "</div></div>";
                 }
-
-                return "<div style='background-color: lightgoldenrodyellow'><div style='text-align: left; padding: 15px;'>" + tooltipText + "</div></div>";
-            }
-        }).data("kendoTooltip");
+            })
+            .data("kendoTooltip");
 
         return $(`#${element}`).data("kendoGrid");
     }
@@ -191,7 +209,8 @@
     private createClassSummary = (classItem: ClassDefinition): HTMLDivElement => {
         var element = document.createElement("div");
         element.id = `summary-${classItem.uid}`;
-        element.setAttribute("style", "border-style: solid; border-color: #bfbfbf; border-width: 1px; padding: 5px 5px 5px 10px; margin: 5px 0 0 0");
+        element.setAttribute("style",
+            "border-style: solid; border-color: #bfbfbf; border-width: 1px; padding: 5px 5px 5px 10px; margin: 5px 0 0 0");
 
         return this.createClassSummaryContent(classItem, element);
     };

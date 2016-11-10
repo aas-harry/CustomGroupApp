@@ -48,7 +48,7 @@ var CustomGroupListViewModel = (function (_super) {
             self.bandSet.createBands("Custom", _this.selectedClass.count, 1);
             self.bandSet.bands[0].setClassCount(1);
             self.bandSet.bands[0].classes[0].copy(self.selectedClass);
-            _this.customClassGridCollection.initTable("#classes-settings-container", _this.bandSet.bands, true);
+            _this.customClassGridCollection.initTable("#classes-settings-container", _this.bandSet.bands, true, _this.classesDefn.students);
         };
         this.onSelectedCustomGroups = function (items) {
             var self = _this;
@@ -70,7 +70,7 @@ var CustomGroupListViewModel = (function (_super) {
                 self.bandSet.bands[0].classes[i].copy(item);
                 i++;
             }
-            self.customClassGridCollection.initTable("#classes-settings-container", self.bandSet.bands, true);
+            self.customClassGridCollection.initTable("#classes-settings-container", self.bandSet.bands, true, _this.classesDefn.students);
         };
         this.customClassGridCollection.classChangedCallback = this.onClassChanged;
     }

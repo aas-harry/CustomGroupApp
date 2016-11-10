@@ -809,6 +809,13 @@ class ClassDefinition {
         }
     }
 
+    cleaAddStudents = (students: Array<StudentClass>) => {
+        this.students = [];
+        for (const s of students) {
+            this.addStudent(s);
+        }
+    }
+
     copy = (source: ClassDefinition) => {
         this.groupSetid = source.groupSetid;
         this.name = source.name;

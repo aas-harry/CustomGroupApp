@@ -5,15 +5,17 @@ var CustomClassGridCollection = (function () {
         this.studentClassListControls = new StudentClassListControl();
         this.kendoHelper = new KendoHelper();
         this.hiddenClasses = [];
-        this.me = this;
         this.classes = [];
         this.classCount = 0;
         this.editClassMode = false;
-        this.initTable = function (elementName, bands, editClassMode) {
+        this.initTable = function (elementName, bands, editClassMode, students, popupWindowElement) {
             if (editClassMode === void 0) { editClassMode = false; }
+            if (popupWindowElement === void 0) { popupWindowElement = "popup-window-container"; }
             _this.elementName = elementName;
             _this.bands = bands;
             _this.editClassMode = editClassMode;
+            _this.popupWindowElement = popupWindowElement;
+            _this.students = students;
             $(elementName).html("<table id='custom-classes-table'></table>");
             _this.table = document.getElementById("custom-classes-table");
             _this.header = _this.table.createTBody();
@@ -56,12 +58,12 @@ var CustomClassGridCollection = (function () {
         };
         this.showAllClasses = function () {
             _this.hiddenClasses = [];
-            _this.initTable(_this.elementName, _this.bands, _this.editClassMode);
+            _this.initTable(_this.elementName, _this.bands, _this.editClassMode, _this.students, _this.popupWindowElement);
         };
         // Remove the selected class from the screen  
         this.onHideClass = function (classItem) {
             _this.hiddenClasses.push(classItem.uid);
-            _this.initTable(_this.elementName, _this.bands, _this.editClassMode);
+            _this.initTable(_this.elementName, _this.bands, _this.editClassMode, _this.students, _this.popupWindowElement);
             var tmpCallback = _this.hideClassCallback;
             if (tmpCallback) {
                 tmpCallback(classItem);
@@ -99,7 +101,10 @@ var CustomClassGridCollection = (function () {
             // Notify the caller the affected classes
             var callback = _this.classChangedCallback;
             if (callback) {
-                callback(classItem);
+                var studentSelector = new StudentSelector(20);
+                studentSelector.openDialog(document.getElementById(_this.popupWindowElement), _this.students, classItem.students, function (students) {
+                    classItem.cleaAddStudents(students);
+                }, 30);
             }
         };
         this.onEditGroupName = function (classItem, status) {

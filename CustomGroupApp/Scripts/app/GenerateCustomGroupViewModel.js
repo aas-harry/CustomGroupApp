@@ -26,7 +26,7 @@ var GenerateCustomGroupViewModel = (function (_super) {
     }
     GenerateCustomGroupViewModel.prototype.showClasses = function (source) {
         this.bandSet = source;
-        this.customClassGridCollection.initTable("#classes-settings-container", source.bands);
+        this.customClassGridCollection.initTable("#classes-settings-container", source.bands, false, []);
         return true;
     };
     return GenerateCustomGroupViewModel;

@@ -64,7 +64,7 @@
         self.bandSet.bands[0].setClassCount(1);
         self.bandSet.bands[0].classes[0].copy(self.selectedClass);
 
-        this.customClassGridCollection.initTable("#classes-settings-container", this.bandSet.bands, true);
+        this.customClassGridCollection.initTable("#classes-settings-container", this.bandSet.bands, true, this.classesDefn.students);
     }
 
    
@@ -88,6 +88,6 @@
             self.bandSet.bands[0].classes[i].copy(item);
             i++;
         }
-        self.customClassGridCollection.initTable("#classes-settings-container", self.bandSet.bands, true);
+        self.customClassGridCollection.initTable("#classes-settings-container", self.bandSet.bands, true, this.classesDefn.students);
     }
 }
