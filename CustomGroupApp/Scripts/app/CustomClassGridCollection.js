@@ -2,7 +2,6 @@ var CustomClassGridCollection = (function () {
     function CustomClassGridCollection() {
         var _this = this;
         this.groupingHelper = new GroupingHelper();
-        this.studentClassListControls = new StudentClassListControl();
         this.kendoHelper = new KendoHelper();
         this.hiddenClasses = [];
         this.classes = [];
@@ -19,6 +18,7 @@ var CustomClassGridCollection = (function () {
             $(elementName).html("<table id='custom-classes-table'></table>");
             _this.table = document.getElementById("custom-classes-table");
             _this.header = _this.table.createTBody();
+            _this.classListControls = [];
             var hiddenClassLookup = Enumerable.From(_this.hiddenClasses).ToDictionary(function (x) { return x; }, function (x) { return x; });
             if (bands.length === 1) {
                 _this.classRow = _this.header.insertRow();
@@ -35,8 +35,10 @@ var CustomClassGridCollection = (function () {
                         cnt = 0;
                     }
                     cnt++;
-                    _this.studentClassListControls
-                        .createStudentClassInputContainer(_this.classRow.insertCell(), classItem, _this.onEditGroupName, _this.onUpdateStudentsInClass, _this.onHideClass, _this.onDropItem, editClassMode);
+                    _this.classListControls.push({
+                        classId: classItem.uid,
+                        studentClassListControls: _this.createStudentClassListControl(classItem)
+                    });
                 }
             }
             else {
@@ -50,11 +52,18 @@ var CustomClassGridCollection = (function () {
                         if (hiddenClassLookup.Contains(classItem.uid)) {
                             continue;
                         }
-                        _this.studentClassListControls
-                            .createStudentClassInputContainer(_this.classRow.insertCell(), classItem, _this.onEditGroupName, _this.onUpdateStudentsInClass, _this.onHideClass, _this.onDropItem, editClassMode);
+                        _this.classListControls.push({
+                            classId: classItem.uid,
+                            studentClassListControls: _this.createStudentClassListControl(classItem)
+                        });
                     }
                 }
             }
+        };
+        this.createStudentClassListControl = function (classItem) {
+            var studentClassListControl = new StudentClassListControl(classItem, _this.students, _this.editClassMode, _this.popupWindowElement);
+            studentClassListControl.createStudentClassInputContainer(_this.classRow.insertCell(), _this.onEditGroupName, _this.onUpdateStudentsInClass, _this.onHideClass, _this.onDropItem);
+            return studentClassListControl;
         };
         this.showAllClasses = function () {
             _this.hiddenClasses = [];
@@ -78,36 +87,48 @@ var CustomClassGridCollection = (function () {
                 targetClass.addStudent(student);
                 sourceClass.calculateClassesAverage();
                 targetClass.calculateClassesAverage();
-                _this.studentClassListControls.updateClassSummaryContent(sourceClass);
-                _this.studentClassListControls.updateClassSummaryContent(targetClass);
+                var sourceControl = _this.getstudentClassListControl(sourceClass);
+                if (sourceControl) {
+                    sourceControl.updateClassSummaryContent();
+                }
+                var targetControl = _this.getstudentClassListControl(targetClass);
+                if (targetControl) {
+                    targetControl.updateClassSummaryContent();
+                }
                 // save the changes in database
                 if (_this.editClassMode) {
                     _this.groupingHelper.addDeleteStudentsInClass(targetClass.groupSetid, [student.studentId], sourceClass.groupSetid, [student.studentId], function (status) {
                         //
+                        if (status) {
+                            // Notify the caller the affected classes
+                            var callback = _this.classChangedCallback;
+                            if (callback) {
+                                callback(sourceClass);
+                                callback(targetClass);
+                            }
+                        }
                     });
-                }
-                // Notify the caller the affected classes
-                var callback = _this.classChangedCallback;
-                if (callback) {
-                    callback(sourceClass);
-                    callback(targetClass);
                 }
                 return true;
             }
             return false;
+        };
+        this.getstudentClassListControl = function (classItem) {
+            var item = Enumerable.From(_this.classListControls).FirstOrDefault(null, function (x) { return x.classId === classItem.uid; });
+            return item ? item.studentClassListControls : null;
         };
         this.onUpdateStudentsInClass = function (classItem, status) {
             // Use this callback function to notify the user
             // Notify the caller the affected classes
             var callback = _this.classChangedCallback;
             if (callback) {
-                var studentSelector = new StudentSelector(20);
-                studentSelector.openDialog(document.getElementById(_this.popupWindowElement), _this.students, classItem.students, function (students) {
-                    classItem.cleaAddStudents(students);
-                }, 30);
+                callback(classItem);
             }
         };
         this.onEditGroupName = function (classItem, status) {
+            if (!status) {
+                return;
+            }
             // Use this callback function to notify the user
             // Notify the caller the affected classes
             var callback = _this.classChangedCallback;

@@ -36,6 +36,7 @@ class CustomGroupListControl {
         classItems: Array<ClassDefinition>,
         selectedItemsCallback: (items: Array<number>) => any,
         selectedItemCallback: (item: ClassDefinition) => any) => {
+
         this.classItems = classItems;
         this.selectedItemCallback = selectedItemCallback;
         this.selectedItemsCallback = selectedItemsCallback;
@@ -50,19 +51,20 @@ class CustomGroupListControl {
 
         parentElement.appendChild(container);
 
-        return this.createClassList(gridElement.id, classItems, selectedItemsCallback, selectedItemCallback);;
+        return this.createClassList(gridElement.id, selectedItemsCallback, selectedItemCallback);;
     };
 
     updateClassItem = (classItem: ClassDefinition) => {
-        const row = Enumerable.From(this.dataSource).FirstOrDefault(null, x => x.groupSetId === classItem.groupSetid);
-        if (row) {
-            row.updateProperties(classItem);
-        }
+       
         const item = Enumerable.From(this.classItems).FirstOrDefault(null, x => x.groupSetid === classItem.groupSetid);
         if (item) {
             item.name = classItem.name;
             item.count = classItem.count;
-            
+            item.copy(classItem);
+        }
+        const row = Enumerable.From(this.dataSource).FirstOrDefault(null, x => x.groupSetId === classItem.groupSetid);
+        if (row) {
+            row.updateProperties(classItem);
         }
     }
 
@@ -96,10 +98,9 @@ class CustomGroupListControl {
 
     createClassList = (
         element: string,
-        classItems: Array<ClassDefinition>,
         selectedItemsCallback: (items: Array<number>) => any,
         selectedItemCallback: (item: ClassDefinition) => any): kendo.ui.Grid => {
-
+        const self = this;
 
         $(`#${element}`)
             .kendoGrid({
@@ -122,7 +123,7 @@ class CustomGroupListControl {
                 },
                 change: e => {
                     // an item has been selected from check box
-                    if (Enumerable.From(this.classItems).Any(x => x.isSelected)) {
+                    if (Enumerable.From(self.classItems).Any(x => x.isSelected)) {
                         return;
                     }
 
@@ -130,7 +131,7 @@ class CustomGroupListControl {
                     const row = gridControl.select().closest("tr");
                     const item = gridControl.dataItem(row);
 
-                    const classDefn = Enumerable.From(classItems)
+                    const classDefn = Enumerable.From(self.classItems)
                         .FirstOrDefault(null, s => s.groupSetid === item.get("groupSetId"));
                     const tmpCallback = selectedItemCallback;
                     if (tmpCallback != null) {
@@ -145,7 +146,7 @@ class CustomGroupListControl {
         this.gridControl.table.on("click", ".checkbox", this.toggleSelectedItem);
 
         this.dataSource = [];
-        Enumerable.From(classItems)
+        Enumerable.From(this.classItems)
             .ForEach(s => this.dataSource.push(new CustomGroupRowViewModel(s)));
         // Populate the grid
         this.gridControl.dataSource.data(this.dataSource);

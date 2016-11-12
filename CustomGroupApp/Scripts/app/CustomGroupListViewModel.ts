@@ -8,8 +8,7 @@
 
     constructor() {
         super();
-
-   
+        
         this.customClassGridCollection.classChangedCallback = this.onClassChanged;
     }
 

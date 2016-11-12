@@ -1,7 +1,6 @@
 ﻿class CustomClassGridCollection {
 
     private groupingHelper = new GroupingHelper();
-    private studentClassListControls = new StudentClassListControl();
     private kendoHelper = new KendoHelper();
     private hiddenClasses: Array<string> = [];
     private elementName: string;
@@ -16,9 +15,11 @@
     classCount = 0;
     editClassMode = false;
     popupWindowElement: string;
+    classListControls: Array<{ classId: string, studentClassListControls: StudentClassListControl}>;
 
 
-    initTable = (elementName: string, bands: Array<BandDefinition>, editClassMode = false, students, popupWindowElement = "popup-window-container") => {
+    initTable = (elementName: string, bands: Array<BandDefinition>, editClassMode = false, students,
+            popupWindowElement = "popup-window-container") => {
         this.elementName = elementName;
         this.bands = bands;
         this.editClassMode = editClassMode;
@@ -29,6 +30,7 @@
         this.table = document.getElementById("custom-classes-table") as HTMLTableElement;
         this.header = this.table.createTBody();
 
+        this.classListControls = [];
         const hiddenClassLookup = Enumerable.From(this.hiddenClasses).ToDictionary(x => x, x => x);
 
         if (bands.length === 1) {
@@ -47,13 +49,10 @@
                 }
                 cnt++;
 
-                this.studentClassListControls
-                    .createStudentClassInputContainer(this.classRow.insertCell(),
-                        classItem,
-                        this.onEditGroupName,
-                        this.onUpdateStudentsInClass,
-                        this.onHideClass,
-                        this.onDropItem, editClassMode);
+                this.classListControls.push({
+                    classId: classItem.uid,
+                    studentClassListControls: this.createStudentClassListControl(classItem)
+                });
             }
         } else {
             for (let band of bands) {
@@ -66,18 +65,27 @@
                         continue;
                     }
 
-                    this.studentClassListControls
-                        .createStudentClassInputContainer(this.classRow.insertCell(),
-                        classItem,
-                        this.onEditGroupName,
-                        this.onUpdateStudentsInClass,
-                        this.onHideClass,
-                        this.onDropItem, editClassMode);
+                    this.classListControls.push({
+                        classId: classItem.uid,
+                        studentClassListControls: this.createStudentClassListControl(classItem)
+                    });
                 }
             }
         }
     };
 
+    createStudentClassListControl = (classItem: ClassDefinition): StudentClassListControl => {
+        const studentClassListControl = new
+            StudentClassListControl(classItem, this.students, this.editClassMode, this.popupWindowElement);
+
+        studentClassListControl.createStudentClassInputContainer(this.classRow.insertCell(),
+            this.onEditGroupName,
+            this.onUpdateStudentsInClass,
+            this.onHideClass,
+            this.onDropItem);
+        return studentClassListControl;
+    }
+    
     showAllClasses = () => {
         this.hiddenClasses = [];
         this.initTable(this.elementName, this.bands, this.editClassMode, this.students, this.popupWindowElement);
@@ -109,8 +117,15 @@
             sourceClass.calculateClassesAverage();
             targetClass.calculateClassesAverage();
 
-            this.studentClassListControls.updateClassSummaryContent(sourceClass);
-            this.studentClassListControls.updateClassSummaryContent(targetClass);
+            const sourceControl = this.getstudentClassListControl(sourceClass);
+            if (sourceControl) {
+                sourceControl.updateClassSummaryContent();
+            }
+            const targetControl = this.getstudentClassListControl(targetClass);
+            if (targetControl) {
+                targetControl.updateClassSummaryContent();
+            }
+            
 
             // save the changes in database
             if (this.editClassMode) {
@@ -120,18 +135,26 @@
                     [student.studentId],
                     (status) => {
                         //
+                        if (status) {
+                            // Notify the caller the affected classes
+                            const callback = this.classChangedCallback;
+                            if (callback) {
+                                callback(sourceClass);
+                                callback(targetClass);
+                            }
+                        }
                     });
             }
 
-            // Notify the caller the affected classes
-            const callback = this.classChangedCallback;
-            if (callback) {
-                callback(sourceClass);
-                callback(targetClass);
-            }
+       
             return true;
         }
         return false;
+    }
+
+    getstudentClassListControl = (classItem: ClassDefinition): StudentClassListControl => {
+        const item = Enumerable.From(this.classListControls).FirstOrDefault(null, x => x.classId === classItem.uid);
+        return item ? item.studentClassListControls : null;
     }
 
     onUpdateStudentsInClass = (classItem: ClassDefinition, status: boolean) => {
@@ -139,23 +162,15 @@
         // Notify the caller the affected classes
         const callback = this.classChangedCallback;
         if (callback) {
-            const studentSelector = new StudentSelector(20);
-
-
-            studentSelector.openDialog(document.getElementById(this.popupWindowElement),
-                this.students,
-                classItem.students,
-                (students) => {
-                    this.groupHelper.updateStudentsInClass(classItem,
-                        (status) => {
-                            classItem.cleaAddStudents(students);
-                        });
-                }, 30);
-
+            callback(classItem);
         }
     }
 
     onEditGroupName = (classItem: ClassDefinition, status: boolean) => {
+        if (!status) {
+            return;
+        }
+
         // Use this callback function to notify the user
         // Notify the caller the affected classes
         const callback = this.classChangedCallback;

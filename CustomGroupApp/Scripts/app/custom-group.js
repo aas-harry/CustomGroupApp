@@ -734,7 +734,7 @@ var ClassDefinition = (function () {
                 }
             }
         };
-        this.cleaAddStudents = function (students) {
+        this.clearAddStudents = function (students) {
             _this.students = [];
             for (var _i = 0, students_1 = students; _i < students_1.length; _i++) {
                 var s = students_1[_i];
@@ -745,10 +745,7 @@ var ClassDefinition = (function () {
             _this.groupSetid = source.groupSetid;
             _this.name = source.name;
             _this.streamType = source.streamType;
-            for (var _i = 0, _a = source.students; _i < _a.length; _i++) {
-                var s = _a[_i];
-                _this.addStudent(s);
-            }
+            _this.clearAddStudents(source.students);
             _this.calculateScore(_this.streamType);
             _this.calculateClassesAverage();
         };

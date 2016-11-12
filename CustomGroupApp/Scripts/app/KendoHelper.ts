@@ -348,6 +348,13 @@
         return dropdownList;
     }
 
+    createToolTip = (element: string, text: string, position = "bottom") => {
+        $(`#${element}`).kendoTooltip({
+            position: position,
+            content: text
+        });
+    }
+
     createKendoButton = (element: string, clickCallback: (e: any) => any, icon: string = null): kendo.ui.Button => {
         $(`#${element}`)
             .kendoButton({

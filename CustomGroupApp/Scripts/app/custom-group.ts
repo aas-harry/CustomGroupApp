@@ -809,7 +809,7 @@ class ClassDefinition {
         }
     }
 
-    cleaAddStudents = (students: Array<StudentClass>) => {
+    clearAddStudents = (students: Array<StudentClass>) => {
         this.students = [];
         for (const s of students) {
             this.addStudent(s);
@@ -820,9 +820,7 @@ class ClassDefinition {
         this.groupSetid = source.groupSetid;
         this.name = source.name;
         this.streamType = source.streamType;
-        for (const s of source.students) {
-            this.addStudent(s);
-        }
+        this.clearAddStudents(source.students);
         this.calculateScore(this.streamType);
         this.calculateClassesAverage();
     }

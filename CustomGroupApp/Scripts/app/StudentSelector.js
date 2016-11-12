@@ -49,9 +49,10 @@ var StudentSelector = (function () {
             _this.container.appendChild(table);
             var body = table.createTBody();
             studentRows.push(body.insertRow());
+            var previousStudentLookup = Enumerable.From(previoustudents).ToDictionary(function (s) { return s.studentId; }, function (s) { return s; });
             for (var _b = 0, _c = Enumerable.From(students).OrderBy(function (x) { return x.name; }).ToArray(); _b < _c.length; _b++) {
                 var student = _c[_b];
-                if (previoustudents.indexOf(student) >= 0) {
+                if (previousStudentLookup.Contains(student.studentId)) {
                     continue;
                 }
                 if (cnt > _this.maxRows) {
@@ -119,18 +120,18 @@ var StudentSelector = (function () {
                 popupWindow.close();
             };
             saveButton.onclick = function () {
-                previoustudents.splice(0, previoustudents.length);
+                var selectedStudents = new Array();
                 var lookup = Enumerable.From(students).ToDictionary(function (x) { return x.id; }, function (x) { return x; });
                 Enumerable.From(_this.studentCheckboxes).Where(function (x) { return x.checked; }).ForEach(function (x) {
                     var studentid = parseInt(_this.commonUtils.getUid(x.id));
                     if (lookup.Contains(studentid)) {
-                        previoustudents.push(lookup.Get(studentid));
+                        selectedStudents.push(lookup.Get(studentid));
                     }
                 });
                 popupWindow.close();
                 var tmpCallback = callback;
                 if (tmpCallback) {
-                    tmpCallback(previoustudents);
+                    tmpCallback(selectedStudents);
                 }
             };
             $("#" + window.id).parent().addClass("h-window-caption");

@@ -55,8 +55,9 @@
         const body = table.createTBody();
         studentRows.push(body.insertRow());
 
+        const previousStudentLookup = Enumerable.From(previoustudents).ToDictionary(s => s.studentId, s => s);
         for (let student of Enumerable.From(students).OrderBy(x=> x.name).ToArray()) {
-            if (previoustudents.indexOf(student) >= 0) {
+            if (previousStudentLookup.Contains(student.studentId)) {
                 continue;
             }
             if (cnt > this.maxRows) {
@@ -136,13 +137,13 @@
             popupWindow.close();
         };
 
-        saveButton.onclick = () => { 
-            previoustudents.splice(0, previoustudents.length);
+        saveButton.onclick = () => {
+            var selectedStudents = new Array<StudentClass>();
             var lookup = Enumerable.From(students).ToDictionary(x => x.id, x => x);
             Enumerable.From(this.studentCheckboxes).Where(x => x.checked).ForEach(x => {
                 var studentid = parseInt(this.commonUtils.getUid(x.id));
                 if (lookup.Contains(studentid)) {
-                    previoustudents.push(lookup.Get(studentid));
+                    selectedStudents.push(lookup.Get(studentid));
                 }
             });
             
@@ -151,7 +152,7 @@
 
             const tmpCallback = callback;
             if (tmpCallback) {
-                tmpCallback(previoustudents);
+                tmpCallback(selectedStudents);
             }
         };
 

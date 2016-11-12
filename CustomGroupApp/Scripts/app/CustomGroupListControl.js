@@ -35,18 +35,19 @@ var CustomGroupListControl = (function () {
             gridElement.id = "class-list";
             container.appendChild(gridElement);
             parentElement.appendChild(container);
-            return _this.createClassList(gridElement.id, classItems, selectedItemsCallback, selectedItemCallback);
+            return _this.createClassList(gridElement.id, selectedItemsCallback, selectedItemCallback);
             ;
         };
         this.updateClassItem = function (classItem) {
-            var row = Enumerable.From(_this.dataSource).FirstOrDefault(null, function (x) { return x.groupSetId === classItem.groupSetid; });
-            if (row) {
-                row.updateProperties(classItem);
-            }
             var item = Enumerable.From(_this.classItems).FirstOrDefault(null, function (x) { return x.groupSetid === classItem.groupSetid; });
             if (item) {
                 item.name = classItem.name;
                 item.count = classItem.count;
+                item.copy(classItem);
+            }
+            var row = Enumerable.From(_this.dataSource).FirstOrDefault(null, function (x) { return x.groupSetId === classItem.groupSetid; });
+            if (row) {
+                row.updateProperties(classItem);
             }
         };
         //on click of the checkbox:
@@ -71,7 +72,8 @@ var CustomGroupListControl = (function () {
                     .ToArray());
             }
         };
-        this.createClassList = function (element, classItems, selectedItemsCallback, selectedItemCallback) {
+        this.createClassList = function (element, selectedItemsCallback, selectedItemCallback) {
+            var self = _this;
             $("#" + element)
                 .kendoGrid({
                 columns: [
@@ -93,13 +95,13 @@ var CustomGroupListControl = (function () {
                 },
                 change: function (e) {
                     // an item has been selected from check box
-                    if (Enumerable.From(_this.classItems).Any(function (x) { return x.isSelected; })) {
+                    if (Enumerable.From(self.classItems).Any(function (x) { return x.isSelected; })) {
                         return;
                     }
                     var gridControl = e.sender;
                     var row = gridControl.select().closest("tr");
                     var item = gridControl.dataItem(row);
-                    var classDefn = Enumerable.From(classItems)
+                    var classDefn = Enumerable.From(self.classItems)
                         .FirstOrDefault(null, function (s) { return s.groupSetid === item.get("groupSetId"); });
                     var tmpCallback = selectedItemCallback;
                     if (tmpCallback != null) {
@@ -111,7 +113,7 @@ var CustomGroupListControl = (function () {
             //bind click event to the checkbox
             _this.gridControl.table.on("click", ".checkbox", _this.toggleSelectedItem);
             _this.dataSource = [];
-            Enumerable.From(classItems)
+            Enumerable.From(_this.classItems)
                 .ForEach(function (s) { return _this.dataSource.push(new CustomGroupRowViewModel(s)); });
             // Populate the grid
             _this.gridControl.dataSource.data(_this.dataSource);

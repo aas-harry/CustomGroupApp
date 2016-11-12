@@ -246,6 +246,13 @@ var KendoHelper = (function () {
             var dropdownList = $("#" + element).data("kendoDropDownList");
             return dropdownList;
         };
+        this.createToolTip = function (element, text, position) {
+            if (position === void 0) { position = "bottom"; }
+            $("#" + element).kendoTooltip({
+                position: position,
+                content: text
+            });
+        };
         this.createKendoButton = function (element, clickCallback, icon) {
             if (icon === void 0) { icon = null; }
             $("#" + element)

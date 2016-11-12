@@ -39,7 +39,8 @@ namespace CustomGroupApp
             var students = (from gs in _dataService.GroupSets
                 join s in _dataService.GroupSetStudents on gs.Id equals s.GroupSetId
                 where gs.Testnum == testnum
-                select new { GroupSetId = gs.Id, gs.Name, s.StudentId, Streaming = gs.Streaming.GetValueOrDefault()}).ToList();
+                select new { GroupSetId = gs.Id, gs.Name, s.StudentId, Streaming = gs.Streaming.GetValueOrDefault()})
+                .OrderBy(x=> x.Name).ToList();
        
             var classes = from s in students
                 group s by new {s.GroupSetId, s.Name, s.Streaming}

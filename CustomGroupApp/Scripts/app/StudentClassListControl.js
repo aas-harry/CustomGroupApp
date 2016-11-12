@@ -1,36 +1,33 @@
 var StudentClassListControl = (function () {
-    function StudentClassListControl() {
+    function StudentClassListControl(classItem, students, editClassMode, popupWindowElement) {
         var _this = this;
+        if (editClassMode === void 0) { editClassMode = false; }
         this.kendoHelper = new KendoHelper();
-        this.groupHelper = new GroupingHelper();
+        this.groupingHelper = new GroupingHelper();
         this.editClassMode = false;
-        this.createStudentClassInputContainer = function (cell, classItem, editGroupNameCallback, updateStudentsCallback, hideClassCallback, dragdropCallback, editClassMode) {
-            if (editClassMode === void 0) { editClassMode = false; }
+        this.createStudentClassInputContainer = function (cell, editGroupNameCallback, updateStudentsCallback, hideClassCallback, dragdropCallback) {
             _this.editGroupNameCallback = editGroupNameCallback;
             _this.updateStudentsCallback = updateStudentsCallback;
             _this.dragdropCallback = dragdropCallback;
-            _this.editClassMode = editClassMode;
             _this.hideClassCallback = hideClassCallback;
-            _this.classItem = classItem;
-            var classGridHeight = classItem.parent.classes.length > 3 && classItem.parent.bandType === BandType.None
+            var classGridHeight = _this.classItem.parent.classes.length > 3 && _this.classItem.parent.bandType === BandType.None
                 ? "500px"
                 : "700px";
-            var classGridWidth = classItem.parent.parent.parent.testFile.isUnisex ? "400px" : "300px";
+            var classGridWidth = _this.classItem.parent.parent.parent.testFile.isUnisex ? "400px" : "300px";
             var container = document.createElement("div");
             container.setAttribute("style", "width: " + classGridWidth + "; height: " + classGridHeight + "; margin: 5px 0 0 0;");
-            container.id = "class-" + classItem.uid + "-container";
+            container.id = "class-" + _this.classItem.uid + "-container";
             var gridElement = document.createElement("div");
             gridElement.setAttribute("style", "height: 100%;");
-            gridElement.id = "class-" + classItem.uid;
-            var summaryElement = _this.createClassSummary(classItem);
+            gridElement.id = "class-" + _this.classItem.uid;
+            var summaryElement = _this.createClassSummary();
             container.appendChild(gridElement);
             cell.appendChild(container);
             cell.appendChild(summaryElement);
-            return _this.createStudentClassGrid(gridElement.id, classItem);
-            ;
+            return _this.createStudentClassGrid(gridElement.id, _this.classItem);
         };
         this.createStudentClassGrid = function (element, classItem) {
-            var grid = _this.createClassGrid(element, classItem);
+            _this.gridControl = _this.createClassGrid(element);
             $("#" + element)
                 .kendoDraggable({
                 filter: "tr",
@@ -42,7 +39,7 @@ var StudentClassListControl = (function () {
                 group: "classGroup"
             });
             var dropCallback = _this.dragdropCallback;
-            grid.table.kendoDropTarget({
+            _this.gridControl.table.kendoDropTarget({
                 drop: function (e) {
                     var targetObject = (Object)(e.draggable.currentTarget[0]);
                     var studentId = parseInt(targetObject.cells[1].textContent);
@@ -66,19 +63,22 @@ var StudentClassListControl = (function () {
                 group: "classGroup"
             });
             // Populate the grid
-            var students = [];
-            Enumerable.From(classItem.students).ForEach(function (x) { return students.push(new StudentClassRow(x)); });
-            grid.dataSource.data(students);
-            grid.refresh();
-            grid.resize();
-            return grid;
+            _this.setDatasource();
+            return _this.gridControl;
         };
-        this.createClassGrid = function (element, classItem) {
+        this.setDatasource = function () {
+            var students = [];
+            Enumerable.From(_this.classItem.students).OrderBy(function (x) { return x.name; }).ForEach(function (x) { return students.push(new StudentClassRow(x)); });
+            _this.gridControl.dataSource.data(students);
+            _this.gridControl.refresh();
+            _this.gridControl.resize();
+        };
+        this.createClassGrid = function (element) {
             var self = _this;
-            var groupNameElementId = "groupname-" + classItem.uid;
-            var updateClassElementId = "updateclass" + classItem.uid;
-            var hideClassElementId = "hideclass" + classItem.uid;
-            var isUniSex = classItem.parent.parent.parent.testFile.isUnisex;
+            var groupNameElementId = "groupname-" + _this.classItem.uid;
+            var updateClassElementId = "updateclass" + _this.classItem.uid;
+            var hideClassElementId = "hideclass" + _this.classItem.uid;
+            var isUniSex = _this.classItem.parent.parent.parent.testFile.isUnisex;
             var columns;
             if (isUniSex) {
                 columns = [
@@ -96,6 +96,7 @@ var StudentClassListControl = (function () {
                 ];
             }
             var btnStyle = "style = 'margin-right: 5px'";
+            // Create students grid
             $("#" + element)
                 .kendoGrid({
                 columns: columns,
@@ -114,32 +115,51 @@ var StudentClassListControl = (function () {
                 selectable: "row",
                 dataSource: []
             });
+            // The Tooltip
+            _this.kendoHelper.createToolTip(updateClassElementId, "Add or Remove students from this custom group");
             // create edit button to add and remove students
             _this.kendoHelper.createKendoButton(updateClassElementId, function (e) {
-                var callback = self.updateStudentsCallback;
-                if (callback) {
-                    callback(classItem, true);
-                }
+                var studentSelector = new StudentSelector(20);
+                studentSelector.openDialog(document.getElementById(self.popupWindowElement), self.students, self.classItem.students, function (students) {
+                    self.classItem.clearAddStudents(students);
+                    self.classItem.calculateClassesAverage();
+                    self.setDatasource();
+                    self.updateClassSummaryContent();
+                    _this.groupingHelper.updateStudentsInClass(self.classItem, function (status) {
+                        if (status) {
+                            var callback = self.updateStudentsCallback;
+                            if (callback) {
+                                callback(self.classItem, true);
+                            }
+                        }
+                    });
+                }, 30);
             });
             // Crerate hide button
             _this.kendoHelper.createKendoButton(hideClassElementId, function (e) {
                 var callback = self.hideClassCallback;
                 if (callback) {
-                    callback(classItem);
+                    callback(self.classItem);
                 }
             });
             // create group name field
             $("#" + groupNameElementId)
                 .kendoMaskedTextBox({
-                value: classItem.name,
+                value: _this.classItem.name,
                 change: function (e) {
                     var inputControl = e.sender;
-                    classItem.name = inputControl.value();
+                    self.classItem.name = inputControl.value();
+                    // Update group name in the database
                     if (self.editClassMode) {
-                        self.groupHelper.updateGroupName(classItem, function (status) { return self.editGroupNameCallback(classItem, status); });
+                        self.groupingHelper.updateGroupName(_this.classItem, function (status) {
+                            var callback = self.editGroupNameCallback;
+                            if (callback) {
+                                callback(self.classItem, status);
+                            }
+                        });
                     }
                     else {
-                        self.editGroupNameCallback(classItem, true);
+                        self.editGroupNameCallback(self.classItem, true);
                     }
                 }
             });
@@ -164,25 +184,25 @@ var StudentClassListControl = (function () {
                 .data("kendoTooltip");
             return $("#" + element).data("kendoGrid");
         };
-        this.createClassSummary = function (classItem) {
+        this.createClassSummary = function () {
             var element = document.createElement("div");
-            element.id = "summary-" + classItem.uid;
+            element.id = "summary-" + _this.classItem.uid;
             element.setAttribute("style", "border-style: solid; border-color: #bfbfbf; border-width: 1px; padding: 5px 5px 5px 10px; margin: 5px 0 0 0");
-            return _this.createClassSummaryContent(classItem, element);
+            return _this.createClassSummaryContent(element);
         };
-        this.updateClassSummaryContent = function (classItem) {
-            var element = document.getElementById("summary-" + classItem.uid);
+        this.updateClassSummaryContent = function () {
+            var element = document.getElementById("summary-" + _this.classItem.uid);
             if (element) {
-                _this.createClassSummaryContent(classItem, element);
+                _this.createClassSummaryContent(element);
             }
         };
-        this.createClassSummaryContent = function (classItem, container) {
+        this.createClassSummaryContent = function (container) {
             if (container.childElementCount > 0) {
                 while (container.hasChildNodes()) {
                     container.removeChild(container.lastChild);
                 }
             }
-            if (classItem.parent.parent.parent.testFile.isUnisex) {
+            if (_this.classItem.parent.parent.parent.testFile.isUnisex) {
                 var table = document.createElement("table");
                 var header = table.createTHead();
                 var headerRow = header.insertRow();
@@ -192,28 +212,32 @@ var StudentClassListControl = (function () {
                 var body = table.createTBody();
                 var schoolRow = body.insertRow();
                 _this.kendoHelper.createLabel(schoolRow.insertCell(), "Composite Score Avg.", 400);
-                _this.kendoHelper.createNumberLabel(schoolRow.insertCell(), classItem.count, 100);
-                _this.kendoHelper.createLabel(schoolRow.insertCell(), classItem.average.toFixed(0), 100);
+                _this.kendoHelper.createNumberLabel(schoolRow.insertCell(), _this.classItem.count, 100);
+                _this.kendoHelper.createLabel(schoolRow.insertCell(), _this.classItem.average.toFixed(0), 100);
                 schoolRow = body.insertRow();
                 _this.kendoHelper.createLabel(schoolRow.insertCell(), "Girls Comp. Score Avg.", 400);
-                _this.kendoHelper.createNumberLabel(schoolRow.insertCell(), classItem.girlsCount, 100);
-                _this.kendoHelper.createLabel(schoolRow.insertCell(), classItem.girlsAverage.toFixed(0), 100);
+                _this.kendoHelper.createNumberLabel(schoolRow.insertCell(), _this.classItem.girlsCount, 100);
+                _this.kendoHelper.createLabel(schoolRow.insertCell(), _this.classItem.girlsAverage.toFixed(0), 100);
                 schoolRow = body.insertRow();
                 _this.kendoHelper.createLabel(schoolRow.insertCell(), "Boys Comp. Score Avg.", 400);
-                _this.kendoHelper.createNumberLabel(schoolRow.insertCell(), classItem.boysCount, 100);
-                _this.kendoHelper.createLabel(schoolRow.insertCell(), classItem.boysAverage.toFixed(0), 100);
+                _this.kendoHelper.createNumberLabel(schoolRow.insertCell(), _this.classItem.boysCount, 100);
+                _this.kendoHelper.createLabel(schoolRow.insertCell(), _this.classItem.boysAverage.toFixed(0), 100);
                 container.appendChild(table);
             }
             else {
                 var elementCnt = document.createElement("div");
-                elementCnt.textContent = "No. of Students: " + classItem.count;
+                elementCnt.textContent = "No. of Students: " + _this.classItem.count;
                 var elementAvg = document.createElement("div");
-                elementAvg.textContent = "Composite Score Avg.: " + Math.round(classItem.average);
+                elementAvg.textContent = "Composite Score Avg.: " + Math.round(_this.classItem.average);
                 container.appendChild(elementCnt);
                 container.appendChild(elementAvg);
             }
             return container;
         };
+        this.classItem = classItem;
+        this.students = students;
+        this.editClassMode = editClassMode;
+        this.popupWindowElement = popupWindowElement;
     }
     return StudentClassListControl;
 }());

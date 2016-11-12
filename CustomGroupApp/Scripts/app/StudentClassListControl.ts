@@ -1,50 +1,59 @@
 ﻿class StudentClassListControl {
     private kendoHelper = new KendoHelper();
-    private groupHelper = new GroupingHelper();
+    private groupingHelper = new GroupingHelper();
     private editGroupNameCallback: (classItem: ClassDefinition, status: boolean) => any;
     private updateStudentsCallback: (classItem: ClassDefinition, status: boolean) => any;
     private hideClassCallback: (classItem: ClassDefinition) => any;
     private dragdropCallback: (targetUid: string, sourceUid: string, studentId: number) => any;
     private editClassMode = false;
     private classItem: ClassDefinition;
+    private students: Array<StudentClass>;
+    private popupWindowElement: string;
+    private gridControl: kendo.ui.Grid;
+    constructor(classItem: ClassDefinition, students: Array<StudentClass>,
+        editClassMode = false, popupWindowElement: string) {
+        this.classItem = classItem;
+        this.students = students;
+        this.editClassMode = editClassMode;
+        this.popupWindowElement = popupWindowElement;
+    }
 
     createStudentClassInputContainer = (
         cell: HTMLTableCellElement,
-        classItem: ClassDefinition,
         editGroupNameCallback: (classItem: ClassDefinition, status: boolean) => any,
         updateStudentsCallback: (classItem: ClassDefinition, status: boolean) => any,
         hideClassCallback: (classItem: ClassDefinition) => any,
-        dragdropCallback: (targetUid: string, sourceUid: string, studentId: number) => any,
-        editClassMode = false
-    ) => {
+        dragdropCallback: (targetUid: string, sourceUid: string, studentId: number) => any): kendo.ui.Grid => {
         this.editGroupNameCallback = editGroupNameCallback;
         this.updateStudentsCallback = updateStudentsCallback;
         this.dragdropCallback = dragdropCallback;
-        this.editClassMode = editClassMode;
         this.hideClassCallback = hideClassCallback;
-        this.classItem = classItem;
 
-        var classGridHeight = classItem.parent.classes.length > 3 && classItem.parent.bandType === BandType.None
+        const classGridHeight = this.classItem.parent.classes.length > 3 && this.classItem.parent.bandType === BandType.None
             ? "500px"
             : "700px";
-        var classGridWidth = classItem.parent.parent.parent.testFile.isUnisex ? "400px" : "300px";
-        var container = document.createElement("div") as HTMLDivElement;
+
+        const classGridWidth = this.classItem.parent.parent.parent.testFile.isUnisex ? "400px" : "300px";
+
+        const container = document.createElement("div") as HTMLDivElement;
         container.setAttribute("style", `width: ${classGridWidth}; height: ${classGridHeight}; margin: 5px 0 0 0;`);
-        container.id = `class-${classItem.uid}-container`;
-        var gridElement = document.createElement("div") as HTMLDivElement;
+        container.id = `class-${this.classItem.uid}-container`;
+
+        const gridElement = document.createElement("div") as HTMLDivElement;
         gridElement.setAttribute("style", "height: 100%;");
-        gridElement.id = `class-${classItem.uid}`;
-        var summaryElement = this.createClassSummary(classItem);
+        gridElement.id = `class-${this.classItem.uid}`;
+
+        const summaryElement = this.createClassSummary();
         container.appendChild(gridElement);
 
         cell.appendChild(container);
         cell.appendChild(summaryElement);
 
-        return this.createStudentClassGrid(gridElement.id, classItem);;
+        return this.createStudentClassGrid(gridElement.id, this.classItem);
     };
 
     createStudentClassGrid = (element: string, classItem: ClassDefinition): kendo.ui.Grid => {
-        var grid = this.createClassGrid(element, classItem);
+        this.gridControl = this.createClassGrid(element);
 
         $(`#${element}`)
             .kendoDraggable({
@@ -60,7 +69,7 @@
             });
 
         var dropCallback = this.dragdropCallback;
-        grid.table.kendoDropTarget({
+        this.gridControl.table.kendoDropTarget({
             drop(e) {
                 const targetObject = (Object)(e.draggable.currentTarget[0]);
                 const studentId = parseInt(targetObject.cells[1].textContent);
@@ -86,20 +95,24 @@
         });
 
         // Populate the grid
-        var students: Array<StudentClassRow> = [];
-        Enumerable.From(classItem.students).ForEach(x => students.push(new StudentClassRow(x)));
-        grid.dataSource.data(students);
-        grid.refresh();
-        grid.resize();
-        return grid;
+        this.setDatasource();
+        return this.gridControl;
     }
 
-    createClassGrid = (element: string, classItem: ClassDefinition): kendo.ui.Grid => {
+    setDatasource = () => {
+        var students: Array<StudentClassRow> = [];
+        Enumerable.From(this.classItem.students).OrderBy(x => x.name).ForEach(x => students.push(new StudentClassRow(x)));
+        this.gridControl.dataSource.data(students);
+        this.gridControl.refresh();
+        this.gridControl.resize();
+    }
+
+    createClassGrid = (element: string): kendo.ui.Grid => {
         const self = this;
-        const groupNameElementId = "groupname-" + classItem.uid;
-        const updateClassElementId = "updateclass" + classItem.uid;
-        const hideClassElementId = "hideclass" + classItem.uid;
-        const isUniSex = classItem.parent.parent.parent.testFile.isUnisex;
+        const groupNameElementId = "groupname-" + this.classItem.uid;
+        const updateClassElementId = "updateclass" + this.classItem.uid;
+        const hideClassElementId = "hideclass" + this.classItem.uid;
+        const isUniSex = this.classItem.parent.parent.parent.testFile.isUnisex;
 
         let columns: { field: string; title: string; width: string; attributes: { class: string } }[];
         if (isUniSex) {
@@ -118,6 +131,7 @@
         }
 
         const btnStyle = "style = 'margin-right: 5px'";
+        // Create students grid
         $(`#${element}`)
             .kendoGrid({
                 columns: columns,
@@ -139,16 +153,33 @@
                 dataSource: []
             });
 
+        // The Tooltip
+        this.kendoHelper.createToolTip(updateClassElementId, "Add or Remove students from this custom group");
+
         // create edit button to add and remove students
         this.kendoHelper.createKendoButton(updateClassElementId,
             (e) => {
+                const studentSelector = new StudentSelector(20);
+                studentSelector.openDialog(document.getElementById(self.popupWindowElement),
+                    self.students,
+                    self.classItem.students,
+                    (students) => {
+                        self.classItem.clearAddStudents(students);
+                        self.classItem.calculateClassesAverage();
+                        self.setDatasource();
+                        self.updateClassSummaryContent();
 
-                const callback = self.updateStudentsCallback;
-                if (callback) {
-                    callback(classItem, true);
-
-
-                }
+                        this.groupingHelper.updateStudentsInClass(self.classItem,
+                            (status) => {
+                                if (status) {
+                                    const callback = self.updateStudentsCallback;
+                                    if (callback) {
+                                        callback(self.classItem, true);
+                                    }
+                                }
+                            });
+                    },
+                    30);
             });
 
         // Crerate hide button
@@ -156,23 +187,29 @@
             (e) => {
                 const callback = self.hideClassCallback;
                 if (callback) {
-                    callback(classItem);
+                    callback(self.classItem);
                 }
             });
 
         // create group name field
         $(`#${groupNameElementId}`)
             .kendoMaskedTextBox({
-                value: classItem.name,
+                value: this.classItem.name,
                 change: (e) => {
                     var inputControl = e.sender as kendo.ui.MaskedTextBox;
 
-                    classItem.name = inputControl.value();
+                    self.classItem.name = inputControl.value();
+                    // Update group name in the database
                     if (self.editClassMode) {
-                        self.groupHelper.updateGroupName(classItem,
-                            (status) => self.editGroupNameCallback(classItem, status));
+                        self.groupingHelper.updateGroupName(this.classItem,
+                            (status) => {
+                                const callback = self.editGroupNameCallback;
+                                if (callback) {
+                                    callback(self.classItem, status);
+                                }
+                            });
                     } else {
-                        self.editGroupNameCallback(classItem, true);
+                        self.editGroupNameCallback(self.classItem, true);
                     }
                 }
             });
@@ -206,29 +243,29 @@
         return $(`#${element}`).data("kendoGrid");
     }
 
-    private createClassSummary = (classItem: ClassDefinition): HTMLDivElement => {
+    private createClassSummary = (): HTMLDivElement => {
         var element = document.createElement("div");
-        element.id = `summary-${classItem.uid}`;
+        element.id = `summary-${this.classItem.uid}`;
         element.setAttribute("style",
             "border-style: solid; border-color: #bfbfbf; border-width: 1px; padding: 5px 5px 5px 10px; margin: 5px 0 0 0");
 
-        return this.createClassSummaryContent(classItem, element);
+        return this.createClassSummaryContent(element);
     };
 
-    updateClassSummaryContent = (classItem: ClassDefinition) => {
-        var element = document.getElementById(`summary-${classItem.uid}`) as HTMLDivElement;
+    updateClassSummaryContent = () => {
+        var element = document.getElementById(`summary-${this.classItem.uid}`) as HTMLDivElement;
         if (element) {
-            this.createClassSummaryContent(classItem, element);
+            this.createClassSummaryContent(element);
         }
     }
 
-    private createClassSummaryContent = (classItem: ClassDefinition, container: HTMLDivElement): HTMLDivElement => {
+    private createClassSummaryContent = (container: HTMLDivElement): HTMLDivElement => {
         if (container.childElementCount > 0) {
             while (container.hasChildNodes()) {
                 container.removeChild(container.lastChild);
             }
         }
-        if (classItem.parent.parent.parent.testFile.isUnisex) {
+        if (this.classItem.parent.parent.parent.testFile.isUnisex) {
             const table = document.createElement("table") as HTMLTableElement;
             const header = table.createTHead();
             const headerRow = header.insertRow();
@@ -240,23 +277,23 @@
 
             let schoolRow = body.insertRow();
             this.kendoHelper.createLabel(schoolRow.insertCell(), "Composite Score Avg.", 400);
-            this.kendoHelper.createNumberLabel(schoolRow.insertCell(), classItem.count, 100);
-            this.kendoHelper.createLabel(schoolRow.insertCell(), classItem.average.toFixed(0), 100);
+            this.kendoHelper.createNumberLabel(schoolRow.insertCell(), this.classItem.count, 100);
+            this.kendoHelper.createLabel(schoolRow.insertCell(), this.classItem.average.toFixed(0), 100);
             schoolRow = body.insertRow();
             this.kendoHelper.createLabel(schoolRow.insertCell(), "Girls Comp. Score Avg.", 400);
-            this.kendoHelper.createNumberLabel(schoolRow.insertCell(), classItem.girlsCount, 100);
-            this.kendoHelper.createLabel(schoolRow.insertCell(), classItem.girlsAverage.toFixed(0), 100);
+            this.kendoHelper.createNumberLabel(schoolRow.insertCell(), this.classItem.girlsCount, 100);
+            this.kendoHelper.createLabel(schoolRow.insertCell(), this.classItem.girlsAverage.toFixed(0), 100);
             schoolRow = body.insertRow();
             this.kendoHelper.createLabel(schoolRow.insertCell(), "Boys Comp. Score Avg.", 400);
-            this.kendoHelper.createNumberLabel(schoolRow.insertCell(), classItem.boysCount, 100);
-            this.kendoHelper.createLabel(schoolRow.insertCell(), classItem.boysAverage.toFixed(0), 100);
+            this.kendoHelper.createNumberLabel(schoolRow.insertCell(), this.classItem.boysCount, 100);
+            this.kendoHelper.createLabel(schoolRow.insertCell(), this.classItem.boysAverage.toFixed(0), 100);
 
             container.appendChild(table);
         } else {
             var elementCnt = document.createElement("div");
-            elementCnt.textContent = "No. of Students: " + classItem.count;
+            elementCnt.textContent = "No. of Students: " + this.classItem.count;
             var elementAvg = document.createElement("div");
-            elementAvg.textContent = "Composite Score Avg.: " + Math.round(classItem.average);
+            elementAvg.textContent = "Composite Score Avg.: " + Math.round(this.classItem.average);
             container.appendChild(elementCnt);
             container.appendChild(elementAvg);
         }

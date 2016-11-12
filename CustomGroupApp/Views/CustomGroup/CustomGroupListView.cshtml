@@ -30,9 +30,10 @@
     <div class="container-fluid" id="custom-group-view">
        
         <div id="custom-group-action"data-binding="visible: isReady">
-            <button class="btn btn-default" data-bind="click: create">Create</button>
-            <button class="btn btn-default" data-bind="click: delete">Delete</button>
-            <button class="btn btn-default" data-bind="click: edit">Edit</button>
+            <button id="create-button" class="k-button" data-bind="click: create">Create</button>
+            <button id="delete-button" class="k-button" data-bind="click: delete">Delete</button>
+            <button id="regroup-button" class="k-button" data-bind="click: edit">Split Group</button>
+            <button id="export-button" class="k-button" data-bind="click: edit">Export</button>
         </div>
 
         <table>
@@ -54,6 +55,12 @@
         var customgroupListViewModel;
         $(document)
             .ready(function () {
+                var kendoHelper = new KendoHelper();
+                kendoHelper.createToolTip("create-button", "Create a new custom group");
+                kendoHelper.createToolTip("delete-button", "Delete selected custom group");
+                kendoHelper.createToolTip("regroup-button", "Create one or more custom groups using selected custom group");
+                kendoHelper.createToolTip("export-button", "Export selected gropup to csv or excel file");
+
                 customgroupListViewModel = new CustomGroupListViewModel();
                 customgroupListViewModel.setDatasource(testFile);
                 customgroupListViewModel.showCustomGroups("custom-group-menu-panel");
