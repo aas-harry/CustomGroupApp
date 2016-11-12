@@ -612,6 +612,29 @@ var GroupingHelper = (function () {
                 }
             });
         };
+        this.deleteClasses = function (groupSets, testnum, callback) {
+            $.ajax({
+                type: "POST",
+                url: "CustomGroup\\DeleteCustomGroupSets",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    'groupSets': groupSets,
+                    'testnum': testnum
+                }),
+                success: function (status) {
+                    var tmpCallback = callback;
+                    if (tmpCallback) {
+                        tmpCallback(true);
+                    }
+                },
+                error: function (e) {
+                    var tmpCallback = callback;
+                    if (tmpCallback) {
+                        tmpCallback(false);
+                    }
+                }
+            });
+        };
         this.updateStudentsInClass = function (classDefn, callback) {
             $.ajax({
                 type: "POST",

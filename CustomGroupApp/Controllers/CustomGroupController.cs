@@ -87,6 +87,12 @@ namespace CustomGroupApp.Controllers
         }
 
         [HttpPost]
+        public JsonResult DeleteCustomGroupSets(IEnumerable<int> groupSets, int testnum)
+        {
+            return Json(_dataService.DeleteCustomGroupSets(groupSets, testnum));
+        }
+
+        [HttpPost]
         public JsonResult SaveCustomGroupSets(IEnumerable<CustomGroupSet> groupSets, int testNumber)
         {
             _dataService.UpdateCustomGroupSets(groupSets, testNumber);

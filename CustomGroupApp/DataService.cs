@@ -34,6 +34,22 @@ namespace CustomGroupApp
             _dataService.SubmitChanges();
         }
 
+        public bool DeleteCustomGroupSets(IEnumerable<int> groupSets, int testnum)
+        {
+            var tmpGroupSets = groupSets.ToArray();
+            foreach (var g in _dataService.GroupSets.Where(x => x.Testnum == testnum).ToArray())
+            {
+                if (!tmpGroupSets.Contains(g.Id))
+                {
+                    continue;
+                }
+                _dataService.GroupSetStudents.DeleteAllOnSubmit(_dataService.GroupSetStudents.Where(x=> x.GroupSetId == g.Id));
+                _dataService.GroupSets.DeleteOnSubmit(g);
+            }
+            _dataService.SubmitChanges();
+            return true;
+        }
+
         public IEnumerable<CustomGroupSet> GetCustomGroupSets(int testnum)
         {
             var students = (from gs in _dataService.GroupSets

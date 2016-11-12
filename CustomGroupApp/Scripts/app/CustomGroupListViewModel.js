@@ -8,14 +8,15 @@ var CustomGroupListViewModel = (function (_super) {
     function CustomGroupListViewModel() {
         var _this = this;
         _super.call(this);
+        this.groupingHelper = new GroupingHelper();
         this.customGroupListControl = new CustomGroupListControl();
         this.customClassGridCollection = new CustomClassGridCollection();
-        this.create = function () {
-            var myself = _this;
+        this.splitgroup = function () {
             $.ajax({
                 type: "POST",
                 url: "CustomGroup\\SplitCustomGroupView",
-                data: { 'groupSetId': myself.selectedClass.groupSetid },
+                contentType: "application/json",
+                data: JSON.stringify({ 'groupSetId': _this.selectedClass.groupSetid }),
                 success: function (html) {
                     $("#content").replaceWith("<div id='content'></div>");
                     $("#content").append(html);
@@ -24,11 +25,39 @@ var CustomGroupListViewModel = (function (_super) {
                 }
             });
         };
-        this.regroup = function () {
-        };
-        this.edit = function () {
+        this.create = function () {
+            $.ajax({
+                type: "POST",
+                url: "CustomGroup\\CustomGroupWizard",
+                success: function (html) {
+                    $("#content").replaceWith("<div id='content'></div>");
+                    $("#content").append(html);
+                },
+                error: function (e) {
+                }
+            });
         };
         this.delete = function () {
+            var self = _this;
+            var selectedItems = _this.customGroupListControl.selectedItems;
+            if (selectedItems.length === 0) {
+                var selectedItem = _this.customGroupListControl.selectedItem;
+                if (selectedItem) {
+                    selectedItems.push(selectedItem);
+                }
+            }
+            if (selectedItems.length === 0) {
+                return;
+            }
+            _this.set("message", "Deleting selected custom groups...");
+            _this.set("hasMessage", true);
+            _this.groupingHelper.deleteClasses(Enumerable.From(selectedItems).Select(function (x) { return x.groupSetid; }).ToArray(), _this.classesDefn.testFile.fileNumber, function (status) {
+                if (status) {
+                    self.customGroupListControl.deleteClassItems(selectedItems);
+                }
+                self.set("message", null);
+                _this.set("hasMessage", false);
+            });
         };
         this.showCustomGroups = function (elementName) {
             _this.customGroupListControl.create(document.getElementById(elementName), _this.testInfo.customGroups, _this.onSelectedCustomGroups, _this.onSelectedCustomGroup);
@@ -39,7 +68,6 @@ var CustomGroupListViewModel = (function (_super) {
             _this.bandSet = new BandSet(_this.classesDefn, "Custom", 0);
         };
         this.onClassChanged = function (classItem) {
-            console.log("onClassChanged: " + classItem.groupSetid, classItem.name);
             _this.customGroupListControl.updateClassItem(classItem);
         };
         this.onSelectedCustomGroup = function (item) {

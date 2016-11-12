@@ -13,6 +13,7 @@ var CustomGroupRowViewModel = (function (_super) {
             _this.set("groupSetId", classItem.groupSetid);
             _this.set("studentCount", classItem.count);
         };
+        this.source = classItem;
         this.updateProperties(classItem);
     }
     return CustomGroupRowViewModel;
@@ -23,6 +24,8 @@ var CustomGroupListControl = (function () {
         var _this = this;
         this.kendoHelper = new KendoHelper();
         this.dataSource = new Array();
+        // ReSharper disable InconsistentNaming
+        this._selectedItems = new Array();
         this.create = function (parentElement, classItems, selectedItemsCallback, selectedItemCallback) {
             _this.classItems = classItems;
             _this.selectedItemCallback = selectedItemCallback;
@@ -37,6 +40,10 @@ var CustomGroupListControl = (function () {
             parentElement.appendChild(container);
             return _this.createClassList(gridElement.id, selectedItemsCallback, selectedItemCallback);
             ;
+        };
+        this.deleteClassItems = function (classItems) {
+            _this.classItems = Enumerable.From(_this.classItems).Except(classItems, function (x) { return x.groupSetid; }).ToArray();
+            _this.setDatasouce();
         };
         this.updateClassItem = function (classItem) {
             var item = Enumerable.From(_this.classItems).FirstOrDefault(null, function (x) { return x.groupSetid === classItem.groupSetid; });
@@ -65,11 +72,11 @@ var CustomGroupListControl = (function () {
                 return;
             }
             classDefn.isSelected = checkBox.checked;
-            if (Enumerable.From(self.classItems).Any(function (s) { return s.isSelected; })) {
-                _this.selectedItemsCallback(Enumerable.From(self.classItems)
-                    .Where(function (s) { return s.isSelected; })
-                    .Select(function (s) { return s.groupSetid; })
-                    .ToArray());
+            self._selectedItems = Enumerable.From(self.classItems)
+                .Where(function (s) { return s.isSelected; })
+                .ToArray();
+            if (_this._selectedItems.length > 0) {
+                _this.selectedItemsCallback(Enumerable.From(_this._selectedItems).Select(function (x) { return x.groupSetid; }).ToArray());
             }
         };
         this.createClassList = function (element, selectedItemsCallback, selectedItemCallback) {
@@ -94,7 +101,7 @@ var CustomGroupListControl = (function () {
                     }
                 },
                 change: function (e) {
-                    // an item has been selected from check box
+                    // an item has been selected from check box, do not display the selected item
                     if (Enumerable.From(self.classItems).Any(function (x) { return x.isSelected; })) {
                         return;
                     }
@@ -112,6 +119,10 @@ var CustomGroupListControl = (function () {
             _this.gridControl = $("#" + element).data("kendoGrid");
             //bind click event to the checkbox
             _this.gridControl.table.on("click", ".checkbox", _this.toggleSelectedItem);
+            _this.setDatasouce();
+            return _this.gridControl;
+        };
+        this.setDatasouce = function () {
             _this.dataSource = [];
             Enumerable.From(_this.classItems)
                 .ForEach(function (s) { return _this.dataSource.push(new CustomGroupRowViewModel(s)); });
@@ -119,12 +130,22 @@ var CustomGroupListControl = (function () {
             _this.gridControl.dataSource.data(_this.dataSource);
             _this.gridControl.refresh();
             _this.gridControl.resize();
-            return _this.gridControl;
         };
     }
+    Object.defineProperty(CustomGroupListControl.prototype, "selectedItems", {
+        get: function () {
+            return this._selectedItems;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(CustomGroupListControl.prototype, "selectedItem", {
         get: function () {
-            return this.gridControl ? this.gridControl.dataItem(this.gridControl.select()) : null;
+            if (!this.gridControl) {
+                return null;
+            }
+            var row = this.gridControl.dataItem(this.gridControl.select());
+            return row ? row.source : null;
         },
         enumerable: true,
         configurable: true

@@ -1,4 +1,5 @@
 ﻿class CustomGroupListViewModel extends kendo.data.ObservableObject {
+    private groupingHelper = new GroupingHelper();
     private testInfo: TestFile;
     private customGroupListControl = new CustomGroupListControl();
     private customClassGridCollection = new CustomClassGridCollection();
@@ -12,13 +13,15 @@
         this.customClassGridCollection.classChangedCallback = this.onClassChanged;
     }
 
+    message: string;
+    hasMessage: boolean;
 
-    create = () => {
-        const myself = this;
+    splitgroup = () => {
         $.ajax({
             type: "POST",
             url: "CustomGroup\\SplitCustomGroupView",
-            data: { 'groupSetId': myself.selectedClass.groupSetid },
+            contentType: "application/json",
+            data: JSON.stringify({ 'groupSetId': this.selectedClass.groupSetid }),
             success(html) {
 
                 $("#content").replaceWith("<div id='content'></div>");
@@ -29,14 +32,47 @@
             }
         });
     }
-    regroup = () => {
+    create = () => {
+        $.ajax({
+            type: "POST",
+            url: "CustomGroup\\CustomGroupWizard",
+            success(html) {
+
+                $("#content").replaceWith("<div id='content'></div>");
+                $("#content").append(html);
+            },
+            error(e) {
+
+            }
+        });
 
     }
-    edit = () => {
-
-    }
+    
     delete = () => {
+        const self = this;
+        let selectedItems = this.customGroupListControl.selectedItems;
+        if (selectedItems.length === 0) {
+            const selectedItem = this.customGroupListControl.selectedItem;
+            if (selectedItem) {
+                selectedItems.push(selectedItem);
+            }
+        }
+        if (selectedItems.length === 0) {
+            return;
+        }
 
+        this.set("message", "Deleting selected custom groups...");
+        this.set("hasMessage", true);
+
+        this.groupingHelper.deleteClasses(
+            Enumerable.From(selectedItems).Select(x => x.groupSetid).ToArray(),
+            this.classesDefn.testFile.fileNumber, (status) => {
+                if (status) {
+                    self.customGroupListControl.deleteClassItems(selectedItems);
+                }
+                self.set("message", null);
+                this.set("hasMessage", false);
+            });
     }
 
     showCustomGroups = (elementName: string) => {
@@ -52,7 +88,6 @@
 
    
     private onClassChanged = (classItem: ClassDefinition) => {
-        console.log("onClassChanged: " + classItem.groupSetid, classItem.name);
         this.customGroupListControl.updateClassItem(classItem);
     }
 
@@ -65,9 +100,7 @@
 
         this.customClassGridCollection.initTable("#classes-settings-container", this.bandSet.bands, true, this.classesDefn.students);
     }
-
-   
-
+    
     onSelectedCustomGroups = (items: Array<number>) => {
         const self = this;
         let classItems = new Array<ClassDefinition>();

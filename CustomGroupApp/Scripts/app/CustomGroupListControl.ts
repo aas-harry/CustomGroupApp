@@ -2,11 +2,13 @@
     name: string;
     groupSetId: number;
     studentCount: number;
+    source: ClassDefinition;
 
     constructor(classItem: ClassDefinition) {
         super();
 
-       this.updateProperties(classItem);
+        this.source = classItem;
+         this.updateProperties(classItem);
 
     }
 
@@ -22,13 +24,25 @@ class CustomGroupListControl {
     private kendoHelper = new KendoHelper();
     private gridControl: kendo.ui.Grid;
     private dataSource = new Array<CustomGroupRowViewModel>();
+// ReSharper disable InconsistentNaming
+    private _selectedItems = new Array<ClassDefinition>();
+// ReSharper restore InconsistentNaming
 
     classItems: Array<ClassDefinition>;
     selectedItemsCallback: (items: Array<number>) => any;
     selectedItemCallback: (item: ClassDefinition) => any;
 
+    get selectedItems() {
+        return this._selectedItems;
+    }
+
     get selectedItem() {
-        return this.gridControl ? this.gridControl.dataItem(this.gridControl.select()) : null;
+        if (!this.gridControl) {
+            return null;
+        }
+
+        const row = this.gridControl.dataItem(this.gridControl.select()) as CustomGroupRowViewModel;
+        return row ? row.source : null;
     }
 
     create = (
@@ -53,6 +67,11 @@ class CustomGroupListControl {
 
         return this.createClassList(gridElement.id, selectedItemsCallback, selectedItemCallback);;
     };
+
+    deleteClassItems = (classItems: Array<ClassDefinition>) => {
+        this.classItems = Enumerable.From(this.classItems).Except(classItems, x => x.groupSetid).ToArray();
+        this.setDatasouce();
+    }
 
     updateClassItem = (classItem: ClassDefinition) => {
        
@@ -87,11 +106,12 @@ class CustomGroupListControl {
         }
 
         classDefn.isSelected = checkBox.checked;
-        if (Enumerable.From(self.classItems).Any(s => s.isSelected)) {
-            this.selectedItemsCallback(Enumerable.From(self.classItems)
-                .Where(s => s.isSelected)
-                .Select(s => s.groupSetid)
-                .ToArray());
+        self._selectedItems = Enumerable.From(self.classItems)
+            .Where(s => s.isSelected)
+            .ToArray();
+
+        if (this._selectedItems.length > 0) {
+            this.selectedItemsCallback(Enumerable.From(this._selectedItems).Select(x=> x.groupSetid).ToArray());
         }
     }
 
@@ -122,7 +142,7 @@ class CustomGroupListControl {
                     }
                 },
                 change: e => {
-                    // an item has been selected from check box
+                    // an item has been selected from check box, do not display the selected item
                     if (Enumerable.From(self.classItems).Any(x => x.isSelected)) {
                         return;
                     }
@@ -145,6 +165,12 @@ class CustomGroupListControl {
         //bind click event to the checkbox
         this.gridControl.table.on("click", ".checkbox", this.toggleSelectedItem);
 
+        this.setDatasouce();
+      
+        return this.gridControl;
+    }
+
+    setDatasouce = () => {
         this.dataSource = [];
         Enumerable.From(this.classItems)
             .ForEach(s => this.dataSource.push(new CustomGroupRowViewModel(s)));
@@ -152,7 +178,5 @@ class CustomGroupListControl {
         this.gridControl.dataSource.data(this.dataSource);
         this.gridControl.refresh();
         this.gridControl.resize();
-        return this.gridControl;
     }
-
 }

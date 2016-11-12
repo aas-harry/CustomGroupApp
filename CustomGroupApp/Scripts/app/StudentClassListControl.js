@@ -95,7 +95,7 @@ var StudentClassListControl = (function () {
                     { field: "score", title: "Score", width: "80px", attributes: { 'class': "text-center" } }
                 ];
             }
-            var btnStyle = "style = 'margin-right: 5px'";
+            var btnStyle = "style = 'margin-right: 0px'";
             // Create students grid
             $("#" + element)
                 .kendoGrid({
@@ -108,7 +108,7 @@ var StudentClassListControl = (function () {
                     {
                         template: kendo.template(("Group: <input id='" + groupNameElementId + "' style='margin: 0 5px 0 5px' />") +
                             (_this.editClassMode
-                                ? "<button id='" + updateClassElementId + "' " + btnStyle + "'>Edit</button>"
+                                ? "<button id='" + updateClassElementId + "' " + btnStyle + "'>Students</button>"
                                 : "<button id='" + hideClassElementId + "' " + btnStyle + "'>Hide</button>"))
                     }
                 ],
@@ -167,7 +167,8 @@ var StudentClassListControl = (function () {
             $("#" + element)
                 .kendoTooltip({
                 filter: "td:nth-child(1)",
-                position: "center",
+                showOn: "click",
+                position: "bottom",
                 content: function (e) {
                     var dataItem = $("#" + element).data("kendoGrid").dataItem(e.target.closest("tr"));
                     var student = dataItem;

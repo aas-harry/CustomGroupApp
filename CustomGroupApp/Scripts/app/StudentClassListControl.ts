@@ -130,7 +130,7 @@
             ];
         }
 
-        const btnStyle = "style = 'margin-right: 5px'";
+        const btnStyle = "style = 'margin-right: 0px'";
         // Create students grid
         $(`#${element}`)
             .kendoGrid({
@@ -144,7 +144,7 @@
                         template: kendo.template(
                             `Group: <input id='${groupNameElementId}' style='margin: 0 5px 0 5px' />` +
                             (this.editClassMode
-                                ? `<button id='${updateClassElementId}' ${btnStyle}'>Edit</button>`
+                                ? `<button id='${updateClassElementId}' ${btnStyle}'>Students</button>`
                                 : `<button id='${hideClassElementId}' ${btnStyle}'>Hide</button>`)
                         )
                     }
@@ -218,7 +218,8 @@
         $(`#${element}`)
             .kendoTooltip({
                 filter: "td:nth-child(1)", //this filter selects the first column cells
-                position: "center",
+                showOn: "click",
+                position: "bottom",
                 content(e) {
                     const dataItem = $(`#${element}`).data("kendoGrid").dataItem(e.target.closest("tr"));
                     const student = dataItem as StudentClassRow;

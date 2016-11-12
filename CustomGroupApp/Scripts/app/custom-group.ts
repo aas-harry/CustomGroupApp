@@ -647,6 +647,31 @@ class GroupingHelper {
         });
     }
 
+    deleteClasses = (groupSets: Array<number>, testnum: number, callback: (boolean) => any) => {
+        $.ajax({
+            type: "POST",
+            url: "CustomGroup\\DeleteCustomGroupSets",
+            contentType: "application/json",
+            data:
+            JSON.stringify({
+                'groupSets': groupSets,
+                'testnum': testnum
+            }),
+            success(status) {
+                const tmpCallback = callback;
+                if (tmpCallback) {
+                    tmpCallback(true);
+                }
+            },
+            error(e) {
+                const tmpCallback = callback;
+                if (tmpCallback) {
+                    tmpCallback(false);
+                }
+            }
+        });
+    }
+
     updateStudentsInClass = (classDefn: ClassDefinition, callback: (boolean) => any) => {
         $.ajax({
             type: "POST",
@@ -703,7 +728,6 @@ class GroupingHelper {
         });
     }
 
-   
     saveClasses = (bandSet: BandSet) => {
         // ReSharper disable InconsistentNaming
         var groupsets = Array<{'GroupSetId': number, 'TestNumber': number, 'Name': string, 'Students': Array<number>, 'Streaming': number}>();
