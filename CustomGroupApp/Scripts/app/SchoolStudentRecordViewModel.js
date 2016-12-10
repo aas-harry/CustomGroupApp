@@ -8,12 +8,18 @@ var SchoolStudentRecordViewModel = (function (_super) {
     function SchoolStudentRecordViewModel(elementName) {
         var _this = this;
         _super.call(this, elementName);
+        this.reports = [
+            new ReportItem("School Student Record", "SchoolStudentRecordView", ReportType.SchoolStudentRecord, this)
+        ];
         this.setAdditionalProperties = function (student) {
             _this.set("bornInAus", student.liveInAus);
             _this.set("secondLanguage", student.speak);
         };
-        this.urlLink = "SchoolStudentRecordView";
-        this.reportName = "School Student Record";
+        this.getReports = function () {
+            return _this.reports;
+        };
+        this.initReport = function (reportType) {
+        };
     }
     return SchoolStudentRecordViewModel;
 }(StudentPortfolio));

@@ -105,6 +105,10 @@ namespace CustomGroupApp.Controllers
             return View("CustomGroupWizard", groupSetId);
         }
 
+        public ActionResult TestPage()
+        {
+            return View("TestPage");
+        }
 
         public ActionResult CustomGroupWizard()
         {

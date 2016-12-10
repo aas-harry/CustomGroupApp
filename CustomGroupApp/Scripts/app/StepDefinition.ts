@@ -19,6 +19,7 @@ class StepCollection {
         step2.views.push(new ViewDefinition(GroupingMethod.TopMiddleLowest, "TopMiddleLowestClassConfigurationStep"));
         step2.views.push(new ViewDefinition(GroupingMethod.Language, "LanguageClassConfigurationStep"));
         step2.views.push(new ViewDefinition(GroupingMethod.Preallocated, "PreallocatedClassConfigurationStep"));
+        step2.views.push(new ViewDefinition(GroupingMethod.SchoolGroup, "SchoolGroupClassConfigurationStep"));
         this.steps.push(step2);
 
         this.steps.push(new StepDefinition(3, true, "StudentGroupingOptionsStep"));

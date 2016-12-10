@@ -15,22 +15,20 @@ var CustomClassGridCollection = (function () {
             _this.editClassMode = editClassMode;
             _this.popupWindowElement = popupWindowElement;
             _this.students = students;
-            $(elementName).html("<table id='custom-classes-table'></table>");
-            _this.table = document.getElementById("custom-classes-table");
-            _this.header = _this.table.createTBody();
-            _this.classListControls = [];
+            _this.clear();
             var hiddenClassLookup = Enumerable.From(_this.hiddenClasses).ToDictionary(function (x) { return x; }, function (x) { return x; });
             if (bands.length === 1) {
-                _this.classRow = _this.header.insertRow();
-                _this.classes = Enumerable.From(bands).SelectMany(function (b) { return b.classes; }).ToArray();
+                _this.classes = Enumerable.From(bands).SelectMany(function (b) { return b.classes; })
+                    .Where(function (b) { return !hiddenClassLookup.Contains(b.uid); })
+                    .ToArray();
                 _this.classCount = _this.classes.length;
+                var maxStudentCount = Enumerable.From(_this.classes).Max(function (x) { return x.count; });
+                var maxClassPerRow = 3;
                 var cnt = 0;
+                _this.classRow = _this.header.insertRow();
                 for (var _i = 0, _a = _this.classes; _i < _a.length; _i++) {
                     var classItem = _a[_i];
-                    if (hiddenClassLookup.Contains(classItem.uid)) {
-                        continue;
-                    }
-                    if (cnt === 3) {
+                    if (cnt === maxClassPerRow) {
                         _this.classRow = _this.header.insertRow();
                         cnt = 0;
                     }
@@ -44,7 +42,9 @@ var CustomClassGridCollection = (function () {
             else {
                 for (var _b = 0, bands_1 = bands; _b < bands_1.length; _b++) {
                     var band = bands_1[_b];
-                    _this.classes = Enumerable.From(bands).SelectMany(function (b) { return b.classes; }).ToArray();
+                    _this.classes = Enumerable.From(bands).SelectMany(function (b) { return b.classes; })
+                        .Where(function (b) { return !hiddenClassLookup.Contains(b.uid); })
+                        .ToArray();
                     _this.classCount = _this.classes.length;
                     _this.classRow = _this.header.insertRow();
                     for (var _c = 0, _d = band.classes; _c < _d.length; _c++) {
@@ -137,6 +137,10 @@ var CustomClassGridCollection = (function () {
             }
         };
         this.clear = function () {
+            $(_this.elementName).html("<table id='custom-classes-table'></table>");
+            _this.table = document.getElementById("custom-classes-table");
+            _this.header = _this.table.createTBody();
+            _this.classListControls = [];
         };
         this.createClassHeader = function (classItem) {
             _this.kendoHelper.createLabel(_this.headerRow.insertCell(), classItem.name);

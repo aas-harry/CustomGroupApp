@@ -12,6 +12,7 @@ var StudentClassRow = (function (_super) {
         this.convert = function (student) {
             _this.id = student.id;
             _this.name = student.name;
+            _this.dob = student.dob;
             _this.gender = student.gender;
             _this.score = student.score;
             _this.class = student.classNo;
@@ -21,6 +22,7 @@ var StudentClassRow = (function (_super) {
             if (_this.langPref1 !== "" || _this.langPref2 !== "" || _this.langPref3 !== "") {
                 _this.hasLanguagePrefs = true;
             }
+            _this.schoolGroup = student.schoolGroup;
         };
         this.convert(student);
     }

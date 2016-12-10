@@ -1,6 +1,5 @@
 ﻿<div id="school-student-record-container" style="overflow: auto;">
     <div id="school-student-details" style="overflow: hidden; width: 850px;">
-   
         <table style="margin-left: 20px">
             <tr>
                 <td colspan="2">
@@ -34,7 +33,7 @@
                 <td style="width: 300px" id="student-personal-details">
                     <div>
                         <div> Year Level: <span data-bind="text: yearLevel"></span></div>
-                        <div>D.O.B: <span data-bind="text: dob"></span></div>
+                        <div>Dob: <span data-bind="text: dob"></span></div>
                         <div>Age: <span data-bind="text: age"></span></div>
                         <div>Born in Australia: <span data-bind="text: bornInAus"></span> </div>
                         <div>Time in Australia: <span data-bind="text: timeInAus"></span> </div>
@@ -42,41 +41,112 @@
                         <div data-bind="visible: hasSchoolStudentId"> Student ID: <span data-bind="text: schoolStudentId"></span> </div>
                     </div>
                 </td>
-                <td style="width: 500px" id="student-raw-scores-container"></td>
+                <td style="width: 400px" id="student-raw-scores-container">
+                    <label>Raw Scores</label>
+                    <div id="raw-score-container" style="width: 400px; height: 300px;">
+                        <div id="raw-score-list"></div>
+                    </div>
+
+                </td>
             </tr>
             <tr>
-                <td colspan="2" style="width: 800px" id="student-scaled-scores-container"></td>
+                <td colspan="2" style="width: 600px" id="student-scaled-scores-container">
+                    <label>Scaled Scores</label>
+                    <div id="scaled-score-container" style="width: 600px; height: 300px;">
+                        <div id="scaled-score-chart"></div>
+                    </div>
+                </td>
             </tr>
             <tr>
                 <td colspan="2" style="width: 800px" id="student-notes-container"></td>
             </tr>
         </table>
-
-        @*<div style="height: 230px;">
-            <div style="width: 200px; padding-top: 20px; padding-left: 30px; float: left;">
-
-                <div class="info">
-                    <p> Year Level: <span data-bind="text: YearLevel"></span></p>
-                    <p> Dob: <span data-bind="text: Dob"></span>,  Age: <span data-bind="text: Age"></span> </p>
-                    <p> Born in Australia: <span data-bind="text: BornInAus"></span> </p>
-                    <p> Time in Australia: <span data-bind="text: TimeInAus"></span> </p>
-                    <p> 2nd Language: <span data-bind="text: Lang"></span> </p>
-                    <p> Student ID: <span data-bind="text: StudentId"></span> </p>
-                </div>
-            </div>
-            <div style="padding-top: 20px; padding-left: 15px; float: left;">
-                <p class="headerText">Raw Scores</p>
-                <div id="rawScoreList" style="width: 400px"></div>
-            </div>
-        </div>
-        <div style="text-align: left; padding-left: 30px;">
-            <p class="headerText">Scaled Scores</p>
-            <div id="scaledScore" style="width: 800px; height: 300px;"></div>
-        </div>
-        <div style="text-align: left; padding-top: 20px; padding-left: 30px;">
-            <p class="headerText">Notes</p>
-            <div><textarea id="editor" rows="10" cols="30" style="height: 300px; width: 800px;" data-bind="value: Notes, events: {change: OnNotesChanged}"></textarea></div>
-            <br /><br /><br />
-        </div>*@
     </div>
 </div>
+
+<script>
+    $(document).ready(function () {
+        $("#raw-score-list").kendoGrid({
+            dataSource: {
+                pageable: false
+            },
+            scrollable: false,
+            sortable: false,
+            selectable: false,
+            columns: [
+                {
+                    field: "Description",
+                    title: " ",
+                    width: 250,
+                    attributes: { "class": "center-name" }
+                },
+                {
+                    field: "TotalCount",
+                    title: "Total",
+                    width: 50,
+                    attributes: { "class": "center-header" }
+                },
+                {
+                    field: "AttemptedCount",
+                    title: "Attempted",
+                    width: 50,
+                    attributes: { "class": "center-header" }
+                },
+                {
+                    field: "CorrectCount",
+                    title: "Correct",
+                    width: 50,
+                    attributes: { "class": "center-header" }
+                },
+                {
+                    field: "Stanine",
+                    title: "Stanine",
+                    width: 50,
+                    attributes: { "class": "center-header" }
+                }
+            ]
+        });
+
+        $("#scaled-score-chart").kendoChart({
+            series: [
+                {
+                    type: "bar",
+                    field: "StudentScore",
+                    name: "Student's score",
+                    attributes: { "class": "center-name" },
+                    tooltip: {
+                        visible: true,
+                        format: "{0:00}",
+                        template: "#= dataItem.Description # : " + "#= kendo.toString(dataItem.StudentStanine,'n0') #"
+                    },
+                    color: "blue"
+                },
+                {
+                    type: "bar",
+                    field: "SchoolScore",
+                    name: "School Mean",
+                    tooltip: {
+                        visible: true,
+                        template: "#= dataItem.Description # : " + "#= kendo.toString(dataItem.SchoolStanine,'n0') #"
+                    },
+                    color: "green"
+                }
+            ],
+            legend: {
+                position: "bottom"
+            },
+            valueAxis: {
+                field: "SchoolScore",
+                min: 0,
+                max: 9,
+                labels: {
+                    template: "#if(value==0){# #}else {# #: value # #}#",
+                    padding: { right: 70 }
+                }
+            },
+            categoryAxis: {
+                field: "Description"
+            }
+        });
+    })
+</script>

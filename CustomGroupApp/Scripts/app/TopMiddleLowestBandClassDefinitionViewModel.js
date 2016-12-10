@@ -19,8 +19,7 @@ var TopMiddleLowestBandClassDefinitionViewModel = (function (_super) {
             _this.bandSet.createBands("Band", _this.studentCount, _this.bandCount);
             _this.bandTableControl.init("classes-settings-container", _this.bandSet);
         };
-        this.bandSet = classesDefn.createTopMiddleBottomBandSet("class", classesDefn.studentCount);
-        this.studentCount = classesDefn.studentCount;
+        this.reset();
         this.bandTableControl = new BandTableControl(this.callOnStudentCountChangedEvent);
     }
     TopMiddleLowestBandClassDefinitionViewModel.prototype.studentCountChanged = function (value) {
@@ -28,11 +27,21 @@ var TopMiddleLowestBandClassDefinitionViewModel = (function (_super) {
     };
     Object.defineProperty(TopMiddleLowestBandClassDefinitionViewModel.prototype, "studentInAllClassesCount", {
         get: function () {
+            for (var _i = 0, _a = this.bandSet.bands; _i < _a.length; _i++) {
+                var bandItem = _a[_i];
+                bandItem.studentCount = Enumerable.From(bandItem.classes).Sum(function (x) { return x.count; });
+            }
             return Enumerable.From(this.bandSet.bands).SelectMany(function (b) { return b.classes; }).Sum(function (x) { return x.count; });
         },
         enumerable: true,
         configurable: true
     });
+    TopMiddleLowestBandClassDefinitionViewModel.prototype.reset = function () {
+        this.bandSet = this.classesDefn.createTopMiddleBottomBandSet("class", this.classesDefn.studentCount);
+        this.studentCount = this.classesDefn.studentCount;
+        this.set("bandCount", 3);
+        this.set("classCount", 1);
+    };
     TopMiddleLowestBandClassDefinitionViewModel.prototype.loadOptions = function () {
         this.bandTableControl.init("classes-settings-container", this.bandSet);
         return true;

@@ -10,6 +10,28 @@ var subjectTypes = [
     { Subject: "Spelling", Index: 8, IsAchievement: true, IsAbility: false },
     { Subject: "Ravens", Index: 9, IsAchievement: false, IsAbility: true }
 ];
+var ReportType;
+(function (ReportType) {
+    ReportType[ReportType["None"] = 0] = "None";
+    ReportType[ReportType["StudentResults"] = 1] = "StudentResults";
+    ReportType[ReportType["SchoolStudentRecord"] = 2] = "SchoolStudentRecord";
+    ReportType[ReportType["NationalProgressIndex"] = 3] = "NationalProgressIndex";
+    ReportType[ReportType["StudentMathsSkillsProfileList"] = 4] = "StudentMathsSkillsProfileList";
+    ReportType[ReportType["StudentMathsSkillsProfileTable"] = 5] = "StudentMathsSkillsProfileTable";
+    ReportType[ReportType["StudentReadingSkillsProfileList"] = 6] = "StudentReadingSkillsProfileList";
+    ReportType[ReportType["StudentReadingSkillsProfileTable"] = 7] = "StudentReadingSkillsProfileTable";
+    ReportType[ReportType["StudentWritingCriteria"] = 8] = "StudentWritingCriteria";
+    ReportType[ReportType["StudentMarkedWritingScript"] = 9] = "StudentMarkedWritingScript";
+    ReportType[ReportType["StudentCareerProfile"] = 10] = "StudentCareerProfile";
+})(ReportType || (ReportType = {}));
+var TestCategory;
+(function (TestCategory) {
+    TestCategory[TestCategory["None"] = 0] = "None";
+    TestCategory[TestCategory["Placement"] = 1] = "Placement";
+    TestCategory[TestCategory["Scholarship"] = 2] = "Scholarship";
+    TestCategory[TestCategory["GandT"] = 3] = "GandT";
+    TestCategory[TestCategory["Nwpa"] = 4] = "Nwpa";
+})(TestCategory || (TestCategory = {}));
 var Subject = (function () {
     function Subject() {
         this.index = 0;
@@ -78,6 +100,10 @@ var TestFile = (function () {
             _this.students = [];
         };
         this.setCustomGroups = function (data, students) {
+            if (students === null) {
+                students = _this.students;
+            }
+            _this.customGroups = [];
             var studentDict = Enumerable.From(students).ToDictionary(function (x) { return x.studentId; }, function (x) { return x; });
             for (var _i = 0, data_1 = data; _i < data_1.length; _i++) {
                 var item = data_1[_i];
@@ -94,6 +120,23 @@ var TestFile = (function () {
                 classItem.streamType = item.Streaming;
                 _this.customGroups.push(classItem);
             }
+            _this.hasCustomGroups = _this.customGroups.length > 0;
+        };
+        this.addCustomGroup = function (item) {
+            var studentDict = Enumerable.From(_this.students).ToDictionary(function (x) { return x.studentId; }, function (x) { return x; });
+            var classItem = new ClassDefinition(null, 0, 0);
+            for (var _i = 0, _a = item.Students; _i < _a.length; _i++) {
+                var id = _a[_i];
+                if (studentDict.Contains(id)) {
+                    classItem.students.push(new StudentClass(studentDict.Get(id)));
+                }
+            }
+            classItem.count = classItem.students.length;
+            classItem.name = item.Name;
+            classItem.groupSetid = item.GroupSetId;
+            classItem.streamType = item.Streaming;
+            _this.customGroups.push(classItem);
+            return classItem;
         };
         this.setStudentLanguagePrefs = function (langPrefs, students) {
             if (students === void 0) { students = null; }
@@ -118,13 +161,32 @@ var TestFile = (function () {
                     }
                 }
             });
+            _this.hasStudentLanguagePrefs = true;
+        };
+        this.setSchoolGroup = function (studentGroups, students) {
+            if (students === void 0) { students = null; }
+            if (!studentGroups || studentGroups.length === 0) {
+                return;
+            }
+            if (!students) {
+                students = _this.students;
+            }
+            var lookup = Enumerable.From(studentGroups).ToDictionary(function (x) { return x.StudentId; }, function (x) { return x.Group; });
+            students.forEach(function (student) {
+                if (lookup.Contains(student.studentId)) {
+                    student.schoolGroup = lookup.Get(student.studentId);
+                }
+                else {
+                    student.schoolGroup = "";
+                }
+            });
         };
         this.setStudents = function (data, langPrefs) {
             if (langPrefs === void 0) { langPrefs = []; }
             _this.students = [];
             _this.hasGirls = false;
             _this.hasBoys = false;
-            var hasStudentLangPrefs = langPrefs && langPrefs.length > 0;
+            _this.hasStudentLanguagePrefs = langPrefs && langPrefs.length > 0;
             var enumerable = Enumerable.From(langPrefs);
             Enumerable.From(data).OrderBy(function (x) { return x.Name; }).ForEach(function (s) {
                 var student = new Student(s);
@@ -135,7 +197,7 @@ var TestFile = (function () {
                 if (!_this.hasGirls && s.Sex === "F") {
                     _this.hasGirls = true;
                 }
-                if (hasStudentLangPrefs) {
+                if (_this.hasStudentLanguagePrefs) {
                     var languagePrefs = enumerable.FirstOrDefault(null, function (s) { return s.StudentId === student.studentId; });
                     if (languagePrefs != null) {
                         if (languagePrefs.Pref1) {
@@ -150,8 +212,19 @@ var TestFile = (function () {
                     }
                 }
             });
+            _this.hasStudentIds = Enumerable.From(_this.students).Any(function (s) { return s.schoolStudentId !== ""; });
             _this.studentCount = _this.students.length;
             _this.isUnisex = _this.hasGirls && _this.hasBoys;
+        };
+        this.filterTestByGroup = function (classItem) {
+            return _this.filterTest(Enumerable.From(classItem.students).Select(function (s) { return s.studentId; }).ToArray());
+        };
+        this.filterTest = function (filtered) {
+            if (!_this.students || _this.students.length === 0) {
+                return [];
+            }
+            var studentFilter = Enumerable.From(filtered).ToDictionary(function (x) { return x; }, function (x) { return x; });
+            return Enumerable.From(_this.students).Where(function (s) { return studentFilter.Contains(s.studentId); }).ToArray();
         };
     }
     Object.defineProperty(TestFile.prototype, "yearLevel", {
@@ -200,6 +273,12 @@ var Student = (function () {
         this.mathsAchievementScore = function () {
             return _this.mathPerformance.scaledScore ? _this.mathPerformance.scaledScore : 0;
         };
+        this.mathsAchievemenQrScore = function () {
+            var total = 0;
+            total += _this.mathPerformance.raw ? _this.mathPerformance.raw : 0;
+            total += _this.mathQr.raw ? _this.mathQr.raw : 0;
+            return total;
+        };
         this.englishScore = function () {
             var total = 0;
             total += _this.verbal.scaledScore ? _this.verbal.scaledScore : 0;
@@ -216,15 +295,17 @@ var Student = (function () {
         this.speak = r.Speak;
         this.liveInAus = r.Live_in_as;
         this.ca = r.Ca;
-        this.genab = new Score(r.Genab, r.Iqs, r.t_genab, r.Sgenab, new RangeScore(r.Iq1, r.Iq2), null);
-        this.verbal = new Score(r.Verb, r.Vis, r.t_verbal, r.Sverb, new RangeScore(r.Vil, r.Vih), null);
-        this.nonverbal = new Score(r.Nverb, r.Nvis, r.t_nverbal, r.Snverb, new RangeScore(r.Nvil, r.Nvih), null);
-        this.mathPerformance = new Score(r.Prs, r.Pst, r.t_pst, r.Smath, null, r.NpiMath);
-        this.reading = new Score(r.Rrs, r.Rst, r.t_rst, r.Sread, null, r.NpiRead);
-        this.spelling = new Score(r.Srs, r.Sst, r.t_sst, r.Sspell, null, null);
-        this.writing = new Score(r.Wrs, r.Wrt, r.t_wr, r.Swrit, null, r.NpiWrit);
-        this.raven = new Score(r.Raven, r.Iqs2, r.Tmst, null, new RangeScore(r.Iq12, r.Iq22), null);
-        this.serialno = r.snow;
+        this.genab = new Score(r.Genab, r.Iqs, r.T_genab, r.S_genab, new RangeScore(r.Iq1, r.Iq2), null);
+        this.verbal = new Score(r.Verb, r.Vis, r.T_verbal, r.S_verbal, new RangeScore(r.Vil, r.Vih), null);
+        this.nonverbal = new Score(r.Nverb, r.Nvis, r.T_nverbal, r.S_nonverb, new RangeScore(r.Nvil, r.Nvih), null);
+        this.mathPerformance = new Score(r.Prs, r.Pst, r.T_pst, r.S_mathper, null, r.NpiMath);
+        this.mathQr = new Score(r.Qr, null, null, null, null, null);
+        this.reading = new Score(r.Rrs, r.Rst, r.T_rst, r.S_reading, null, r.NpiRead);
+        this.spelling = new Score(r.Srs, r.Sst, r.T_sst, r.S_spelling, null, null);
+        this.writing = new Score(r.Wrs, r.Wrt, r.T_wr, r.S_written, null, r.NpiWrit);
+        this.raven = new Score(r.Raven, r.Iqs2, r.T_mst, null, new RangeScore(r.Iq12, r.Iq22), null);
+        this.serialno = r.Serialno;
+        this.schoolGroup = "";
     }
     Object.defineProperty(Student.prototype, "hasLanguagePrefs", {
         get: function () {

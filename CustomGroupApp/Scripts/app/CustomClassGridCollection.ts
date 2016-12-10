@@ -18,6 +18,7 @@
     classListControls: Array<{ classId: string, studentClassListControls: StudentClassListControl}>;
 
 
+
     initTable = (elementName: string, bands: Array<BandDefinition>, editClassMode = false, students,
             popupWindowElement = "popup-window-container") => {
         this.elementName = elementName;
@@ -26,24 +27,23 @@
         this.popupWindowElement = popupWindowElement;
         this.students = students;
 
-        $(elementName).html("<table id='custom-classes-table'></table>");
-        this.table = document.getElementById("custom-classes-table") as HTMLTableElement;
-        this.header = this.table.createTBody();
+        this.clear();
 
-        this.classListControls = [];
         const hiddenClassLookup = Enumerable.From(this.hiddenClasses).ToDictionary(x => x, x => x);
 
         if (bands.length === 1) {
-            this.classRow = this.header.insertRow();
-            this.classes = Enumerable.From(bands).SelectMany(b => b.classes).ToArray();
+            this.classes = Enumerable.From(bands).SelectMany(b => b.classes)
+                .Where(b=> ! hiddenClassLookup.Contains(b.uid))
+                .ToArray();
             this.classCount = this.classes.length;
 
+            const maxStudentCount = Enumerable.From(this.classes).Max(x => x.count);
+            const maxClassPerRow = 3;
             let cnt = 0;
+            this.classRow = this.header.insertRow();
             for (let classItem of this.classes) {
-                if (hiddenClassLookup.Contains(classItem.uid)) {
-                    continue;
-                }
-                if (cnt === 3) {
+               
+                if (cnt === maxClassPerRow) {
                     this.classRow = this.header.insertRow();
                     cnt = 0;
                 }
@@ -56,7 +56,9 @@
             }
         } else {
             for (let band of bands) {
-                this.classes = Enumerable.From(bands).SelectMany(b => b.classes).ToArray();
+                this.classes = Enumerable.From(bands).SelectMany(b => b.classes)
+                    .Where(b => !hiddenClassLookup.Contains(b.uid))
+                    .ToArray();
                 this.classCount = this.classes.length;
 
                 this.classRow = this.header.insertRow();
@@ -180,6 +182,11 @@
     }
 
     clear = () => {
+        $(this.elementName).html("<table id='custom-classes-table'></table>");
+        this.table = document.getElementById("custom-classes-table") as HTMLTableElement;
+        this.header = this.table.createTBody();
+
+        this.classListControls = [];
     }
 
     createClassHeader = (classItem: ClassDefinition) => {

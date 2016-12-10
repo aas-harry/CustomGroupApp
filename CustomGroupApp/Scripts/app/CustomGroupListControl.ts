@@ -24,9 +24,10 @@ class CustomGroupListControl {
     private kendoHelper = new KendoHelper();
     private gridControl: kendo.ui.Grid;
     private dataSource = new Array<CustomGroupRowViewModel>();
-// ReSharper disable InconsistentNaming
+    // ReSharper disable InconsistentNaming
+    private _selectedItem: ClassDefinition;
     private _selectedItems = new Array<ClassDefinition>();
-// ReSharper restore InconsistentNaming
+    // ReSharper restore InconsistentNaming
 
     classItems: Array<ClassDefinition>;
     selectedItemsCallback: (items: Array<number>) => any;
@@ -37,12 +38,33 @@ class CustomGroupListControl {
     }
 
     get selectedItem() {
-        if (!this.gridControl) {
-            return null;
+        return this._selectedItem;
+    }
+
+    set selectedItem(newValue: ClassDefinition) {
+       if (this._selectedItem === newValue) {
+            return;
+        }
+        this._selectedItem = newValue;
+
+        // an item has been selected from check box, do not display the selected item
+        if (this.selectedItems.length > 0 || !newValue){
+            return;
         }
 
-        const row = this.gridControl.dataItem(this.gridControl.select()) as CustomGroupRowViewModel;
-        return row ? row.source : null;
+
+        const tmpCallback = this.selectedItemCallback;
+        if (tmpCallback != null) {
+            tmpCallback(newValue);
+        }
+
+   }
+
+    private resetSelectedItems = () => {
+        this._selectedItems = [];
+        for (let classItem of this.classItems) {
+            classItem.isSelected = false;
+        }
     }
 
     create = (
@@ -52,25 +74,32 @@ class CustomGroupListControl {
         selectedItemCallback: (item: ClassDefinition) => any) => {
 
         this.classItems = classItems;
+        this.resetSelectedItems();
+
         this.selectedItemCallback = selectedItemCallback;
         this.selectedItemsCallback = selectedItemsCallback;
 
-        var container = document.createElement("div") as HTMLDivElement;
-        container.setAttribute("style", `width: 370px; height: 800px; margin: 5px 0 0 0;`);
-        container.id = `class-list-container`;
         var gridElement = document.createElement("div") as HTMLDivElement;
-        gridElement.setAttribute("style", "height: 100%;");
+        gridElement.setAttribute("style", "width: 370px; height: 100%;");
         gridElement.id = `class-list`;
-        container.appendChild(gridElement);
 
-        parentElement.appendChild(container);
+        parentElement.appendChild(gridElement);
 
-        return this.createClassList(gridElement.id, selectedItemsCallback, selectedItemCallback);;
+        return this.createClassList(gridElement.id);;
     };
 
     deleteClassItems = (classItems: Array<ClassDefinition>) => {
+        this.resetSelectedItems();
         this.classItems = Enumerable.From(this.classItems).Except(classItems, x => x.groupSetid).ToArray();
         this.setDatasouce();
+    }
+
+    addClassItems = (classItems: Array<ClassDefinition>) => {
+        this.resetSelectedItems();
+        for (let classItem of classItems) {
+            this.classItems.push(classItem);
+        }
+        this.setDatasouce(classItems.length > 0 ? classItems[0] : null);
     }
 
     updateClassItem = (classItem: ClassDefinition) => {
@@ -87,8 +116,34 @@ class CustomGroupListControl {
         }
     }
 
+    private showSelectedItems = () => {
+        this._selectedItems = Enumerable.From(this.classItems)
+            .Where(s => s.isSelected)
+            .ToArray();
+
+     if (this._selectedItems.length > 0) {
+            this.selectedItemsCallback(Enumerable.From(this._selectedItems).Select(x => x.groupSetid).ToArray());
+        } else {
+            if (this._selectedItem)
+            {this.selectedItemsCallback(Enumerable.From([this._selectedItem]).Select(x => x.groupSetid).ToArray());}
+        }
+        
+    }
+
+    private toggleAllItemsSelections(checked) {
+        const self = this;
+
+        for (let classItem of self.classItems) {
+            classItem.isSelected = checked;
+        }
+
+       $(".checkbox-select").prop("checked", checked);
+      
+        self.showSelectedItems();  
+    }
+
     //on click of the checkbox:
-    toggleSelectedItem = (e) => {
+    private toggleSelectedItem = (e) => {
         const checkBox = e.target;
         if (!checkBox) {
             return;
@@ -106,28 +161,32 @@ class CustomGroupListControl {
         }
 
         classDefn.isSelected = checkBox.checked;
-        self._selectedItems = Enumerable.From(self.classItems)
-            .Where(s => s.isSelected)
-            .ToArray();
 
-        if (this._selectedItems.length > 0) {
-            this.selectedItemsCallback(Enumerable.From(this._selectedItems).Select(x=> x.groupSetid).ToArray());
-        }
+        self.showSelectedItems();
     }
 
 
-    createClassList = (
-        element: string,
-        selectedItemsCallback: (items: Array<number>) => any,
-        selectedItemCallback: (item: ClassDefinition) => any): kendo.ui.Grid => {
+    createClassList = (element: string): kendo.ui.Grid => {
         const self = this;
 
         $(`#${element}`)
             .kendoGrid({
                 columns: [
-                    { width: "30px", template: "<input type='checkbox' class='checkbox' />" },
-                    { field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" } },
-                    { field: "studentCount", title: "Count", width: "50px", attributes: { 'class': "text-nowrap" } }
+                    {
+                        width: "30px",
+                        template: "<input type='checkbox' class='checkbox-select' />",
+                        headerTemplate: '<input type="checkbox" id="check-all" />'
+                    },
+                    {
+                        field: "name", title:"Select All", width: "200px",
+                        attributes: { 'class': "text-nowrap"}
+                    },
+                    {
+                        field: "studentCount",
+                        title: "Count",
+                        width: "50px",
+                        attributes: { 'class': "text-nowrap", 'style': "text-align: center" }
+                    }
                 ],
                 sortable: {
                     mode: "single",
@@ -136,41 +195,52 @@ class CustomGroupListControl {
                 selectable: "row",
                 dataSource: [],
                 dataBound(e) {
-                    const grid = e.sender;
-                    if (grid) {
-                        grid.select("tr:eq(0)");
-                    }
+                   this.element.find("tbody tr:first").addClass("k-state-selected");
+                   const row = this.select().closest("tr");
+                    var value = this.dataItem(row) as CustomGroupRowViewModel;
+
+                   self.selectedItem = (value)
+                       ? Enumerable.From(self.classItems)
+                           .FirstOrDefault(null, s => s.groupSetid === value.get("groupSetId"))
+                       : null;
+
+                  
+
                 },
                 change: e => {
-                    // an item has been selected from check box, do not display the selected item
-                    if (Enumerable.From(self.classItems).Any(x => x.isSelected)) {
-                        return;
-                    }
-
                     var gridControl = e.sender as kendo.ui.Grid;
                     const row = gridControl.select().closest("tr");
-                    const item = gridControl.dataItem(row);
-
-                    const classDefn = Enumerable.From(self.classItems)
-                        .FirstOrDefault(null, s => s.groupSetid === item.get("groupSetId"));
-                    const tmpCallback = selectedItemCallback;
-                    if (tmpCallback != null) {
-                        tmpCallback(classDefn);
-                    }
+                    var value = gridControl.dataItem(row) as CustomGroupRowViewModel;
+                    
+                    self.selectedItem = (value)
+                        ? Enumerable.From(self.classItems)
+                        .FirstOrDefault(null, s => s.groupSetid === value.get("groupSetId"))
+                        : null;
+                
                 }
             });
 
 
         this.gridControl = $(`#${element}`).data("kendoGrid");
         //bind click event to the checkbox
-        this.gridControl.table.on("click", ".checkbox", this.toggleSelectedItem);
+        this.gridControl.table.on("click", ".checkbox-select", this.toggleSelectedItem);
+        $("#check-all")
+            .click((e) => {
+                const checkBox = e.target as HTMLInputElement;
+                if (!checkBox) {
+                    return;
+                }
+                this.toggleAllItemsSelections(checkBox.checked);
+            });
+
 
         this.setDatasouce();
-      
         return this.gridControl;
     }
 
-    setDatasouce = () => {
+  
+
+    setDatasouce = (classItem: ClassDefinition = null) => {
         this.dataSource = [];
         Enumerable.From(this.classItems)
             .ForEach(s => this.dataSource.push(new CustomGroupRowViewModel(s)));
@@ -178,5 +248,38 @@ class CustomGroupListControl {
         this.gridControl.dataSource.data(this.dataSource);
         this.gridControl.refresh();
         this.gridControl.resize();
+
+        if (classItem) {
+            const self = this;
+            let foundIt = false;
+            $.each(this.gridControl.tbody.find('tr'),
+                function() {
+                    const foundItem = self.gridControl.dataItem(this) as CustomGroupRowViewModel;
+                    if (foundItem.get("groupSetId") === classItem.groupSetid) {
+                        $('[data-uid=' + foundItem.uid + ']').addClass('k-state-selected');
+
+                        self.selectedItem = (foundItem)
+                            ? Enumerable.From(self.classItems)
+                                .FirstOrDefault(null, s => s.groupSetid === foundItem.get("groupSetId"))
+                            : null;
+
+
+                        foundIt = true;
+                        return false;
+                    }
+                });
+
+            //calculate scrollTop distance
+            if (foundIt) {
+                const scrollContentOffset = this.gridControl.element.find("tbody").offset().top;
+                const selectContentOffset = this.gridControl.select().offset().top;
+                const distance = selectContentOffset - scrollContentOffset;
+                this.gridControl.element.find(".k-grid-content")
+                    .animate({
+                            scrollTop: distance
+                        },
+                    400);
+            }
+        }
     }
 }

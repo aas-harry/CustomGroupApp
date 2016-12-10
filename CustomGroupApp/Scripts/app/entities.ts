@@ -11,11 +11,33 @@
     { Subject: "Ravens", Index: 9, IsAchievement: false, IsAbility: true }
 ];
 
+enum ReportType {
+    None = 0,
+    StudentResults = 1,
+    SchoolStudentRecord = 2,
+    NationalProgressIndex = 3,
+    StudentMathsSkillsProfileList = 4,
+    StudentMathsSkillsProfileTable = 5,
+    StudentReadingSkillsProfileList = 6,
+    StudentReadingSkillsProfileTable = 7,
+    StudentWritingCriteria = 8,
+    StudentMarkedWritingScript = 9,
+    StudentCareerProfile = 10
+}
+
+enum TestCategory {
+    None = 0,
+    Placement = 1,
+    Scholarship = 2,
+    GandT = 3,
+    Nwpa = 4
+}
+
 class Subject {
-    index: number = 0;
-    subject: string = "";
-    isAchievement: boolean = false;
-    isAbility: boolean = false;
+    index = 0;
+    subject = "";
+    isAchievement = false;
+    isAbility = false;
 }
 
 class User {
@@ -27,7 +49,7 @@ class User {
     currentSchool: School;
     isInternalUser: boolean;
     greeting = () => {
-        return "Hi " + this.name;
+        return `Hi ${this.name}`;
     };
 }
 
@@ -35,12 +57,11 @@ class School {
     id: number;
     name: string;
     scode: number;
-    isMainSchool: boolean = false;
-
+    isMainSchool = false;
 }
 
 class TestFile {
-    school: School = new School();
+    school = new School();
     fileNumber: number;
     grade: number;
     category: string;
@@ -51,17 +72,18 @@ class TestFile {
     subjectTypes: Array<Subject> = [];
     students: Array<Student> = [];
     isUnisex: boolean;
-    hasBoys: boolean = false;
-    hasGirls: boolean = false;
+    hasBoys = false;
+    hasGirls = false;
     isCoopSchoolTest: boolean;
     customGroups: Array<ClassDefinition> = [];
+    hasCustomGroups: boolean;
+    hasStudentLanguagePrefs: boolean;
+    hasStudentIds: boolean;
 
     displayTestDate: string;
-
     get yearLevel(): string {
         return `${this.grade} / ${this.testYear}`;
     }
-
     description = () => {
         if (this.fileNumber === 1015049) {
             return this.fileNumber + " " + this.category + " Ravens";
@@ -78,7 +100,6 @@ class TestFile {
         this.setStudents(results, languages);
         this.setStudentLanguagePrefs(languages, this.students);
         this.setCustomGroups(customGroupSets, this.students);
-
         if (school) {
             this.school.name = school.Name;
             this.school.id = school.Id;
@@ -100,6 +121,10 @@ class TestFile {
     };
 
     setCustomGroups = (data: any, students: Array<Student>) => {
+        if (students === null) {
+            students = this.students;
+        }
+        this.customGroups = [];
         var studentDict = Enumerable.From(students).ToDictionary(x => x.studentId, x => x);
         for (let item of data) {
             const classItem = new ClassDefinition(null, 0, 0);
@@ -114,6 +139,24 @@ class TestFile {
             classItem.streamType = item.Streaming;
             this.customGroups.push(classItem);
         }
+
+        this.hasCustomGroups = this.customGroups.length > 0;
+    }
+
+    addCustomGroup = (item: any): ClassDefinition => {
+        var studentDict = Enumerable.From(this.students).ToDictionary(x => x.studentId, x => x);
+        const classItem = new ClassDefinition(null, 0, 0);
+        for (let id of item.Students) {
+            if (studentDict.Contains(id)) {
+                classItem.students.push(new StudentClass(studentDict.Get(id)));
+            }
+        }
+        classItem.count = classItem.students.length;
+        classItem.name = item.Name;
+        classItem.groupSetid = item.GroupSetId;
+        classItem.streamType = item.Streaming;
+        this.customGroups.push(classItem);
+        return classItem;
     }
 
     setStudentLanguagePrefs = (langPrefs: Array<any>, students: Array<Student> = null) => {
@@ -126,8 +169,8 @@ class TestFile {
         var enumerable = Enumerable.From(langPrefs);
 
         students.forEach((student: Student) => {
-            
             var languagePrefs = enumerable.FirstOrDefault(null, s => s.StudentId === student.studentId);
+
             if (languagePrefs != null) {
                 if (languagePrefs.Pref1) {
                     student.languagePrefs.push(languagePrefs.Pref1);
@@ -139,7 +182,26 @@ class TestFile {
                     student.languagePrefs.push(languagePrefs.Pref3);
                 }
             }
-            
+        });
+
+        this.hasStudentLanguagePrefs = true;
+    }
+
+    setSchoolGroup = (studentGroups: Array<any>, students: Array<Student> = null) => {
+        if (!studentGroups || studentGroups.length === 0) {
+            return;
+        }
+        if (!students) {
+            students = this.students;
+        }
+        var lookup = Enumerable.From(studentGroups).ToDictionary(x => x.StudentId, x => x.Group);
+
+        students.forEach((student: Student) => {
+            if (lookup.Contains(student.studentId)) {
+                student.schoolGroup = lookup.Get(student.studentId);
+            } else {
+                student.schoolGroup = "";
+            }
         });
     }
 
@@ -147,7 +209,7 @@ class TestFile {
         this.students = [];
         this.hasGirls = false;
         this.hasBoys = false;
-        var hasStudentLangPrefs = langPrefs && langPrefs.length > 0;
+        this.hasStudentLanguagePrefs = langPrefs && langPrefs.length > 0;
         var enumerable = Enumerable.From(langPrefs);
 
         Enumerable.From(data).OrderBy(x=>x.Name).ForEach((s: any) => {
@@ -159,7 +221,7 @@ class TestFile {
             if (!this.hasGirls && s.Sex === "F") {
                 this.hasGirls = true;
             }
-            if (hasStudentLangPrefs) {
+            if (this.hasStudentLanguagePrefs) {
                 var languagePrefs = enumerable.FirstOrDefault(null, s => s.StudentId === student.studentId);
                 if (languagePrefs != null) {
                     if (languagePrefs.Pref1) {
@@ -175,10 +237,22 @@ class TestFile {
             }
         });
 
-     
+        this.hasStudentIds = Enumerable.From(this.students).Any(s => s.schoolStudentId !== "");
         this.studentCount = this.students.length;
         this.isUnisex = this.hasGirls && this.hasBoys;
     };
+
+    filterTestByGroup = (classItem: ClassDefinition): Array<Student> => {
+        return this.filterTest(Enumerable.From(classItem.students).Select(s => s.studentId).ToArray());
+    }
+
+    filterTest = (filtered: Array<number>): Array<Student> => {
+        if (! this.students || this.students.length === 0) {
+            return [];
+        }
+        const studentFilter = Enumerable.From(filtered).ToDictionary(x => x, x => x);
+        return Enumerable.From(this.students).Where(s => studentFilter.Contains(s.studentId)).ToArray();
+    }
 }
 
 class RangeScore {
@@ -201,7 +275,6 @@ class Student {
     name: string;
     sex: string;
     dob: Date;
-   
     speak: string;
     liveInAus: string;
     ca: number;
@@ -212,11 +285,13 @@ class Student {
     nonverbal: Score;
     mathPerformance: Score;
     mathReasoning: Score;
+    mathQr: Score;
     reading: Score;
     writing: Score;
     spelling: Score;
     raven: Score;
 
+    schoolGroup: string;
     languagePrefs: Array<string> = [];
     get hasLanguagePrefs(): boolean {
         return this.languagePrefs && this.languagePrefs.length > 0;
@@ -232,21 +307,22 @@ class Student {
         this.name = r.Name;
         this.sex = r.Sex;
         this.dob = new Date(parseInt(r.Dob.substr(6)));
-     
         this.speak = r.Speak;
         this.liveInAus = r.Live_in_as;
         this.ca = r.Ca;
 
-        this.genab = new Score(r.Genab, r.Iqs, r.t_genab, r.Sgenab, new RangeScore(r.Iq1, r.Iq2), null);
-        this.verbal = new Score(r.Verb, r.Vis, r.t_verbal, r.Sverb, new RangeScore(r.Vil, r.Vih), null);
-        this.nonverbal = new Score(r.Nverb, r.Nvis, r.t_nverbal, r.Snverb, new RangeScore(r.Nvil, r.Nvih), null);
-        this.mathPerformance = new Score(r.Prs, r.Pst, r.t_pst, r.Smath, null, r.NpiMath);
-        this.reading = new Score(r.Rrs, r.Rst, r.t_rst, r.Sread, null, r.NpiRead);
-        this.spelling = new Score(r.Srs, r.Sst, r.t_sst, r.Sspell, null, null);
-        this.writing = new Score(r.Wrs, r.Wrt, r.t_wr, r.Swrit, null, r.NpiWrit);
-        this.raven = new Score(r.Raven, r.Iqs2, r.Tmst, null, new RangeScore(r.Iq12, r.Iq22), null);
+        this.genab = new Score(r.Genab, r.Iqs, r.T_genab, r.S_genab, new RangeScore(r.Iq1, r.Iq2), null);
+        this.verbal = new Score(r.Verb, r.Vis, r.T_verbal, r.S_verbal, new RangeScore(r.Vil, r.Vih), null);
+        this.nonverbal = new Score(r.Nverb, r.Nvis, r.T_nverbal, r.S_nonverb, new RangeScore(r.Nvil, r.Nvih), null);
+        this.mathPerformance = new Score(r.Prs, r.Pst, r.T_pst, r.S_mathper, null, r.NpiMath);
+        this.mathQr = new Score(r.Qr, null, null, null, null, null);
+        this.reading = new Score(r.Rrs, r.Rst, r.T_rst, r.S_reading, null, r.NpiRead);
+        this.spelling = new Score(r.Srs, r.Sst, r.T_sst, r.S_spelling, null, null);
+        this.writing = new Score(r.Wrs, r.Wrt, r.T_wr, r.S_written, null, r.NpiWrit);
+        this.raven = new Score(r.Raven, r.Iqs2, r.T_mst, null, new RangeScore(r.Iq12, r.Iq22), null);
 
-        this.serialno = r.snow;
+        this.serialno = r.Serialno;
+        this.schoolGroup = "";
     }
 
     get dobString(): string {
@@ -264,6 +340,14 @@ class Student {
     mathsAchievementScore = (): number => {
         return this.mathPerformance.scaledScore ? this.mathPerformance.scaledScore : 0;
     }
+    mathsAchievemenQrScore = (): number => {
+        var total = 0;
+        total += this.mathPerformance.raw ? this.mathPerformance.raw : 0;
+        total += this.mathQr.raw ? this.mathQr.raw : 0;
+        return total;
+    }
+
+
     englishScore = (): number => {
         var total = 0;
         total += this.verbal.scaledScore ? this.verbal.scaledScore : 0;
@@ -272,7 +356,3 @@ class Student {
         return total;
     }
 }
-
-
-
-

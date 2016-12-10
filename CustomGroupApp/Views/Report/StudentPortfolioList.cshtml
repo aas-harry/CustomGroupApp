@@ -1,18 +1,12 @@
 ﻿<div id="student-portfolio-list-container">
+    <div id="student-portfolio-toolbar" style="margin-top: 10px;"></div>
     <table>
         <tr>
             <td>
-                <span id="student-list-container"></span>
-                <span style="margin-left: 5px; width: 200px" id="report-list-container"></span>
+                <div id="student-list-container"></div>
             </td>
-        </tr>
-        <tr>
-            <td>
-                <div>
-                </div>
-
-                <div id="student-report" style="vertical-align: top">
-                    <p>Select a report..</p>
+            <td style="vertical-align: top">
+                <div id="student-report" >
                 </div>
             </td>
         </tr>
@@ -23,20 +17,33 @@
 
     var studentPortfolioViewModel;
     $(document).ready(function () {
-        var studentNavigationControl = new StudentNavigationControl("student-list-container");
+        $("#student-portfolio-toolbar").kendoToolBar({
+            items: [
+                { template: "<div id='custom-group-container' style='padding-left: 10px;'></div>" },
+                { template: "<div id='report-list-container' style='padding-left: 5px; padding-right:5px;'></div>" },
+                { type: "button", text: "Print" }
+            ]
+        });
+
+        var studentNavigationControl = new StudentListControl("student-list-container");
         studentNavigationControl.create("Students",
             function (student) {
                 studentPortfolioViewModel.showStudentReport(student);
-
             },
             300, 600);
+
+      
+        var customGroupFilterControl = new StudentFilterControl(testFile);
+        customGroupFilterControl.create("custom-group-container",
+            function(classItem) {
+                studentNavigationControl.setDatasource(testFile.filterTestByGroup(classItem));
+            });
 
         studentPortfolioViewModel = new StudentPortfolioViewModel();
         studentPortfolioViewModel.createReportList("report-list-container");
         studentPortfolioViewModel.setDatasource(testFile);
         studentNavigationControl.setDatasource(testFile.students);
-
     });
 
- 
+
 </script>

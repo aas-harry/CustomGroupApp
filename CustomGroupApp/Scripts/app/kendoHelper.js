@@ -38,13 +38,45 @@ var KendoHelper = (function () {
             cell.appendChild(element);
             return _this.createStudentCountInputControl(element.id, studentCount, callbackChangeEvent);
         };
-        this.createLabel = function (cell, description, width, textAlign) {
+        this.createLabel = function (cell, description, width, textAlign, marginTop, marginLeft, marginBottom, marginRight) {
             if (width === void 0) { width = 150; }
             if (textAlign === void 0) { textAlign = "left"; }
+            if (marginTop === void 0) { marginTop = 0; }
+            if (marginLeft === void 0) { marginLeft = 5; }
+            if (marginBottom === void 0) { marginBottom = 0; }
+            if (marginRight === void 0) { marginRight = 5; }
             var label = document.createElement("span");
             label.textContent = description;
-            label.setAttribute("style", "margin-right: 5px; width: " + width + "px; textAlign: " + textAlign);
+            label.setAttribute("style", ("margin: " + marginTop + "px " + marginRight + "px " + marginBottom + "px " + marginLeft + "px; ") +
+                ("width: " + width + "px; textAlign: " + textAlign));
             cell.appendChild(label);
+        };
+        this.addNumberCell = function (row, value) {
+            var cell = row.insertCell();
+            cell.textContent = value.toString();
+        };
+        this.addCell = function (row, value) {
+            var cell = row.insertCell();
+            cell.textContent = value;
+        };
+        this.createButtonWithId = function (cell, description, uid, onClick, width, textAlign, marginTop, marginLeft, marginBottom, marginRight) {
+            if (width === void 0) { width = 150; }
+            if (textAlign === void 0) { textAlign = "left"; }
+            if (marginTop === void 0) { marginTop = 0; }
+            if (marginLeft === void 0) { marginLeft = 5; }
+            if (marginBottom === void 0) { marginBottom = 0; }
+            if (marginRight === void 0) { marginRight = 5; }
+            var button = document.createElement("button");
+            button.textContent = description;
+            button.onclick = function () {
+                var tmpClick = onClick;
+                if (tmpClick) {
+                    tmpClick(uid);
+                }
+            };
+            button.setAttribute("style", ("margin: " + marginTop + "px " + marginRight + "px " + marginBottom + "px " + marginLeft + "px; ") +
+                ("width: " + width + "px; textAlign: " + textAlign));
+            cell.appendChild(button);
         };
         this.createNumberLabel = function (cell, value, width) {
             if (width === void 0) { width = 150; }
@@ -123,8 +155,8 @@ var KendoHelper = (function () {
                     { field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" } },
                     { field: "gender", title: "Sex", width: "80px" },
                     { field: "langPref1", title: "Pref1", width: "80px" },
-                    { field: "langPref2", title: "Pref1", width: "80px" },
-                    { field: "langPref3", title: "Pref1", width: "80px" }
+                    { field: "langPref2", title: "Pref2", width: "80px" },
+                    { field: "langPref3", title: "Pref3", width: "80px" }
                 ];
             }
             else {
@@ -132,8 +164,8 @@ var KendoHelper = (function () {
                     { field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" } },
                     { field: "score", title: "Score", width: "80px" },
                     { field: "langPref1", title: "Pref1", width: "80px" },
-                    { field: "langPref2", title: "Pref1", width: "80px" },
-                    { field: "langPref3", title: "Pref1", width: "80px" }
+                    { field: "langPref2", title: "Pref2", width: "80px" },
+                    { field: "langPref3", title: "Pref3", width: "80px" }
                 ];
             }
             var studentLanguages = Enumerable.From(students).Select(function (x) { return new StudentClassRow(x); }).ToArray();
@@ -146,6 +178,36 @@ var KendoHelper = (function () {
                 },
                 selectable: "row",
                 dataSource: studentLanguages
+            });
+            return $("#" + element).data("kendoGrid");
+        };
+        this.createStudentSchoolGroupGrid = function (element, students, isUnisex) {
+            if (element === void 0) { element = "student-school-groups-list"; }
+            var columns;
+            if (isUnisex) {
+                columns = [
+                    { field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" } },
+                    { field: "dob", title: "Dob", template: "#= kendo.toString(kendo.parseDate(dob, 'yyyy-MM-dd'), 'dd/MM/yyyy') #", width: 100 },
+                    { field: "schoolGroup", title: "Group", width: "80px" }
+                ];
+            }
+            else {
+                columns = [
+                    { field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" } },
+                    { field: "dob", title: "Dob", template: "#= kendo.toString(kendo.parseDate(dob, 'yyyy-MM-dd'), 'dd/MM/yyyy') #", width: 100 },
+                    { field: "schoolGroup", title: "Group", width: "80px" }
+                ];
+            }
+            var datasource = Enumerable.From(students).Select(function (x) { return new StudentClassRow(x); }).ToArray();
+            $("#" + element)
+                .kendoGrid({
+                columns: columns,
+                sortable: {
+                    mode: "single",
+                    allowUnsort: true
+                },
+                selectable: "row",
+                dataSource: datasource
             });
             return $("#" + element).data("kendoGrid");
         };
@@ -220,21 +282,30 @@ var KendoHelper = (function () {
                     if (callbackChangeEvent != null) {
                         callbackChangeEvent(inputControl.value(), inputControl);
                     }
+                },
+                spin: function (e) {
+                    var inputControl = e.sender;
+                    console.log("Value: ", inputControl.value());
+                    if (callbackChangeEvent != null) {
+                        callbackChangeEvent(inputControl.value(), inputControl);
+                    }
                 }
             });
             var numericTextBox = $("#" + element).data("kendoNumericTextBox");
-            numericTextBox.options.format = format;
-            numericTextBox.value(defaultValue);
-            numericTextBox.max(max);
-            numericTextBox.min(min);
+            if (numericTextBox) {
+                numericTextBox.options.format = format;
+                numericTextBox.value(defaultValue);
+                numericTextBox.max(max);
+                numericTextBox.min(min);
+            }
             return numericTextBox;
         };
-        this.createDropDownList = function (element, dataSource, dataTextField, dataValueField, changeCallback) {
+        this.createDropDownList = function (element, dataSource, changeCallback) {
             $("#" + element)
                 .kendoDropDownList({
                 dataSource: dataSource,
-                dataTextField: dataTextField,
-                dataValueField: dataValueField,
+                dataTextField: "displayField",
+                dataValueField: "valueField",
                 change: function (e) {
                     var tmpCallback = changeCallback;
                     if (tmpCallback) {

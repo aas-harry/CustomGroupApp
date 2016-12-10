@@ -1,21 +1,33 @@
-﻿interface IStudentPortfolio {
-    // Url link defined in the ReportController
-    urlLink: string;
+﻿/// <reference path="entities.ts" />
+class ReportItem {
+    content: string;
+    constructor(
+        public name: string,
+        public urlLink: string,
+        public reportType: ReportType,
+        public reportViewModel: IStudentPortfolio) { }
+}
 
-    // Report description
-    reportName: string;
-
+interface IStudentPortfolio {
     // Called when a new test file is selected
     setDatasource(testFile: TestFile);
 
     // Called when a new student is selected
     setStudent(student: Student);
 
+    getReports(): Array<ReportItem>;
+
     // Flag to indicate whether testFile property has been set
     isTestFileSet: boolean;
 
     // Report content in html text
-    content: string;
+    getContent(reportType: ReportType): string;
+
+    getUrlLink(reportType: ReportType): string;
+
+    setContent(reportType: ReportType, content: string);
+
+    initReport(reportType: ReportType);
 
     reset();
 }
@@ -82,7 +94,30 @@ class StudentPortfolio extends kendo.data.ObservableObject
 
     // Use this function to set other properties in the subclasses
     setAdditionalProperties = (student: Student) => {
-
     }
+
+    getContent = (reportType: ReportType): string => {
+        var report = Enumerable.From(this.getReports())
+            .FirstOrDefault(null, x => x.reportType === reportType);
+        return report ? report.content : null;
+    }
+    
+    setContent = (reportType: ReportType, content: string) => {
+        var report = Enumerable.From(this.getReports())
+            .FirstOrDefault(null, x => x.reportType === reportType);
+        if (report) {
+            report.content = content;
+        }
+    }
+
+    getReports = (): Array<ReportItem> => { return []; }
+
+    getUrlLink = (reportType: ReportType): string => {
+        var report = Enumerable.From(this.getReports())
+            .FirstOrDefault(null, x => x.reportType === reportType);
+        return report ? report.urlLink : "";
+    }
+
+    initReport = (reportType: ReportType) => {};
 }
 

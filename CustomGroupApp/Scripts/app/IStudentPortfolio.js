@@ -3,6 +3,16 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+/// <reference path="entities.ts" />
+var ReportItem = (function () {
+    function ReportItem(name, urlLink, reportType, reportViewModel) {
+        this.name = name;
+        this.urlLink = urlLink;
+        this.reportType = reportType;
+        this.reportViewModel = reportViewModel;
+    }
+    return ReportItem;
+}());
 var StudentPortfolio = (function (_super) {
     __extends(StudentPortfolio, _super);
     function StudentPortfolio(elementName) {
@@ -22,6 +32,25 @@ var StudentPortfolio = (function (_super) {
         // Use this function to set other properties in the subclasses
         this.setAdditionalProperties = function (student) {
         };
+        this.getContent = function (reportType) {
+            var report = Enumerable.From(_this.getReports())
+                .FirstOrDefault(null, function (x) { return x.reportType === reportType; });
+            return report ? report.content : null;
+        };
+        this.setContent = function (reportType, content) {
+            var report = Enumerable.From(_this.getReports())
+                .FirstOrDefault(null, function (x) { return x.reportType === reportType; });
+            if (report) {
+                report.content = content;
+            }
+        };
+        this.getReports = function () { return []; };
+        this.getUrlLink = function (reportType) {
+            var report = Enumerable.From(_this.getReports())
+                .FirstOrDefault(null, function (x) { return x.reportType === reportType; });
+            return report ? report.urlLink : "";
+        };
+        this.initReport = function (reportType) { };
         this.elementName = elementName;
     }
     StudentPortfolio.prototype.setStudent = function (student) {

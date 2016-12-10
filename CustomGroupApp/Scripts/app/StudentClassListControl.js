@@ -5,17 +5,21 @@ var StudentClassListControl = (function () {
         this.kendoHelper = new KendoHelper();
         this.groupingHelper = new GroupingHelper();
         this.editClassMode = false;
+        this.destroy = function () {
+            // TODO
+        };
         this.createStudentClassInputContainer = function (cell, editGroupNameCallback, updateStudentsCallback, hideClassCallback, dragdropCallback) {
             _this.editGroupNameCallback = editGroupNameCallback;
             _this.updateStudentsCallback = updateStudentsCallback;
             _this.dragdropCallback = dragdropCallback;
             _this.hideClassCallback = hideClassCallback;
-            var classGridHeight = _this.classItem.parent.classes.length > 3 && _this.classItem.parent.bandType === BandType.None
+            var classGridHeight = _this.classItem.parent.classes.length > 3 &&
+                _this.classItem.parent.bandType === BandType.None
                 ? "500px"
-                : "700px";
+                : "600px";
             var classGridWidth = _this.classItem.parent.parent.parent.testFile.isUnisex ? "400px" : "300px";
             var container = document.createElement("div");
-            container.setAttribute("style", "width: " + classGridWidth + "; height: " + classGridHeight + "; margin: 5px 0 0 0;");
+            container.setAttribute("style", "width: " + classGridWidth + "; height: " + classGridHeight + "; padding: 2.5px");
             container.id = "class-" + _this.classItem.uid + "-container";
             var gridElement = document.createElement("div");
             gridElement.setAttribute("style", "height: 100%;");
@@ -26,34 +30,39 @@ var StudentClassListControl = (function () {
             cell.appendChild(summaryElement);
             return _this.createStudentClassGrid(gridElement.id, _this.classItem);
         };
+        this.calculateHeight = function () {
+            return "";
+        };
         this.createStudentClassGrid = function (element, classItem) {
             _this.gridControl = _this.createClassGrid(element);
             $("#" + element)
                 .kendoDraggable({
                 filter: "tr",
                 hint: function (e) {
-                    var studentId = e[0].cells[1].textContent;
                     var studentName = e[0].cells[0].textContent;
-                    return $("<div id=\"student-" + studentId + "\" style=\"background-color: DarkOrange; color: black\"><div class=\"k-grid k-widget\" style=\"padding=15px\">" + studentName + "</div></div>");
+                    return $("<div style=\"background-color: DarkOrange; color: black\"><div class=\"k-grid k-widget\" style=\"padding=15px\">" + studentName + "</div></div>");
                 },
                 group: "classGroup"
             });
             var dropCallback = _this.dragdropCallback;
             _this.gridControl.table.kendoDropTarget({
                 drop: function (e) {
-                    var targetObject = (Object)(e.draggable.currentTarget[0]);
-                    var studentId = parseInt(targetObject.cells[1].textContent);
                     var sourceClass = $(e.draggable.element).attr('id');
-                    if (dropCallback("class-" + classItem.uid, sourceClass, studentId)) {
-                        var sourceGrid = $("#" + sourceClass).data("kendoGrid");
+                    var sourceGrid = $("#" + sourceClass).data("kendoGrid");
+                    var sourceDatasource = sourceGrid.dataSource.view();
+                    var sourceObject = (Object)(e.draggable.currentTarget[0]);
+                    if (!sourceObject || sourceObject.rowIndex >= sourceDatasource.length) {
+                        return;
+                    }
+                    var student = sourceDatasource[sourceObject.rowIndex];
+                    if (dropCallback("class-" + classItem.uid, sourceClass, student.id)) {
                         var targetGrid = $("#class-" + classItem.uid).data("kendoGrid");
-                        var sourceDatasource = sourceGrid.dataSource.view();
                         var targetDatasource = targetGrid.dataSource.view();
                         for (var i = 0; i < sourceDatasource.length; i++) {
-                            if (sourceDatasource[i].id === studentId) {
-                                var student = sourceDatasource[i];
-                                sourceDatasource.remove(student);
-                                targetDatasource.push(student);
+                            if (sourceDatasource[i].id === student.id) {
+                                var student_1 = sourceDatasource[i];
+                                sourceDatasource.remove(student_1);
+                                targetDatasource.push(student_1);
                                 sourceGrid.refresh();
                                 targetGrid.refresh();
                             }
@@ -68,7 +77,9 @@ var StudentClassListControl = (function () {
         };
         this.setDatasource = function () {
             var students = [];
-            Enumerable.From(_this.classItem.students).OrderBy(function (x) { return x.name; }).ForEach(function (x) { return students.push(new StudentClassRow(x)); });
+            Enumerable.From(_this.classItem.students)
+                .OrderBy(function (x) { return x.name; })
+                .ForEach(function (x) { return students.push(new StudentClassRow(x)); });
             _this.gridControl.dataSource.data(students);
             _this.gridControl.refresh();
             _this.gridControl.resize();
@@ -83,16 +94,24 @@ var StudentClassListControl = (function () {
             if (isUniSex) {
                 columns = [
                     { field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" } },
-                    { field: "id", title: "", width: "0px", attributes: { 'class': "text-nowrap" } },
                     { field: "gender", title: "Sex", width: "80px", attributes: { 'class': "text-center" } },
-                    { field: "score", title: "Score", width: "80px", attributes: { 'class': "text-center" } }
+                    {
+                        field: "score",
+                        title: "Score",
+                        width: "80px",
+                        attributes: { 'class': "text-nowrap", 'style': "text-align: center" }
+                    }
                 ];
             }
             else {
                 columns = [
                     { field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" } },
-                    { field: "id", title: "", width: "0px", attributes: { 'class': "text-nowrap" } },
-                    { field: "score", title: "Score", width: "80px", attributes: { 'class': "text-center" } }
+                    {
+                        field: "score",
+                        title: "Score",
+                        width: "50px",
+                        attributes: { 'class': "text-nowrap", 'style': "text-align: center" }
+                    }
                 ];
             }
             var btnStyle = "style = 'margin-right: 0px'";
@@ -119,7 +138,7 @@ var StudentClassListControl = (function () {
             _this.kendoHelper.createToolTip(updateClassElementId, "Add or Remove students from this custom group");
             // create edit button to add and remove students
             _this.kendoHelper.createKendoButton(updateClassElementId, function (e) {
-                var studentSelector = new StudentSelector(20);
+                var studentSelector = new StudentSelector();
                 studentSelector.openDialog(document.getElementById(self.popupWindowElement), self.students, self.classItem.students, function (students) {
                     self.classItem.clearAddStudents(students);
                     self.classItem.calculateClassesAverage();
@@ -188,7 +207,7 @@ var StudentClassListControl = (function () {
         this.createClassSummary = function () {
             var element = document.createElement("div");
             element.id = "summary-" + _this.classItem.uid;
-            element.setAttribute("style", "border-style: solid; border-color: #bfbfbf; border-width: 1px; padding: 5px 5px 5px 10px; margin: 5px 0 0 0");
+            element.setAttribute("style", "color: black; border-style: solid; border-color: #bfbfbf; border-width: 1px; padding: 5px; margin: 2.5px");
             return _this.createClassSummaryContent(element);
         };
         this.updateClassSummaryContent = function () {

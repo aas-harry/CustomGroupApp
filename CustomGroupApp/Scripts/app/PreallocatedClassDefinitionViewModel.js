@@ -35,21 +35,26 @@ var PreallocatedClassDefinitionViewModel = (function (_super) {
         this.preAllocatedStudentsMatchedCount = 0;
         this.hasPreallocatedStudents = false;
         this.showPreallocatedStudentsList = false;
-        this.showPreallocatedStudents = function () {
+        this.togglePreallocatedStudents = function () {
             _this.set("showPreallocatedStudentsList", !_this.showPreallocatedStudentsList);
-            if (_this.showPreallocatedStudentsList) {
+            _this.showPreallocatedStudents(_this.showPreallocatedStudentsList);
+        };
+        this.showPreallocatedStudents = function (showList) {
+            if (showList) {
                 _this.set("showStudentCaption", "Hide Students");
                 _this.kendoHelper.createPreAllocatedStudentGrid("preallocated-students-list", _this.preallocatedStudents);
-                _this.classTableControl.init("classes-settings-container", _this.bandSet);
             }
             else {
                 _this.set("showStudentCaption", "Show Students");
             }
         };
         this.importStudents = function () {
-            _this.kendoHelper.createUploadControl("files", "Customgroup\\importPreallocatedClasses?id=" + _this.bandSet.parent.testFile.fileNumber, _this.onUploadCompleted);
+            var container = document.getElementById("uploader-container");
+            container.innerHTML = '<input type="file" id= "files" name= "files" />';
+            _this.kendoHelper.createUploadControl("files", "..\\Customgroup\\importPreallocatedClasses?id=" + _this.bandSet.parent.testFile.fileNumber, _this.onUploadCompleted);
             $("#import-preallocated-classes").show();
-            _this.set("showPreallocatedClasses", false);
+            _this.set("showPreallocatedStudentsList", false);
+            _this.showPreallocatedStudents(false);
         };
         this.onUploadCompleted = function (e) {
             _this.preallocatedStudents = [];
@@ -61,7 +66,7 @@ var PreallocatedClassDefinitionViewModel = (function (_super) {
                     }
                     _this.preallocatedStudents.push(new PreAllocatedStudent(item));
                 }
-                var studentLookup = Enumerable.From(_this.bandSet.parent.testFile.students)
+                var studentLookup = Enumerable.From(_this.bandSet.parent.students)
                     .ToDictionary(function (x) { return x.studentId; }, function (x) { return x; });
                 _this.set("preAllocatedStudentsMatchedCount", Enumerable.From(_this.preallocatedStudents)
                     .Count(function (x) { return x.studentId !== null; }));
@@ -73,36 +78,39 @@ var PreallocatedClassDefinitionViewModel = (function (_super) {
                 var classNo = 0;
                 for (var _b = 0, classGroups_1 = classGroups; _b < classGroups_1.length; _b++) {
                     var classItem = classGroups_1[_b];
+                    var allocatedStudentCount = classItem.source.length;
                     _this.bandSet.bands[0].classes[classNo].index = classNo + 1;
                     _this.bandSet.bands[0].classes[classNo].name = "Class " + classItem.Key();
                     _this.bandSet.bands[0].classes[classNo].students = [];
+                    _this.bandSet.bands[0].classes[classNo].preallocatedStudentCount = allocatedStudentCount;
+                    if (_this.bandSet.bands[0].classes[classNo].count < allocatedStudentCount) {
+                        _this.bandSet.bands[0].classes[classNo].count = allocatedStudentCount;
+                        _this.bandSet.bands[0].classes[classNo].notAllocatedStudentCount = 0;
+                    }
+                    else {
+                        _this.bandSet.bands[0].classes[classNo]
+                            .notAllocatedStudentCount = _this.bandSet.bands[0].classes[classNo]
+                            .count -
+                            allocatedStudentCount;
+                    }
                     for (var _c = 0, _d = classItem.source; _c < _d.length; _c++) {
                         var s = _d[_c];
                         if (studentLookup.Contains(s)) {
-                            var studentClass = new StudentClass(studentLookup.Get(s));
-                            studentClass.canMoveToOtherClass = false;
-                            _this.bandSet.bands[0].classes[classNo].addStudent(studentClass);
+                            var studentClass = studentLookup.Get(s);
+                            _this.bandSet.bands[0].classes[classNo].addStudent(studentClass, false);
                         }
                     }
                     classNo++;
                 }
-                _this.bandSet.students = Enumerable.From(_this.bandSet.parent.testFile.students)
+                _this.bandSet.students = Enumerable.From(_this.bandSet.parent.students)
                     .Except(_this.preallocatedStudents, function (x) { return x.studentId; })
-                    .Select(function (x) { return new StudentClass(x); }).ToArray();
+                    .Select(function (x) { return x; }).ToArray();
                 _this.bandSet.bands[0].students = _this.bandSet.students;
-                //const unallocatedStudents = Enumerable.From(this.bandSet.parent.testFile.students)
-                //    .Except(this.preallocatedStudents, x => x.studentId)
-                //    .ToArray();
-                //const lastClassNo = classGroups.length;
-                //for (let s of unallocatedStudents) {
-                //    this.bandSet.bands[0].classes[lastClassNo].students.push(new StudentClass(s));
-                //}
-                //this.bandSet.bands[0].classes[lastClassNo].count = this.bandSet.bands[0].classes[lastClassNo].students.length;
-                _this.showPreallocatedStudents();
+                _this.classTableControl.init("classes-settings-container", _this.bandSet);
             }
             $("#import-preallocated-classes").hide();
-            _this.set("showPreallocatedClasses", true);
-            _this.set("showStudentCaption", "Hide Students");
+            _this.set("showPreallocatedStudentsList", true);
+            _this.showPreallocatedStudents(true);
         };
         this.genderChanged = function (gender, studentCount) {
             _this.bandSet.studentCount = studentCount;
@@ -111,8 +119,7 @@ var PreallocatedClassDefinitionViewModel = (function (_super) {
             _this.onClassCountChanged();
         };
         this.showStudentLanguagePreferences = function () { };
-        this.bandSet = classesDefn.createBandSet("class", classesDefn.studentCount);
-        this.studentCount = classesDefn.studentCount;
+        this.reset();
         this.onStudentCountChangedEvent = onStudentCountChangedEvent;
         this.classTableControl = new ClassTableControl(this.callOnStudentCountChangedEvent);
     }
@@ -137,8 +144,14 @@ var PreallocatedClassDefinitionViewModel = (function (_super) {
         enumerable: true,
         configurable: true
     });
+    PreallocatedClassDefinitionViewModel.prototype.reset = function () {
+        this.bandSet = this.classesDefn.createPreAllocatedClassBandSet("class", this.classesDefn.studentCount);
+        this.set("classCount", 1);
+    };
     PreallocatedClassDefinitionViewModel.prototype.loadOptions = function () {
         this.classTableControl.init("classes-settings-container", this.bandSet);
+        this.set("showPreallocatedStudentsList", false);
+        this.showPreallocatedStudents(false);
         $("#import-preallocated-classes").hide();
         return true;
     };

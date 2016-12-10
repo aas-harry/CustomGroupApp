@@ -1,28 +1,31 @@
 var StudentSelector = (function () {
-    function StudentSelector(maxRows) {
+    function StudentSelector() {
         var _this = this;
-        if (maxRows === void 0) { maxRows = 40; }
-        this.maxRows = maxRows;
         this.students = [];
+        this.maxRows = 21;
         this.studentCheckboxes = new Array();
         this.commonUtils = new CommonUtils();
         this.kendoHelper = new KendoHelper();
         this.createTable = function (element, students, previoustudents) {
             if (previoustudents === void 0) { previoustudents = []; }
             var cnt = 0;
+            var maxRows = 3;
             var previousStudentRows = [];
             _this.studentCheckboxes = [];
             _this.container = element;
             if (previoustudents.length > 0) {
                 // Create the table
-                var label_1 = document.createElement("div");
-                label_1.textContent = "Previously selected students, un-check the checkbox to remove students from the list.";
-                label_1.setAttribute("style", "margin-right: 5px; margin-bottom: 5px; font-weight: bold");
-                _this.container.appendChild(label_1);
+                var previousStudentsContainer = document.createElement("div");
+                previousStudentsContainer.setAttribute("style", "padding: 5px; margin-right: 5px; margin-bottom: 5px; overflow-y: none; overflow-x: auto");
+                _this.container.appendChild(previousStudentsContainer);
+                var descLabel = document.createElement("div");
+                descLabel.setAttribute("style", "font-weight: bold; margin-bottom: 5px");
+                descLabel
+                    .textContent = "Previously selected students, un-check the checkbox to remove students from the list.";
+                previousStudentsContainer.appendChild(descLabel);
                 var previousStudentsTable = document.createElement("table");
-                _this.container.appendChild(previousStudentsTable);
+                previousStudentsContainer.appendChild(previousStudentsTable);
                 var previousStudentBody = previousStudentsTable.createTBody();
-                var maxRows = 3;
                 previousStudentRows.push(previousStudentBody.insertRow());
                 for (var _i = 0, _a = Enumerable.From(previoustudents).OrderBy(function (x) { return x.name; }).ToArray(); _i < _a.length; _i++) {
                     var student = _a[_i];
@@ -38,15 +41,38 @@ var StudentSelector = (function () {
                 }
                 _this.container.appendChild(document.createElement("hr"));
             }
+            maxRows = _this.maxRows;
+            // Increase the height of the available students if nothing selected previously
+            if (previoustudents.length === 0) {
+                maxRows += 3;
+            }
+            else if (previoustudents.length === 1) {
+                maxRows -= 2;
+            }
+            else if (previoustudents.length === 2) {
+                maxRows -= 3;
+            }
+            else if (previoustudents.length === 3) {
+                maxRows -= 4;
+            }
+            else if (previoustudents.length > 12) {
+                maxRows -= 6;
+            }
+            else {
+                maxRows -= 5;
+            }
             // Create the table
             cnt = 0;
             var studentRows = [];
+            var availableStudentsContainer = document.createElement("div");
+            availableStudentsContainer.setAttribute("style", "padding: 5px; overflow-y: none; overflow-x: auto");
             var label = document.createElement("div");
             label.textContent = "Select one or more students from the list below:";
             label.setAttribute("style", "margin-right: 5px; margin-bottom: 5px; font-weight: bold");
-            _this.container.appendChild(label);
+            _this.container.appendChild(availableStudentsContainer);
+            availableStudentsContainer.appendChild(label);
             var table = document.createElement("table");
-            _this.container.appendChild(table);
+            availableStudentsContainer.appendChild(table);
             var body = table.createTBody();
             studentRows.push(body.insertRow());
             var previousStudentLookup = Enumerable.From(previoustudents).ToDictionary(function (s) { return s.studentId; }, function (s) { return s; });
@@ -55,7 +81,7 @@ var StudentSelector = (function () {
                 if (previousStudentLookup.Contains(student.studentId)) {
                     continue;
                 }
-                if (cnt > _this.maxRows) {
+                if (cnt > maxRows) {
                     cnt = 0;
                 }
                 if (cnt >= studentRows.length) {
@@ -69,7 +95,7 @@ var StudentSelector = (function () {
         this.createStudentCell = function (cell, student, isSelected) {
             if (isSelected === void 0) { isSelected = false; }
             var container = document.createElement("div");
-            container.setAttribute("style", "width: 220px");
+            container.setAttribute("style", "width: 200px; margin-right: 15px");
             cell.appendChild(container);
             var checkBox = document.createElement("input");
             checkBox.type = "checkbox";
@@ -92,6 +118,7 @@ var StudentSelector = (function () {
             }
             // create window content
             var window = document.createElement("div");
+            window.setAttribute("style", "margin: 10px 0 10px 0; overflow: none");
             window.id = _this.commonUtils.createUid();
             if (element.childElementCount > 0) {
                 while (element.hasChildNodes()) {
@@ -99,43 +126,52 @@ var StudentSelector = (function () {
                 }
             }
             element.appendChild(window);
-            var buttonContainer = document.createElement("div");
-            var saveButton = _this.kendoHelper.createButton("Save");
-            var cancelButton = _this.kendoHelper.createButton("Cancel");
-            buttonContainer.setAttribute("style", "margin: 0 5px 5px 0px");
-            buttonContainer.appendChild(saveButton);
-            buttonContainer.appendChild(cancelButton);
-            window.appendChild(buttonContainer);
-            _this.createTable(window, students, previoustudents);
-            var popupWindow = $("#" + window.id).kendoWindow({
-                width: "690px",
-                height: "705px",
+            _this.popupWindow = $("#" + window.id)
+                .kendoWindow({
+                width: "700px",
+                height: "625px",
                 modal: true,
                 scrollable: true,
                 actions: ["Maximize", "Close"],
                 resizable: false,
                 title: 'Select Students'
-            }).data("kendoWindow");
-            cancelButton.onclick = function () {
-                popupWindow.close();
-            };
-            saveButton.onclick = function () {
+            })
+                .data("kendoWindow");
+            var buttonContainer = document.createElement("div");
+            var saveButtonElement = document.createElement("button");
+            saveButtonElement.id = "save-button";
+            saveButtonElement.textContent = "Save";
+            saveButtonElement.setAttribute("style", "margin-left: 2.5px; margin-right: 2.5px");
+            var cancelButtonElement = document.createElement("button");
+            cancelButtonElement.id = "cancel-button";
+            cancelButtonElement.textContent = "Cancel";
+            buttonContainer.setAttribute("style", "margin: 0 5px 5px 0px");
+            buttonContainer.appendChild(saveButtonElement);
+            buttonContainer.appendChild(cancelButtonElement);
+            window.appendChild(buttonContainer);
+            _this.createTable(window, students, previoustudents);
+            _this.kendoHelper.createKendoButton("save-button", function (e) {
                 var selectedStudents = new Array();
                 var lookup = Enumerable.From(students).ToDictionary(function (x) { return x.id; }, function (x) { return x; });
-                Enumerable.From(_this.studentCheckboxes).Where(function (x) { return x.checked; }).ForEach(function (x) {
+                Enumerable.From(_this.studentCheckboxes)
+                    .Where(function (x) { return x.checked; })
+                    .ForEach(function (x) {
                     var studentid = parseInt(_this.commonUtils.getUid(x.id));
                     if (lookup.Contains(studentid)) {
                         selectedStudents.push(lookup.Get(studentid));
                     }
                 });
-                popupWindow.close();
+                _this.popupWindow.close().destroy();
                 var tmpCallback = callback;
                 if (tmpCallback) {
                     tmpCallback(selectedStudents);
                 }
-            };
+            });
+            _this.kendoHelper.createKendoButton("cancel-button", function (e) {
+                _this.popupWindow.close().destroy();
+            });
             $("#" + window.id).parent().addClass("h-window-caption");
-            popupWindow.center().open();
+            _this.popupWindow.center().open();
         };
     }
     return StudentSelector;

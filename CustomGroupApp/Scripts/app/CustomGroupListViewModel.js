@@ -8,18 +8,45 @@ var CustomGroupListViewModel = (function (_super) {
     function CustomGroupListViewModel() {
         var _this = this;
         _super.call(this);
+        this.popupWindowContainer = "popup-window-container";
         this.groupingHelper = new GroupingHelper();
+        this.messageBox = new MessageBoxDialog();
         this.customGroupListControl = new CustomGroupListControl();
         this.customClassGridCollection = new CustomClassGridCollection();
-        this.splitgroup = function () {
+        this.add = function () {
+            var self = _this;
+            var studentSelector = new AddCustomGroupDialog();
+            studentSelector.openDialog(document.getElementById("popup-window-container"), _this.classesDefn.students, function (groupName, students) {
+                var classItem = self.testInfo.addCustomGroup({
+                    "Name": groupName,
+                    "Students": Enumerable.From(students).Select(function (s) { return s.studentId; }).ToArray(),
+                    "GroupSetId": 0,
+                    "Streaming": StreamType.None
+                });
+                self.groupingHelper.addClass(self.classesDefn.testFile.fileNumber, classItem, function (status, item) {
+                    if (status) {
+                        classItem.name = item.Name;
+                        classItem.groupSetid = item.Id;
+                        self.customGroupListControl.addClassItems([classItem]);
+                    }
+                    else {
+                        toastr.info("Failed to add custom group.");
+                    }
+                });
+            }, 30);
+        };
+        this.regroup = function () {
+            var selectedItems = _this.getSelectedItems();
+            if (selectedItems.length === 0) {
+                return;
+            }
             $.ajax({
                 type: "POST",
-                url: "CustomGroup\\SplitCustomGroupView",
+                url: "..\\CustomGroup\\SplitCustomGroupView",
                 contentType: "application/json",
-                data: JSON.stringify({ 'groupSetId': _this.selectedClass.groupSetid }),
+                data: JSON.stringify({ 'groupSetIds': Enumerable.From(selectedItems).Select(function (x) { return x.groupSetid; }).ToArray() }),
                 success: function (html) {
-                    $("#content").replaceWith("<div id='content'></div>");
-                    $("#content").append(html);
+                    $("#reportContent").replaceWith(html);
                 },
                 error: function (e) {
                 }
@@ -28,10 +55,9 @@ var CustomGroupListViewModel = (function (_super) {
         this.create = function () {
             $.ajax({
                 type: "POST",
-                url: "CustomGroup\\CustomGroupWizard",
+                url: "..\\CustomGroup\\CustomGroupWizard",
                 success: function (html) {
-                    $("#content").replaceWith("<div id='content'></div>");
-                    $("#content").append(html);
+                    $("#reportContent").replaceWith(html);
                 },
                 error: function (e) {
                 }
@@ -39,6 +65,62 @@ var CustomGroupListViewModel = (function (_super) {
         };
         this.delete = function () {
             var self = _this;
+            var selectedItems = _this.getSelectedItems();
+            if (selectedItems.length === 0) {
+                _this.messageBox.showInfoDialog(_this.popupWindowContainer, "Please select a custom group to delete.", "Delete Custom Groups", 120, 450, null);
+                return;
+            }
+            _this.messageBox.showYesNoDialog(_this.popupWindowContainer, "Do you want to delete the selected custom groups (" +
+                selectedItems.length + (selectedItems.length === 1 ? " item)" : " items)") +
+                "?", "Delete Custom Groups", 120, 450, function (status) {
+                if (status !== DialogResult.Yes) {
+                    return;
+                }
+                _this.set("message", "Deleting selected custom groups...");
+                _this.set("hasMessage", true);
+                _this.groupingHelper.deleteClasses(Enumerable.From(selectedItems).Select(function (x) { return x.groupSetid; }).ToArray(), _this.classesDefn.testFile.fileNumber, function (status) {
+                    if (status) {
+                        self.customClassGridCollection.clear();
+                        self.testInfo.customGroups = Enumerable.From(self.testInfo.customGroups).Except(selectedItems, function (x) { return x.groupSetid; }).ToArray();
+                        self.customGroupListControl.deleteClassItems(selectedItems);
+                    }
+                    self.set("message", null);
+                    _this.set("hasMessage", false);
+                });
+            });
+        };
+        this.merge = function () {
+            var self = _this;
+            var selectedItems = _this.getSelectedItems();
+            if (selectedItems.length === 0) {
+                return;
+            }
+            _this.set("message", "merging selected custom groups...");
+            _this.set("hasMessage", true);
+            _this.groupingHelper.mergeClasses(Enumerable.From(selectedItems).Select(function (x) { return x.groupSetid; }).ToArray(), _this.classesDefn.testFile.fileNumber, function (status, item) {
+                if (status) {
+                    var classItem = self.testInfo.addCustomGroup(item);
+                    self.customGroupListControl.addClassItems([classItem]);
+                }
+                self.set("message", null);
+                _this.set("hasMessage", false);
+            });
+        };
+        this.exportToCsv = function () {
+            var selectedItems = _this.getSelectedItems();
+            if (selectedItems.length === 0) {
+                return;
+            }
+            _this.groupingHelper.exportGroupSetIds(_this.classesDefn.testFile, Enumerable.From(selectedItems).Select(function (x) { return x.groupSetid; }).ToArray(), "csv", function (status, msg) { });
+        };
+        this.exportToExcel = function () {
+            var selectedItems = _this.getSelectedItems();
+            if (selectedItems.length === 0) {
+                return;
+            }
+            _this.groupingHelper.exportGroupSetIds(_this.classesDefn.testFile, Enumerable.From(selectedItems).Select(function (x) { return x.groupSetid; }).ToArray(), "excel", function (status, msg) { });
+        };
+        this.getSelectedItems = function () {
             var selectedItems = _this.customGroupListControl.selectedItems;
             if (selectedItems.length === 0) {
                 var selectedItem = _this.customGroupListControl.selectedItem;
@@ -46,21 +128,11 @@ var CustomGroupListViewModel = (function (_super) {
                     selectedItems.push(selectedItem);
                 }
             }
-            if (selectedItems.length === 0) {
-                return;
-            }
-            _this.set("message", "Deleting selected custom groups...");
-            _this.set("hasMessage", true);
-            _this.groupingHelper.deleteClasses(Enumerable.From(selectedItems).Select(function (x) { return x.groupSetid; }).ToArray(), _this.classesDefn.testFile.fileNumber, function (status) {
-                if (status) {
-                    self.customGroupListControl.deleteClassItems(selectedItems);
-                }
-                self.set("message", null);
-                _this.set("hasMessage", false);
-            });
+            return selectedItems;
         };
         this.showCustomGroups = function (elementName) {
-            _this.customGroupListControl.create(document.getElementById(elementName), _this.testInfo.customGroups, _this.onSelectedCustomGroups, _this.onSelectedCustomGroup);
+            var customGroupSets = Enumerable.From(_this.testInfo.customGroups).Where(function (s) { return s.groupSetid > 0; }).ToArray();
+            _this.customGroupListControl.create(document.getElementById(elementName), customGroupSets, _this.onSelectedCustomGroups, _this.onSelectedCustomGroup);
         };
         this.setDatasource = function (testFile) {
             _this.testInfo = testFile;
@@ -80,6 +152,9 @@ var CustomGroupListViewModel = (function (_super) {
         };
         this.onSelectedCustomGroups = function (items) {
             var self = _this;
+            if (items.length > 20) {
+                items = Enumerable.From(items).Take(20).ToArray();
+            }
             var classItems = new Array();
             var studentCount = 0;
             var itemLookup = Enumerable.From(items).ToDictionary(function (x) { return x; }, function (x) { return x; });

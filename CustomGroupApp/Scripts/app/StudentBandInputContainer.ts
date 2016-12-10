@@ -28,6 +28,7 @@ class StudentBandInputContainer {
             this.cell.appendChild(label);
         }
 
+
         var element = document.createElement("input") as HTMLInputElement;
         element.type = "text";
         element.setAttribute("style", "width: 100px");

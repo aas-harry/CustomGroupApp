@@ -2,13 +2,18 @@
     implements IStudentPortfolio {
     constructor(elementName: string) {
         super(elementName);
-
-        this.urlLink = "StudentNaplanView";
-        this.reportName = "Student Naplan Report";
-
     }
+
+    private reports = [
+        new ReportItem("Student Naplan Report", "StudentNaplanView", ReportType.NationalProgressIndex, this)
+    ];
 
     setAdditionalProperties = (student: Student) => {
     }
+
+    getReports = (): Array<ReportItem> => {
+        return this.reports;
+    }
+
 }
 

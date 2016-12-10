@@ -47,6 +47,7 @@ var CustomGroupBaseViewModel = (function (_super) {
     });
     CustomGroupBaseViewModel.prototype.studentCountChanged = function (value) {
     };
+    CustomGroupBaseViewModel.prototype.reset = function () { };
     CustomGroupBaseViewModel.prototype.loadOptions = function () { };
     CustomGroupBaseViewModel.prototype.getBandSet = function () { return this.bandSet; };
     return CustomGroupBaseViewModel;
@@ -71,8 +72,7 @@ var BandClassDefinitionViewModel = (function (_super) {
             _this.bandSet.createBands("Band", _this.studentCount, _this.bandCount);
             _this.bandTableControl.init("classes-settings-container", _this.bandSet);
         };
-        this.bandSet = classesDefn.createBandSet("Band", classesDefn.studentCount, 2);
-        this.studentCount = classesDefn.studentCount;
+        this.reset();
         this.bandTableControl = new BandTableControl(this.callOnStudentCountChangedEvent);
     }
     BandClassDefinitionViewModel.prototype.studentCountChanged = function (value) {
@@ -80,11 +80,21 @@ var BandClassDefinitionViewModel = (function (_super) {
     };
     Object.defineProperty(BandClassDefinitionViewModel.prototype, "studentInAllClassesCount", {
         get: function () {
+            for (var _i = 0, _a = this.bandSet.bands; _i < _a.length; _i++) {
+                var bandItem = _a[_i];
+                bandItem.studentCount = Enumerable.From(bandItem.classes).Sum(function (x) { return x.count; });
+            }
             return Enumerable.From(this.bandSet.bands).SelectMany(function (b) { return b.classes; }).Sum(function (x) { return x.count; });
         },
         enumerable: true,
         configurable: true
     });
+    BandClassDefinitionViewModel.prototype.reset = function () {
+        this.bandSet = this.classesDefn.createBandSet("Band", this.classesDefn.studentCount, 2);
+        this.studentCount = this.classesDefn.studentCount;
+        this.set("bandCount", 1);
+        this.set("classCount", 1);
+    };
     BandClassDefinitionViewModel.prototype.loadOptions = function () {
         this.bandTableControl.init("classes-settings-container", this.bandSet);
         return true;

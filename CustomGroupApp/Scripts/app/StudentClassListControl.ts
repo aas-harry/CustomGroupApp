@@ -10,12 +10,19 @@
     private students: Array<StudentClass>;
     private popupWindowElement: string;
     private gridControl: kendo.ui.Grid;
-    constructor(classItem: ClassDefinition, students: Array<StudentClass>,
-        editClassMode = false, popupWindowElement: string) {
+
+    constructor(classItem: ClassDefinition,
+        students: Array<StudentClass>,
+        editClassMode = false,
+        popupWindowElement: string) {
         this.classItem = classItem;
         this.students = students;
         this.editClassMode = editClassMode;
         this.popupWindowElement = popupWindowElement;
+    }
+
+    destroy = () => {
+        // TODO
     }
 
     createStudentClassInputContainer = (
@@ -29,14 +36,15 @@
         this.dragdropCallback = dragdropCallback;
         this.hideClassCallback = hideClassCallback;
 
-        const classGridHeight = this.classItem.parent.classes.length > 3 && this.classItem.parent.bandType === BandType.None
+        const classGridHeight = this.classItem.parent.classes.length > 3 &&
+            this.classItem.parent.bandType === BandType.None
             ? "500px"
-            : "700px";
+            : "600px";
 
         const classGridWidth = this.classItem.parent.parent.parent.testFile.isUnisex ? "400px" : "300px";
 
         const container = document.createElement("div") as HTMLDivElement;
-        container.setAttribute("style", `width: ${classGridWidth}; height: ${classGridHeight}; margin: 5px 0 0 0;`);
+        container.setAttribute("style", `width: ${classGridWidth}; height: ${classGridHeight}; padding: 2.5px`);
         container.id = `class-${this.classItem.uid}-container`;
 
         const gridElement = document.createElement("div") as HTMLDivElement;
@@ -52,6 +60,10 @@
         return this.createStudentClassGrid(gridElement.id, this.classItem);
     };
 
+    calculateHeight = (): string => {
+        return "";
+    }
+
     createStudentClassGrid = (element: string, classItem: ClassDefinition): kendo.ui.Grid => {
         this.gridControl = this.createClassGrid(element);
 
@@ -59,10 +71,8 @@
             .kendoDraggable({
                 filter: "tr",
                 hint(e) {
-                    const studentId = e[0].cells[1].textContent;
                     const studentName = e[0].cells[0].textContent;
-                    return $(`<div id="student-${studentId
-                        }" style="background-color: DarkOrange; color: black"><div class="k-grid k-widget" style="padding=15px">${
+                    return $(`<div style="background-color: DarkOrange; color: black"><div class="k-grid k-widget" style="padding=15px">${
                         studentName}</div></div>`);
                 },
                 group: "classGroup"
@@ -71,17 +81,20 @@
         var dropCallback = this.dragdropCallback;
         this.gridControl.table.kendoDropTarget({
             drop(e) {
-                const targetObject = (Object)(e.draggable.currentTarget[0]);
-                const studentId = parseInt(targetObject.cells[1].textContent);
                 const sourceClass = $(e.draggable.element).attr('id');
-                if (dropCallback(`class-${classItem.uid}`, sourceClass, studentId)) {
-                    const sourceGrid = $(`#${sourceClass}`).data("kendoGrid");
-                    const targetGrid = $(`#class-${classItem.uid}`).data("kendoGrid");
-                    const sourceDatasource = sourceGrid.dataSource.view();
+                const sourceGrid = $(`#${sourceClass}`).data("kendoGrid");
+                const sourceDatasource = sourceGrid.dataSource.view();
+                const sourceObject = (Object)(e.draggable.currentTarget[0]);
+                if (! sourceObject || sourceObject.rowIndex >= sourceDatasource.length) {
+                    return;
+                }
+                const student = sourceDatasource[sourceObject.rowIndex];
+                if (dropCallback(`class-${classItem.uid}`, sourceClass, student.id)) {
 
+                    const targetGrid = $(`#class-${classItem.uid}`).data("kendoGrid");
                     const targetDatasource = targetGrid.dataSource.view();
                     for (let i = 0; i < sourceDatasource.length; i++) {
-                        if (sourceDatasource[i].id === studentId) {
+                        if (sourceDatasource[i].id === student.id) {
                             let student = sourceDatasource[i];
                             sourceDatasource.remove(student);
                             targetDatasource.push(student);
@@ -101,7 +114,9 @@
 
     setDatasource = () => {
         var students: Array<StudentClassRow> = [];
-        Enumerable.From(this.classItem.students).OrderBy(x => x.name).ForEach(x => students.push(new StudentClassRow(x)));
+        Enumerable.From(this.classItem.students)
+            .OrderBy(x => x.name)
+            .ForEach(x => students.push(new StudentClassRow(x)));
         this.gridControl.dataSource.data(students);
         this.gridControl.refresh();
         this.gridControl.resize();
@@ -114,19 +129,27 @@
         const hideClassElementId = "hideclass" + this.classItem.uid;
         const isUniSex = this.classItem.parent.parent.parent.testFile.isUnisex;
 
-        let columns: { field: string; title: string; width: string; attributes: { class: string } }[];
+        let columns: any;
         if (isUniSex) {
             columns = [
                 { field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" } },
-                { field: "id", title: "", width: "0px", attributes: { 'class': "text-nowrap" } },
                 { field: "gender", title: "Sex", width: "80px", attributes: { 'class': "text-center" } },
-                { field: "score", title: "Score", width: "80px", attributes: { 'class': "text-center" } }
+                {
+                    field: "score",
+                    title: "Score",
+                    width: "80px",
+                    attributes: { 'class': "text-nowrap", 'style': "text-align: center" }
+                }
             ];
         } else {
             columns = [
                 { field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" } },
-                { field: "id", title: "", width: "0px", attributes: { 'class': "text-nowrap" } },
-                { field: "score", title: "Score", width: "80px", attributes: { 'class': "text-center" } }
+                {
+                    field: "score",
+                    title: "Score",
+                    width: "50px",
+                    attributes: { 'class': "text-nowrap", 'style': "text-align: center" }
+                }
             ];
         }
 
@@ -159,7 +182,7 @@
         // create edit button to add and remove students
         this.kendoHelper.createKendoButton(updateClassElementId,
             (e) => {
-                const studentSelector = new StudentSelector(20);
+                const studentSelector = new StudentSelector();
                 studentSelector.openDialog(document.getElementById(self.popupWindowElement),
                     self.students,
                     self.classItem.students,
@@ -248,7 +271,7 @@
         var element = document.createElement("div");
         element.id = `summary-${this.classItem.uid}`;
         element.setAttribute("style",
-            "border-style: solid; border-color: #bfbfbf; border-width: 1px; padding: 5px 5px 5px 10px; margin: 5px 0 0 0");
+            "color: black; border-style: solid; border-color: #bfbfbf; border-width: 1px; padding: 5px; margin: 2.5px");
 
         return this.createClassSummaryContent(element);
     };

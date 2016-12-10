@@ -3,10 +3,9 @@ class TopMiddleLowestBandClassDefinitionViewModel extends CustomGroupBaseViewMod
      {
     constructor(classesDefn: ClassesDefinition, onStudentCountChangedEvent: (classCount: number) => any) {
         super(classesDefn, onStudentCountChangedEvent);
-    
 
-        this.bandSet = classesDefn.createTopMiddleBottomBandSet("class", classesDefn.studentCount);
-        this.studentCount = classesDefn.studentCount;
+
+        this.reset();
         
         this.bandTableControl = new BandTableControl(this.callOnStudentCountChangedEvent);
     }
@@ -23,8 +22,19 @@ class TopMiddleLowestBandClassDefinitionViewModel extends CustomGroupBaseViewMod
 
 
     get studentInAllClassesCount(): number {
+        for (let bandItem of this.bandSet.bands) {
+            bandItem.studentCount = Enumerable.From(bandItem.classes).Sum(x => x.count);
+        }
+
         return Enumerable.From(this.bandSet.bands).SelectMany(b => b.classes).Sum(x => x.count);
     } 
+
+    reset() {
+        this.bandSet = this.classesDefn.createTopMiddleBottomBandSet("class", this.classesDefn.studentCount);
+        this.studentCount = this.classesDefn.studentCount;
+        this.set("bandCount", 3);
+        this.set("classCount", 1);
+    }
 
     loadOptions(): boolean {
         this.bandTableControl.init("classes-settings-container", this.bandSet);

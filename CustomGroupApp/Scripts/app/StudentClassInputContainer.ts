@@ -6,6 +6,9 @@ class StudentClassInputContainer {
         addLabel = false) {
 
         this.cell = cell;
+        this.cellContainer = document.createElement("div");
+        this.cellContainer.setAttribute("style", "margin: 5px 5px 0 0");
+        this.cell.appendChild(this.cellContainer);
         this.classItem = classItem;
         this.callbackAction = callback;
         this.addLabel = addLabel;
@@ -13,26 +16,55 @@ class StudentClassInputContainer {
         this.init();
     }
 
+    private cellContainer: HTMLDivElement;
     private cell: HTMLTableCellElement;
     private callbackAction: (classItem: ClassDefinition, newValue: number, oldValue: number, inputControl: kendo.ui.NumericTextBox) => any;
     private addLabel: boolean;
     private inputControl: kendo.ui.NumericTextBox;
     private kendoHelper = new KendoHelper();
 
+    dispose = () => {
+        this.kendoHelper = null;
+        this.callbackAction = null;
+
+        this.inputControl.destroy();
+        this.inputControl = null;
+    }
+
     private init = () => {
         if (this.addLabel) {
+            const container = document.createElement("div") as HTMLDivElement;
+            container.setAttribute("style", "margin: 5px 5px 0 0");
+
             const label = document.createElement("span");
             label.textContent = `Class ${this.classItem.index}`;
-            label.setAttribute("style", "margin-right: 5px");
-            this.cell.appendChild(label);
+
+            container.appendChild(label);
+            this.cellContainer.appendChild(container);
         }
+
+        if (this.classItem.parent.parent.bandType === BandType.PreallocatedClass) {
+            const container = document.createElement("div") as HTMLDivElement;
+            container.setAttribute("style", "margin: 5px 5px 0 0");
+
+            const label = document.createElement("span");
+            label.textContent = `Pre-alloc: ${this.classItem.preallocatedStudentCount}`;
+
+            container.appendChild(label);
+            this.cellContainer.appendChild(container);
+        }
+
+        let container = document.createElement("div") as HTMLDivElement;
+        container.setAttribute("style", "margin: 5px 5px 0 0");
 
         var element = document.createElement("input") as HTMLInputElement;
         element.type = "text";
-        element.setAttribute("style", "width: 100px; margin-right: 20px");
+        element.setAttribute("style", "width: 100px; margin-right: 5px 5px 5px 20px");
         const elementId = this.classItem ? this.classItem.uid : createUuid();
         element.id = `studentclass-${elementId}`;
-        this.cell.appendChild(element);
+
+        container.appendChild(element);
+        this.cellContainer.appendChild(container);
 
         const studentCount = this.classItem ? this.classItem.count : 0;
         this.inputControl = this.kendoHelper.createStudentCountInputControl(element.id, studentCount, this.onStudentCountChanged);

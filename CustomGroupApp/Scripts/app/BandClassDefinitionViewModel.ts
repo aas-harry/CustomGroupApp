@@ -38,7 +38,8 @@
 
     addBandsAndClassesControl = () => {};
 
- 
+    reset() { }
+
     loadOptions() { }
 
     getBandSet(): BandSet { return this.bandSet; }
@@ -59,8 +60,7 @@ class BandClassDefinitionViewModel extends CustomGroupBaseViewModel {
     constructor(classesDefn: ClassesDefinition, onStudentCountChangedEvent: (classCount: number) => any) {
         super(classesDefn, onStudentCountChangedEvent);
 
-        this.bandSet = classesDefn.createBandSet("Band", classesDefn.studentCount, 2);
-        this.studentCount = classesDefn.studentCount;
+        this.reset();
 
         this.bandTableControl = new BandTableControl(this.callOnStudentCountChangedEvent);
     }
@@ -80,7 +80,17 @@ class BandClassDefinitionViewModel extends CustomGroupBaseViewModel {
     }
 
     get studentInAllClassesCount(): number {
+        for (let bandItem of this.bandSet.bands) {
+            bandItem.studentCount = Enumerable.From(bandItem.classes).Sum(x => x.count);
+        }
         return Enumerable.From(this.bandSet.bands).SelectMany(b => b.classes).Sum(x => x.count);
+    }
+
+    reset() {
+        this.bandSet = this.classesDefn.createBandSet("Band", this.classesDefn.studentCount, 2);
+        this.studentCount = this.classesDefn.studentCount;
+        this.set("bandCount", 1);
+        this.set("classCount", 1);
     }
 
     loadOptions(): boolean {

@@ -14,7 +14,6 @@ var GenerateCustomGroupViewModel = (function (_super) {
             _this.parentViewModel.set("hasHiddenClasses", true);
         };
         this.onClassChanged = function (classItem) {
-            console.log("onClassChanged: " + classItem.groupSetid, classItem.name);
         };
         this.showAllClasses = function () {
             _this.customClassGridCollection.showAllClasses();

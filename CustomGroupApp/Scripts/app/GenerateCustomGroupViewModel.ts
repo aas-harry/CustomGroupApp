@@ -1,6 +1,4 @@
-﻿
-
-class GenerateCustomGroupViewModel extends kendo.data.ObservableObject{
+﻿class GenerateCustomGroupViewModel extends kendo.data.ObservableObject {
     constructor(parentViewModel: CustomGroupViewModel) {
         super();
 
@@ -21,7 +19,6 @@ class GenerateCustomGroupViewModel extends kendo.data.ObservableObject{
     }
 
     private onClassChanged = (classItem: ClassDefinition) => {
-        console.log("onClassChanged: "+ classItem.groupSetid, classItem.name);
     }
 
     showClasses(source: BandSet): boolean {

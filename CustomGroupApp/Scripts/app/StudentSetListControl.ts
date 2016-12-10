@@ -1,15 +1,22 @@
 ﻿class StudentSetListControl {
     constructor(
         public name: string,
-        public studentSets: Array<StudentSet>,
         public students: Array<StudentClass> = [],
         public popupWindowElement: HTMLElement) {
         this.uid = this.commonUtils.createUid();
+        this._studentSets = [];
     }
 
+    // ReSharper disable once InconsistentNaming
+    private _studentSets: Array<StudentSet>;
     private kendoHelper = new KendoHelper();
     private commonUtils = new CommonUtils();
     private gridControl: kendo.ui.Grid;
+    private groupType: StudentSetType;
+
+    get studentSets (): Array<StudentSet>  {
+        return this._studentSets;
+    }
 
     get selectedItem() {
         return this.gridControl ? this.gridControl.dataItem(this.gridControl.select()) : null;
@@ -19,11 +26,14 @@
 
     createStudentSetContainer = (
         cell: HTMLTableCellElement,
+        groupType: StudentSetType,
         isCoedSchool: boolean,
         width = 600,
         height = 200) => {
+
+        this.groupType = groupType;
         var container = document.createElement("div") as HTMLDivElement;
-        container.setAttribute("style", `width: ${width}px; height: ${height}px; margin: 5px 0 0 0;`);
+        container.setAttribute("style", `width: ${width}px; height: ${height}px; margin: 0 0 0 0;`);
         container.id = `${this.name}-studentsets-${this.uid}-container`;
         var gridElement = document.createElement("div") as HTMLDivElement;
         gridElement.setAttribute("style", "height: 100%;");
@@ -39,9 +49,9 @@
         if (!this.gridControl || !this.isEqual(elementId)) {
             return false;
         }
-        const studentSelector = new StudentSelector(20);
+        const studentSelector = new StudentSelector();
         studentSelector.openDialog(this.popupWindowElement, this.students, [], (students) => {
-            const studentSet = new StudentSet();
+            const studentSet = new StudentSet(this.groupType);
             studentSet.students = students;
             this.studentSets.push(studentSet);
 
@@ -60,7 +70,7 @@
         var selectedItem = this.selectedItem;
         if (selectedItem != null) {
             const studentSet = this.findStudentSetItem(selectedItem.get("studentSetId")) ;
-            const studentSelector = new StudentSelector(20);
+            const studentSelector = new StudentSelector();
             studentSelector.openDialog(this.popupWindowElement, this.students, studentSet.students, (students) => {
                 studentSet.students = students;
 
@@ -91,6 +101,18 @@
             return true;
         }
         return false;
+    }
+
+    clear = () => {
+        this.studentSets.splice(0, this.studentSets.length);
+    }
+
+    loadStudentSets = (studentSets: Array<StudentSet>) => {
+        this.studentSets.splice(0, this.studentSets.length);
+        for (let s of studentSets) {
+            this.studentSets.push(s);
+        }
+        this.setDataSource();
     }
 
     createStudentSetGrid = (
@@ -124,10 +146,10 @@
                 selectable: "row",
                 dataSource: [],
                 dataBound(e) {
-                    const grid = e.sender;
-                    if (grid) {
-                        grid.select("tr:eq(0)");
-                    }
+                    this.element.find("tbody tr:first").addClass("k-state-selected");
+                    const row = this.select().closest("tr");
+                    // var value = this.dataItem(row) as CustomGroupRowViewModel;
+
                 }
             });
 
@@ -147,14 +169,14 @@
         return null;
     }
     private setDataSource = () => {
-        var data = [];
-        for (let s of this.studentSets) {
-            data.push({
-                'studentSetId': s.studentSetId,
-                 'studentList': s.studentList
+        const dataItems = [];
+        for(let item of this.studentSets) {
+            dataItems.push({
+                'studentList': item.studentList,
+                'studentSetId': item.studentSetId
             });
         }
-        this.gridControl.dataSource.data(data);
+        this.gridControl.dataSource.data(dataItems);
         this.gridControl.refresh();
       
     };

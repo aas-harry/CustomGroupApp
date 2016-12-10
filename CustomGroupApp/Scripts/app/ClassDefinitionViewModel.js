@@ -21,11 +21,9 @@ var ClassDefinitionViewModel = (function (_super) {
         };
         this.addBandsAndClassesControl = function () {
             _this.bandSet.bands[0].setClassCount(_this.classCount);
-            _this.classTableControl.init("classes-settings-container", _this.bandSet);
+            _this.classTableControl.updateStudentClassRows();
         };
-        this.bandSet = classesDefn.createBandSet("class", classesDefn.studentCount);
-        this.bandSet.bands[0].setClassCount(3);
-        this.studentCount = classesDefn.studentCount;
+        this.reset();
         this.classTableControl = new ClassTableControl(this.callOnStudentCountChangedEvent);
     }
     ClassDefinitionViewModel.prototype.studentCountChanged = function (value) {
@@ -39,6 +37,12 @@ var ClassDefinitionViewModel = (function (_super) {
         enumerable: true,
         configurable: true
     });
+    ClassDefinitionViewModel.prototype.reset = function () {
+        this.bandSet = this.classesDefn.createBandSet("class", this.classesDefn.studentCount);
+        this.bandSet.bands[0].setClassCount(3);
+        this.set("classCount", 3);
+        this.set("studentCount", this.classesDefn.studentCount);
+    };
     ClassDefinitionViewModel.prototype.loadOptions = function () {
         this.classTableControl.init("classes-settings-container", this.bandSet);
     };

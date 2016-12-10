@@ -47,13 +47,43 @@
         return this.createStudentCountInputControl(element.id, studentCount, callbackChangeEvent);
     }
 
-    createLabel = (cell: HTMLTableCellElement, description: string, width = 150, textAlign = "left") => {
+
+    createLabel = (cell: HTMLTableCellElement, description: string, width = 150, textAlign = "left",
+        marginTop = 0, marginLeft = 5, marginBottom = 0, marginRight = 5) => {
         var label = document.createElement("span");
         label.textContent = description;
-        label.setAttribute("style", `margin-right: 5px; width: ${width}px; textAlign: ${textAlign}`);
+        label.setAttribute("style", `margin: ${marginTop}px ${marginRight}px ${marginBottom}px ${marginLeft}px; ` +
+            `width: ${width}px; textAlign: ${textAlign}`);
         cell.appendChild(label);
 
     }
+
+    addNumberCell = (row: HTMLTableRowElement, value: number) => {
+        const cell = row.insertCell();
+        cell.textContent = value.toString();
+    }
+
+    addCell = (row: HTMLTableRowElement, value: string) => {
+        const cell = row.insertCell();
+        cell.textContent = value;
+    }
+
+    createButtonWithId = (cell: HTMLTableCellElement, description: string, uid: string, onClick: (uid: string) => any, width = 150, textAlign = "left",
+        marginTop = 0, marginLeft = 5, marginBottom = 0, marginRight = 5) => {
+        var button = document.createElement("button");
+        button.textContent = description;
+        button.onclick = () => {
+            var tmpClick = onClick;
+            if (tmpClick) {
+                tmpClick(uid);
+            }
+        }
+        button.setAttribute("style", `margin: ${marginTop}px ${marginRight}px ${marginBottom}px ${marginLeft}px; ` +
+            `width: ${width}px; textAlign: ${textAlign}`);
+        cell.appendChild(button);
+
+    }
+
     createNumberLabel = (cell: HTMLTableCellElement, value: number, width = 150) => {
         var label = document.createElement("span");
         label.textContent = value.toString();
@@ -194,16 +224,16 @@
                 { field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" } },
                 { field: "gender", title: "Sex", width: "80px" },
                 { field: "langPref1", title: "Pref1", width: "80px" },
-                { field: "langPref2", title: "Pref1", width: "80px" },
-                { field: "langPref3", title: "Pref1", width: "80px" }
+                { field: "langPref2", title: "Pref2", width: "80px" },
+                { field: "langPref3", title: "Pref3", width: "80px" }
             ];
         } else {
             columns = [
                 { field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" } },
                 { field: "score", title: "Score", width: "80px" },
                 { field: "langPref1", title: "Pref1", width: "80px" },
-                { field: "langPref2", title: "Pref1", width: "80px" },
-                { field: "langPref3", title: "Pref1", width: "80px" }
+                { field: "langPref2", title: "Pref2", width: "80px" },
+                { field: "langPref3", title: "Pref3", width: "80px" }
             ];
         }
 
@@ -221,6 +251,40 @@
 
         return $(`#${element}`).data("kendoGrid");
     }
+
+    createStudentSchoolGroupGrid = (element: string = "student-school-groups-list",
+        students: Array<StudentClass>,
+        isUnisex: boolean): kendo.ui.Grid => {
+        var columns;
+        if (isUnisex) {
+            columns = [
+                { field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" } },
+                { field: "dob", title: "Dob", template: "#= kendo.toString(kendo.parseDate(dob, 'yyyy-MM-dd'), 'dd/MM/yyyy') #", width: 100 },
+                { field: "schoolGroup", title: "Group", width: "80px" }
+            ];
+        } else {
+            columns = [
+                { field: "name", title: "Name", width: "200px", attributes: { 'class': "text-nowrap" } },
+                { field: "dob", title: "Dob", template: "#= kendo.toString(kendo.parseDate(dob, 'yyyy-MM-dd'), 'dd/MM/yyyy') #", width: 100 },
+                { field: "schoolGroup", title: "Group", width: "80px" }
+            ];
+        }
+
+        var datasource = Enumerable.From(students).Select(x => new StudentClassRow(x)).ToArray();
+        $(`#${element}`)
+            .kendoGrid({
+                columns: columns,
+                sortable: {
+                    mode: "single",
+                    allowUnsort: true
+                },
+                selectable: "row",
+                dataSource: datasource
+            });
+
+        return $(`#${element}`).data("kendoGrid");
+    }
+
 
     createPreAllocatedStudentGrid = (element: string = "preallocated-students-list",
         students: Array<PreAllocatedStudent>): kendo.ui.Grid => {
@@ -307,32 +371,34 @@
                         if (callbackChangeEvent != null) {
                             callbackChangeEvent(inputControl.value(), inputControl);
                         }
+                    },
+                    spin: (e) => {
+                        var inputControl = e.sender as kendo.ui.NumericTextBox;
+                        console.log("Value: ", inputControl.value());
+                        if (callbackChangeEvent != null) {
+                            callbackChangeEvent(inputControl.value(), inputControl);
+                        }
                     }
-                    //spin: (e) => {
-                    //    var inputControl = e.sender as kendo.ui.NumericTextBox;
-                    //    if (callbackChangeEvent != null) {
-                    //        callbackChangeEvent(inputControl.value(), inputControl);
-                    //    }
-                    //}
                 } as kendo.ui.NumericTextBoxOptions);
 
             const numericTextBox = $(`#${element}`).data("kendoNumericTextBox");
-            numericTextBox.options.format = format;
-            numericTextBox.value(defaultValue);
-            numericTextBox.max(max);
-            numericTextBox.min(min);
+            if (numericTextBox) {
+                numericTextBox.options.format = format;
+                numericTextBox.value(defaultValue);
+                numericTextBox.max(max);
+                numericTextBox.min(min);
+            }
 
             return numericTextBox;
         };
 
     createDropDownList = (element: string, dataSource: { displayField: string, valueField: any },
-        dataTextField: string, dataValueField: string,
         changeCallback: (e: any) => any): kendo.ui.DropDownList => {
         $(`#${element}`)
             .kendoDropDownList({
                 dataSource: dataSource,
-                dataTextField: dataTextField,
-                dataValueField: dataValueField,
+                dataTextField: "displayField",
+                dataValueField: "valueField",
                 change: (e: kendo.ui.DropDownListChangeEvent) => {
                     const tmpCallback = changeCallback;
                     if (tmpCallback) {

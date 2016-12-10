@@ -1,18 +1,18 @@
 var StudentSetListControl = (function () {
-    function StudentSetListControl(name, studentSets, students, popupWindowElement) {
+    function StudentSetListControl(name, students, popupWindowElement) {
         var _this = this;
         if (students === void 0) { students = []; }
         this.name = name;
-        this.studentSets = studentSets;
         this.students = students;
         this.popupWindowElement = popupWindowElement;
         this.kendoHelper = new KendoHelper();
         this.commonUtils = new CommonUtils();
-        this.createStudentSetContainer = function (cell, isCoedSchool, width, height) {
+        this.createStudentSetContainer = function (cell, groupType, isCoedSchool, width, height) {
             if (width === void 0) { width = 600; }
             if (height === void 0) { height = 200; }
+            _this.groupType = groupType;
             var container = document.createElement("div");
-            container.setAttribute("style", "width: " + width + "px; height: " + height + "px; margin: 5px 0 0 0;");
+            container.setAttribute("style", "width: " + width + "px; height: " + height + "px; margin: 0 0 0 0;");
             container.id = _this.name + "-studentsets-" + _this.uid + "-container";
             var gridElement = document.createElement("div");
             gridElement.setAttribute("style", "height: 100%;");
@@ -25,9 +25,9 @@ var StudentSetListControl = (function () {
             if (!_this.gridControl || !_this.isEqual(elementId)) {
                 return false;
             }
-            var studentSelector = new StudentSelector(20);
+            var studentSelector = new StudentSelector();
             studentSelector.openDialog(_this.popupWindowElement, _this.students, [], function (students) {
-                var studentSet = new StudentSet();
+                var studentSet = new StudentSet(_this.groupType);
                 studentSet.students = students;
                 _this.studentSets.push(studentSet);
                 _this.setDataSource();
@@ -41,7 +41,7 @@ var StudentSetListControl = (function () {
             var selectedItem = _this.selectedItem;
             if (selectedItem != null) {
                 var studentSet_1 = _this.findStudentSetItem(selectedItem.get("studentSetId"));
-                var studentSelector = new StudentSelector(20);
+                var studentSelector = new StudentSelector();
                 studentSelector.openDialog(_this.popupWindowElement, _this.students, studentSet_1.students, function (students) {
                     studentSet_1.students = students;
                     _this.gridControl.dataSource.data(_this.studentSets);
@@ -69,6 +69,17 @@ var StudentSetListControl = (function () {
             }
             return false;
         };
+        this.clear = function () {
+            _this.studentSets.splice(0, _this.studentSets.length);
+        };
+        this.loadStudentSets = function (studentSets) {
+            _this.studentSets.splice(0, _this.studentSets.length);
+            for (var _i = 0, studentSets_1 = studentSets; _i < studentSets_1.length; _i++) {
+                var s = studentSets_1[_i];
+                _this.studentSets.push(s);
+            }
+            _this.setDataSource();
+        };
         this.createStudentSetGrid = function (name, element) {
             _this.gridControl = _this.createStudentSetGridControl(name, element);
             // Populate the grid
@@ -94,10 +105,9 @@ var StudentSetListControl = (function () {
                 selectable: "row",
                 dataSource: [],
                 dataBound: function (e) {
-                    var grid = e.sender;
-                    if (grid) {
-                        grid.select("tr:eq(0)");
-                    }
+                    this.element.find("tbody tr:first").addClass("k-state-selected");
+                    var row = this.select().closest("tr");
+                    // var value = this.dataItem(row) as CustomGroupRowViewModel;
                 }
             });
             return $("#" + element).data("kendoGrid");
@@ -115,19 +125,27 @@ var StudentSetListControl = (function () {
             return null;
         };
         this.setDataSource = function () {
-            var data = [];
+            var dataItems = [];
             for (var _i = 0, _a = _this.studentSets; _i < _a.length; _i++) {
-                var s = _a[_i];
-                data.push({
-                    'studentSetId': s.studentSetId,
-                    'studentList': s.studentList
+                var item = _a[_i];
+                dataItems.push({
+                    'studentList': item.studentList,
+                    'studentSetId': item.studentSetId
                 });
             }
-            _this.gridControl.dataSource.data(data);
+            _this.gridControl.dataSource.data(dataItems);
             _this.gridControl.refresh();
         };
         this.uid = this.commonUtils.createUid();
+        this._studentSets = [];
     }
+    Object.defineProperty(StudentSetListControl.prototype, "studentSets", {
+        get: function () {
+            return this._studentSets;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(StudentSetListControl.prototype, "selectedItem", {
         get: function () {
             return this.gridControl ? this.gridControl.dataItem(this.gridControl.select()) : null;

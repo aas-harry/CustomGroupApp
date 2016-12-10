@@ -10,6 +10,7 @@
     private kendoHelper = new KendoHelper();
     private maxColumns = 4;
     private studentCountChangedCallback;
+    private studentClassControls = new Array <StudentClassInputContainer>();
 
     init(elementName: string, bandSet: BandSet) {
         this.tableContainerElementName = elementName;
@@ -19,19 +20,33 @@
         $(`#${this.tableContainerElementName}`).html(`<table id='${this.tableElementName}'></table>`);
         this.table = document.getElementById(this.tableElementName) as HTMLTableElement;
         this.bodyTable = this.table.createTBody();
-        let classRow = this.bodyTable.insertRow();
 
+        this.updateStudentClassRows();
+    }
+
+    updateStudentClassRows = () => {
+        while (this.bodyTable.rows.length > 0) {
+            this.bodyTable.deleteRow(0);
+        }
+        for (let ctrl of this.studentClassControls) {
+            ctrl.dispose();
+        }
+        this.studentClassControls = [];
+
+        let classRow = this.bodyTable.insertRow();
         let cnt = 0;
-        for (let classItem of bandSet.bands[0].classes) {
+        for (let classItem of this.bandSet.bands[0].classes) {
             if (cnt === this.maxColumns) {
                 cnt = 0;
                 classRow = this.bodyTable.insertRow();
             }
             cnt++;
-            const ctrl =new StudentClassInputContainer(classRow.insertCell(),
+
+            this.studentClassControls.push(new StudentClassInputContainer(classRow.insertCell(),
                 classItem,
                 this.studentCountInClassChangedCallback,
-                true);
+                true));
+
         }
     }
 

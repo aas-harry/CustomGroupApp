@@ -5,17 +5,20 @@
     }
     id: number;
     name: string;
+    dob: Date;
     gender: string;
     score: number;
     class: number;
     langPref1: string;
     langPref2: string;
     langPref3: string;
+    schoolGroup: string;
     hasLanguagePrefs = false;
 
     convert = (student: StudentClass) => {
         this.id = student.id;
         this.name = student.name;
+        this.dob = student.dob;
         this.gender = student.gender;
         this.score = student.score;
         this.class = student.classNo;
@@ -25,5 +28,6 @@
         if (this.langPref1 !== "" || this.langPref2 !== "" || this.langPref3 !== "") {
             this.hasLanguagePrefs = true;
         }
+        this.schoolGroup = student.schoolGroup;
     }
 }

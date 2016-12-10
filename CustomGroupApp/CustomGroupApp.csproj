@@ -575,6 +575,8 @@
     <Content Include="Content\themes\base\minified\jquery.ui.tabs.min.css" />
     <Content Include="Content\themes\base\minified\jquery.ui.theme.min.css" />
     <Content Include="Content\themes\base\minified\jquery.ui.tooltip.min.css" />
+    <Content Include="Content\toastr.css" />
+    <Content Include="Content\toastr.min.css" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\fontawesome-webfont.svg" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
@@ -684,6 +686,8 @@
     <Content Include="fonts\fontawesome-webfont.woff" />
     <Content Include="fonts\fontawesome-webfont.ttf" />
     <Content Include="fonts\fontawesome-webfont.eot" />
+    <Content Include="Content\toastr.scss" />
+    <Content Include="Content\toastr.less" />
     <None Include="Scripts\jquery-2.2.4.intellisense.js" />
     <Content Include="Scripts\i18n\grid.locale-ar.js" />
     <Content Include="Scripts\i18n\grid.locale-bg.js" />
@@ -996,7 +1000,10 @@
     <Content Include="Scripts\modernizr-2.6.2.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
+    <Content Include="Scripts\toastr.js" />
+    <Content Include="Scripts\toastr.min.js" />
     <Content Include="Scripts\_references.js" />
+    <None Include="Views\CustomGroup\TestPage.cshtml" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -1068,14 +1075,18 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="Scripts\app\AddCustomGroupDialog.ts" />
     <TypeScriptCompile Include="Scripts\app\BandClassDefinitionViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\BandTabControl.ts" />
     <TypeScriptCompile Include="Scripts\app\ClassBandInputContainer.ts" />
     <TypeScriptCompile Include="Scripts\app\CustomGroupBaseViewModel.ts" />
+    <TypeScriptCompile Include="Scripts\app\StudentFilterControl.ts" />
     <TypeScriptCompile Include="Scripts\app\CustomGroupListControl.ts" />
     <TypeScriptCompile Include="Scripts\app\CustomGroupListViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\ClassTabControl.ts" />
     <TypeScriptCompile Include="Scripts\app\CustomClassGridCollection.ts" />
+    <TypeScriptCompile Include="Scripts\app\ExportCustomGroupDialog.ts" />
+    <TypeScriptCompile Include="Scripts\app\ExportStudentListViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\GenerateCustomGroupViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\GroupingTypeViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\ClassDefinitionViewModel.ts" />
@@ -1083,13 +1094,17 @@
     <TypeScriptCompile Include="Scripts\app\custom-group.ts" />
     <TypeScriptCompile Include="Scripts\app\CustomGroupViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\entities.ts" />
+    <TypeScriptCompile Include="Scripts\app\ImportSchoolClassViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\IndividualStudentTestResult.ts" />
     <TypeScriptCompile Include="Scripts\app\IStudentPortfolio.ts" />
     <TypeScriptCompile Include="Scripts\app\KendoHelper.ts" />
+    <TypeScriptCompile Include="Scripts\app\MathsSkillsProfileViewModel.ts" />
+    <TypeScriptCompile Include="Scripts\app\MessageBoxDialog.ts" />
     <TypeScriptCompile Include="Scripts\app\PreallocatedClassDefinitionViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\repository.ts" />
     <TypeScriptCompile Include="Scripts\app\LanguageClassDefinitionViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\ResultHelper.ts" />
+    <TypeScriptCompile Include="Scripts\app\SchoolGroupClassDefinitionViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\StudentNaplanViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\StudentNavigationControl.ts" />
     <TypeScriptCompile Include="Scripts\app\StudentPortfolioListViewModel.ts" />
@@ -1109,6 +1124,7 @@
     <TypeScriptCompile Include="Scripts\typings\kendo-ui\kendo-ui.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\linq\linq.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\linq\linq.jquery.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\toastr\toastr.d.ts" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

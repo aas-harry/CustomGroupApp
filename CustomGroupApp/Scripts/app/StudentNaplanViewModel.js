@@ -6,11 +6,16 @@ var __extends = (this && this.__extends) || function (d, b) {
 var StudentNaplanViewModel = (function (_super) {
     __extends(StudentNaplanViewModel, _super);
     function StudentNaplanViewModel(elementName) {
+        var _this = this;
         _super.call(this, elementName);
+        this.reports = [
+            new ReportItem("Student Naplan Report", "StudentNaplanView", ReportType.NationalProgressIndex, this)
+        ];
         this.setAdditionalProperties = function (student) {
         };
-        this.urlLink = "StudentNaplanView";
-        this.reportName = "Student Naplan Report";
+        this.getReports = function () {
+            return _this.reports;
+        };
     }
     return StudentNaplanViewModel;
 }(StudentPortfolio));
