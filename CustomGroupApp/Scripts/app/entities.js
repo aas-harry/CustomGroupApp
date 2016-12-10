@@ -219,6 +219,18 @@ var TestFile = (function () {
         this.filterTestByGroup = function (classItem) {
             return _this.filterTest(Enumerable.From(classItem.students).Select(function (s) { return s.studentId; }).ToArray());
         };
+        this.filterByGender = function (gender) {
+            if (!_this.students || _this.students.length === 0) {
+                return [];
+            }
+            if (gender === Gender.Girls) {
+                return Enumerable.From(_this.students).Where(function (s) { return s.sex === "F"; }).ToArray();
+            }
+            if (gender === Gender.Boys) {
+                return Enumerable.From(_this.students).Where(function (s) { return s.sex === "M"; }).ToArray();
+            }
+            return _this.students;
+        };
         this.filterTest = function (filtered) {
             if (!_this.students || _this.students.length === 0) {
                 return [];

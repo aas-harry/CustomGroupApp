@@ -246,6 +246,20 @@ class TestFile {
         return this.filterTest(Enumerable.From(classItem.students).Select(s => s.studentId).ToArray());
     }
 
+    filterByGender = (gender: Gender): Array<Student> => {
+        if (!this.students || this.students.length === 0) {
+            return [];
+        }
+
+        if (gender === Gender.Girls) {
+            return Enumerable.From(this.students).Where(s => s.sex === "F").ToArray();
+        }
+        if (gender === Gender.Boys) {
+            return Enumerable.From(this.students).Where(s => s.sex === "M").ToArray();
+        }
+        return this.students;
+    }
+
     filterTest = (filtered: Array<number>): Array<Student> => {
         if (! this.students || this.students.length === 0) {
             return [];

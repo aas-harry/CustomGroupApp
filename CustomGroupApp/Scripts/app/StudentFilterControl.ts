@@ -8,8 +8,16 @@
         this.setDatasource();
     }
 
-    create = (elementName: string, callback: (classItem: ClassDefinition) => any) => {
+    create = (elementName: string, callback: (students: Array<Student>) => any) => {
         const container = document.getElementById(elementName);
+       
+        this.addCustomGroupFiler(container, callback);
+        if (this.testFile.isUnisex) {
+            this.addGenderFiler(container, callback);
+        }
+    }
+
+    private addCustomGroupFiler = (container: HTMLElement, callback: (students: Array<Student>) => any) => {
         const groupElementName = "custom-group-list";
 
         const label = document.createElement("span");
@@ -32,14 +40,48 @@
                     if (tmpCallback) {
                         const control = e.sender as kendo.ui.DropDownList;
                         const val = control.dataItem();
-                       tmpCallback(val.classItem as ClassDefinition);
+                        const classItem = val.classItem as ClassDefinition;
+                        if (classItem) {
+                            tmpCallback(this.testFile.filterTestByGroup(classItem));
+                        }
                     }
                 }
             } as kendo.ui.DropDownListOptions);
 
         var groupList = $(`#${groupElementName}`).data("kendoDropDownList");
         groupList.list.width(350);
+    }
 
+    private addGenderFiler = (container: HTMLElement, callback: (students: Array<Student>) => any) => {
+        const genderElementName = "gender-filter";
+        const genderCombobox = document.createElement("div");
+        genderCombobox.id = genderElementName;
+        genderCombobox.setAttribute("style", "width: 90px");
+        container.appendChild(genderCombobox);
+
+        const genders =  [
+            { "name": "CoEd", "gender": Gender.All },
+            { "name": "Female", "gender": Gender.Girls },
+            { "name": "Male", "gender": Gender.Boys }
+        ];
+
+        $(`#${genderElementName}`)
+            .kendoDropDownList({
+                dataSource: genders,
+                dataTextField: "name",
+                dataValueField: "gender",
+                change: (e: kendo.ui.DropDownListChangeEvent) => {
+                    const tmpCallback = callback;
+                    if (tmpCallback) {
+                        const control = e.sender as kendo.ui.DropDownList;
+                        const val = control.dataItem();
+                        const gender = val.gender as Gender;
+                        if (gender) {
+                            tmpCallback(this.testFile.filterByGender(gender));
+                        }
+                    }
+                }
+            } as kendo.ui.DropDownListOptions);
     }
 
     selectedCustomGroupChanged = () => {

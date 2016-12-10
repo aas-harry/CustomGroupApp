@@ -35,8 +35,8 @@
       
         var customGroupFilterControl = new StudentFilterControl(testFile);
         customGroupFilterControl.create("custom-group-container",
-            function(classItem) {
-                studentNavigationControl.setDatasource(testFile.filterTestByGroup(classItem));
+            function(students) {
+                studentNavigationControl.setDatasource(students);
             });
 
         studentPortfolioViewModel = new StudentPortfolioViewModel();

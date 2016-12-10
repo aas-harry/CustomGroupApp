@@ -17,9 +17,9 @@ enum BandType {
 }
 
 enum Gender {
-    All,
-    Girls,
-    Boys
+    All = 0,
+    Girls = 1,
+    Boys = 2
 }
 
 enum GroupingMethod {
