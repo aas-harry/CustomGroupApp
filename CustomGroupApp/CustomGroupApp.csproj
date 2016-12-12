@@ -1080,6 +1080,7 @@
     <TypeScriptCompile Include="Scripts\app\BandTabControl.ts" />
     <TypeScriptCompile Include="Scripts\app\ClassBandInputContainer.ts" />
     <TypeScriptCompile Include="Scripts\app\CustomGroupBaseViewModel.ts" />
+    <TypeScriptCompile Include="Scripts\app\ReadingSkillsProfileViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\StudentFilterControl.ts" />
     <TypeScriptCompile Include="Scripts\app\CustomGroupListControl.ts" />
     <TypeScriptCompile Include="Scripts\app\CustomGroupListViewModel.ts" />
@@ -1119,7 +1120,9 @@
     <TypeScriptCompile Include="Scripts\app\StudentRow.ts" />
     <TypeScriptCompile Include="Scripts\app\StudentSelector.ts" />
     <TypeScriptCompile Include="Scripts\app\StudentSetListControl.ts" />
+    <TypeScriptCompile Include="Scripts\app\Subject.ts" />
     <TypeScriptCompile Include="Scripts\app\TopMiddleLowestBandClassDefinitionViewModel.ts" />
+    <TypeScriptCompile Include="Scripts\app\WritingCriteriaViewModel.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\kendo-ui\kendo-ui.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\linq\linq.d.ts" />

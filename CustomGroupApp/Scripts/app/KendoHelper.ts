@@ -47,7 +47,6 @@
         return this.createStudentCountInputControl(element.id, studentCount, callbackChangeEvent);
     }
 
-
     createLabel = (cell: HTMLTableCellElement, description: string, width = 150, textAlign = "left",
         marginTop = 0, marginLeft = 5, marginBottom = 0, marginRight = 5) => {
         var label = document.createElement("span");

@@ -101,7 +101,7 @@ class StudentPortfolio extends kendo.data.ObservableObject
             .FirstOrDefault(null, x => x.reportType === reportType);
         return report ? report.content : null;
     }
-    
+
     setContent = (reportType: ReportType, content: string) => {
         var report = Enumerable.From(this.getReports())
             .FirstOrDefault(null, x => x.reportType === reportType);
@@ -118,6 +118,5 @@ class StudentPortfolio extends kendo.data.ObservableObject
         return report ? report.urlLink : "";
     }
 
-    initReport = (reportType: ReportType) => {};
+    initReport = (reportType: ReportType) => { };
 }
-

@@ -1,15 +1,3 @@
-var subjectTypes = [
-    { Subject: "Unknown", Index: 0, IsAchievement: false, IsAbility: false },
-    { Subject: "Genab", Index: 1, IsAchievement: false, IsAbility: true },
-    { Subject: "Verbal", Index: 2, IsAchievement: false, IsAbility: true },
-    { Subject: "NonVerbal", Index: 3, IsAchievement: false, IsAbility: true },
-    { Subject: "MathReasoning", Index: 4, IsAchievement: false, IsAbility: true },
-    { Subject: "MathPerformance", Index: 5, IsAchievement: true, IsAbility: false },
-    { Subject: "Reading", Index: 6, IsAchievement: true, IsAbility: false },
-    { Subject: "Writing", Index: 7, IsAchievement: true, IsAbility: false },
-    { Subject: "Spelling", Index: 8, IsAchievement: true, IsAbility: false },
-    { Subject: "Ravens", Index: 9, IsAchievement: false, IsAbility: true }
-];
 var ReportType;
 (function (ReportType) {
     ReportType[ReportType["None"] = 0] = "None";
@@ -32,15 +20,6 @@ var TestCategory;
     TestCategory[TestCategory["GandT"] = 3] = "GandT";
     TestCategory[TestCategory["Nwpa"] = 4] = "Nwpa";
 })(TestCategory || (TestCategory = {}));
-var Subject = (function () {
-    function Subject() {
-        this.index = 0;
-        this.subject = "";
-        this.isAchievement = false;
-        this.isAbility = false;
-    }
-    return Subject;
-}());
 var User = (function () {
     function User() {
         var _this = this;
@@ -60,11 +39,12 @@ var TestFile = (function () {
     function TestFile() {
         var _this = this;
         this.school = new School();
-        this.subjectTypes = [];
+        // subjectTypes: Array<Subject> = [];
         this.students = [];
         this.hasBoys = false;
         this.hasGirls = false;
         this.customGroups = [];
+        this.allSubjects = new Array();
         this.description = function () {
             if (_this.fileNumber === 1015049) {
                 return _this.fileNumber + " " + _this.category + " Ravens";
@@ -96,7 +76,6 @@ var TestFile = (function () {
             _this.testYear = undefined;
             _this.studentCount = undefined;
             _this.published = undefined;
-            _this.subjectTypes = [];
             _this.students = [];
         };
         this.setCustomGroups = function (data, students) {
@@ -215,6 +194,25 @@ var TestFile = (function () {
             _this.hasStudentIds = Enumerable.From(_this.students).Any(function (s) { return s.schoolStudentId !== ""; });
             _this.studentCount = _this.students.length;
             _this.isUnisex = _this.hasGirls && _this.hasBoys;
+            _this.subjectsTested = [];
+            var sampleStudents = Enumerable.From(_this.students).Take(30).ToArray();
+            var _loop_1 = function(item) {
+                if (!item.subject) {
+                    return "continue";
+                }
+                if (Enumerable.From(sampleStudents).Count(function (student) {
+                    var score = item.subject.getScore(student);
+                    return score ? item.subject.getScore(student).raw > 1 : false;
+                }) > 5) {
+                    item.subject.isTested = true;
+                    _this.subjectsTested.push(item.subject);
+                }
+            };
+            for (var _i = 0, _a = _this.allSubjects; _i < _a.length; _i++) {
+                var item = _a[_i];
+                var state_1 = _loop_1(item);
+                if (state_1 === "continue") continue;
+            }
         };
         this.filterTestByGroup = function (classItem) {
             return _this.filterTest(Enumerable.From(classItem.students).Select(function (s) { return s.studentId; }).ToArray());
@@ -238,6 +236,16 @@ var TestFile = (function () {
             var studentFilter = Enumerable.From(filtered).ToDictionary(function (x) { return x; }, function (x) { return x; });
             return Enumerable.From(_this.students).Where(function (s) { return studentFilter.Contains(s.studentId); }).ToArray();
         };
+        this.allSubjects.push(new SubjectInfo(null, 0, false, false));
+        this.allSubjects.push(new SubjectInfo(new GenabSubject(), 1, false, true));
+        this.allSubjects.push(new SubjectInfo(new VerbalSubject(), 2, false, true));
+        this.allSubjects.push(new SubjectInfo(new NonVerbalSubject(), 3, false, true));
+        this.allSubjects.push(new SubjectInfo(new MathReasoningSubject(), 4, false, true));
+        this.allSubjects.push(new SubjectInfo(new MathPerformanceSubject(), 5, true, false));
+        this.allSubjects.push(new SubjectInfo(new ReadingSubject(), 6, true, false));
+        this.allSubjects.push(new SubjectInfo(new WritingSubject(), 7, true, false));
+        this.allSubjects.push(new SubjectInfo(new SpellingSubject(), 8, true, false));
+        this.allSubjects.push(new SubjectInfo(new RavenSubject(), 9, false, true));
     }
     Object.defineProperty(TestFile.prototype, "yearLevel", {
         get: function () {
@@ -310,11 +318,11 @@ var Student = (function () {
         this.genab = new Score(r.Genab, r.Iqs, r.T_genab, r.S_genab, new RangeScore(r.Iq1, r.Iq2), null);
         this.verbal = new Score(r.Verb, r.Vis, r.T_verbal, r.S_verbal, new RangeScore(r.Vil, r.Vih), null);
         this.nonverbal = new Score(r.Nverb, r.Nvis, r.T_nverbal, r.S_nonverb, new RangeScore(r.Nvil, r.Nvih), null);
-        this.mathPerformance = new Score(r.Prs, r.Pst, r.T_pst, r.S_mathper, null, r.NpiMath);
+        this.mathPerformance = new Score(r.Prs, r.Pst, r.T_pst, r.S_mathper, null, r.Npi_Math);
         this.mathQr = new Score(r.Qr, null, null, null, null, null);
-        this.reading = new Score(r.Rrs, r.Rst, r.T_rst, r.S_reading, null, r.NpiRead);
+        this.reading = new Score(r.Rrs, r.Rst, r.T_rst, r.S_reading, null, r.Npi_Read);
         this.spelling = new Score(r.Srs, r.Sst, r.T_sst, r.S_spelling, null, null);
-        this.writing = new Score(r.Wrs, r.Wrt, r.T_wr, r.S_written, null, r.NpiWrit);
+        this.writing = new Score(r.NewWr, r.Wrt, r.T_wr, r.S_written, null, r.Npi_Writing);
         this.raven = new Score(r.Raven, r.Iqs2, r.T_mst, null, new RangeScore(r.Iq12, r.Iq22), null);
         this.serialno = r.Serialno;
         this.schoolGroup = "";

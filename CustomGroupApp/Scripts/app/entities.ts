@@ -1,17 +1,4 @@
-﻿var subjectTypes = [
-    { Subject: "Unknown", Index: 0, IsAchievement: false, IsAbility: false },
-    { Subject: "Genab", Index: 1, IsAchievement: false, IsAbility: true },
-    { Subject: "Verbal", Index: 2, IsAchievement: false, IsAbility: true },
-    { Subject: "NonVerbal", Index: 3, IsAchievement: false, IsAbility: true },
-    { Subject: "MathReasoning", Index: 4, IsAchievement: false, IsAbility: true },
-    { Subject: "MathPerformance", Index: 5, IsAchievement: true, IsAbility: false },
-    { Subject: "Reading", Index: 6, IsAchievement: true, IsAbility: false },
-    { Subject: "Writing", Index: 7, IsAchievement: true, IsAbility: false },
-    { Subject: "Spelling", Index: 8, IsAchievement: true, IsAbility: false },
-    { Subject: "Ravens", Index: 9, IsAchievement: false, IsAbility: true }
-];
-
-enum ReportType {
+﻿enum ReportType {
     None = 0,
     StudentResults = 1,
     SchoolStudentRecord = 2,
@@ -33,12 +20,6 @@ enum TestCategory {
     Nwpa = 4
 }
 
-class Subject {
-    index = 0;
-    subject = "";
-    isAchievement = false;
-    isAbility = false;
-}
 
 class User {
     id: number;
@@ -69,7 +50,7 @@ class TestFile {
     testYear: number;
     studentCount: number;
     published: Date;
-    subjectTypes: Array<Subject> = [];
+    // subjectTypes: Array<Subject> = [];
     students: Array<Student> = [];
     isUnisex: boolean;
     hasBoys = false;
@@ -79,6 +60,9 @@ class TestFile {
     hasCustomGroups: boolean;
     hasStudentLanguagePrefs: boolean;
     hasStudentIds: boolean;
+    subjectsTested: Array<ISubject>;
+
+    private allSubjects = new Array<SubjectInfo>();
 
     displayTestDate: string;
     get yearLevel(): string {
@@ -108,6 +92,20 @@ class TestFile {
         }
     }
 
+    constructor(){
+        this.allSubjects.push(new SubjectInfo(null, 0, false, false));
+        this.allSubjects.push(new SubjectInfo(new GenabSubject(), 1, false, true));
+        this.allSubjects.push(new SubjectInfo(new VerbalSubject(), 2, false, true));
+        this.allSubjects.push(new SubjectInfo(new NonVerbalSubject(), 3, false, true));
+        this.allSubjects.push(new SubjectInfo(new MathReasoningSubject(), 4, false, true));
+        this.allSubjects.push(new SubjectInfo(new MathPerformanceSubject(), 5, true, false));
+        this.allSubjects.push(new SubjectInfo(new ReadingSubject(), 6, true, false));
+        this.allSubjects.push(new SubjectInfo(new WritingSubject(), 7, true, false));
+        this.allSubjects.push(new SubjectInfo(new SpellingSubject(), 8, true, false));
+        this.allSubjects.push(new SubjectInfo(new RavenSubject(), 9, false, true));
+
+    }
+
     clear = () => {
         this.fileNumber = undefined;
         this.grade = undefined;
@@ -116,7 +114,6 @@ class TestFile {
         this.testYear = undefined;
         this.studentCount = undefined;
         this.published = undefined;
-        this.subjectTypes = [];
         this.students = [];
     };
 
@@ -240,6 +237,22 @@ class TestFile {
         this.hasStudentIds = Enumerable.From(this.students).Any(s => s.schoolStudentId !== "");
         this.studentCount = this.students.length;
         this.isUnisex = this.hasGirls && this.hasBoys;
+
+        this.subjectsTested = [];
+        const sampleStudents = Enumerable.From(this.students).Take(30).ToArray();
+        for (let item of this.allSubjects) {
+            if (!item.subject) {
+                continue;
+            }
+            if (Enumerable.From(sampleStudents).Count(student => {
+                    var score = item.subject.getScore(student);
+                    return score ? item.subject.getScore(student).raw > 1 : false;
+                }
+            ) > 5) {
+                item.subject.isTested = true;
+                this.subjectsTested.push(item.subject);
+            }
+        }
     };
 
     filterTestByGroup = (classItem: ClassDefinition): Array<Student> => {
@@ -328,11 +341,11 @@ class Student {
         this.genab = new Score(r.Genab, r.Iqs, r.T_genab, r.S_genab, new RangeScore(r.Iq1, r.Iq2), null);
         this.verbal = new Score(r.Verb, r.Vis, r.T_verbal, r.S_verbal, new RangeScore(r.Vil, r.Vih), null);
         this.nonverbal = new Score(r.Nverb, r.Nvis, r.T_nverbal, r.S_nonverb, new RangeScore(r.Nvil, r.Nvih), null);
-        this.mathPerformance = new Score(r.Prs, r.Pst, r.T_pst, r.S_mathper, null, r.NpiMath);
+        this.mathPerformance = new Score(r.Prs, r.Pst, r.T_pst, r.S_mathper, null, r.Npi_Math);
         this.mathQr = new Score(r.Qr, null, null, null, null, null);
-        this.reading = new Score(r.Rrs, r.Rst, r.T_rst, r.S_reading, null, r.NpiRead);
+        this.reading = new Score(r.Rrs, r.Rst, r.T_rst, r.S_reading, null, r.Npi_Read);
         this.spelling = new Score(r.Srs, r.Sst, r.T_sst, r.S_spelling, null, null);
-        this.writing = new Score(r.Wrs, r.Wrt, r.T_wr, r.S_written, null, r.NpiWrit);
+        this.writing = new Score(r.NewWr, r.Wrt, r.T_wr, r.S_written, null, r.Npi_Writing);
         this.raven = new Score(r.Raven, r.Iqs2, r.T_mst, null, new RangeScore(r.Iq12, r.Iq22), null);
 
         this.serialno = r.Serialno;
