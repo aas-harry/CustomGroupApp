@@ -98,6 +98,9 @@ var StudentPortfolioViewModel = (function (_super) {
             if (student) {
                 _this.student = student;
             }
+            if (!_this.selectedReportItem.reportViewModel.isViewReady) {
+                return;
+            }
             if (_this.selectedReportItem) {
                 _this.selectedReportItem.reportViewModel.setStudent(_this.student);
             }

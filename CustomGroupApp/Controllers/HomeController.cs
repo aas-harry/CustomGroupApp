@@ -8,6 +8,13 @@ namespace CustomGroupApp.Controllers
 {
     public class HomeController : Controller
     {
+        private DataService _dataService;
+
+        public HomeController()
+        {
+            _dataService = new DataService();
+        }
+
         public ActionResult Index()
         {
             return View();
@@ -26,5 +33,14 @@ namespace CustomGroupApp.Controllers
 
             return View();
         }
+
+        public ActionResult SaveStudentNotes(int id, string notes)
+        {
+            _dataService.SaveStudentNotes(id, notes);
+            return Json(true);
+            
+        }
     }
+
+
 }

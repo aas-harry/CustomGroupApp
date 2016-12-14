@@ -120,6 +120,9 @@
         if (student) {
             this.student = student;
         }
+        if (!this.selectedReportItem.reportViewModel.isViewReady) {
+            return;
+        }
         if (this.selectedReportItem) {
             this.selectedReportItem.reportViewModel.setStudent(this.student);
         }

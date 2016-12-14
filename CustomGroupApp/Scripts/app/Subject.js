@@ -1,11 +1,30 @@
 var SubjectInfo = (function () {
-    function SubjectInfo(subject, index, isAchievement, isAbility) {
+    function SubjectInfo(subject, index, count, isAchievement, isAbility) {
         this.subject = subject;
         this.index = index;
+        this.count = count;
         this.isAchievement = isAchievement;
         this.isAbility = isAbility;
+        if (subject) {
+            subject.count = count;
+        }
     }
     return SubjectInfo;
+}());
+var SubjectSummary = (function () {
+    function SubjectSummary(subject) {
+        var _this = this;
+        this.set = function (students) {
+            var scores = Enumerable.From(students).Select(function (s) { return _this.subject.getScore(s); }).ToArray();
+            _this.stanineAverage = Enumerable.From(scores).Average(function (s) { return s.stanine; });
+            _this.rawScoreAverage = Enumerable.From(scores).Average(function (s) { return _this.subject.getRawScore(s); });
+            if (_this.subject.hasNaplanScore) {
+                _this.naplanAverage = Enumerable.From(scores).Average(function (s) { return s.naplan; });
+            }
+        };
+        this.subject = subject;
+    }
+    return SubjectSummary;
 }());
 var SubjectType;
 (function (SubjectType) {
@@ -26,12 +45,17 @@ var GenabSubject = (function () {
         this.getScore = function (student) {
             return student.genab;
         };
+        this.getRawScore = function (score) {
+            return score.range.mid;
+        };
         this.name = "General Reasoning";
+        this.count = 0;
         this.subject = SubjectType.Genab;
         this.hasRangeScore = true;
         this.hasNaplanScore = false;
         this.hasCorrelationScore = true;
         this.isTested = false;
+        this.summary = new SubjectSummary(this);
     }
     return GenabSubject;
 }());
@@ -41,25 +65,35 @@ var VerbalSubject = (function () {
             return student.verbal;
         };
         this.name = "Verbal Reasoning";
+        this.count = 0;
         this.subject = SubjectType.Verbal;
+        this.getRawScore = function (score) {
+            return score.range.mid;
+        };
         this.hasRangeScore = true;
         this.hasNaplanScore = false;
         this.hasCorrelationScore = true;
         this.isTested = false;
+        this.summary = new SubjectSummary(this);
     }
     return VerbalSubject;
 }());
 var NonVerbalSubject = (function () {
     function NonVerbalSubject() {
         this.getScore = function (student) {
-            return student.verbal;
+            return student.nonverbal;
         };
         this.name = "Non Verbal Reasoning";
+        this.count = 0;
+        this.getRawScore = function (score) {
+            return score.range.mid;
+        };
         this.subject = SubjectType.NonVerbal;
         this.hasRangeScore = true;
         this.hasNaplanScore = false;
         this.hasCorrelationScore = true;
         this.isTested = false;
+        this.summary = new SubjectSummary(this);
     }
     return NonVerbalSubject;
 }());
@@ -68,12 +102,17 @@ var MathReasoningSubject = (function () {
         this.getScore = function (student) {
             return student.mathReasoning;
         };
+        this.getRawScore = function (score) {
+            return score.range.mid;
+        };
         this.name = "Maths Reasoning";
+        this.count = 0;
         this.subject = SubjectType.MathReasoning;
         this.hasRangeScore = false;
         this.hasNaplanScore = true;
         this.hasCorrelationScore = true;
         this.isTested = false;
+        this.summary = new SubjectSummary(this);
     }
     return MathReasoningSubject;
 }());
@@ -83,11 +122,16 @@ var MathPerformanceSubject = (function () {
             return student.mathPerformance;
         };
         this.name = "Maths Performance";
+        this.count = 0;
+        this.getRawScore = function (score) {
+            return score.raw;
+        };
         this.subject = SubjectType.MathPerformance;
         this.hasRangeScore = false;
         this.hasNaplanScore = true;
         this.hasCorrelationScore = false;
         this.isTested = false;
+        this.summary = new SubjectSummary(this);
     }
     return MathPerformanceSubject;
 }());
@@ -97,11 +141,16 @@ var ReadingSubject = (function () {
             return student.reading;
         };
         this.name = "Reading Comprehension";
+        this.count = 0;
+        this.getRawScore = function (score) {
+            return score.raw;
+        };
         this.subject = SubjectType.Reading;
         this.hasRangeScore = false;
         this.hasNaplanScore = true;
         this.hasCorrelationScore = false;
         this.isTested = false;
+        this.summary = new SubjectSummary(this);
     }
     return ReadingSubject;
 }());
@@ -111,11 +160,16 @@ var SpellingSubject = (function () {
             return student.spelling;
         };
         this.name = "Spelling";
+        this.count = 0;
+        this.getRawScore = function (score) {
+            return score.raw;
+        };
         this.subject = SubjectType.Spelling;
         this.hasRangeScore = false;
         this.hasNaplanScore = false;
         this.hasCorrelationScore = false;
         this.isTested = false;
+        this.summary = new SubjectSummary(this);
     }
     return SpellingSubject;
 }());
@@ -125,11 +179,16 @@ var WritingSubject = (function () {
             return student.writing;
         };
         this.name = "Writing Comprehension";
+        this.count = 0;
+        this.getRawScore = function (score) {
+            return score.raw;
+        };
         this.subject = SubjectType.Writing;
         this.hasRangeScore = false;
         this.hasNaplanScore = true;
         this.hasCorrelationScore = false;
         this.isTested = false;
+        this.summary = new SubjectSummary(this);
     }
     return WritingSubject;
 }());
@@ -139,11 +198,16 @@ var RavenSubject = (function () {
             return student.raven;
         };
         this.name = "Ravens SPM";
+        this.getRawScore = function (score) {
+            return score.raw;
+        };
+        this.count = 0;
         this.subject = SubjectType.Ravens;
         this.hasRangeScore = false;
         this.hasNaplanScore = true;
         this.hasCorrelationScore = false;
         this.isTested = false;
+        this.summary = new SubjectSummary(this);
     }
     return RavenSubject;
 }());

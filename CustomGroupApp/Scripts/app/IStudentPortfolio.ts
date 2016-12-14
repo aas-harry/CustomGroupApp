@@ -19,6 +19,7 @@ interface IStudentPortfolio {
 
     // Flag to indicate whether testFile property has been set
     isTestFileSet: boolean;
+    isViewReady: boolean;
 
     // Report content in html text
     getContent(reportType: ReportType): string;
@@ -40,6 +41,7 @@ class StudentPortfolio extends kendo.data.ObservableObject
 
     }
 
+    isViewReady = false;
     urlLink: string;
     reportName: string;
     content: string;

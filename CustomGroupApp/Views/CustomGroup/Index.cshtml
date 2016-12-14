@@ -51,7 +51,8 @@
             success: function (data) {
                 
                 testFile.clear();
-                testFile.set(data.Test, data.School, data.Results, [], data.CustomGroups);
+                testFile.set(data.Test, data.School, data.Results, [],
+                    data.CustomGroups, data.StanineTables);
                 $("#message-text").replaceWith("Rows: " + data.Results.length);
              
             },

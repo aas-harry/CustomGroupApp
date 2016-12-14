@@ -50,6 +50,62 @@ namespace CustomGroupApp
             return true;
         }
 
+        public IEnumerable<StanineTable> GetStanineTables(Test test, int semester)
+        {
+               var result = _dataService.Results.FirstOrDefault();
+                var testType = result == null || string.IsNullOrEmpty(result.Wr_task) ||
+                                 (result.Wr_task != "N" && result.Wr_task != "P")
+                    ? "N"
+                    : result.Wr_task;
+
+                var genabStanine = new StanineTable { Subject = SubjectType.Genab, Stanines = new short[9] };
+                var verbalStanine = new StanineTable { Subject = SubjectType.Verbal, Stanines = new short[9] };
+                var nonVerbalStanine = new StanineTable { Subject = SubjectType.NonVerbal, Stanines = new short[9] };
+                var mathStanine = new StanineTable { Subject = SubjectType.MathPerformance, Stanines = new short[9] };
+                var readingStanine = new StanineTable { Subject = SubjectType.Reading, Stanines = new short[9] };
+                var spellingStanine = new StanineTable { Subject = SubjectType.Spelling, Stanines = new short[9] };
+                var writingStanine = new StanineTable { Subject = SubjectType.Writing, Stanines = new short[9] };
+
+                foreach (Answer item in _dataService.Answers.Where(x => x.Name == test.Answer && x.Stanine <= 9)
+                    .OrderBy(x => x.Stanine))
+                {
+                    mathStanine.Stanines[item.Stanine - 1] = item.Mathp > 0 ? item.Mathp : item.Maths;
+                    readingStanine.Stanines[item.Stanine - 1] = item.Reading;
+                    spellingStanine.Stanines[item.Stanine - 1] = item.Spelling;
+                }
+
+                genabStanine.Stanines[0] = 70;
+                genabStanine.Stanines[1] = 79;
+                genabStanine.Stanines[2] = 87;
+                genabStanine.Stanines[3] = 95;
+                genabStanine.Stanines[4] = 103;
+                genabStanine.Stanines[5] = 111;
+                genabStanine.Stanines[6] = 119;
+                genabStanine.Stanines[7] = 126;
+                genabStanine.Stanines[8] = 150;
+
+                verbalStanine.Stanines = genabStanine.Stanines;
+                nonVerbalStanine.Stanines = genabStanine.Stanines;
+
+                foreach (WritingCutoff item in _dataService.WritingCutoffs.Where(x => x.Grade == test.Grade && x.Semester == semester
+                                                                            && x.Testtype == testType && x.Stanine <= 9)
+                    )
+                {
+                    writingStanine.Stanines[item.Stanine - 1] = item.Rawscore;
+                }
+
+                return new List<StanineTable>
+                {
+                    genabStanine,
+                    verbalStanine,
+                    nonVerbalStanine,
+                    mathStanine,
+                    readingStanine,
+                    spellingStanine,
+                    writingStanine
+                };
+        }
+
         public IEnumerable<CustomGroupSet> GetCustomGroupSets(int testnum)
         {
             var students = (from gs in _dataService.GroupSets
@@ -186,6 +242,16 @@ namespace CustomGroupApp
                 }
             }
             _dataService.SubmitChanges();
+        }
+
+        public void SaveStudentNotes(int id, string notes)
+        {
+            var student = _dataService.Results.FirstOrDefault(x => x.Id == id);
+            if (student != null)
+            {
+                student.Notes = notes;
+                _dataService.SubmitChanges();
+            }
         }
     }
 }

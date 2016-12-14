@@ -31,12 +31,19 @@ namespace CustomGroupApp.Controllers
         {
             // var testnum = 10000040;
             var results = _dataService.GetResults(testnum).ToList();
+
+            var semester = results.Count == 0 || results[0].Sem.HasValue == false
+                ? 1
+                : results[0].Sem.Value;
+
             var test = _dataService.GetTest(testnum);
             var school = _dataService.GetSchool(testnum);
             var customGroupSets = _dataService.GetCustomGroupSets(testnum).ToList();
-
-            return Json(new {Test = test, Results = results, School = school, CustomGroups = customGroupSets });
+            var stanineTables = _dataService.GetStanineTables(test, semester).ToList();
+            return Json(new {Test = test, Results = results, School = school, CustomGroups = customGroupSets, StanineTables = stanineTables });
         }
+
+     
 
         [HttpPost]
         public JsonResult GetStudentLanguagePrefs(int testnum)

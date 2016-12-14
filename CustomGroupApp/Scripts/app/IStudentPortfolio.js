@@ -19,6 +19,7 @@ var StudentPortfolio = (function (_super) {
         var _this = this;
         _super.call(this);
         this.elementName = elementName;
+        this.isViewReady = false;
         this.reset = function () {
             _this.testFile = null;
             _this.student = null;

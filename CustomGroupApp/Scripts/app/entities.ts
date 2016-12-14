@@ -41,10 +41,13 @@ class School {
     isMainSchool = false;
 }
 
+
+
 class TestFile {
     school = new School();
     fileNumber: number;
     grade: number;
+    semester: number;
     category: string;
     testDate: Date;
     testYear: number;
@@ -62,6 +65,8 @@ class TestFile {
     hasStudentIds: boolean;
     subjectsTested: Array<ISubject>;
 
+    stanineTables = new StanineTables();
+
     private allSubjects = new Array<SubjectInfo>();
 
     displayTestDate: string;
@@ -75,7 +80,10 @@ class TestFile {
         return this.fileNumber + " " + this.category;
     };
 
-    set = (test: any, school: any, results: any, languages: any, customGroupSets: any = []) => {
+    set = (test: any, school: any, results: any, languages: any, customGroupSets: any = [],
+            stanineTables: any) => {
+        this.initSubjects(test);
+
         this.fileNumber = test.Testnum;
         this.grade = test.Grade;
         this.category = test.Category;
@@ -84,26 +92,29 @@ class TestFile {
         this.setStudents(results, languages);
         this.setStudentLanguagePrefs(languages, this.students);
         this.setCustomGroups(customGroupSets, this.students);
+        this.stanineTables.setStanines(stanineTables);
         if (school) {
             this.school.name = school.Name;
             this.school.id = school.Id;
             this.school.scode = test.Scode;
             this.school.isMainSchool = school.IsMainSchool;
         }
+
+
     }
 
-    constructor(){
-        this.allSubjects.push(new SubjectInfo(null, 0, false, false));
-        this.allSubjects.push(new SubjectInfo(new GenabSubject(), 1, false, true));
-        this.allSubjects.push(new SubjectInfo(new VerbalSubject(), 2, false, true));
-        this.allSubjects.push(new SubjectInfo(new NonVerbalSubject(), 3, false, true));
-        this.allSubjects.push(new SubjectInfo(new MathReasoningSubject(), 4, false, true));
-        this.allSubjects.push(new SubjectInfo(new MathPerformanceSubject(), 5, true, false));
-        this.allSubjects.push(new SubjectInfo(new ReadingSubject(), 6, true, false));
-        this.allSubjects.push(new SubjectInfo(new WritingSubject(), 7, true, false));
-        this.allSubjects.push(new SubjectInfo(new SpellingSubject(), 8, true, false));
-        this.allSubjects.push(new SubjectInfo(new RavenSubject(), 9, false, true));
-
+    initSubjects(test: any) {
+        this.allSubjects = [];
+        this.allSubjects.push(new SubjectInfo(null, 0, 0, false, false));
+        this.allSubjects.push(new SubjectInfo(new GenabSubject(), 1, test.Nq_genab, false, true));
+        this.allSubjects.push(new SubjectInfo(new VerbalSubject(), 2, test.Nq_verbal, false, true));
+        this.allSubjects.push(new SubjectInfo(new NonVerbalSubject(), 3, test.Nq_genab, false, true));
+        this.allSubjects.push(new SubjectInfo(new MathReasoningSubject(), 4, test.Type === "2" ? 34 : 35, false, true));
+        this.allSubjects.push(new SubjectInfo(new MathPerformanceSubject(), 5, test.Nq_maths, true, false));
+        this.allSubjects.push(new SubjectInfo(new ReadingSubject(), 6, test.Nq_read, true, false));
+        this.allSubjects.push(new SubjectInfo(new SpellingSubject(), 7, test.Nq_spell, true, false));
+        this.allSubjects.push(new SubjectInfo(new WritingSubject(), 8, test.Nq_written ? test.Nq_written : 35, true, false));
+        this.allSubjects.push(new SubjectInfo(new RavenSubject(), 9, 65,  false, true));
     }
 
     clear = () => {
@@ -116,6 +127,8 @@ class TestFile {
         this.published = undefined;
         this.students = [];
     };
+
+  
 
     setCustomGroups = (data: any, students: Array<Student>) => {
         if (students === null) {
@@ -245,12 +258,18 @@ class TestFile {
                 continue;
             }
             if (Enumerable.From(sampleStudents).Count(student => {
-                    var score = item.subject.getScore(student);
-                    return score ? item.subject.getScore(student).raw > 1 : false;
+                var score = item.subject.getScore(student);
+                if (! score) {
+                    return false;
+                }
+                    var rawScore = item.subject.getRawScore(score);
+                    return rawScore ? rawScore > 1 : false;
                 }
             ) > 5) {
                 item.subject.isTested = true;
+                item.subject.summary.set(this.students);
                 this.subjectsTested.push(item.subject);
+
             }
         }
     };
@@ -287,12 +306,41 @@ class RangeScore {
         return this.low + "-" + this.high;
     };
 
+    get mid(): number {
+        return (this.high + this.low) / 2;
+    }
     constructor(public low: number, public high: number) {}
 }
 
 class Score {
-    constructor(public raw: number, public stanine: number,
-        public scaledScore: number, public score: number, public range: RangeScore, public naplan: number) { }
+    correctAnswers: number;
+    attemptedQuestions: number;
+    notAttemptedQuestions: number;
+
+    constructor(public raw: number,
+        public stanine: number,
+        public scaledScore: number,
+        public score: number,
+        public range: RangeScore,
+        public naplan: number,
+        public answers: string) {
+
+        if (answers) {
+            this.correctAnswers = 0;
+            this.attemptedQuestions = 0;
+            this.notAttemptedQuestions = 0;
+            for (let i = 0; i < answers.length; i++) {
+                if (answers[i] === "*") {
+                    this.correctAnswers++;
+                }
+                if (answers[i] === ".") {
+                    this.notAttemptedQuestions++;
+                } else {
+                    this.attemptedQuestions++;
+                }
+            }
+        }
+    }
 }
 
 class Student {
@@ -306,6 +354,7 @@ class Student {
     liveInAus: string;
     ca: number;
     serialno: number;
+    notes: string;
 
     genab: Score;
     verbal: Score;
@@ -337,16 +386,18 @@ class Student {
         this.speak = r.Speak;
         this.liveInAus = r.Live_in_as;
         this.ca = r.Ca;
+        this.notes = r.Notes;
 
-        this.genab = new Score(r.Genab, r.Iqs, r.T_genab, r.S_genab, new RangeScore(r.Iq1, r.Iq2), null);
-        this.verbal = new Score(r.Verb, r.Vis, r.T_verbal, r.S_verbal, new RangeScore(r.Vil, r.Vih), null);
-        this.nonverbal = new Score(r.Nverb, r.Nvis, r.T_nverbal, r.S_nonverb, new RangeScore(r.Nvil, r.Nvih), null);
-        this.mathPerformance = new Score(r.Prs, r.Pst, r.T_pst, r.S_mathper, null, r.Npi_Math);
-        this.mathQr = new Score(r.Qr, null, null, null, null, null);
-        this.reading = new Score(r.Rrs, r.Rst, r.T_rst, r.S_reading, null, r.Npi_Read);
-        this.spelling = new Score(r.Srs, r.Sst, r.T_sst, r.S_spelling, null, null);
-        this.writing = new Score(r.NewWr, r.Wrt, r.T_wr, r.S_written, null, r.Npi_Writing);
-        this.raven = new Score(r.Raven, r.Iqs2, r.T_mst, null, new RangeScore(r.Iq12, r.Iq22), null);
+        this.genab = new Score(r.Genab, r.Iqs, r.T_genab, r.S_genab, new RangeScore(r.Iq1, r.Iq2), null, r.Genabcor);
+        this.verbal = new Score(r.Verb, r.Vis, r.T_verbal, r.S_verbal, new RangeScore(r.Vil, r.Vih), null, null);
+        this.nonverbal = new Score(r.Nverb, r.Nvis, r.T_nverbal, r.S_nonverb, new RangeScore(r.Nvil, r.Nvih), null, null);
+        this.mathPerformance = new Score(r.Prs, r.Pst, r.T_pst, r.S_mathper, null, r.Npi_Math, r.Mathcor);
+        this.mathQr = new Score(r.Qr, null, null, null, null, null, null);
+        this.reading = new Score(r.Rrs, r.Rst, r.T_rst, r.S_reading, null, r.Npi_Read, r.Readcor);
+        this.spelling = new Score(r.Srs, r.Sst, r.T_sst, r.S_spelling, null, null, r.Spellcor);
+        this.writing = new Score(r.NewWr, r.Wrt, r.T_wr, r.S_written, null, r.Npi_Writing, null);
+        this.writing.correctAnswers = r.NewWr;
+        this.raven = new Score(r.Raven, r.Iqs2, r.T_mst, null, new RangeScore(r.Iq12, r.Iq22), null, new Array(65 + 1).join(" "));
 
         this.serialno = r.Serialno;
         this.schoolGroup = "";

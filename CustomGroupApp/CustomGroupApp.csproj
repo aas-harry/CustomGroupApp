@@ -166,6 +166,7 @@
     <Compile Include="Models\CustomGroupSet.cs" />
     <Compile Include="Models\CustomGroupContext.cs" />
     <Compile Include="Models\PreallocatedClassStudent.cs" />
+    <Compile Include="Models\StanineTable.cs" />
     <Compile Include="Models\StudentLanguage.cs" />
     <Compile Include="Models\CustomGroupViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -1081,6 +1082,7 @@
     <TypeScriptCompile Include="Scripts\app\ClassBandInputContainer.ts" />
     <TypeScriptCompile Include="Scripts\app\CustomGroupBaseViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\ReadingSkillsProfileViewModel.ts" />
+    <TypeScriptCompile Include="Scripts\app\StanineTable.ts" />
     <TypeScriptCompile Include="Scripts\app\StudentFilterControl.ts" />
     <TypeScriptCompile Include="Scripts\app\CustomGroupListControl.ts" />
     <TypeScriptCompile Include="Scripts\app\CustomGroupListViewModel.ts" />

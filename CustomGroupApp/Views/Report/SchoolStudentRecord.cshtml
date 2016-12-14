@@ -1,37 +1,27 @@
 ﻿<div id="school-student-record-container" style="overflow: auto;">
-    <div id="school-student-details" style="overflow: hidden; width: 850px;">
+    <div id="school-student-details" style="overflow: hidden; width: 700px;">
         <table style="margin-left: 20px">
             <tr>
                 <td colspan="2">
-                    <div style="text-align: center; font-size: 14px; font-weight: bold">
+                    <div style="text-align: center; font-size: 14px; font-weight: bold; margin-top: 10px">
                         School Student Record
                     </div>
                 </td>
             </tr>
             <tr>
                 <td colspan="2">
-                    <div style="text-align: center;">
+                    <div style="text-align: center; margin-bottom: 20px">
                         (for school use only)
                     </div>
                 </td>
             </tr>
+       
             <tr>
-                <td colspan="2">
-                    <div style="font-size: 14px; font-weight: bold">
-                        <span data-bind="text: schoolName"></span>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="2">
-                    <div style="margin-top: 20px; margin-bottom: 10px; font-size: 14px; font-weight: bold; text-align: left">
-                        <span data-bind="text: name"></span>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td style="width: 300px" id="student-personal-details">
+                <td style="width: 275px; vertical-align: top" id="student-personal-details">
                     <div>
+                        <div style="margin-bottom: 10px; font-size: 14px; font-weight: bold; text-align: left">
+                            <span data-bind="text: name"></span>
+                        </div>
                         <div> Year Level: <span data-bind="text: yearLevel"></span></div>
                         <div>Dob: <span data-bind="text: dob"></span></div>
                         <div>Age: <span data-bind="text: age"></span></div>
@@ -41,24 +31,27 @@
                         <div data-bind="visible: hasSchoolStudentId"> Student ID: <span data-bind="text: schoolStudentId"></span> </div>
                     </div>
                 </td>
-                <td style="width: 400px" id="student-raw-scores-container">
+                <td style="width: 421px" id="student-raw-scores-container">
                     <label>Raw Scores</label>
-                    <div id="raw-score-container" style="width: 400px; height: 300px;">
+                    <div id="raw-score-container" style="width: 421px;">
                         <div id="raw-score-list"></div>
                     </div>
-
                 </td>
             </tr>
             <tr>
                 <td colspan="2" style="width: 600px" id="student-scaled-scores-container">
-                    <label>Scaled Scores</label>
-                    <div id="scaled-score-container" style="width: 600px; height: 300px;">
+                    <label  style="margin-top: 20px">Scaled Scores</label>
+                    <div id="scaled-score-container">
                         <div id="scaled-score-chart"></div>
                     </div>
                 </td>
             </tr>
             <tr>
-                <td colspan="2" style="width: 800px" id="student-notes-container"></td>
+                <td colspan="2" style="width: 500px; height: 300px; margin-top: 20px" id="student-notes-container">
+                    <label>Notes:</label>
+                    <div><textarea id="student-notes" rows="10" cols="30" style="height: 300px; width: 675px;"
+                                    data-bind="value: studentNote, events: {change: onNotesChanged}"></textarea></div>
+                </td>
             </tr>
         </table>
     </div>
@@ -66,87 +59,71 @@
 
 <script>
     $(document).ready(function () {
-        $("#raw-score-list").kendoGrid({
-            dataSource: {
-                pageable: false
-            },
-            scrollable: false,
-            sortable: false,
-            selectable: false,
-            columns: [
-                {
-                    field: "Description",
-                    title: " ",
-                    width: 250,
-                    attributes: { "class": "center-name" }
-                },
-                {
-                    field: "TotalCount",
-                    title: "Total",
-                    width: 50,
-                    attributes: { "class": "center-header" }
-                },
-                {
-                    field: "AttemptedCount",
-                    title: "Attempted",
-                    width: 50,
-                    attributes: { "class": "center-header" }
-                },
-                {
-                    field: "CorrectCount",
-                    title: "Correct",
-                    width: 50,
-                    attributes: { "class": "center-header" }
-                },
-                {
-                    field: "Stanine",
-                    title: "Stanine",
-                    width: 50,
-                    attributes: { "class": "center-header" }
-                }
-            ]
-        });
+         $("#scaled-score-chart").kendoChart({
+             series: [
+                 {
+                     type: "bar",
+                     field: "studentScore",
+                     name: "Student's score",
+                     attributes: { "class": "center-name" },
+                     tooltip: {
+                         visible: true,
+                         format: "{0:00}",
+                         template: "#= dataItem.subjectName # : " + "#= kendo.toString(dataItem.studentStanine,'n0') #"
+                     },
+                     color: "blue"
+                 },
+                 {
+                     type: "bar",
+                     field: "schoolScore",
+                     name: "School Mean",
+                     tooltip: {
+                         visible: true,
+                         template: "#= dataItem.subjectName # : " + "#= kendo.toString(dataItem.schoolStanine,'n0') #"
+                     },
+                     color: "green"
+                 }
+             ],
+             legend: {
+                 position: "bottom"
+             },
+             valueAxis: {
+                 field: "schoolScore",
+                 min: 0,
+                 max: 9,
+                 labels: {
+                     template: "#if(value==0){# #}else {# #: value # #}#",
+                     padding: { right: 70 }
+                 }
+             },
+             categoryAxis: {
+                 field: "subjectName"
+             }
+         });
 
-        $("#scaled-score-chart").kendoChart({
-            series: [
-                {
-                    type: "bar",
-                    field: "StudentScore",
-                    name: "Student's score",
-                    attributes: { "class": "center-name" },
-                    tooltip: {
-                        visible: true,
-                        format: "{0:00}",
-                        template: "#= dataItem.Description # : " + "#= kendo.toString(dataItem.StudentStanine,'n0') #"
-                    },
-                    color: "blue"
-                },
-                {
-                    type: "bar",
-                    field: "SchoolScore",
-                    name: "School Mean",
-                    tooltip: {
-                        visible: true,
-                        template: "#= dataItem.Description # : " + "#= kendo.toString(dataItem.SchoolStanine,'n0') #"
-                    },
-                    color: "green"
-                }
-            ],
-            legend: {
-                position: "bottom"
-            },
-            valueAxis: {
-                field: "SchoolScore",
-                min: 0,
-                max: 9,
-                labels: {
-                    template: "#if(value==0){# #}else {# #: value # #}#",
-                    padding: { right: 70 }
-                }
-            },
-            categoryAxis: {
-                field: "Description"
-            }
-        });
-    })
+         $("#student-notes").kendoEditor({
+             resizable: true,
+             tools: [
+                 "bold",
+                 "italic",
+                 "underline",
+                 "justifyLeft",
+                 "justifyCenter",
+                 "justifyRight",
+                 "justifyFull",
+                 "insertUnorderedList",
+                 "insertOrderedList",
+                 "indent",
+                 "outdent",
+                 "formatting",
+                 {
+                     name: "saveNotes",
+                     template: "<button id='saveNoteButton' class='k-button' data-bind='click: saveNotes'>Save Notes</button>"+
+                         "<span data-bind='text: message' style='margin-left: 5px; color: red'></span>"
+                 }
+             ]
+         });
+
+     })
 </script>
+
