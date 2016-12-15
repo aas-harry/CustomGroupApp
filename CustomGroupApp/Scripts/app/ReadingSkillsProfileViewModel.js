@@ -9,8 +9,7 @@ var ReadingSkillsProfileViewModel = (function (_super) {
         var _this = this;
         _super.call(this, elementName);
         this.reports = [
-            new ReportItem("Reading Skills Profile - List", "ReadingSkillsProfileListView", ReportType.StudentReadingSkillsProfileList, this),
-            new ReportItem("Reading Skills Profile - Table", "ReadingMathsSkillsProfileTableView", ReportType.StudentReadingSkillsProfileTable, this)
+            new ReportItem("Reading Skills Profile", "ReadingSkillsProfileView", ReportType.StudentReadingSkillsProfile, this),
         ];
         this.getReports = function () {
             return _this.reports;

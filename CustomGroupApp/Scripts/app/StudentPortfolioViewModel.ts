@@ -1,8 +1,10 @@
 ﻿class StudentPortfolioViewModel extends kendo.data.ObservableObject {
-    constructor(elementName: string) {
+    constructor(public testFile: TestFile) {
         super();
 
+        this.printViewModel = new StudentPortfolioPrintViewModel(testFile);
         this.registerReportViewModels();
+        this.setDatasource(this.testFile);
         this.selectedReportItem = this.studentReports[0];
     }
     private kendoHelper = new KendoHelper();
@@ -12,26 +14,27 @@
         this.reportViewModels.push(new MathsSkillsProfileViewModel("maths-skills-profile"));
         this.reportViewModels.push(new ReadingSkillsProfileViewModel("reading-skills-profile"));
         this.reportViewModels.push(new WritingCriteriaViewModel("writing-criteria-reports"));
-        this.reportViewModels.push(new CareerProfileViewModel("student-career-profile"));
+        if (this.testFile.grade === 10) {
+            this.reportViewModels.push(new CareerProfileViewModel("student-career-profile"));
+        }
 
+        
         this.studentReports = [];
         Enumerable.From(this.reportViewModels).SelectMany(s=> s.getReports()).ForEach(s=> this.studentReports.push(s));
        
     }
 
+    private printViewModel: StudentPortfolioPrintViewModel;
     private reportControls: kendo.ui.DropDownList;
     private selectedReportItem: ReportItem;
     private reportViewModels = new Array<IStudentPortfolio>();
     studentReports = new Array<ReportItem>();
     private student: Student;
 
-    testFile: TestFile;
-
     setDatasource = (testFile: TestFile) => {
         this.testFile = testFile;
-        
         for (let report of this.reportViewModels) {
-            report.setDatasource(testFile);
+            report.setDatasource(this.testFile);
         }
     }
 
@@ -92,7 +95,25 @@
         });
     }
 
-    private setReportContent = (content: string) => {
+    printReports = () => {
+        const self = this;
+        $.ajax({
+            type: "POST",
+            url: "Report\\StudentPortfolioPrintDialog",
+            contentType: "application/json",
+            success(html) {
+                const container = self.clearConntent();
+                self.addContent(container, html);
+
+                kendo.unbind("#student-report");
+                kendo.bind($("#student-report"), self.printViewModel);
+            }
+        });
+    }
+
+    
+
+    private clearConntent = (): HTMLElement => {
         var container = document.getElementById("student-report");
 
         // Remove previous report 
@@ -101,18 +122,25 @@
                 container.removeChild(container.lastChild);
             }
         }
+        return container;
+    }
 
+    private addContent = (container: HTMLElement, content: string) => {
         var reportContainer = document.createElement("div");
         reportContainer.id = "report-container";
         container.appendChild(reportContainer);
         $("#report-container").html(content);
+    }
+
+    private setReportContent = (content: string) => {
+        const container = this.clearConntent();
+        this.addContent(container, content);
 
         // initialise report elements
         this.selectedReportItem.reportViewModel.initReport(this.selectedReportItem.reportType);
 
         kendo.unbind("#student-report");
         kendo.bind($("#student-report"), this.selectedReportItem.reportViewModel);
-
         this.showStudentReport();
     }
 

@@ -1052,6 +1052,7 @@
     <Content Include="Views\Report\StudentPortfolioList.cshtml" />
     <Content Include="Views\Report\StudentNaplanReport.cshtml" />
     <Content Include="Views\CustomGroup\SplitCustomGroup.cshtml" />
+    <Content Include="Views\Report\StudentPortfolioPrintDialogView.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1111,6 +1112,7 @@
     <TypeScriptCompile Include="Scripts\app\StudentNaplanViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\StudentNavigationControl.ts" />
     <TypeScriptCompile Include="Scripts\app\StudentPortfolioListViewModel.ts" />
+    <TypeScriptCompile Include="Scripts\app\StudentPortfolioPrintViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\StudentPortfolioViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\SchoolStudentRecordViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\StepDefinition.ts" />

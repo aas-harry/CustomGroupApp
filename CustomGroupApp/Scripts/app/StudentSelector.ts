@@ -121,6 +121,7 @@
         label.setAttribute("style", "margin-left: 5px");
         container.appendChild(label);
     }
+
     popupWindow: kendo.ui.Window;
     openDialog = (element: HTMLElement,
         students: Array<StudentClass>,

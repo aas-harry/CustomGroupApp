@@ -9,8 +9,7 @@ var MathsSkillsProfileViewModel = (function (_super) {
         var _this = this;
         _super.call(this, elementName);
         this.reports = [
-            new ReportItem("Maths Skills Profile - List", "MathsSkillsProfileListView", ReportType.StudentMathsSkillsProfileList, this),
-            new ReportItem("Maths Skills Profile - Table", "MathsSkillsProfileTableView", ReportType.StudentMathsSkillsProfileTable, this)
+            new ReportItem("Maths Skills Profile", "MathsSkillsProfileListView", ReportType.StudentMathsSkillsProfile, this),
         ];
         this.getReports = function () {
             return _this.reports;

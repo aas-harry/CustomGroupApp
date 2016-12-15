@@ -1,0 +1,63 @@
+﻿<div id="student-portfolio-print-dialog-container" style="margin: 10px">
+    <style scoped>
+    </style>
+    <div id="student-portfolio-toolbar">
+        <button class="btn btn-default" data-bind="click: showReports">Reports</button>
+        <button class="btn btn-default" data-bind="click: showStudents">Students</button>
+        <button class="btn btn-default" data-bind="click: printReports">Print</button>
+    </div>
+    <div id="student-portfolio-reports" data-bind="visible: reportSelectorOption">
+        <div class="panel panel-default" style="width: 400px; margin-top: 10px">
+            <!-- Default panel contents -->
+            <div class="panel-body">
+                <label>Select reports to include.</label>
+                <div>
+                    <input type="checkbox" value="0" data-bind="checked: schoolStudentRecordOption">
+                    <span>School Student Record</span>
+                </div>
+                <div>
+                    <input type="checkbox" value="0" data-bind="checked: naplanProgressIndexOption">
+                    <span>National Progress Index</span>
+                </div>
+                <div style="margin-top: 10px">Maths Skills Profile Reports</div>
+                <div>
+                    <input type="checkbox" value="0" data-bind="checked: mathsSkillsProfileListOption">
+                    <span>List Format</span>
+                </div>
+                <div>
+                    <input type="checkbox" value="0" data-bind="checked: mathsSkillsProfileTableOption">
+                    <span>Table Format</span>
+                </div>
+
+                <div style="margin-top: 10px">Reading Skills Profile Reports</div>
+                <div>
+                    <input type="checkbox" value="0" data-bind="checked: readingSkillsProfileListOption">
+                    <span>List Format</span>
+                </div>
+                <div>
+                    <input type="checkbox" value="0" data-bind="checked: readingSkillsProfileTableOption">
+                    <span>Table Format</span>
+                </div>
+
+                <div style="margin-top: 10px">Writing Criteria Reports</div>
+                <div>
+                    <input type="checkbox" value="0" data-bind="checked: writingCriteriaOption">
+                    <span>Writing Criteria</span>
+                </div>
+                <div>
+                    <input type="checkbox" value="0" data-bind="checked: markedWritingCriteriaOption">
+                    <span>Marked Writing Script</span>
+                </div>
+
+                <div style="margin: 10px 0">
+                    <button class="btn btn-default" data-bind="click: selectAllReports">Select All Reports</button>
+                    <button class="btn btn-default" data-bind="click: clearAllReports">Clear All Reports</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div id="student-portfolio-students" data-bind="visible: studentSelectorOption">
+        <div id="student-list" style="margin-top: 10px"></div>
+    </div>
+</div>

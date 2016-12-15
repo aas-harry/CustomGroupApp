@@ -18,5 +18,10 @@ namespace CustomGroupApp.Controllers
         {
             return PartialView("SchoolStudentRecord");
         }
+
+        public ActionResult StudentPortfolioPrintDialog()
+        {
+            return PartialView("StudentPortfolioPrintDialogView");
+        }
     }
 }

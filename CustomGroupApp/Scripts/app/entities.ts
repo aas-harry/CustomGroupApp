@@ -3,13 +3,15 @@
     StudentResults = 1,
     SchoolStudentRecord = 2,
     NationalProgressIndex = 3,
-    StudentMathsSkillsProfileList = 4,
-    StudentMathsSkillsProfileTable = 5,
-    StudentReadingSkillsProfileList = 6,
-    StudentReadingSkillsProfileTable = 7,
-    StudentWritingCriteria = 8,
-    StudentMarkedWritingScript = 9,
-    StudentCareerProfile = 10
+    StudentMathsSkillsProfile = 4,
+    StudentMathsSkillsProfileList = 5,
+    StudentMathsSkillsProfileTable = 6,
+    StudentReadingSkillsProfile = 7,
+    StudentReadingSkillsProfileList = 8,
+    StudentReadingSkillsProfileTable = 9,
+    StudentWritingCriteria = 10,
+    StudentMarkedWritingScript = 11,
+    StudentCareerProfile = 12
 }
 
 enum TestCategory {

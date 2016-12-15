@@ -5,9 +5,10 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var StudentPortfolioViewModel = (function (_super) {
     __extends(StudentPortfolioViewModel, _super);
-    function StudentPortfolioViewModel(elementName) {
+    function StudentPortfolioViewModel(testFile) {
         var _this = this;
         _super.call(this);
+        this.testFile = testFile;
         this.kendoHelper = new KendoHelper();
         this.registerReportViewModels = function () {
             _this.reportViewModels.push(new SchoolStudentRecordViewModel("school-student-record"));
@@ -15,7 +16,9 @@ var StudentPortfolioViewModel = (function (_super) {
             _this.reportViewModels.push(new MathsSkillsProfileViewModel("maths-skills-profile"));
             _this.reportViewModels.push(new ReadingSkillsProfileViewModel("reading-skills-profile"));
             _this.reportViewModels.push(new WritingCriteriaViewModel("writing-criteria-reports"));
-            _this.reportViewModels.push(new CareerProfileViewModel("student-career-profile"));
+            if (_this.testFile.grade === 10) {
+                _this.reportViewModels.push(new CareerProfileViewModel("student-career-profile"));
+            }
             _this.studentReports = [];
             Enumerable.From(_this.reportViewModels).SelectMany(function (s) { return s.getReports(); }).ForEach(function (s) { return _this.studentReports.push(s); });
         };
@@ -25,7 +28,7 @@ var StudentPortfolioViewModel = (function (_super) {
             _this.testFile = testFile;
             for (var _i = 0, _a = _this.reportViewModels; _i < _a.length; _i++) {
                 var report = _a[_i];
-                report.setDatasource(testFile);
+                report.setDatasource(_this.testFile);
             }
         };
         this.createReportList = function (elementName) {
@@ -75,7 +78,21 @@ var StudentPortfolioViewModel = (function (_super) {
                 }
             });
         };
-        this.setReportContent = function (content) {
+        this.printReports = function () {
+            var self = _this;
+            $.ajax({
+                type: "POST",
+                url: "Report\\StudentPortfolioPrintDialog",
+                contentType: "application/json",
+                success: function (html) {
+                    var container = self.clearConntent();
+                    self.addContent(container, html);
+                    kendo.unbind("#student-report");
+                    kendo.bind($("#student-report"), self.printViewModel);
+                }
+            });
+        };
+        this.clearConntent = function () {
             var container = document.getElementById("student-report");
             // Remove previous report 
             if (container.childElementCount > 0) {
@@ -83,10 +100,17 @@ var StudentPortfolioViewModel = (function (_super) {
                     container.removeChild(container.lastChild);
                 }
             }
+            return container;
+        };
+        this.addContent = function (container, content) {
             var reportContainer = document.createElement("div");
             reportContainer.id = "report-container";
             container.appendChild(reportContainer);
             $("#report-container").html(content);
+        };
+        this.setReportContent = function (content) {
+            var container = _this.clearConntent();
+            _this.addContent(container, content);
             // initialise report elements
             _this.selectedReportItem.reportViewModel.initReport(_this.selectedReportItem.reportType);
             kendo.unbind("#student-report");
@@ -105,7 +129,9 @@ var StudentPortfolioViewModel = (function (_super) {
                 _this.selectedReportItem.reportViewModel.setStudent(_this.student);
             }
         };
+        this.printViewModel = new StudentPortfolioPrintViewModel(testFile);
         this.registerReportViewModels();
+        this.setDatasource(this.testFile);
         this.selectedReportItem = this.studentReports[0];
     }
     return StudentPortfolioViewModel;

@@ -5,8 +5,7 @@ implements IStudentPortfolio {
     }
 
     private reports = [
-        new ReportItem("Maths Skills Profile - List", "MathsSkillsProfileListView", ReportType.StudentMathsSkillsProfileList, this),
-        new ReportItem("Maths Skills Profile - Table", "MathsSkillsProfileTableView", ReportType.StudentMathsSkillsProfileTable, this)
+        new ReportItem("Maths Skills Profile", "MathsSkillsProfileListView", ReportType.StudentMathsSkillsProfile, this),
     ];
 
     getReports = (): Array<ReportItem> => {

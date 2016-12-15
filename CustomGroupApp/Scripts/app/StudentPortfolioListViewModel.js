@@ -5,7 +5,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var StudentPortfolioListViewModel = (function (_super) {
     __extends(StudentPortfolioListViewModel, _super);
-    function StudentPortfolioListViewModel() {
+    function StudentPortfolioListViewModel(testFile) {
         var _this = this;
         _super.call(this);
         this.setDatasource = function (testFile) {
@@ -15,7 +15,8 @@ var StudentPortfolioListViewModel = (function (_super) {
         this.showStudentReport = function (student) {
             _this.studentPortfolioViewModel.showStudentReport(student);
         };
-        this.studentPortfolioViewModel = new StudentPortfolioViewModel("student-portfolio-details");
+        this.testFile = testFile;
+        this.studentPortfolioViewModel = new StudentPortfolioViewModel(testFile);
     }
     return StudentPortfolioListViewModel;
 }(kendo.data.ObservableObject));
