@@ -352,6 +352,7 @@ class Student {
     dob: Date;
     speak: string;
     liveInAus: string;
+    bornInAus: string;
     ca: number;
     serialno: number;
     notes: string;
@@ -383,8 +384,9 @@ class Student {
         this.name = r.Name;
         this.sex = r.Sex;
         this.dob = new Date(parseInt(r.Dob.substr(6)));
-        this.speak = r.Speak;
-        this.liveInAus = r.Live_in_as;
+        this.speak = this.languageSpeak(r.Speak);
+        this.liveInAus = this.liveInAust(r.Live_in_as);
+        this.bornInAus = this.bornInAust(r.Live_in_as);
         this.ca = r.Ca;
         this.notes = r.Notes;
 
@@ -432,5 +434,54 @@ class Student {
         total += this.reading.scaledScore ? this.reading.scaledScore : 0;
         total += this.writing.scaledScore ? this.writing.scaledScore : 0;
         return total;
+    }
+
+    private liveInAust = (val: string, shortDesc = false): string => {
+        if (! val) {
+            return "";
+        }
+
+        const years = parseInt(val);
+        switch (years) {
+        case 1:
+            return shortDesc ? "< 2" : "Less than 2 years";
+
+        case 3:
+            return shortDesc ? "< 4" : "Less than 4 years";
+
+        case 5:
+            return shortDesc ? "< 6" : "Less than 6 years";
+
+        case 7:
+            return shortDesc ? "> 6" : "More than 6 years";
+        default:
+            return "";
+        }
+    }
+
+    private bornInAust = (val: string): string => {
+        if (! val) {
+            return "Yes";
+        }
+
+        const years = parseInt(val);
+        return years === 0 ? "Yes" : "No";
+    }
+
+    private languageSpeak = (speak: string, shortDesc = true): string => {
+        if (!speak) {
+            return "";
+        }
+
+        switch (speak) {
+        case "A":
+            return shortDesc ? "Always" : "Always Spoken";
+
+        case "S":
+            return shortDesc ? "Sometimes" : "Sometimes Spoken";
+
+        default:
+            return shortDesc ? "" : "Never Spoken";
+        }
     }
 }

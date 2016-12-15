@@ -341,14 +341,55 @@ var Student = (function () {
             total += _this.writing.scaledScore ? _this.writing.scaledScore : 0;
             return total;
         };
+        this.liveInAust = function (val, shortDesc) {
+            if (shortDesc === void 0) { shortDesc = false; }
+            if (!val) {
+                return "";
+            }
+            var years = parseInt(val);
+            switch (years) {
+                case 1:
+                    return shortDesc ? "< 2" : "Less than 2 years";
+                case 3:
+                    return shortDesc ? "< 4" : "Less than 4 years";
+                case 5:
+                    return shortDesc ? "< 6" : "Less than 6 years";
+                case 7:
+                    return shortDesc ? "> 6" : "More than 6 years";
+                default:
+                    return "";
+            }
+        };
+        this.bornInAust = function (val) {
+            if (!val) {
+                return "Yes";
+            }
+            var years = parseInt(val);
+            return years === 0 ? "Yes" : "No";
+        };
+        this.languageSpeak = function (speak, shortDesc) {
+            if (shortDesc === void 0) { shortDesc = true; }
+            if (!speak) {
+                return "";
+            }
+            switch (speak) {
+                case "A":
+                    return shortDesc ? "Always" : "Always Spoken";
+                case "S":
+                    return shortDesc ? "Sometimes" : "Sometimes Spoken";
+                default:
+                    return shortDesc ? "" : "Never Spoken";
+            }
+        };
         this.studentId = r.Id;
         this.commonId = r.GlobalStudentId;
         this.schoolStudentId = r.Student_id;
         this.name = r.Name;
         this.sex = r.Sex;
         this.dob = new Date(parseInt(r.Dob.substr(6)));
-        this.speak = r.Speak;
-        this.liveInAus = r.Live_in_as;
+        this.speak = this.languageSpeak(r.Speak);
+        this.liveInAus = this.liveInAust(r.Live_in_as);
+        this.bornInAus = this.bornInAust(r.Live_in_as);
         this.ca = r.Ca;
         this.notes = r.Notes;
         this.genab = new Score(r.Genab, r.Iqs, r.T_genab, r.S_genab, new RangeScore(r.Iq1, r.Iq2), null, r.Genabcor);

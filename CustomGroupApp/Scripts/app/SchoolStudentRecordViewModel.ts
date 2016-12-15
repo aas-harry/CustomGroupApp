@@ -10,11 +10,13 @@
 
     bornInAus: string;
     secondLanguage: string;
+    liveInAus: string;
     rawScoreGridControl: kendo.ui.Grid;
     scaledScoresChartControl: kendo.dataviz.ui.Chart;
    
     setAdditionalProperties = (student: Student) => {
-        this.set("bornInAus", student.liveInAus);
+        this.set("bornInAus", student.bornInAus);
+        this.set("liveInAus", student.liveInAus);
         this.set("secondLanguage", student.speak);
         this.set("studentNote", student.notes);
 
@@ -29,6 +31,7 @@
     studentNote: string;
     hasNotesChanged = false;
     message: string;
+
     saveNotes = (e) => {
         const self = this;
 

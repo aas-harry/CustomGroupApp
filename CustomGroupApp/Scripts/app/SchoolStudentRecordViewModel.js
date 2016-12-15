@@ -12,7 +12,8 @@ var SchoolStudentRecordViewModel = (function (_super) {
             new ReportItem("School Student Record", "SchoolStudentRecordView", ReportType.SchoolStudentRecord, this)
         ];
         this.setAdditionalProperties = function (student) {
-            _this.set("bornInAus", student.liveInAus);
+            _this.set("bornInAus", student.bornInAus);
+            _this.set("liveInAus", student.liveInAus);
             _this.set("secondLanguage", student.speak);
             _this.set("studentNote", student.notes);
             _this.setRawScores(student);
