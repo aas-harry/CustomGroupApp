@@ -1,0 +1,153 @@
+﻿@model OnlineReporting.ViewModels.StudentMarkedWritingPrintDialogViewModel
+
+<div id="PrintDialog" style="margin: 10px">
+    <style scoped>
+        .studentName {
+            float: left;
+            width: 200px;
+            height: 20px;
+            padding-top: 4px;
+            padding-bottom: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            overflow: hidden;
+            font-weight: normal;
+            float: left;
+            max-width: 200px;
+        }
+
+
+        .k-listview {
+            padding: 10px;
+            margin: 2px;
+        }
+    </style>
+    <div class="container-fluid">
+        
+        <div class="row" style="margin-left: 15px; margin-bottom: 5px">
+            <div>Report Options:</div>
+            <div><input type="radio" name="reportoptions" style="margin-right: 10px" data-bind="attr: { value: ReportOptions.Pdf}, checked: SelectedReportOption">Combine student marked writing scripts into a pdf file
+            </div>
+            <div><input type="radio" name="reportoptions" style="margin-right: 10px" data-bind="attr: { value: ReportOptions.Zip}, checked: SelectedReportOption">Add student marked writing script into a zip file
+            </div>
+        </div>
+
+        <div class="row" style="margin-left: 15px">
+            <div><input type="radio" name="options" style="margin-right: 10px" data-bind="attr: { value: PrintOptions.All}, checked: SelectedOption">All Students</div>
+            <div><input type="radio" name="options" style="margin-right: 10px" data-bind="attr: { value: PrintOptions.Selected}, checked: SelectedOption">Select from students list below:</div>
+        </div>
+
+        <div id="studentListDialog" style="height: 415px; overflow-y: auto; margin-left: 15px; margin-top: 10px; margin-bottom: 10px" data-role="listview" class="studentSelector"
+                data-bind="source: Students, events: {change: OnSelectedStudent}" data-selectable="true" data-template="templateName"></div>
+
+        <div class="row">
+            <div style="display:block; margin: 0 auto; text-align: center;">
+                <button class="btn btn-sm btn-default" data-bind="click: Cancel">Cancel</button>
+                <button class="btn btn-sm btn-default" data-bind="click: Print">OK</button>
+            </div>
+        </div>
+        </div>
+</div>
+
+<script type="text/x-kendo-tmpl" id="templateName">
+     <div class="studentName">
+    <dl>
+        <dd><input type="checkbox" style="margin-right: 5px" data-bind="checked: IsSelected">#:Name#</dd>
+    </dl>
+    </div>
+</script>
+
+<script>
+
+    $(document).ready(function() {
+        var subjects = @Html.Raw(Json.Encode(Model.Subjects));
+        var reportCode = @Html.Raw(Json.Encode(Model.ReportCode));
+        var reportOrder = @Html.Raw(Json.Encode(Model.ReportOrder));
+        var outputType = @Html.Raw(Json.Encode(Model.OutputType));
+        var testNumber = @Html.Raw(Json.Encode(Model.TestNumber));
+
+        var printDialogViewModel = kendo.observable({
+            SelectedOption: 1,
+            SelectedReportOption: 1,
+            PrintOptions: {
+                All: 1,
+                Selected: 2
+            },
+            ReportOptions: {
+                Pdf: 1,
+                Zip: 2
+            },
+            
+            SelectedStudents: [],
+            Students: @Html.Raw(Json.Encode(Model.Students)),
+            OnSelectedStudent: function(e) {
+                printDialogViewModel.set("SelectedOption", 2);
+            },
+            Print: function(e) {
+                e.preventDefault();
+
+                printReport();
+                closeDialog();
+            },
+            Cancel: function() {
+                closeDialog();
+            }
+        });
+
+
+        kendo.bind($("#PrintDialog"), printDialogViewModel);
+
+        function closeDialog() {
+            var dialog = $("#PrintDialog").data("kendoWindow");
+            if (dialog) {
+                dialog.close();
+            }
+        }
+
+        function printReport() {
+            var students = printDialogViewModel.get('Students');
+            var selOption = printDialogViewModel.get('SelectedOption');
+            var reportOptions = printDialogViewModel.get('SelectedReportOption');
+            var studentList = [];
+            for (var i = 0; i < students.length; i++) {
+                if (selOption == 1 || students[i].IsSelected) {
+                    studentList.push(students[i].Id);
+                }
+            }
+
+            var reportViewModel = {
+                reportCode: reportOptions == 1 ? "StudentMarkedWritingScript" : "StudentMarkedWritingScriptZip",
+                testNumber: testNumber,
+                students: studentList,
+                subjects: subjects,
+                outputType: outputType,
+                reportOrder: reportOrder,
+                includeDetails: false
+            };
+
+            if (outputType == "zip") {
+                toastr.info("Preparing report...");
+            }
+
+            $.ajax({
+                url: '@Url.Action("PreviewReport", "Report")',
+                type: 'POST',
+                dataType: "json",
+                contentType: 'application/json',
+                data: JSON.stringify(reportViewModel),
+                success: function(url) {
+                    if (url == "Error: Your connection to this website has timed out. Please login again.") {
+                        alert(url);
+                        return;
+                    }
+                    url = url.replace('"', "").replace('"', "");
+                    window.open(url, "_blank");
+
+                },
+                error: function() {
+                    alert("There are some issues downloading the report file from the web sever.");
+                }
+            });
+        }
+    });
+</script>

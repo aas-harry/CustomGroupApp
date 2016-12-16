@@ -12,7 +12,7 @@ var StudentPortfolioPrintViewModel = (function (_super) {
         this.studentSelector = new StudentSelector();
         this.studentListInitialised = false;
         this.reportSelectorOption = true;
-        this.studentSelectorOption = true;
+        this.studentSelectorOption = false;
         this.schoolStudentRecordOption = true;
         this.naplanProgressIndexOption = true;
         this.mathsSkillsProfileListOption = true;
@@ -28,6 +28,8 @@ var StudentPortfolioPrintViewModel = (function (_super) {
         this.clearAllReports = function () {
             _this.setAllReports(false);
         };
+        this.selectedReports = 1;
+        this.selectedStudents = 1;
         this.showReports = function () {
             _this.set("reportSelectorOption", true);
             _this.set("studentSelectorOption", false);

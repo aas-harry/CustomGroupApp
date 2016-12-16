@@ -1,0 +1,183 @@
+﻿@model OnlineReporting.ViewModels.PrintDialogViewModel
+
+<div id="PrintDialog" style="margin: 10px">
+    <style scoped>
+        .studentName {
+            float: left;
+            width: 200px;
+            height: 20px;
+            padding-top: 4px;
+            padding-bottom: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            overflow: hidden;
+            font-weight: normal;
+            float: left;
+            max-width: 200px;
+        }
+
+        .k-listview {
+            padding: 10px;
+            margin: 2px;
+        }
+
+         input[type="checkbox"] {
+         margin-right: 5px;
+        }
+         input[type="radio"] {
+         margin-right: 5px;
+        }
+    </style>
+    <div class="container-fluid">
+        <div style="margin-bottom: 10px"><span>Order By: </span><input type="radio" name="orderby" onclick="onReportOrderChanged(1);" style="margin-right: 10px; margin-left: 5px" data-bind="attr: { value: OrderByOptions.Rank}, checked: SelectedOrderByOption">Rank
+            <input type="radio" name="orderby" style="margin-right: 10px; margin-left: 10px" data-bind="attr: { value: OrderByOptions.Name}, checked: SelectedOrderByOption" onclick="onReportOrderChanged(2);">Name
+            <input type="checkbox" data-bind="checked: IncludeApplicantDetail" style="margin-left: 15px" />Include Scholarship Application Details
+        </div>
+        <div><input type="radio" name="options" style="margin-right: 10px" data-bind="attr: { value: PrintOptions.All}, checked: SelectedOption">All Students</div>
+        <div><input type="radio" name="options" style="margin-right: 10px" data-bind="attr: { value: PrintOptions.Selected}, checked: SelectedOption">Select from students list below:</div>
+        <div id="studentListDialog" style="height: 465px; overflow-y: auto; margin-left: 15px; margin-top: 10px; margin-bottom: 10px" data-role="listview" class="studentSelector"
+             data-bind="source: Students, events: {change: OnSelectedStudent}" data-selectable="true" data-template="templateName"></div>
+        <div style="margin-bottom: 10px">
+        </div>
+        <div class="row">
+            <div style="display:block; margin: 0 auto; text-align: center;">
+                <button class="btn btn-sm btn-default" data-bind="click: Cancel">Cancel</button>
+                <button class="btn btn-sm btn-default" data-bind="click: Print">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/x-kendo-tmpl" id="templateName">
+    <div class="studentName">
+        <dl>
+            <dd style="width:500px"><input type="checkbox" style="margin-right: 5px" data-bind="checked: IsSelected">#:Name# (#:TotalScore#)</dd>
+        </dl>
+    </div>
+</script>
+
+<script>
+    var printDialogViewModel;
+    var reportOrder = 2;
+
+    function SortByName(a, b){
+        var aName = a.Name.toLowerCase();
+        var bName = b.Name.toLowerCase();
+        return ((aName < bName) ? -1 : ((aName > bName) ? 1 : 0));
+    }
+    function SortByRank(a, b) {
+        var aScore = a.TotalScore;
+        var bScore = b.TotalScore;
+        return ((aScore < bScore) ? -1 : ((aScore > bScore) ? 1 : 0));
+    }
+
+    function onReportOrderChanged(sort) {
+
+        var dataSource = printDialogViewModel.get("Students");
+        if (sort == 1) {
+            reportOrder = 2;
+            dataSource.sort({ field: "TotalScore", dir: "desc" });
+        }
+        if (sort == 2) {
+            reportOrder = 1;
+            dataSource.sort({ field: "Name", dir: "asc" });
+        }
+       
+    }
+
+    $(document).ready(function() {
+
+        var subjects = @Html.Raw(Json.Encode(Model.Subjects));
+        var reportCode = @Html.Raw(Json.Encode(Model.ReportCode));
+        var outputType = @Html.Raw(Json.Encode(Model.OutputType));
+        var testNumber = @Html.Raw(Json.Encode(Model.TestNumber));
+
+        var dataSource = new kendo.data.DataSource({
+            data:@Html.Raw(Json.Encode(Model.Students.OrderBy(x=> x.TotalScore))),
+            sort: {field: "TotalScore", dir: "desc"}
+        });
+
+        printDialogViewModel = kendo.observable({
+            IncludeApplicantDetail: false,
+            SelectedOption: 1,
+            SelectedOrderByOption: 1,
+            PrintOptions: {
+                All: 1,
+                Selected: 2
+            },
+            OrderByOptions: {
+                Rank: 1,
+                Name: 2
+            },
+            SelectedStudents: [],
+            Students: dataSource,
+            OnSelectedStudent: function(e) {
+                printDialogViewModel.set("SelectedOption", 2);
+            },
+            Print: function(e) {
+                e.preventDefault();
+
+                printReport();
+                closeDialog();
+            },
+            Cancel: function() {
+                closeDialog();
+            }
+        });
+
+        kendo.bind($("#PrintDialog"), printDialogViewModel);
+
+
+        function closeDialog() {
+            var dialog = $("#PrintDialog").data("kendoWindow");
+            if (dialog) {
+                dialog.close();
+            }
+        }
+
+        function printReport() {
+            var tmpStudents = printDialogViewModel.get('Students').data();
+            var selOption = printDialogViewModel.get('SelectedOption');
+            var studentList = [];
+            for (var i = 0; i < tmpStudents.length; i++) {
+                if (selOption == 1 || tmpStudents[i].IsSelected) {
+                    studentList.push(tmpStudents[i].Id);
+                }
+            }
+
+            var reportViewModel = {
+                reportCode: reportCode,
+                testNumber: testNumber,
+                students: studentList,
+                subjects: subjects,
+                outputType: outputType,
+                reportOrder: reportOrder,
+                includeDetails: printDialogViewModel.get('IncludeApplicantDetail')
+            };
+
+            if (outputType == "zip") {
+                toastr.info("Preparing report...");
+            }
+
+            $.ajax({
+                url: '@Url.Action("PreviewReport", "Report")',
+                type: 'POST',
+                dataType: "json",
+                contentType: 'application/json',
+                data: JSON.stringify(reportViewModel),
+                success: function(url) {
+                    if (url == "Error: Your connection to this website has timed out. Please login again.") {
+                        alert(url);
+                        return;
+                    }
+                    url = url.replace('"', "").replace('"', "");
+                    window.open(url, "_blank");
+
+                },
+                error: function() {
+                    alert("There are some issues downloading the report file from the web sever.");
+                }
+            });
+        }
+    });
+</script>

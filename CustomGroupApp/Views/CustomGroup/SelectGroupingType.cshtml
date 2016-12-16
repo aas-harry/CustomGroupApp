@@ -35,10 +35,16 @@
     <div>
         <input type="radio" value="Language" data-bind="checked:selectedGroupingOption"/>
         <span>Language Preferences</span>
+        <input type="radio" name="languageOption" value="1" data-type="number" data-bind="checked: selectedLanguageOption" style="margin-left: 95px; margin-right: 5px">1 Language Pref
+        <input type="radio" name="languageOption" value="2" data-type="number" data-bind="checked: selectedLanguageOption" style="margin-left: 28px; margin-right: 5px">2 Language Prefs
     </div>
     <div>
         <input type="radio" value="Preallocated" data-bind="checked:selectedGroupingOption" />
         <span>School Preallocated Classes</span>
+    </div>
+    <div>
+        <input type="radio" value="SchoolGroup" data-bind="checked:selectedGroupingOption" />
+        <span>School Groups. E.g. House</span>
     </div>
      
     <div style="margin-top: 20px">Choose one of the following options:</div>
@@ -54,11 +60,17 @@
         <input type="radio" value="MathsAchievement" data-bind="checked:selectedStreamingOption" />
         <span>Maths Achievement</span>
     </div>
+    <div>
+        <input type="radio" value="MathsAchievementQr" data-bind="checked:selectedStreamingOption" />
+        <span>Maths Achievement & Math Reasoning Raw Scores</span>
+    </div>
 </div>
 
 <script>
     $(document)
         .ready(function () {
-            kendo.bind($("#custom-group-container"), customGroupViewModel);
+            if (customGroupViewModel) {
+                kendo.bind($("#custom-group-container"), customGroupViewModel);
+            }
         });
 </script>

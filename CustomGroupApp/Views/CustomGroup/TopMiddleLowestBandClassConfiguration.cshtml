@@ -3,7 +3,7 @@
 </div>
 <div style="margin: 20px">
     <div data-bind="visible: isCoedSchool">
-        <div>Choose students to include option:</div>
+        <div style="margin-bottom: 5px">Choose students to include option:</div>
         <div>
             <input type="radio" value="All" data-bind="checked:selectedGenderOption" />
             <span>All Students</span>
@@ -18,11 +18,17 @@
         </div>
     </div>
 
-    <div style="margin-top: 20px; margin-bottom: 5px">Number of students in this test: <span data-bind="text: studentCount"></span></div>
-    <div style="margin-bottom: 5px">Number of students in all classes: <span data-bind="text: studentCountInAllClasses"></span></div>
+    <div style="margin-top: 20px; margin-bottom: 10px">Number of students in this test: <span data-bind="text: studentCount"></span></div>
+    <div style="margin-bottom: 10px">
+        <label style="font-weight: normal">Number of students in all classes: </label>
+        <span data-bind="text: studentCountInAllClasses, style: {color: studentCountInAllClassesColor}"></span>
+    </div>
 
     <div id="class-definition-container" style="margin-bottom: 20px">
-        <p>You can adjust the number of students in each classes below:</p>
+        <div style="margin-top: 5px; margin-bottom: 10px">
+            <label style="font-weight: normal">Adjust the number of students in each class below:</label>
+            <span style="margin-left: 5px" data-bind="text: diffTotalStudentsInClass, visible: incorrectTotalStudentsInClass, style: {color: studentCountInAllClassesColor}"></span>
+        </div>
         <div id="classes-settings-container" style="width: 540px">
             <table id="band-definition-table"></table>
         </div>

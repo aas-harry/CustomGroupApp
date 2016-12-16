@@ -16,7 +16,7 @@ var StudentSelector = (function () {
             if (previoustudents.length > 0) {
                 // Create the table
                 var previousStudentsContainer = document.createElement("div");
-                previousStudentsContainer.setAttribute("style", "padding: 5px; margin-right: 5px; margin-bottom: 5px; overflow-y: none; overflow-x: auto");
+                previousStudentsContainer.setAttribute("style", "padding: 5px; margin-right: 5px; margin-bottom: 5px; overflow-y: hidden; overflow-x: auto");
                 _this.container.appendChild(previousStudentsContainer);
                 var descLabel = document.createElement("div");
                 descLabel.setAttribute("style", "font-weight: bold; margin-bottom: 5px");

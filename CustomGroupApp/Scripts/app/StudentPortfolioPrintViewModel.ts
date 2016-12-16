@@ -6,7 +6,7 @@
     studentSelector = new StudentSelector();
     studentListInitialised = false;
     reportSelectorOption = true;
-    studentSelectorOption = true;
+    studentSelectorOption = false;
     schoolStudentRecordOption = true;
     naplanProgressIndexOption = true;
     mathsSkillsProfileListOption = true;
@@ -24,6 +24,9 @@
     clearAllReports = () => {
         this.setAllReports(false);
     }
+
+    selectedReports = 1;
+    selectedStudents = 1;
 
     showReports = () => {
         this.set("reportSelectorOption", true);

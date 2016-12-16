@@ -19,7 +19,7 @@
             // Create the table
             const previousStudentsContainer = document.createElement("div");
             previousStudentsContainer.setAttribute("style",
-                "padding: 5px; margin-right: 5px; margin-bottom: 5px; overflow-y: none; overflow-x: auto");
+                `padding: 5px; margin-right: 5px; margin-bottom: 5px; overflow-y: hidden; overflow-x: auto`);
             this.container.appendChild(previousStudentsContainer);
 
             const descLabel = document.createElement("div");
