@@ -54,6 +54,7 @@ class StudentPortfolio extends kendo.data.ObservableObject
 
     name: string;
     dob: string;
+    studentInfo: string;
     age: string;
     schoolStudentId: string;
     hasSchoolStudentId: boolean;
@@ -87,6 +88,11 @@ class StudentPortfolio extends kendo.data.ObservableObject
         this.set("age", student.ca);
         this.set("schoolStudentId", student.schoolStudentId);
         this.set("hasSchoolStudentId", student.hasSchoolStudentId);
+        if (this.hasSchoolStudentId) {
+            this.set("studentInfo", `Dob: ${this.dob},  Student ID: ${this.schoolStudentId}`);
+        } else {
+            this.set("studentInfo", `Dob: ${this.dob}`);
+        }
 
         this.set("yearLevel", this.testFile.yearLevel);
         this.set("schoolName", this.testFile.school.name);

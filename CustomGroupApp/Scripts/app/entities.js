@@ -22,6 +22,17 @@ var TestCategory;
     TestCategory[TestCategory["GandT"] = 3] = "GandT";
     TestCategory[TestCategory["Nwpa"] = 4] = "Nwpa";
 })(TestCategory || (TestCategory = {}));
+var MeanType;
+(function (MeanType) {
+    MeanType[MeanType["School"] = 0] = "School";
+    MeanType[MeanType["State"] = 1] = "State";
+    MeanType[MeanType["National"] = 2] = "National";
+})(MeanType || (MeanType = {}));
+var TestType;
+(function (TestType) {
+    TestType[TestType["Aas"] = 0] = "Aas";
+    TestType[TestType["Naplan"] = 1] = "Naplan";
+})(TestType || (TestType = {}));
 var User = (function () {
     function User() {
         var _this = this;
@@ -41,11 +52,11 @@ var TestFile = (function () {
     function TestFile() {
         var _this = this;
         this.school = new School();
-        // subjectTypes: Array<Subject> = [];
         this.students = [];
         this.hasBoys = false;
         this.hasGirls = false;
         this.customGroups = [];
+        this.meanScores = [];
         this.stanineTables = new StanineTables();
         this.allSubjects = new Array();
         this.description = function () {
@@ -82,6 +93,40 @@ var TestFile = (function () {
             _this.studentCount = undefined;
             _this.published = undefined;
             _this.students = [];
+            _this.meanScores = [];
+            _this.hasStudentLanguagePrefs = false;
+            _this.hasNaplanResults = false;
+            _this.hasBoys = false;
+            _this.hasGirls = false;
+            _this.isCoopSchoolTest = false;
+            _this.customGroups = [];
+        };
+        this.setNaplanResults = function (data) {
+            var tmpNaplanResults = new Array();
+            for (var i = 0; i < data.NaplanResults.length; i++) {
+                tmpNaplanResults.push(new NaplanScore(data.NaplanResults[i]));
+            }
+            var naplanResults = Enumerable.From(tmpNaplanResults).GroupBy(function (s) { return s.studentId; }).ToArray();
+            var studentLookup = Enumerable.From(_this.students).ToDictionary(function (s) { return s.studentId; }, function (s) { return s; });
+            for (var _i = 0, naplanResults_1 = naplanResults; _i < naplanResults_1.length; _i++) {
+                var g = naplanResults_1[_i];
+                if (studentLookup.Contains(g.Key())) {
+                    studentLookup.Get(g.Key()).naplanResults = g.source;
+                }
+            }
+            _this.meanScores = [];
+            for (var i = 0; i < data.MeanScores.length; i++) {
+                var meanScore = new NaplanMeanScore();
+                meanScore.type = data.MeanScores[i].TestType;
+                meanScore.source = data.MeanScores[i].Source;
+                meanScore.year = data.MeanScores[i].Year;
+                meanScore.testNumber = data.MeanScores[i].TestNumber;
+                meanScore.reading = data.MeanScores[i].Reading;
+                meanScore.numeracy = data.MeanScores[i].Numeracy;
+                meanScore.writing = data.MeanScores[i].Writing;
+                _this.meanScores.push(meanScore);
+            }
+            _this.hasNaplanResults = true;
         };
         this.setCustomGroups = function (data, students) {
             if (students === null) {
@@ -287,6 +332,29 @@ var RangeScore = (function () {
     });
     return RangeScore;
 }());
+var NaplanMeanScore = (function () {
+    function NaplanMeanScore() {
+    }
+    return NaplanMeanScore;
+}());
+var NaplanScore = (function () {
+    function NaplanScore(data) {
+        var _this = this;
+        this.set = function (data) {
+            _this.studentId = data.Id;
+            _this.testNumber = data.TestNumber;
+            _this.source = data.Source;
+            _this.grade = data.Grade;
+            _this.testYear = data.TestYear;
+            _this.testDate = data.TestDate ? new Date(parseInt(data.TestDate.substr(6))) : undefined;
+            _this.numeracy = data.Numeracy;
+            _this.reading = data.Reading;
+            _this.writing = data.Writing;
+        };
+        this.set(data);
+    }
+    return NaplanScore;
+}());
 var Score = (function () {
     function Score(raw, stanine, scaledScore, score, range, naplan, answers) {
         this.raw = raw;
@@ -318,6 +386,7 @@ var Score = (function () {
 var Student = (function () {
     function Student(r) {
         var _this = this;
+        this.naplanResults = [];
         this.languagePrefs = [];
         this.overallAbilityScore = function () {
             var total = 0;

@@ -22,6 +22,16 @@ enum TestCategory {
     Nwpa = 4
 }
 
+enum MeanType {
+    School = 0,
+    State = 1,
+    National = 2
+}
+
+enum TestType {
+    Aas = 0,
+    Naplan = 1
+}
 
 class User {
     id: number;
@@ -44,7 +54,6 @@ class School {
 }
 
 
-
 class TestFile {
     school = new School();
     fileNumber: number;
@@ -55,7 +64,6 @@ class TestFile {
     testYear: number;
     studentCount: number;
     published: Date;
-    // subjectTypes: Array<Subject> = [];
     students: Array<Student> = [];
     isUnisex: boolean;
     hasBoys = false;
@@ -64,9 +72,11 @@ class TestFile {
     customGroups: Array<ClassDefinition> = [];
     hasCustomGroups: boolean;
     hasStudentLanguagePrefs: boolean;
+    hasNaplanResults: boolean;
+    hasStudentPastResults: boolean;
     hasStudentIds: boolean;
     subjectsTested: Array<ISubject>;
-
+    meanScores: Array<NaplanMeanScore> = [];
     stanineTables = new StanineTables();
 
     private allSubjects = new Array<SubjectInfo>();
@@ -128,9 +138,44 @@ class TestFile {
         this.studentCount = undefined;
         this.published = undefined;
         this.students = [];
+        this.meanScores = [];
+        this.hasStudentLanguagePrefs = false;
+        this.hasNaplanResults = false;
+        this.hasBoys = false;
+        this.hasGirls = false;
+        this.isCoopSchoolTest = false;
+        this.customGroups = [];
+
     };
 
-  
+    setNaplanResults = (data: any) => {
+        const tmpNaplanResults = new Array<NaplanScore>();
+        for (let i = 0; i < data.NaplanResults.length; i++) {
+            tmpNaplanResults.push(new NaplanScore(data.NaplanResults[i]));
+        }
+        const naplanResults = Enumerable.From(tmpNaplanResults).GroupBy(s => s.studentId).ToArray();
+        const studentLookup = Enumerable.From(this.students).ToDictionary(s => s.studentId, s => s);
+        for (let g of naplanResults) {
+            if (studentLookup.Contains(g.Key())) {
+                studentLookup.Get(g.Key()).naplanResults = g.source;
+            }    
+        }
+
+        this.meanScores = [];
+        for (let i = 0; i < data.MeanScores.length; i++) {
+            const meanScore = new NaplanMeanScore();
+            meanScore.type = data.MeanScores[i].TestType;
+            meanScore.source = data.MeanScores[i].Source;
+            meanScore.year = data.MeanScores[i].Year;
+            meanScore.testNumber = data.MeanScores[i].TestNumber;
+            meanScore.reading = data.MeanScores[i].Reading;
+            meanScore.numeracy = data.MeanScores[i].Numeracy;
+            meanScore.writing = data.MeanScores[i].Writing;
+
+            this.meanScores.push(meanScore);
+        }
+        this.hasNaplanResults = true;
+    }
 
     setCustomGroups = (data: any, students: Array<Student>) => {
         if (students === null) {
@@ -314,6 +359,43 @@ class RangeScore {
     constructor(public low: number, public high: number) {}
 }
 
+class NaplanMeanScore {
+    type: MeanType;
+    year: number;
+    testNumber: number;
+    source: TestType;
+    numeracy: number;
+    reading: number;
+    writing: number;  
+}
+
+class NaplanScore {
+    studentId: number;
+    testNumber: number;
+    source: TestType;
+    grade: number;
+    testDate: Date;
+    testYear: number;
+    numeracy: number;
+    reading: number;
+    writing: number;
+    constructor(data: any) {
+        this.set(data);
+    }
+
+    set = (data: any) => {
+        this.studentId = data.Id;
+        this.testNumber = data.TestNumber;
+        this.source = data.Source;
+        this.grade = data.Grade;
+        this.testYear = data.TestYear;
+        this.testDate = data.TestDate ? new Date(parseInt(data.TestDate.substr(6))) : undefined;
+        this.numeracy = data.Numeracy;
+        this.reading = data.Reading;
+        this.writing = data.Writing;
+    }
+}
+
 class Score {
     correctAnswers: number;
     attemptedQuestions: number;
@@ -371,6 +453,7 @@ class Student {
     raven: Score;
 
     schoolGroup: string;
+    naplanResults: Array<NaplanScore> = [];
     languagePrefs: Array<string> = [];
     get hasLanguagePrefs(): boolean {
         return this.languagePrefs && this.languagePrefs.length > 0;

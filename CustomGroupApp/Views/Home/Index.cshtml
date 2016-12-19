@@ -1,31 +1,81 @@
-﻿@{
-    ViewBag.Title = "Home Page";
-}
-
-<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="http://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
-</div>
-
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
+﻿<div id="window-popup"></div>
+<div class="container-fluid">
+    <style scoped="">
+        .k-grid td {
+            padding-bottom: 2px;
+            padding-top: 2px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+    </style>
+    <div id="nav-panel">
+        <div class="row">
+            <input id="test-number" style="width: 280px; margin-right: 5px; margin-left: 10px">
+            <button class="btn btn-default" onClick="getResults()">Get</button>
+            <button class="btn btn-default" onClick="openStudentPortfolioList()">Student Portfolios</button>
+            <div id="message-text"></div>
+        </div>
     </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
+    <div id="content">
     </div>
 </div>
+<script>
+    var testFile = new TestFile();
+   
+    $(document)
+        .ready(function() {
+            $("#test-number")
+                .kendoComboBox({
+                    dataTextField: "text",
+                    dataValueField: "value",
+                    dataSource: [
+                        { text: " Marcellin Burlene - 14181", value: 1014181 }, // 1014181
+                        { text: "Padua - 14270", value: 1010996 },
+                        { text: "Abbotsleigh - 14270", value: 1014270 },
+                        { text: "Casimir Catholic College - 15246", value: 1015246 },
+                        { text: " Emanuel School - 14337", value: 1014337 }
+                    ],
+                    index: 0
+                });
+        });
+
+    function getResults() {
+        var numericTextBox = $("#test-number").data("kendoComboBox");
+        var testnumber = parseInt(numericTextBox.value());
+
+        $.ajax({
+            url: '@Url.Action("GetResults", "Home")',
+            data: { testnum: testnumber },
+            type: 'POST',
+            cache: false,
+            success: function (data) {
+                
+                testFile.clear();
+                testFile.set(data.Test, data.School, data.Results, [],
+                    data.CustomGroups, data.StanineTables);
+                $("#message-text").replaceWith("Rows: " + data.Results.length);
+             
+            },
+            fail: function(data) {
+
+            }
+        });
+    }
+
+    
+    function openStudentPortfolioList() {
+        $.ajax({
+            url: '@Url.Action("StudentPortfolioView", "Report")',
+            type: 'POST',
+            cache: false,
+            success: function (html) {
+                $("#content").replaceWith("<div id='content'></div>");
+                $("#content").append(html);
+            },
+            fail: function (data) {
+
+            }
+        });
+    }
+  
+</script>

@@ -1,54 +1,122 @@
-﻿<div id="student-naplan-container" style="overflow: auto;">
-    <div id="student-naplan-details" style="overflow: hidden; width: 850px;">
-   
-        <table style="margin-left: 20px">
-            <tr>
-                <td colspan="2">
-                    <div style="text-align: center; font-size: 14px; font-weight: bold">
-                        Student Naplan Report
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="2">
-                    <div style="font-size: 14px; font-weight: bold">
-                        <span data-bind="text: name"></span>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="2" style="width: 800px" id="student-scaled-scores-container"></td>
-            </tr>
-            <tr>
-                <td colspan="2" style="width: 800px" id="student-notes-container"></td>
-            </tr>
-        </table>
+﻿<div id="student-naplan-container" style="margin: 20px">
+    <div style="font-weight: bold; font-size: 13px">
+        <span data-bind="text: name"></span>
+    </div>
+    <div style="font-weight: bold; font-size: 12px">
+        <span data-bind="text: studentInfo"></span>
+    </div>
 
-        @*<div style="height: 230px;">
-            <div style="width: 200px; padding-top: 20px; padding-left: 30px; float: left;">
-
-                <div class="info">
-                    <p> Year Level: <span data-bind="text: YearLevel"></span></p>
-                    <p> Dob: <span data-bind="text: Dob"></span>,  Age: <span data-bind="text: Age"></span> </p>
-                    <p> Born in Australia: <span data-bind="text: BornInAus"></span> </p>
-                    <p> Time in Australia: <span data-bind="text: TimeInAus"></span> </p>
-                    <p> 2nd Language: <span data-bind="text: Lang"></span> </p>
-                    <p> Student ID: <span data-bind="text: StudentId"></span> </p>
-                </div>
-            </div>
-            <div style="padding-top: 20px; padding-left: 15px; float: left;">
-                <p class="headerText">Raw Scores</p>
-                <div id="rawScoreList" style="width: 400px"></div>
-            </div>
-        </div>
-        <div style="text-align: left; padding-left: 30px;">
-            <p class="headerText">Scaled Scores</p>
-            <div id="scaledScore" style="width: 800px; height: 300px;"></div>
-        </div>
-        <div style="text-align: left; padding-top: 20px; padding-left: 30px;">
-            <p class="headerText">Notes</p>
-            <div><textarea id="editor" rows="10" cols="30" style="height: 300px; width: 800px;" data-bind="value: Notes, events: {change: OnNotesChanged}"></textarea></div>
-            <br /><br /><br />
-        </div>*@
+    <div id="numeracy-chart-container">
+        <div style="font-weight: bold; font-size: 12px; margin-top: 20px">Numeracy</div>
+        <div id="numeracy-chart" style="width: 600px; height: 40px"></div>
+    </div>
+    <div id="reading-chart-container">
+        <div style="font-weight: bold; font-size: 12px; margin-top: 20px">Reading</div>
+        <div id="reading-chart" style="width: 600px; height: 40px"></div>
+    </div>
+    <div id="writing-chart-container">
+        <div style="font-weight: bold; font-size: 12px; margin-top: 20px">Writing</div>
+        <div id="writing-chart" style="width: 600px; height: 40px"></div>
+    </div>
+    <div style="margin-top: 20px; margin-left: 20px; font-size: 11px;">
+        <span style="border-left: thick solid blue; border-width: 15px;padding-left: 10px; margin-right: 20px">AAS Test</span>
+        <span style="border-left: thick solid #EEAD40; border-width: 15px;padding-left: 10px; margin-right: 20px">Naplan Test</span>
+        <span style="border-left: thick solid #ff0000; border-width: 3px;padding-left: 10px; margin-right: 20px">School Mean</span>
+        <span style="border-left: thick solid blue; border-width: 3px;padding-left: 10px; margin-right: 20px">State Mean</span>
+        <span style="border-left: thick solid green; border-width: 3px;padding-left: 10px; margin-right: 20px">National Mean</span>
     </div>
 </div>
+<script>
+    $(document)
+        .ready(function () {
+            createChart("numeracy-chart");
+            createChart("reading-chart");
+            createChart("writing-chart");
+
+            function drawAverageScores(e) {
+                var data = e.dataItem;
+                var origin = e.rect.origin;
+                var bottomRight = e.rect.bottomRight();
+
+                console.log(data.school, data.state, data.national);
+                var group = new kendo.drawing.Group();
+                group.append(createVline(origin, bottomRight, data.school, data.school, "red", 0));
+                if (data.state) {
+                    group.append(createVline(origin, bottomRight, data.school, data.state, "blue", 3.2));
+                }
+                if (data.national) {
+                    group.append(createVline(origin, bottomRight, data.school, data.national, "green", 6.5));
+                }
+                return group;
+            }
+
+            function createVline(origin, bottomRight, barScore, score, color, offset) {
+                var xpos = offset === 0 ? origin.x : (origin.x / barScore) * score + offset;
+                var vericalLine = new kendo.drawing.Path().stroke(color, 1).fill(color)
+                 .moveTo(xpos, origin.y)
+                 .lineTo(xpos, bottomRight.y)
+                 .lineTo(xpos + 1, bottomRight.y)
+                 .lineTo(xpos + 1, origin.y)
+                 .close();
+                return vericalLine;
+            }
+
+            function createChart(elementName) {
+                $("#" + elementName)
+                    .kendoChart({
+                        title: { visible: false },
+                        legend: { visible: false },
+                        seriesDefaults: {
+                        
+                        },
+                        series: [
+                            {
+                                type: "rangeBar",
+                                name: "School",
+                                fromField: "school",
+                                toField: "school",
+                                gap: 0.5,
+                                visual: drawAverageScores
+                            },
+                            {
+                                type: "bar",
+                                name: "Student",
+                                field: "score",
+                                colorField: "color",
+                                gap: 0.5,
+                                opacity: 0.9,
+                                labels: {
+                                    visible: true,
+                                    visual: function(e) {
+                                        var center = e.rect.center();
+                                        return new kendo.drawing.Text(e.text,
+                                            [550, center.y - 8],
+                                            {
+                                                fill: {
+                                                    color: "black"
+                                                }
+                                            });
+                                    }
+                                },
+                                overlay: { "gradient": "none" }
+                            }
+                        ],
+                        categoryAxis: {
+                            field: "grade",
+                            majorGridLines: {
+                                visible: false
+                            }
+                        },
+                        valueAxis: {
+                            max: 1000,
+                            min: 0,
+                            majorUnit: 100
+                        },
+                        tooltip: {
+                            visible: true,
+                            template: "#= dataItem.tooltipText #"
+                        }
+                    });
+            }
+        })
+</script>
