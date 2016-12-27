@@ -13,7 +13,7 @@ interface IStudentPortfolio {
     setDatasource(testFile: TestFile);
 
     // Called when a new student is selected
-    setStudent(student: Student);
+    setStudent(student: Student, refresh: boolean);
 
     getReports(): Array<ReportItem>;
 
@@ -73,12 +73,12 @@ class StudentPortfolio extends kendo.data.ObservableObject
         this.isTestFileSet = true;
     }
 
-    setStudent(student: Student) {
+    setStudent(student: Student, refresh: boolean = false) {
         if (!student) {
             return;
         }
 
-        if (this.student && student.studentId === this.student.studentId) {
+        if (! refresh && this.student && student.studentId === this.student.studentId) {
             return;
         }
 

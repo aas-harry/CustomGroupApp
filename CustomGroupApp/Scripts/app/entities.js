@@ -10,9 +10,10 @@ var ReportType;
     ReportType[ReportType["StudentReadingSkillsProfile"] = 7] = "StudentReadingSkillsProfile";
     ReportType[ReportType["StudentReadingSkillsProfileList"] = 8] = "StudentReadingSkillsProfileList";
     ReportType[ReportType["StudentReadingSkillsProfileTable"] = 9] = "StudentReadingSkillsProfileTable";
-    ReportType[ReportType["StudentWritingCriteria"] = 10] = "StudentWritingCriteria";
-    ReportType[ReportType["StudentMarkedWritingScript"] = 11] = "StudentMarkedWritingScript";
-    ReportType[ReportType["StudentCareerProfile"] = 12] = "StudentCareerProfile";
+    ReportType[ReportType["WritingCriteria"] = 10] = "WritingCriteria";
+    ReportType[ReportType["StudentWritingCriteria"] = 11] = "StudentWritingCriteria";
+    ReportType[ReportType["StudentMarkedWritingScript"] = 12] = "StudentMarkedWritingScript";
+    ReportType[ReportType["StudentCareerProfile"] = 13] = "StudentCareerProfile";
 })(ReportType || (ReportType = {}));
 var TestCategory;
 (function (TestCategory) {

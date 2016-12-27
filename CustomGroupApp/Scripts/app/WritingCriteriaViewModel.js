@@ -9,8 +9,7 @@ var WritingCriteriaViewModel = (function (_super) {
         var _this = this;
         _super.call(this, elementName);
         this.reports = [
-            new ReportItem("Writing Criteria", "WritingCriteriaView", ReportType.StudentWritingCriteria, this),
-            new ReportItem("Marked Writing Script", "MarkedWritingCriteriaView", ReportType.StudentMarkedWritingScript, this)
+            new ReportItem("Writing Criteria", "WritingCriteriaView", ReportType.WritingCriteria, this)
         ];
         this.getReports = function () {
             return _this.reports;

@@ -53,7 +53,8 @@
                 testFile.clear();
                 testFile.set(data.Test, data.School, data.Results, [],
                     data.CustomGroups, data.StanineTables);
-                $("#message-text").replaceWith("Rows: " + data.Results.length);
+
+                $("#message-text").replaceWith("<div id='message-text'>Rows: "+ data.Results.length + "</div>");
              
             },
             fail: function(data) {

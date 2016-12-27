@@ -4,6 +4,7 @@ using System.Web.Mvc;
 using ReportDataLibrary;
 using ReportDataLibrary.Models;
 using ReportDataLibrary.Models.StudentNaplan;
+using ReportDataLibrary.Models.StudentSkillsProfile;
 
 namespace CustomGroupApp.Controllers
 {
@@ -88,6 +89,13 @@ namespace CustomGroupApp.Controllers
                         NaplanResults = scores,
                         MeanScores = meanScores
                     });
+        }
+
+        [HttpPost]
+        public JsonResult GetMathProfileData(int testnum)
+        {
+            var data = new StudentSkillsProfiles(new ReportDataContext { TestNumber = testnum });
+            return Json(true);
         }
 
         [HttpPost]

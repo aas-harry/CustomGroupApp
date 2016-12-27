@@ -7,7 +7,10 @@
         this.setDatasource(this.testFile);
         this.selectedReportItem = this.studentReports[0];
     }
+
     private kendoHelper = new KendoHelper();
+    private popupWindow: kendo.ui.Window;
+
     private registerReportViewModels = () => {
         this.reportViewModels.push(new SchoolStudentRecordViewModel("school-student-record"));
         this.reportViewModels.push(new StudentNaplanViewModel("student-naplan-report"));
@@ -95,23 +98,60 @@
         });
     }
 
+    showStudentReport = (student: Student = null) => {
+        if (student) {
+            this.student = student;
+        }
+        if (!this.selectedReportItem.reportViewModel.isViewReady) {
+            return;
+        }
+        if (this.selectedReportItem) {
+            this.selectedReportItem.reportViewModel.setStudent(this.student, true);
+        }
+    }
+
     printReports = () => {
         const self = this;
         $.ajax({
             type: "POST",
             url: "Report\\StudentPortfolioPrintDialog",
-            contentType: "application/json",
             success(html) {
-                const container = self.clearConntent();
-                self.addContent(container, html);
-
-                kendo.unbind("#student-report");
-                kendo.bind($("#student-report"), self.printViewModel);
+                self.openDialog(html);
             }
         });
     }
 
-    
+    openDialog = (html: string) => {
+        // create window content
+        const window = document.getElementById("popup-window-container");
+
+        if (window.childElementCount > 0) {
+            while (window.hasChildNodes()) {
+                window.removeChild(window.lastChild);
+            }
+        }
+
+        const container = document.createElement("div");
+        container.id = "container-id";
+
+        $("#popup-window-container").append(html);
+
+        this.popupWindow = $(`#${window.id}`)
+            .kendoWindow({
+                width: "700px",
+                height: "625px",
+                modal: true,
+                scrollable: true,
+                actions: ["Close"],
+                resizable: false,
+                title: "Export Student Reports"
+            })
+            .data("kendoWindow");
+
+     
+        $(`#${window.id}`).parent().addClass("h-window-caption");
+        this.popupWindow.center().open();
+    }
 
     private clearConntent = (): HTMLElement => {
         var container = document.getElementById("student-report");
@@ -144,15 +184,4 @@
         this.showStudentReport();
     }
 
-    showStudentReport = (student: Student = null) => {
-        if (student) {
-            this.student = student;
-        }
-        if (!this.selectedReportItem.reportViewModel.isViewReady) {
-            return;
-        }
-        if (this.selectedReportItem) {
-            this.selectedReportItem.reportViewModel.setStudent(this.student);
-        }
-    }
 }

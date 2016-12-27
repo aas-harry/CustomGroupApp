@@ -1,9 +1,10 @@
 ﻿<div id="student-naplan-container" style="margin: 20px">
-    <div style="font-weight: bold; font-size: 13px">
+    <div style="text-align: center; font-size: 14px; font-weight: bold; margin-top: 10px">National Progress Index</div>
+    <div style="font-weight: bold; font-size: 13px; margin-top: 20px">
         <span data-bind="text: name"></span>
-    </div>
-    <div style="font-weight: bold; font-size: 12px">
-        <span data-bind="text: studentInfo"></span>
+        <div class="pull-right" style="font-weight: bold; font-size: 12px">
+            <span data-bind="text: studentInfo"></span>
+        </div>
     </div>
 
     <div id="numeracy-chart-container">
@@ -67,7 +68,7 @@
                         title: { visible: false },
                         legend: { visible: false },
                         seriesDefaults: {
-                        
+
                         },
                         series: [
                             {
@@ -87,13 +88,13 @@
                                 opacity: 0.9,
                                 labels: {
                                     visible: true,
-                                    visual: function(e) {
+                                    visual: function (e) {
                                         var center = e.rect.center();
                                         return new kendo.drawing.Text(e.text,
                                             [550, center.y - 8],
                                             {
                                                 fill: {
-                                                    color: "black"
+                                                    color: "blue"
                                                 }
                                             });
                                     }

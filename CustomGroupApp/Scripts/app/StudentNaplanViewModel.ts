@@ -53,7 +53,7 @@ class StudentNaplanViewModel extends StudentPortfolio
     private writingDatasource = new  Array <NaplanChartData>();
 
     private reports = [
-        new ReportItem("Student Naplan Report", "StudentNaplanView", ReportType.NationalProgressIndex, this)
+        new ReportItem("National Progress Index", "StudentNaplanView", ReportType.NationalProgressIndex, this)
     ];
 
     

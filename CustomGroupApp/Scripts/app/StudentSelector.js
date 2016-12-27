@@ -16,15 +16,18 @@ var StudentSelector = (function () {
             if (previoustudents.length > 0) {
                 // Create the table
                 var previousStudentsContainer = document.createElement("div");
-                previousStudentsContainer.setAttribute("style", "padding: 5px; margin-right: 5px; margin-bottom: 5px; overflow-y: hidden; overflow-x: auto");
+                previousStudentsContainer.setAttribute("style", "padding: 5px; margin-right: 5px; margin-bottom: 5px; overflow: hidden");
                 _this.container.appendChild(previousStudentsContainer);
                 var descLabel = document.createElement("div");
                 descLabel.setAttribute("style", "font-weight: bold; margin-bottom: 5px");
                 descLabel
                     .textContent = "Previously selected students, un-check the checkbox to remove students from the list.";
                 previousStudentsContainer.appendChild(descLabel);
+                var previousTableContainer = document.createElement("div");
+                previousTableContainer.setAttribute("style", "overflow-y: hidden; overflow-x: auto");
                 var previousStudentsTable = document.createElement("table");
-                previousStudentsContainer.appendChild(previousStudentsTable);
+                previousStudentsContainer.appendChild(previousTableContainer);
+                previousTableContainer.appendChild(previousStudentsTable);
                 var previousStudentBody = previousStudentsTable.createTBody();
                 previousStudentRows.push(previousStudentBody.insertRow());
                 for (var _i = 0, _a = Enumerable.From(previoustudents).OrderBy(function (x) { return x.name; }).ToArray(); _i < _a.length; _i++) {
@@ -65,14 +68,17 @@ var StudentSelector = (function () {
             cnt = 0;
             var studentRows = [];
             var availableStudentsContainer = document.createElement("div");
-            availableStudentsContainer.setAttribute("style", "padding: 5px; overflow-y: none; overflow-x: auto");
+            availableStudentsContainer.setAttribute("style", "padding: 5px; overflow: hidden");
             var label = document.createElement("div");
             label.textContent = "Select one or more students from the list below:";
             label.setAttribute("style", "margin-right: 5px; margin-bottom: 5px; font-weight: bold");
             _this.container.appendChild(availableStudentsContainer);
             availableStudentsContainer.appendChild(label);
+            var availableTableContainer = document.createElement("div");
+            availableTableContainer.setAttribute("style", "overflow-y: hidden; overflow-x: auto");
+            availableStudentsContainer.appendChild(availableTableContainer);
             var table = document.createElement("table");
-            availableStudentsContainer.appendChild(table);
+            availableTableContainer.appendChild(table);
             var body = table.createTBody();
             studentRows.push(body.insertRow());
             var previousStudentLookup = Enumerable.From(previoustudents).ToDictionary(function (s) { return s.studentId; }, function (s) { return s; });

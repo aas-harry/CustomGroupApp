@@ -9,9 +9,10 @@
     StudentReadingSkillsProfile = 7,
     StudentReadingSkillsProfileList = 8,
     StudentReadingSkillsProfileTable = 9,
-    StudentWritingCriteria = 10,
-    StudentMarkedWritingScript = 11,
-    StudentCareerProfile = 12
+    WritingCriteria = 10,
+    StudentWritingCriteria = 11,
+    StudentMarkedWritingScript = 12,
+    StudentCareerProfile = 13
 }
 
 enum TestCategory {

@@ -1023,6 +1023,7 @@
     <Content Include="Views\Report\StudentNaplanReport.cshtml" />
     <Content Include="Views\Report\StudentPortfolioPrintDialogView.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Report\StudentMathProfileView.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

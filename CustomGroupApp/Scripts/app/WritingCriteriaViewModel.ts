@@ -5,8 +5,7 @@ implements IStudentPortfolio {
     }
 
     private reports = [
-        new ReportItem("Writing Criteria", "WritingCriteriaView", ReportType.StudentWritingCriteria, this),
-        new ReportItem("Marked Writing Script", "MarkedWritingCriteriaView", ReportType.StudentMarkedWritingScript, this)
+        new ReportItem("Writing Criteria", "WritingCriteriaView", ReportType.WritingCriteria, this)
     ];
 
     getReports = (): Array<ReportItem> => {

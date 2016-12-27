@@ -54,11 +54,12 @@ var StudentPortfolio = (function (_super) {
         this.initReport = function (reportType) { };
         this.elementName = elementName;
     }
-    StudentPortfolio.prototype.setStudent = function (student) {
+    StudentPortfolio.prototype.setStudent = function (student, refresh) {
+        if (refresh === void 0) { refresh = false; }
         if (!student) {
             return;
         }
-        if (this.student && student.studentId === this.student.studentId) {
+        if (!refresh && this.student && student.studentId === this.student.studentId) {
             return;
         }
         this.student = student;

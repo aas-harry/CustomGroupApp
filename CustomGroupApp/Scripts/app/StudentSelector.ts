@@ -19,7 +19,7 @@
             // Create the table
             const previousStudentsContainer = document.createElement("div");
             previousStudentsContainer.setAttribute("style",
-                `padding: 5px; margin-right: 5px; margin-bottom: 5px; overflow-y: hidden; overflow-x: auto`);
+                `padding: 5px; margin-right: 5px; margin-bottom: 5px; overflow: hidden`);
             this.container.appendChild(previousStudentsContainer);
 
             const descLabel = document.createElement("div");
@@ -28,8 +28,12 @@
                 .textContent = "Previously selected students, un-check the checkbox to remove students from the list.";
             previousStudentsContainer.appendChild(descLabel);
 
+            const previousTableContainer = document.createElement("div");
+            previousTableContainer.setAttribute("style", "overflow-y: hidden; overflow-x: auto");
+
             const previousStudentsTable = document.createElement("table") as HTMLTableElement;
-            previousStudentsContainer.appendChild(previousStudentsTable);
+            previousStudentsContainer.appendChild(previousTableContainer);
+            previousTableContainer.appendChild(previousStudentsTable);
             const previousStudentBody = previousStudentsTable.createTBody();
             previousStudentRows.push(previousStudentBody.insertRow());
 
@@ -71,15 +75,19 @@
         var studentRows = [];
 
         const availableStudentsContainer = document.createElement("div");
-        availableStudentsContainer.setAttribute("style", "padding: 5px; overflow-y: none; overflow-x: auto");
+        availableStudentsContainer.setAttribute("style", "padding: 5px; overflow: hidden");
         const label = document.createElement("div");
         label.textContent = "Select one or more students from the list below:";
         label.setAttribute("style", "margin-right: 5px; margin-bottom: 5px; font-weight: bold");
         this.container.appendChild(availableStudentsContainer);
         availableStudentsContainer.appendChild(label);
 
+        const availableTableContainer = document.createElement("div");
+        availableTableContainer.setAttribute("style", "overflow-y: hidden; overflow-x: auto");
+        availableStudentsContainer.appendChild(availableTableContainer);
+
         const table = document.createElement("table") as HTMLTableElement;
-        availableStudentsContainer.appendChild(table);
+        availableTableContainer.appendChild(table);
         const body = table.createTBody();
         studentRows.push(body.insertRow());
 

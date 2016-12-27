@@ -1,10 +1,10 @@
-﻿<div id="student-portfolio-print-dialog-container" style="margin: 10px">
+﻿<div id="student-portfolio-print-dialog-container" style="margin: 10px; overflow: hidden">
     <div id="student-portfolio-print-toolbar">
-        <button class="btn btn-default" data-bind="click: showReports">Select Reports</button>
-        <button class="btn btn-default" data-bind="click: showStudents">Select Students</button>
-        <button class="btn btn-default" data-bind="click: printReports">Print</button>
+        <button class="k-button" data-bind="click: downloadReports">Download Reports</button>
+        <button class="k-button" data-bind="enabled: reportSelectorOption, click: showStudents">Select Students</button>
+        <button class="k-button" data-bind="enabled: studentSelectorOption, click: showReports">Select Reports </button>
     </div>
-    <div id="student-portfolio-reports" data-bind="visible: reportSelectorOption" style="margin-top: 10px; margin-left: 20px">
+    <div id="student-portfolio-reports" data-bind="visible: reportSelectorOption" style="margin-top: 10px;">
         <div>
             <input type="radio" name="reportOptions" style="margin-right: 10px" value="1" data-type="number" data-bind="checked: selectedReports">All Reports
         </div>
@@ -52,7 +52,7 @@
             </div>
         </div>
     </div>
-    <div id="student-portfolio-students" data-bind="visible: studentSelectorOption" style="margin-top: 10px; margin-left: 20px">
+    <div id="student-portfolio-students" data-bind="visible: studentSelectorOption" style="margin-top: 10px;">
         <div>
             <input type="radio" name="studentOptions" style="margin-right: 10px" value="1" data-type="number" data-bind="checked: selectedStudents">All Students
         </div>
@@ -64,3 +64,12 @@
         </div>
     </div>
 </div>
+
+<script>
+    $(document).ready(function() {
+        var printViewModel = new StudentPortfolioPrintViewModel(testFile);
+        printViewModel.initStudentList();
+
+        kendo.bind($("#student-portfolio-print-dialog-container"), printViewModel);
+    })
+</script>

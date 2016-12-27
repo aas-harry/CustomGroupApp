@@ -78,19 +78,52 @@ var StudentPortfolioViewModel = (function (_super) {
                 }
             });
         };
+        this.showStudentReport = function (student) {
+            if (student === void 0) { student = null; }
+            if (student) {
+                _this.student = student;
+            }
+            if (!_this.selectedReportItem.reportViewModel.isViewReady) {
+                return;
+            }
+            if (_this.selectedReportItem) {
+                _this.selectedReportItem.reportViewModel.setStudent(_this.student, true);
+            }
+        };
         this.printReports = function () {
             var self = _this;
             $.ajax({
                 type: "POST",
                 url: "Report\\StudentPortfolioPrintDialog",
-                contentType: "application/json",
                 success: function (html) {
-                    var container = self.clearConntent();
-                    self.addContent(container, html);
-                    kendo.unbind("#student-report");
-                    kendo.bind($("#student-report"), self.printViewModel);
+                    self.openDialog(html);
                 }
             });
+        };
+        this.openDialog = function (html) {
+            // create window content
+            var window = document.getElementById("popup-window-container");
+            if (window.childElementCount > 0) {
+                while (window.hasChildNodes()) {
+                    window.removeChild(window.lastChild);
+                }
+            }
+            var container = document.createElement("div");
+            container.id = "container-id";
+            $("#popup-window-container").append(html);
+            _this.popupWindow = $("#" + window.id)
+                .kendoWindow({
+                width: "700px",
+                height: "625px",
+                modal: true,
+                scrollable: true,
+                actions: ["Close"],
+                resizable: false,
+                title: "Export Student Reports"
+            })
+                .data("kendoWindow");
+            $("#" + window.id).parent().addClass("h-window-caption");
+            _this.popupWindow.center().open();
         };
         this.clearConntent = function () {
             var container = document.getElementById("student-report");
@@ -116,18 +149,6 @@ var StudentPortfolioViewModel = (function (_super) {
             kendo.unbind("#student-report");
             kendo.bind($("#student-report"), _this.selectedReportItem.reportViewModel);
             _this.showStudentReport();
-        };
-        this.showStudentReport = function (student) {
-            if (student === void 0) { student = null; }
-            if (student) {
-                _this.student = student;
-            }
-            if (!_this.selectedReportItem.reportViewModel.isViewReady) {
-                return;
-            }
-            if (_this.selectedReportItem) {
-                _this.selectedReportItem.reportViewModel.setStudent(_this.student);
-            }
         };
         this.printViewModel = new StudentPortfolioPrintViewModel(testFile);
         this.registerReportViewModels();

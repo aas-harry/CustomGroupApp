@@ -22,14 +22,14 @@
             items: [
                 { template: "<div id='custom-group-container' style='padding-left: 10px;'></div>" },
                 { template: "<div id='report-list-container' style='padding-left: 5px; padding-right:5px;'></div>" },
-                { type: "button", text: "Print Student Reports" , click: printReports}
+                { type: "button", text: "Export Student Reports" , click: printReports}
             ]
         });
 
         var studentNavigationControl = new StudentListControl("student-list-container");
         studentNavigationControl.create("Students",
             function (student) {
-                studentPortfolioViewModel.showStudentReport(student);
+                studentPortfolioViewModel.showStudentReport(student, false);
             },
             300, 800);
 

@@ -9,10 +9,28 @@ var MathsSkillsProfileViewModel = (function (_super) {
         var _this = this;
         _super.call(this, elementName);
         this.reports = [
-            new ReportItem("Maths Skills Profile", "MathsSkillsProfileListView", ReportType.StudentMathsSkillsProfile, this),
+            new ReportItem("Maths Skills Profile", "MathsSkillsProfileView", ReportType.StudentMathsSkillsProfile, this),
         ];
         this.getReports = function () {
             return _this.reports;
+        };
+        this.initReport = function (reportType) {
+            _this.getData();
+            _this.isViewReady = true;
+        };
+        this.getData = function () {
+            var self = _this;
+            $.ajax({
+                type: "POST",
+                url: "Home\\GetMathProfileData",
+                data: JSON.stringify({ 'testnum': self.testFile.fileNumber }),
+                contentType: "application/json",
+                success: function (data) {
+                    // self.testFile.setNaplanResults(data);
+                },
+                error: function (e) {
+                }
+            });
         };
     }
     return MathsSkillsProfileViewModel;

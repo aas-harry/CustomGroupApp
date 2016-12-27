@@ -3,10 +3,10 @@
         super();
     }
 
+    popupWindow: kendo.ui.Window;
     studentSelector = new StudentSelector();
-    studentListInitialised = false;
-    reportSelectorOption = true;
-    studentSelectorOption = false;
+    reportSelectorOption = false;
+    studentSelectorOption = true;
     schoolStudentRecordOption = true;
     naplanProgressIndexOption = true;
     mathsSkillsProfileListOption = true;
@@ -36,19 +36,19 @@
     showStudents = () => {
         this.set("studentSelectorOption", true);
         this.set("reportSelectorOption", false);
-
-        if (this.studentListInitialised) {
-            return;
-        }
-
-        const container = document.getElementById("student-list");
-        this.studentSelector.createTable(container, Enumerable.From(this.testFile.students).Select(s => new StudentClass(s)).ToArray(), []);
-
-        this.studentListInitialised = true;
     }
 
-    printReports = () => {
+    initStudentList = () => {
+        const container = document.getElementById("student-list");
+        this.studentSelector.maxRows = 16;
+        this.studentSelector.createTable(container, Enumerable.From(this.testFile.students).Select(s => new StudentClass(s)).ToArray(), []);
+    }
 
+    downloadReports = () => {
+        var dialog = $("#popup-window-container").data("kendoWindow");
+        if (dialog) {
+            dialog.close();
+        }
     }
 
     setAllReports = (val: boolean) => {

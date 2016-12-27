@@ -52,7 +52,7 @@ var StudentNaplanViewModel = (function (_super) {
         this.readingDatasource = new Array();
         this.writingDatasource = new Array();
         this.reports = [
-            new ReportItem("Student Naplan Report", "StudentNaplanView", ReportType.NationalProgressIndex, this)
+            new ReportItem("National Progress Index", "StudentNaplanView", ReportType.NationalProgressIndex, this)
         ];
         this.setAdditionalProperties = function (student) {
             _this.numeracyDatasource = [];
