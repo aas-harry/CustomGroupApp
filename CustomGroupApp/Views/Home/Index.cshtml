@@ -13,7 +13,7 @@
             <input id="test-number" style="width: 280px; margin-right: 5px; margin-left: 10px">
             <button class="btn btn-default" onClick="getResults()">Get</button>
             <button class="btn btn-default" onClick="openStudentPortfolioList()">Student Portfolios</button>
-            <div id="message-text"></div>
+            <span id="message-text"></span>
         </div>
     </div>
     <div id="content">
@@ -54,7 +54,7 @@
                 testFile.set(data.Test, data.School, data.Results, [],
                     data.CustomGroups, data.StanineTables);
 
-                $("#message-text").replaceWith("<div id='message-text'>Rows: "+ data.Results.length + "</div>");
+                $("#message-text").replaceWith("<span id='message-text'>Rows: "+ data.Results.length + "</span>");
              
             },
             fail: function(data) {

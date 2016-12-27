@@ -28,6 +28,8 @@ interface IStudentPortfolio {
 
     setContent(reportType: ReportType, content: string);
 
+    setAdditionalData(callback: (status) => any);
+
     initReport(reportType: ReportType);
 
     reset();
@@ -102,6 +104,14 @@ class StudentPortfolio extends kendo.data.ObservableObject
 
     // Use this function to set other properties in the subclasses
     setAdditionalProperties = (student: Student) => {
+    }
+
+    // Overwrite this function if the report needs to get addtional data.
+    // Testfile data does not have enough data to produce the report
+    setAdditionalData = (callback: (status) => any) => {
+        if (callback) {
+            callback(true);
+        }
     }
 
     getContent = (reportType: ReportType): string => {

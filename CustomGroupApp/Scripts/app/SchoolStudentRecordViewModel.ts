@@ -59,7 +59,6 @@
 
         this.initRawScoresGrid();
         this.initScaledScoresChart();
-
         this.isViewReady = true;
     }
 

@@ -133,7 +133,6 @@ var StudentNaplanViewModel = (function (_super) {
             return _this.reports;
         };
         this.initReport = function (reportType) {
-            _this.getData();
             _this.initCharts();
             _this.isViewReady = true;
         };
@@ -145,7 +144,14 @@ var StudentNaplanViewModel = (function (_super) {
             _this.readingChartControl = $("#reading-chart").data("kendoChart");
             _this.writingChartControl = $("#writing-chart").data("kendoChart");
         };
-        this.getData = function () {
+        this.setAdditionalData = function (callback) {
+            if (_this.testFile.hasNaplanResults) {
+                var tmpCallback = callback;
+                if (tmpCallback) {
+                    tmpCallback(true);
+                }
+                return;
+            }
             var self = _this;
             $.ajax({
                 type: "POST",
@@ -154,8 +160,16 @@ var StudentNaplanViewModel = (function (_super) {
                 contentType: "application/json",
                 success: function (data) {
                     self.testFile.setNaplanResults(data);
+                    var tmpCallback = callback;
+                    if (tmpCallback) {
+                        tmpCallback(true);
+                    }
                 },
                 error: function (e) {
+                    var tmpCallback = callback;
+                    if (tmpCallback) {
+                        tmpCallback(false);
+                    }
                 }
             });
         };

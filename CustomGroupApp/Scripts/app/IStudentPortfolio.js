@@ -33,6 +33,13 @@ var StudentPortfolio = (function (_super) {
         // Use this function to set other properties in the subclasses
         this.setAdditionalProperties = function (student) {
         };
+        // Overwrite this function if the report needs to get addtional data.
+        // Testfile data does not have enough data to produce the report
+        this.setAdditionalData = function (callback) {
+            if (callback) {
+                callback(true);
+            }
+        };
         this.getContent = function (reportType) {
             var report = Enumerable.From(_this.getReports())
                 .FirstOrDefault(null, function (x) { return x.reportType === reportType; });

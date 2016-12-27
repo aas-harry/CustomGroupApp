@@ -84,6 +84,8 @@
             return;
         }
 
+        this.loadingContent("loading report...");
+
         $.ajax({
             type: "POST",
             url: `Report\\${reportItem.urlLink}`,
@@ -153,6 +155,11 @@
         this.popupWindow.center().open();
     }
 
+    private loadingContent = (message: string) => {
+        const container = this.clearConntent();
+        this.addContent(container, "<div style='margin: 20px'>"+ message + "</div>");        
+    }
+
     private clearConntent = (): HTMLElement => {
         var container = document.getElementById("student-report");
 
@@ -173,15 +180,23 @@
     }
 
     private setReportContent = (content: string) => {
-        const container = this.clearConntent();
-        this.addContent(container, content);
+        var self = this;
+        this.selectedReportItem.reportViewModel.setAdditionalData(function(status) {
+            if (! status) {
+                self.loadingContent("Failed to load report.");
+                return;
+            }
+            const container = self.clearConntent();
+            self.addContent(container, content);
 
-        // initialise report elements
-        this.selectedReportItem.reportViewModel.initReport(this.selectedReportItem.reportType);
+            // initialise report elements
+            self.selectedReportItem.reportViewModel.initReport(self.selectedReportItem.reportType);
 
-        kendo.unbind("#student-report");
-        kendo.bind($("#student-report"), this.selectedReportItem.reportViewModel);
-        this.showStudentReport();
+            kendo.unbind("#student-report");
+            kendo.bind($("#student-report"), self.selectedReportItem.reportViewModel);
+
+            self.showStudentReport();
+        });
     }
 
 }

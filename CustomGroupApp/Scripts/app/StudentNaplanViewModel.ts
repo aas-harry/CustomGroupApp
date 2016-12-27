@@ -147,9 +147,7 @@ class StudentNaplanViewModel extends StudentPortfolio
 
  
     initReport = (reportType: ReportType) => {
-        this.getData();
         this.initCharts();
-
         this.isViewReady = true;
     }
 
@@ -173,7 +171,15 @@ class StudentNaplanViewModel extends StudentPortfolio
         this.writingChartControl = $("#writing-chart").data("kendoChart");
     }
 
-    private getData = () => {
+    setAdditionalData = (callback: (status) => any) => {
+        if (this.testFile.hasNaplanResults) {
+            const tmpCallback = callback;
+            if (tmpCallback) {
+                tmpCallback(true);
+            }
+            return;
+        }
+
         const self = this;
         $.ajax({
             type: "POST",
@@ -181,10 +187,18 @@ class StudentNaplanViewModel extends StudentPortfolio
             data: JSON.stringify({ 'testnum': self.testFile.fileNumber }),
             contentType: "application/json",
             success(data) {
-               self.testFile.setNaplanResults(data);
+                self.testFile.setNaplanResults(data);
+
+                const tmpCallback = callback;
+                if (tmpCallback) {
+                    tmpCallback(true);
+                }
             },
             error(e) {
-
+                const tmpCallback = callback;
+                if (tmpCallback) {
+                    tmpCallback(false);
+                }
             }
         });
     }

@@ -66,6 +66,7 @@ var StudentPortfolioViewModel = (function (_super) {
                 _this.setReportContent(content);
                 return;
             }
+            _this.loadingContent("loading report...");
             $.ajax({
                 type: "POST",
                 url: "Report\\" + reportItem.urlLink,
@@ -125,6 +126,10 @@ var StudentPortfolioViewModel = (function (_super) {
             $("#" + window.id).parent().addClass("h-window-caption");
             _this.popupWindow.center().open();
         };
+        this.loadingContent = function (message) {
+            var container = _this.clearConntent();
+            _this.addContent(container, "<div style='margin: 20px'>" + message + "</div>");
+        };
         this.clearConntent = function () {
             var container = document.getElementById("student-report");
             // Remove previous report 
@@ -142,13 +147,20 @@ var StudentPortfolioViewModel = (function (_super) {
             $("#report-container").html(content);
         };
         this.setReportContent = function (content) {
-            var container = _this.clearConntent();
-            _this.addContent(container, content);
-            // initialise report elements
-            _this.selectedReportItem.reportViewModel.initReport(_this.selectedReportItem.reportType);
-            kendo.unbind("#student-report");
-            kendo.bind($("#student-report"), _this.selectedReportItem.reportViewModel);
-            _this.showStudentReport();
+            var self = _this;
+            _this.selectedReportItem.reportViewModel.setAdditionalData(function (status) {
+                if (!status) {
+                    self.loadingContent("Failed to load report.");
+                    return;
+                }
+                var container = self.clearConntent();
+                self.addContent(container, content);
+                // initialise report elements
+                self.selectedReportItem.reportViewModel.initReport(self.selectedReportItem.reportType);
+                kendo.unbind("#student-report");
+                kendo.bind($("#student-report"), self.selectedReportItem.reportViewModel);
+                self.showStudentReport();
+            });
         };
         this.printViewModel = new StudentPortfolioPrintViewModel(testFile);
         this.registerReportViewModels();
