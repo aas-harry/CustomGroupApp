@@ -55,9 +55,15 @@ var KendoHelper = (function () {
             var cell = row.insertCell();
             cell.textContent = value.toString();
         };
+        this.addElementCell = function (row, element) {
+            var cell = row.insertCell();
+            cell.appendChild(element);
+            return cell;
+        };
         this.addCell = function (row, value) {
             var cell = row.insertCell();
             cell.textContent = value;
+            return cell;
         };
         this.createButtonWithId = function (cell, description, uid, onClick, width, textAlign, marginTop, marginLeft, marginBottom, marginRight) {
             if (width === void 0) { width = 150; }
@@ -100,7 +106,7 @@ var KendoHelper = (function () {
         this.createClassCountInputControl = function (element, classCount, callbackChangeEvent) {
             if (classCount === void 0) { classCount = 1; }
             if (callbackChangeEvent === void 0) { callbackChangeEvent = null; }
-            return _this.createNumericTextBox(element, classCount, 1, 50, _this.integerFormat, callbackChangeEvent);
+            return _this.createNumericTextBox(element, classCount, 0, 50, _this.integerFormat, callbackChangeEvent);
         };
         // This function convert the passed element id into numerictextbox for student count input textbox
         this.createStudentCountInputControl = function (element, studentCount, callbackChangeEvent) {

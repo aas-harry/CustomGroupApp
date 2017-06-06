@@ -11,6 +11,47 @@ var SubjectInfo = (function () {
     }
     return SubjectInfo;
 }());
+var SubjectPerformanceScore = (function () {
+    function SubjectPerformanceScore(subject, testNumber, testDate) {
+        this.subject = subject;
+        this.testNumber = testNumber;
+        this.testDate = testDate;
+        var subjectHelper = new SubjectHelper();
+        this.name = subjectHelper.description(subject);
+    }
+    return SubjectPerformanceScore;
+}());
+var SubjectHelper = (function () {
+    function SubjectHelper() {
+    }
+    SubjectHelper.prototype.description = function (subjectType) {
+        switch (subjectType) {
+            case SubjectType.Genab:
+                return "General Reasoning";
+            case SubjectType.Verbal:
+                return "Verbal Reasoning";
+            case SubjectType.NonVerbal:
+                return "Non Verbal Reasoning";
+            case SubjectType.Ravens:
+                return "Ravens SPM";
+            case SubjectType.MathReasoning:
+                return "Maths Reasoning";
+            case SubjectType.MathPerformance:
+                return "Maths Performance";
+            case SubjectType.Reading:
+                return "Reading Comprehension";
+            case SubjectType.Writing:
+                return "Writing Expression";
+            case SubjectType.Spelling:
+                return "Spelling";
+            case SubjectType.MathQr:
+                return "Math Reasoning";
+            default:
+                return "Unknown test subject";
+        }
+    };
+    return SubjectHelper;
+}());
 var SubjectSummary = (function () {
     function SubjectSummary(subject) {
         var _this = this;

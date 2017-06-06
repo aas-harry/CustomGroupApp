@@ -11,13 +11,13 @@
     create = (elementName: string, callback: (students: Array<Student>) => any) => {
         const container = document.getElementById(elementName);
        
-        this.addCustomGroupFiler(container, callback);
+        this.addCustomGroupFilter(container, callback);
         if (this.testFile.isUnisex) {
             this.addGenderFiler(container, callback);
         }
     }
 
-    private addCustomGroupFiler = (container: HTMLElement, callback: (students: Array<Student>) => any) => {
+    private addCustomGroupFilter = (container: HTMLElement, callback: (students: Array<Student>) => any) => {
         const groupElementName = "custom-group-list";
 
         const label = document.createElement("span");

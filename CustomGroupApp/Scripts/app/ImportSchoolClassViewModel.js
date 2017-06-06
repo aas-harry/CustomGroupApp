@@ -18,7 +18,6 @@ var ImportSchoolClassViewModel = (function (_super) {
         this.classCount = 1;
         this.preallocatedStudents = new Array();
         this.unMatchedStudents = new Array();
-        this.dataSource = new Array();
         this.groupingHelper = new GroupingHelper();
         this.kendoHelper = new KendoHelper();
         this.messageBox = new MessageBoxDialog();
@@ -61,10 +60,10 @@ var ImportSchoolClassViewModel = (function (_super) {
                 if (status) {
                     $.ajax({
                         url: "..\\Customgroup\\CustomGroupListView",
-                        type: 'POST',
+                        type: "POST",
                         success: function (html) {
                             $("#reportContent").replaceWith(html);
-                            $(window).trigger('resize');
+                            $(window).trigger("resize");
                         }
                     });
                 }
@@ -103,7 +102,7 @@ var ImportSchoolClassViewModel = (function (_super) {
         };
         this.importStudents = function () {
             var container = document.getElementById("uploader-container");
-            container.innerHTML = '<input type="file" id= "files" name= "files" />';
+            container.innerHTML = "<input type=\"file\" id= \"files\" name= \"files\" />";
             _this.uploader = _this.kendoHelper.createUploadControl("files", "..\\Customgroup\\ImportSchoolClasses?id=" + _this.classesDefn.testFile.fileNumber, _this.onUploadCompleted);
         };
         this.showClasses = function () {

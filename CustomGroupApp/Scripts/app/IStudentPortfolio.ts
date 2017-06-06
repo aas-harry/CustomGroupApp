@@ -30,7 +30,9 @@ interface IStudentPortfolio {
 
     setAdditionalData(callback: (status) => any);
 
-    initReport(reportType: ReportType);
+    initReport(reportType: ReportType, width: number, height: number);
+
+    resizeContent(width: number, height: number);
 
     reset();
 }
@@ -41,6 +43,7 @@ class StudentPortfolio extends kendo.data.ObservableObject
         super();
         this.elementName = elementName;
 
+        this.sex = "M";
     }
 
     isViewReady = false;
@@ -56,6 +59,9 @@ class StudentPortfolio extends kendo.data.ObservableObject
 
     name: string;
     dob: string;
+    sex: string;
+    speak: string;
+    liveInAus: string;
     studentInfo: string;
     age: string;
     schoolStudentId: string;
@@ -87,7 +93,13 @@ class StudentPortfolio extends kendo.data.ObservableObject
         this.student = student;
         this.set("name", student.name);
         this.set("dob", student.dobString);
-        this.set("age", student.ca);
+        const year = Math.floor(student.ca);
+        const month = Math.round((student.ca - year) * 100);
+        this.set("age", `${year} Years` + (month <= 0 ? "" : ` ${month} Month` + (month > 1 ? "s" : "")) );
+        this.set("sex", student.sex === "M" ? "Male" : "Female");
+        this.set("speak", student.speak);
+        this.set("liveInAus", student.liveInAus);
+
         this.set("schoolStudentId", student.schoolStudentId);
         this.set("hasSchoolStudentId", student.hasSchoolStudentId);
         if (this.hasSchoolStudentId) {
@@ -136,5 +148,21 @@ class StudentPortfolio extends kendo.data.ObservableObject
         return report ? report.urlLink : "";
     }
 
-    initReport = (reportType: ReportType) => { };
+    initReport = (reportType: ReportType, width: number, height: number) => {
+        this.isViewReady = true;
+    };
+
+    resizeContent = (width: number, height: number) => {
+        var container = document.getElementById(this.elementName);
+        if (!container) {
+            return;
+        }
+        container.setAttribute("style", "overflow: auto; height: " + height + "px");
+
+        this.resizeOtherContent(width, height);
+    };
+
+    resizeOtherContent = (width: number, height: number) => {
+        // overwrite this in subclass
+    }
 }

@@ -119,23 +119,49 @@
     merge = () => {
         const self = this;
         const selectedItems = this.getSelectedItems();
-        if (selectedItems.length === 0) {
+        if (selectedItems.length <= 1) {
+            this.messageBox.showInfoDialog("popup-window-container", "Please select one or more groups to merge.", "Merge");
             return;
         }
 
-        this.set("message", "merging selected custom groups...");
-        this.set("hasMessage", true);
+        let initialName = undefined;
+        for (let g of selectedItems) {
+            initialName = initialName ? initialName + ", " + g.name : g.name;
+        }
+        const msg = "You have selected " + selectedItems.length + " custom groups. Please enter new custom group name (max 80 chars).";
+        this.messageBox.showInputDialog("popup-window-container", msg, "Merge", (e) => {
+            if (e == DialogResult.No) {
+                return true;
+            }
 
-        this.groupingHelper.mergeClasses(
-            Enumerable.From(selectedItems).Select(x => x.groupSetid).ToArray(),
-            this.classesDefn.testFile.fileNumber, (status, item) => {
-                if (status) {
-                    const classItem = self.testInfo.addCustomGroup(item);
-                    self.customGroupListControl.addClassItems([classItem]);
-                }
-                self.set("message", null);
-                this.set("hasMessage", false);
-            });
+            const input = document.getElementById("input-text") as HTMLInputElement;
+            const groupName = input.value;
+            if (! groupName) {
+                toastr.warning("Custom group name must not be blank.");
+                return false;
+            }
+            if (groupName.length > 80) {
+                toastr.warning("Custom group name must be less than 80 characters.");
+                return false;
+            }
+            this.set("message", "merging selected custom groups...");
+            this.set("hasMessage", true);
+
+            this.groupingHelper.mergeClasses(
+                Enumerable.From(selectedItems).Select(x => x.groupSetid).ToArray(),
+                this.classesDefn.testFile.fileNumber, groupName, (status, item) => {
+                    if (status) {
+                        const classItem = self.testInfo.addCustomGroup(item);
+                        self.customGroupListControl.addClassItems([classItem]);
+                    }
+                    self.set("message", null);
+                    this.set("hasMessage", false);
+                });
+                return true;
+        },
+            initialName,
+            135, 520);
+       
     }
 
     exportToCsv = () => {

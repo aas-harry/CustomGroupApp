@@ -12,7 +12,15 @@
     WritingCriteria = 10,
     StudentWritingCriteria = 11,
     StudentMarkedWritingScript = 12,
-    StudentCareerProfile = 13
+    StudentCareerProfile = 13,
+    StudentDetails = 14,
+    StudentPortfolio = 15
+}
+
+enum AnswerType {
+    NotAttempted = 0,
+    Correct = 1,
+    Incorrect = 2
 }
 
 enum TestCategory {
@@ -32,6 +40,16 @@ enum MeanType {
 enum TestType {
     Aas = 0,
     Naplan = 1
+}
+
+class TestInfo {
+    testNumber: number;
+    testDate: Date;
+    testYear: number;
+    grade: number;
+    studentCount: number;
+    type: TestType;
+    category: TestCategory;
 }
 
 class User {
@@ -54,6 +72,47 @@ class School {
     isMainSchool = false;
 }
 
+class WritingQuestion {
+    title: string;
+    description: string;
+    code: string;
+    answers: Array<string>;
+    sampleDistributions: Array<number>;
+    schoolAverage: number;
+
+    constructor(writingQuestion: any) {
+        this.title = writingQuestion.Title;
+        this.description = writingQuestion.Description;
+        this.code = writingQuestion.Code;
+        this.answers = writingQuestion.Answers;
+        this.sampleDistributions = writingQuestion.SampleDistributions;
+    }
+}
+
+class Question {
+    constructor(public seq: number,
+        public description: string,
+        public strand: string,
+        public difficulty: string,
+        public index: number) {
+
+        this.expandDifficulty();
+    }
+
+    private expandDifficulty = () => {
+        switch (this.difficulty) {
+            case "L":
+                this.difficulty = "Low";
+                break;
+            case "H":
+                this.difficulty = "High";
+                break;
+            case "I":
+                this.difficulty = "Intermediate";
+                break;
+        }
+    }
+}
 
 class TestFile {
     school = new School();
@@ -66,21 +125,37 @@ class TestFile {
     studentCount: number;
     published: Date;
     students: Array<Student> = [];
-    isUnisex: boolean;
+    customGroups: Array<ClassDefinition> = [];
+    testHistory: Array<TestInfo> = [];
+    pastTestResults: Array<SubjectPerformanceScore> = [];
+
+    // Flags
     hasBoys = false;
     hasGirls = false;
+    isUnisex: boolean;
     isCoopSchoolTest: boolean;
-    customGroups: Array<ClassDefinition> = [];
+    hasWritingCriteria: boolean;
     hasCustomGroups: boolean;
     hasStudentLanguagePrefs: boolean;
+    hasCareerDetails: boolean;
     hasNaplanResults: boolean;
+    hasMathsQuestions: boolean;
+    hasReadingQuestions: boolean;
     hasStudentPastResults: boolean;
+    hasPastTestResults: boolean;
     hasStudentIds: boolean;
+
+    // Skill Profiles
+    mathsQuestionSetId: number;
+    readingQuestionSetId: number;
+    mathsQuestions: Array<Question> = [];
+    readingQuestions: Array<Question> = [];
+
     subjectsTested: Array<ISubject>;
     meanScores: Array<NaplanMeanScore> = [];
     stanineTables = new StanineTables();
-
-    private allSubjects = new Array<SubjectInfo>();
+    allSubjects = new Array<SubjectInfo>();
+    writingCriteria = new WritingCriteria();
 
     displayTestDate: string;
     get yearLevel(): string {
@@ -94,7 +169,9 @@ class TestFile {
     };
 
     set = (test: any, school: any, results: any, languages: any, customGroupSets: any = [],
-            stanineTables: any) => {
+        stanineTables: any, testHistory: any) => {
+
+        this.clear();
         this.initSubjects(test);
 
         this.fileNumber = test.Testnum;
@@ -102,10 +179,13 @@ class TestFile {
         this.category = test.Category;
         this.testDate = new Date(parseInt(test.Testdate.substr(6)));
         this.testYear = this.testDate.getFullYear();
+        this.mathsQuestionSetId = test.MathProfileId;
+        this.readingQuestionSetId = test.ReadProfileId;
         this.setStudents(results, languages);
         this.setStudentLanguagePrefs(languages, this.students);
         this.setCustomGroups(customGroupSets, this.students);
         this.stanineTables.setStanines(stanineTables);
+        this.setTestHistory(testHistory);
         if (school) {
             this.school.name = school.Name;
             this.school.id = school.Id;
@@ -121,13 +201,13 @@ class TestFile {
         this.allSubjects.push(new SubjectInfo(null, 0, 0, false, false));
         this.allSubjects.push(new SubjectInfo(new GenabSubject(), 1, test.Nq_genab, false, true));
         this.allSubjects.push(new SubjectInfo(new VerbalSubject(), 2, test.Nq_verbal, false, true));
-        this.allSubjects.push(new SubjectInfo(new NonVerbalSubject(), 3, test.Nq_genab, false, true));
+        this.allSubjects.push(new SubjectInfo(new NonVerbalSubject(), 3, test.Nq_nonverb, false, true));
+        this.allSubjects.push(new SubjectInfo(new RavenSubject(), 9, 60, false, true));
         this.allSubjects.push(new SubjectInfo(new MathReasoningSubject(), 4, test.Type === "2" ? 34 : 35, false, true));
         this.allSubjects.push(new SubjectInfo(new MathPerformanceSubject(), 5, test.Nq_maths, true, false));
         this.allSubjects.push(new SubjectInfo(new ReadingSubject(), 6, test.Nq_read, true, false));
         this.allSubjects.push(new SubjectInfo(new SpellingSubject(), 7, test.Nq_spell, true, false));
-        this.allSubjects.push(new SubjectInfo(new WritingSubject(), 8, test.Nq_written ? test.Nq_written : 35, true, false));
-        this.allSubjects.push(new SubjectInfo(new RavenSubject(), 9, 65,  false, true));
+        this.allSubjects.push(new SubjectInfo(new WritingSubject(), 8, 35, true, false));
     }
 
     clear = () => {
@@ -140,14 +220,68 @@ class TestFile {
         this.published = undefined;
         this.students = [];
         this.meanScores = [];
+        this.hasWritingCriteria = false;
         this.hasStudentLanguagePrefs = false;
         this.hasNaplanResults = false;
+        this.hasMathsQuestions = false;
+        this.hasReadingQuestions = false;
+        this.hasCareerDetails = false;
+        this.hasPastTestResults = false;
         this.hasBoys = false;
         this.hasGirls = false;
         this.isCoopSchoolTest = false;
         this.customGroups = [];
-
     };
+
+    setCareerDetails = (items: any) => {
+        const studentLookup = Enumerable.From(this.students).ToDictionary(s => s.studentId, s => s);
+        for (let item of items) {
+            if (studentLookup.Contains(item.Id)) {
+                const student = studentLookup.Get(item.Id);
+                student.careers.careers = Enumerable.From(item.StudentCareers).Select(s => new Career(s)).ToArray();
+                student.careers.careerAwareness = item.CareerAwareness;
+                student.workCharacteristics = Enumerable.From(item.WorkCharacteristics)
+                    .Select(s => new WorkCharacteristic(s)).ToArray();
+            }
+        }
+        this.hasCareerDetails = true;
+    }
+
+    setWritingCriterias = (writingTask: string, writingScores: any, writingQuestions: any, schoolScoreDistributions: any) => {
+        this.writingCriteria.clear();
+        const studentLookup = Enumerable.From(this.students).ToDictionary(s => s.studentId, s => s);
+        for (let score of writingScores) {
+            if (studentLookup.Contains(score.StudentId)) {
+                studentLookup.Get(score.StudentId).writingCriteria = new StudentWritingCriteria(score);
+            }
+        }
+
+        const questions = new Array<WritingQuestion>();
+        for (let wq of  writingQuestions) {
+            questions.push(new WritingQuestion(wq));
+        }
+        const lookup = Enumerable.From(questions).ToDictionary(x => x.code, x => x);
+        for (let code of writingTask === "P" ? this.writingCriteria.persuasiveQuestionsOrder : this.writingCriteria.narativeQuestionsOrder)
+        {
+            if (lookup.Contains(code)) {
+                this.writingCriteria.questions.push(lookup.Get(code));
+            } else {
+                this.writingCriteria.questions.push(new WritingQuestion({
+                    Code: code,
+                    Title: "Unknown",
+                    Description: "",
+                    Asnwers: [],
+                    SampleDistributions: []
+                }));
+            }
+        }
+
+        for (let i = 0; i < questions.length; i++) {
+            questions[i].schoolAverage = Enumerable.From(this.students).Average(s => s.writingCriteria.scores[i]);
+        }
+
+        this.hasWritingCriteria = true;
+    }
 
     setNaplanResults = (data: any) => {
         const tmpNaplanResults = new Array<NaplanScore>();
@@ -178,6 +312,38 @@ class TestFile {
         this.hasNaplanResults = true;
     }
 
+    setTestHistory = (data: any) => {
+        this.testHistory = [];
+        if (!data) {
+            return;
+        }
+        for (let item of data) {
+            const testInfo = new TestInfo();
+            testInfo.testNumber = item.TestNumber;
+            testInfo.testYear = item.TestYear;
+            testInfo.category = item.TestNumber;
+            testInfo.type = item.Source;
+            testInfo.grade = item.Grade;
+            testInfo.studentCount = item.Tested;
+            this.testHistory.push(testInfo);
+        }
+    }
+
+    setPastTestResults = (data: any) => {
+        this.pastTestResults = [];
+        for (let item of data) {
+            const result = new SubjectPerformanceScore(item.Subject, item.TestNumber, item.TestDate);
+            result.lowCount = item.LowCount;
+            result.lowPct = item.LowPct;
+            result.avgCount = item.AvgCount;
+            result.avgPct = item.AvgPct;
+            result.highCount = item.HighCount;
+            result.highPct = item.HighPct;
+            this.pastTestResults.push(result);
+        }
+        this.hasPastTestResults = true;
+    }
+
     setCustomGroups = (data: any, students: Array<Student>) => {
         if (students === null) {
             students = this.students;
@@ -185,17 +351,19 @@ class TestFile {
         this.customGroups = [];
         var studentDict = Enumerable.From(students).ToDictionary(x => x.studentId, x => x);
         for (let item of data) {
-            const classItem = new ClassDefinition(null, 0, 0);
-            for (let id of item.Students) {
-                if (studentDict.Contains(id)) {
-                    classItem.students.push(new StudentClass(studentDict.Get(id)));
+            if (item.GroupSetId > 0) {
+                const classItem = new ClassDefinition(null, 0, 0);
+                for (let id of item.Students) {
+                    if (studentDict.Contains(id)) {
+                        classItem.students.push(new StudentClass(studentDict.Get(id)));
+                    }
                 }
+                classItem.count = classItem.students.length;
+                classItem.name = item.Name;
+                classItem.groupSetid = item.GroupSetId;
+                classItem.streamType = item.Streaming;
+                this.customGroups.push(classItem);
             }
-            classItem.count = classItem.students.length;
-            classItem.name = item.Name;
-            classItem.groupSetid = item.GroupSetId;
-            classItem.streamType = item.Streaming;
-            this.customGroups.push(classItem);
         }
 
         this.hasCustomGroups = this.customGroups.length > 0;
@@ -263,6 +431,20 @@ class TestFile {
         });
     }
 
+    setMathsQuestions = (data: any) => {
+        this.mathsQuestions = [];
+        for (let q of data) {
+            this.mathsQuestions.push(new Question(q.QuestionNo, q.Description, q.Strand, q.Difficulty, q.StrandIndex));
+        }
+        this.hasMathsQuestions = true;
+    }
+    setReadingQuestions = (data: any) => {
+        this.readingQuestions = [];
+        for (let q of data) {
+            this.readingQuestions.push(new Question(q.QuestionNo, q.Description, q.Strand, q.Difficulty, q.StrandIndex));
+        }
+        this.hasReadingQuestions = true;
+    }
     setStudents = (data: Array<any>, langPrefs: Array<any> = []) => {
         this.students = [];
         this.hasGirls = false;
@@ -310,8 +492,7 @@ class TestFile {
                 if (! score) {
                     return false;
                 }
-                    var rawScore = item.subject.getRawScore(score);
-                    return rawScore ? rawScore > 1 : false;
+                    return score.stanine ? score.stanine > 1 : false;
                 }
             ) > 5) {
                 item.subject.isTested = true;
@@ -397,11 +578,231 @@ class NaplanScore {
     }
 }
 
-class Score {
-    correctAnswers: number;
-    attemptedQuestions: number;
-    notAttemptedQuestions: number;
+class StudentAnswer {
+    seq: number;
+    description: string;
+    strand: string;
+    difficulty: string;
+    index: number;
 
+    constructor(public question: Question, public answer: AnswerType) {
+        this.seq = question.seq;
+        this.description = question.description;
+        this.strand = question.strand;
+        this.difficulty = question.difficulty;
+        this.index = question.index;
+    }
+}
+
+class StrandSummary {
+    count: number;
+    correctAnswers = 0;
+    incorrectAnswers = 0;
+    attemptedQuestions = 0;
+    notAttemptedQuestions = 0;
+    index = 0;
+    studentAnswers: Array<StudentAnswer> = [];
+
+    constructor(public strand: string, studentAnswers: Array<StudentAnswer>) {
+        this.studentAnswers = studentAnswers;
+        this.count = studentAnswers.length;
+        this.index = studentAnswers.length > 0 ? studentAnswers[0].index : 0;
+
+        for (let s of studentAnswers) {
+            if (s.answer === AnswerType.Correct) {
+                this.correctAnswers++;
+                this.attemptedQuestions++;
+            }
+            if (s.answer == AnswerType.Incorrect) {
+                this.incorrectAnswers++;
+                this.attemptedQuestions++;
+            }
+            if (s.answer == AnswerType.NotAttempted) {
+                this.notAttemptedQuestions++;
+            }
+        }
+    }
+}
+
+class WritingCriteria {
+    taskType: string;
+    questions = new Array<WritingQuestion>();
+    schoolScoreDistributions = new Array<number>();
+
+    narativeQuestionsOrder = ["WRNARDEV", "WRTHMDEV", "WRVOCAB", "WRSENSTR", "WRSYNTEN", "WRPUNCT", "WRSPELL"];
+    persuasiveQuestionsOrder = ["WRGENRE", "WRARGS", "WRRHTDEV", "WRSENSTR", "WRSYNTEN", "WRPUNCT", "WRSPELL"];
+
+    clear = () => {
+        this.taskType = undefined;
+        this.questions = [];
+        this.schoolScoreDistributions = [];
+    }
+}
+
+class StudentWritingCriteria {
+    scores: Array<number>;
+    serialno: number;
+    hasMarkedWritingScript: boolean;
+    markedWritingScriptFile: string;
+
+    constructor(data: any) {
+        this.scores = [];
+        this.scores.push(data.Score1);
+        this.scores.push(data.Score2);
+        this.scores.push(data.Score3);
+        this.scores.push(data.Score4);
+        this.scores.push(data.Score5);
+        this.scores.push(data.Score6);
+        this.scores.push(data.Score7);
+        this.hasMarkedWritingScript = data.HasWritingScript,
+            this.markedWritingScriptFile = data.WritingScript,
+        this.serialno = data.Serialno;
+    }
+}
+
+class Career {
+    code: string;
+    description: string;
+    value: number;
+    notes: string;
+    constructor(data: any) {
+        this.code = data.CareerCode;
+        this.description = data.Description;
+        this.value = data.Value;
+        this.notes = this.getNotes(this.description);
+    }
+
+    private getNotes = (desc: string): string => {
+        switch (desc) {
+            case "Realistic":
+                return "Work which is generally manual or practical.";
+
+            case "Investigative":
+                return "Work which involves mathematics, science or research.";
+
+            case "Artistic":
+                return "Work which is creative and artistic.";
+
+            case "Social":
+                return "Work which is involves a lot of personal contact.";
+
+            case "Enterprising":
+                return "Work which has an emphasis on business and sales.";
+
+            case "Conventional":
+                return "Work which is administrative or clerical.";
+        }
+        return "Unknown Type";
+    }
+}
+
+class StudentCareer {
+    // ReSharper disable once InconsistentNaming
+    private _careers = new Array<Career>();
+
+    get careers(): Array<Career> {
+        return this._careers;
+    };
+    set careers(val: Array<Career>) {
+        this._careers = val;
+        this.hasCareerData = (val && val.length > 0 && val[0].value > 0);
+    }
+
+    careerAwareness: string;
+    hasCareerData: boolean;
+
+    getCareerPrefs = (): Array<Career> => {
+        if (! this.careerPrefs) {
+            this.careerPrefs = Enumerable.From(this.careers).OrderByDescending(x => x.value).Take(3).ToArray();
+        }
+        return this.careerPrefs;
+    }
+
+
+    private careerPrefs: Array<Career>;
+
+}
+
+class WorkCharacteristic {
+    code: number;
+    description: string;
+    value: number;
+    constructor(data: any) {
+        this.code = data.WorkCharacteristicType;
+        this.value = data.Value;
+        this.description = this.convertCode(this.code);
+    }
+
+    private convertCode = (code: number): string => {
+        switch (code) {
+            case 1:
+                return "Management";
+            case 2:
+                return "Independence";
+            case 3:
+                return "JobSecurity";
+            case 4:
+                return "SelfDevelopment";
+           
+        }
+        return "Unknown Type";
+    }
+}
+
+
+class ScoreProfile {
+    count = 0;
+    correctAnswers = 0;
+    incorrectAnswers = 0;
+    attemptedQuestions = 0;
+    notAttemptedQuestions = 0;
+    answers: Array<AnswerType> = [];
+    hasProfile = false;
+
+    constructor(answers: string) {
+        if (answers) {
+            this.hasProfile = true;
+            for (let i = 0; i < answers.length; i++) {
+                if (answers[i] === ".") {
+                    this.notAttemptedQuestions++;
+                    this.answers.push(AnswerType.NotAttempted);
+                } else {
+                    this.attemptedQuestions++;
+                    if (answers[i] === "*") {
+                        this.answers.push(AnswerType.Correct);
+                        this.correctAnswers++;
+                    } else {
+                        this.answers.push(AnswerType.Incorrect);
+                        this.incorrectAnswers++;
+                    }
+                }
+                this.count++;
+            }
+        }
+    }
+
+    getStudentAnswers = (questions: Array<Question>): Array<StudentAnswer> => {
+        var studentAnswers = new Array<StudentAnswer>();
+        for (let q of questions) {
+            const index = q.seq - 1;
+            const answer = index < this.answers.length ? this.answers[index] : AnswerType.NotAttempted;
+            studentAnswers.push(new StudentAnswer(q, answer));
+        }
+        return studentAnswers;
+    }
+
+    getStrandSummary = (studentAnswers: Array<StudentAnswer>): Array<StrandSummary> => {
+        return Enumerable.From(studentAnswers)
+            .GroupBy(s => s.strand)
+            .Select(strand => new StrandSummary(strand.Key(), strand.source))
+            .ToArray();
+    }
+
+}
+
+class Score {
+    scoreProfile : ScoreProfile;
+  
     constructor(public raw: number,
         public stanine: number,
         public scaledScore: number,
@@ -410,21 +811,7 @@ class Score {
         public naplan: number,
         public answers: string) {
 
-        if (answers) {
-            this.correctAnswers = 0;
-            this.attemptedQuestions = 0;
-            this.notAttemptedQuestions = 0;
-            for (let i = 0; i < answers.length; i++) {
-                if (answers[i] === "*") {
-                    this.correctAnswers++;
-                }
-                if (answers[i] === ".") {
-                    this.notAttemptedQuestions++;
-                } else {
-                    this.attemptedQuestions++;
-                }
-            }
-        }
+        this.scoreProfile = new ScoreProfile(answers);
     }
 }
 
@@ -452,10 +839,13 @@ class Student {
     writing: Score;
     spelling: Score;
     raven: Score;
-
+    writingCriteria: StudentWritingCriteria;
+    careers = new StudentCareer();
+    workCharacteristics: Array<WorkCharacteristic> = [];
     schoolGroup: string;
     naplanResults: Array<NaplanScore> = [];
     languagePrefs: Array<string> = [];
+
     get hasLanguagePrefs(): boolean {
         return this.languagePrefs && this.languagePrefs.length > 0;
     }
@@ -484,7 +874,7 @@ class Student {
         this.reading = new Score(r.Rrs, r.Rst, r.T_rst, r.S_reading, null, r.Npi_Read, r.Readcor);
         this.spelling = new Score(r.Srs, r.Sst, r.T_sst, r.S_spelling, null, null, r.Spellcor);
         this.writing = new Score(r.NewWr, r.Wrt, r.T_wr, r.S_written, null, r.Npi_Writing, null);
-        this.writing.correctAnswers = r.NewWr;
+        this.writing.scoreProfile.correctAnswers = r.NewWr;
         this.raven = new Score(r.Raven, r.Iqs2, r.T_mst, null, new RangeScore(r.Iq12, r.Iq22), null, new Array(65 + 1).join(" "));
 
         this.serialno = r.Serialno;
@@ -521,6 +911,7 @@ class Student {
         total += this.writing.scaledScore ? this.writing.scaledScore : 0;
         return total;
     }
+
 
     private liveInAust = (val: string, shortDesc = false): string => {
         if (! val) {

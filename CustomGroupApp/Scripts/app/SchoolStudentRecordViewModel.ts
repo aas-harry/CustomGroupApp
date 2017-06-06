@@ -4,6 +4,7 @@
         super(elementName);
     }
 
+    private container: HTMLElement;
     private reports = [
         new ReportItem("School Student Record", "SchoolStudentRecordView", ReportType.SchoolStudentRecord, this)
     ];
@@ -62,6 +63,7 @@
         this.isViewReady = true;
     }
 
+   
     private initScaledScoresChart = () => {
         this.scaledScoresChartControl = $("#scaled-score-chart").data("kendoChart");
     }
@@ -104,7 +106,7 @@
                 {
                     field: "subjectName",
                     title: " ",
-                    width: 250
+                    width: 225
                 },
                 {
                     field: "totalCount",
@@ -144,7 +146,7 @@
             totalCount: number,
             attemptedCount: number,
             correctCount: number,
-            stanine: number
+            stanine: number,
         }>();
 
         for (let s of this.testFile.subjectsTested) {
@@ -154,8 +156,8 @@
             dataSource.push({
                 subjectName: s.name,
                 totalCount: s.count,
-                attemptedCount: s.getScore(student).attemptedQuestions,
-                correctCount: s.getScore(student).correctAnswers,
+                attemptedCount: s.getScore(student).scoreProfile.attemptedQuestions,
+                correctCount: s.getScore(student).scoreProfile.correctAnswers,
                 stanine: s.getScore(student).stanine
             });
         }
@@ -163,5 +165,6 @@
             this.rawScoreGridControl.dataSource.data(dataSource);
         }
     }
+
 
 }

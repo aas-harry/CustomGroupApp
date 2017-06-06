@@ -1,4 +1,6 @@
 ﻿class Stanine {
+    lowerScore: number;
+    midScore: number;
     constructor(public subject: SubjectType, public stanine: number, public score: number) { }
 }
 
@@ -21,6 +23,17 @@ class StanineTables {
             }
         }
         return 0;
+    }
+
+    getStanines = (subject: SubjectType): Array<Stanine> => {
+        var tables = Enumerable.From(this.stanines).Where(s => s.subject === subject).OrderBy(s => s.stanine).ToArray();
+        let lowerScore = 0;
+        for (let t of tables) {
+            t.lowerScore = lowerScore;
+            t.midScore = Math.floor((t.score - t.lowerScore) / 2) + t.lowerScore;
+            lowerScore = t.score;
+        }
+        return tables;
     }
 
     getStanineRangeScore = (score: number, subject: SubjectType, maxScore: number): number => {

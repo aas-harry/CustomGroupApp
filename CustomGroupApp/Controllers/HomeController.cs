@@ -104,7 +104,6 @@ namespace CustomGroupApp.Controllers
         
             // var testnum = 10000040;
             var results = _dataService.GetResults(testnum).ToList();
-            var naplanResults = _dataService.GetNaplanResults(testnum).ToList();
 
             var semester = results.Count == 0 || results[0].Sem.HasValue == false
                 ? 1

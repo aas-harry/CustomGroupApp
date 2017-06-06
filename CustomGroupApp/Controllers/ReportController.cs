@@ -10,6 +10,11 @@ namespace CustomGroupApp.Controllers
             return PartialView("StudentPortfolioList");
         }
 
+        public ActionResult AlphanumericReportView()
+        {
+            return PartialView("AlphanumericReport");
+        }
+
         public ActionResult StudentNaplanView()
         {
             return PartialView("StudentNaplanReport");

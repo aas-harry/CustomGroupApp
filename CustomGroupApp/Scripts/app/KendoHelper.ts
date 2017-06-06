@@ -62,9 +62,16 @@
         cell.textContent = value.toString();
     }
 
-    addCell = (row: HTMLTableRowElement, value: string) => {
+    addElementCell = (row: HTMLTableRowElement, element: HTMLElement): HTMLTableCellElement => {
+        const cell = row.insertCell();
+        cell.appendChild(element);
+        return cell;
+    }
+
+    addCell = (row: HTMLTableRowElement, value: string): HTMLTableCellElement => {
         const cell = row.insertCell();
         cell.textContent = value;
+        return cell;
     }
 
     createButtonWithId = (cell: HTMLTableCellElement, description: string, uid: string, onClick: (uid: string) => any, width = 150, textAlign = "left",
@@ -119,7 +126,7 @@
             return this.createNumericTextBox(
                 element,
                 classCount,
-                1,
+                0,
                 50,
                 this.integerFormat,
                 callbackChangeEvent);

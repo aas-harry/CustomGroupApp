@@ -189,6 +189,9 @@ var StudentClass = (function () {
             toClass.addStudent(_this);
             fromClass.addStudent(studentTo);
         };
+        this.copy = function () {
+            return new StudentClass(_this.source);
+        };
         this.source = s;
         this.uid = createUuid();
         this._name = s.name;
@@ -761,14 +764,15 @@ var GroupingHelper = (function () {
                 }
             });
         };
-        this.mergeClasses = function (groupSets, testnum, callback) {
+        this.mergeClasses = function (groupSets, testnum, groupName, callback) {
             $.ajax({
                 type: "POST",
                 url: "..\\CustomGroup\\MergeCustomGroupSets",
                 contentType: "application/json",
                 data: JSON.stringify({
                     'groupSets': groupSets,
-                    'testnum': testnum
+                    'testnum': testnum,
+                    'groupName': groupName
                 }),
                 success: function (result) {
                     var tmpCallback = callback;

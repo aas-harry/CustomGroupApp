@@ -92,19 +92,42 @@ var CustomGroupListViewModel = (function (_super) {
         this.merge = function () {
             var self = _this;
             var selectedItems = _this.getSelectedItems();
-            if (selectedItems.length === 0) {
+            if (selectedItems.length <= 1) {
+                _this.messageBox.showInfoDialog("popup-window-container", "Please select one or more groups to merge.", "Merge");
                 return;
             }
-            _this.set("message", "merging selected custom groups...");
-            _this.set("hasMessage", true);
-            _this.groupingHelper.mergeClasses(Enumerable.From(selectedItems).Select(function (x) { return x.groupSetid; }).ToArray(), _this.classesDefn.testFile.fileNumber, function (status, item) {
-                if (status) {
-                    var classItem = self.testInfo.addCustomGroup(item);
-                    self.customGroupListControl.addClassItems([classItem]);
+            var initialName = undefined;
+            for (var _i = 0, selectedItems_1 = selectedItems; _i < selectedItems_1.length; _i++) {
+                var g = selectedItems_1[_i];
+                initialName = initialName ? initialName + ", " + g.name : g.name;
+            }
+            var msg = "You have selected " + selectedItems.length + " custom groups. Please enter new custom group name (max 80 chars).";
+            _this.messageBox.showInputDialog("popup-window-container", msg, "Merge", function (e) {
+                if (e == DialogResult.No) {
+                    return true;
                 }
-                self.set("message", null);
-                _this.set("hasMessage", false);
-            });
+                var input = document.getElementById("input-text");
+                var groupName = input.value;
+                if (!groupName) {
+                    toastr.warning("Custom group name must not be blank.");
+                    return false;
+                }
+                if (groupName.length > 80) {
+                    toastr.warning("Custom group name must be less than 80 characters.");
+                    return false;
+                }
+                _this.set("message", "merging selected custom groups...");
+                _this.set("hasMessage", true);
+                _this.groupingHelper.mergeClasses(Enumerable.From(selectedItems).Select(function (x) { return x.groupSetid; }).ToArray(), _this.classesDefn.testFile.fileNumber, groupName, function (status, item) {
+                    if (status) {
+                        var classItem = self.testInfo.addCustomGroup(item);
+                        self.customGroupListControl.addClassItems([classItem]);
+                    }
+                    self.set("message", null);
+                    _this.set("hasMessage", false);
+                });
+                return true;
+            }, initialName, 135, 520);
         };
         this.exportToCsv = function () {
             var selectedItems = _this.getSelectedItems();

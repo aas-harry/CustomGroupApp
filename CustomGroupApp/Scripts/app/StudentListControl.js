@@ -39,7 +39,12 @@ var StudentListControl = (function () {
             }
             // Create HTML element for hosting the grid control
             var container = document.createElement("div");
-            container.setAttribute("style", "width: " + width + "px; height: " + height + "px; margin: 5px 0 0 0;");
+            if (height > 0) {
+                container.setAttribute("style", "width: " + width + "px; height: " + height + "px; margin: 5px 0 0 0;");
+            }
+            else {
+                container.setAttribute("style", "width: " + width + "px; height: 100%; margin: 5px 0 0 0;");
+            }
             container.id = name + "-" + _this.commonUtils.createUid() + "-container";
             var gridElement = document.createElement("div");
             gridElement.setAttribute("style", "height: 100%;");
@@ -62,6 +67,9 @@ var StudentListControl = (function () {
                     var gridControl = e.sender;
                     var row = gridControl.select().closest("tr");
                     var studentRow = gridControl.dataItem(row);
+                    if (!studentRow) {
+                        return;
+                    }
                     var student = Enumerable.From(self.students).FirstOrDefault(null, function (x) { return x.studentId === studentRow.id; });
                     var tmpCallback = studentSelectedCallback;
                     if (tmpCallback != null) {
@@ -78,6 +86,16 @@ var StudentListControl = (function () {
             _this.gridControl = $("#" + gridElement.id).data("kendoGrid");
             return _this.self;
         };
+        this.selectRow = function (index) {
+            if (index === void 0) { index = 0; }
+            var models = _this.gridControl.dataSource.view();
+            var student = models[index];
+            //find the target row element:
+            var row = _this.gridControl.table.find("[data-uid=" + student.uid + "]");
+            if (row) {
+                _this.gridControl.select(row);
+            }
+        };
         this.setDatasource = function (students) {
             // Populate the grid
             _this.students = students;
@@ -87,6 +105,12 @@ var StudentListControl = (function () {
             _this.gridControl.refresh();
             _this.gridControl.resize();
             return _this.self;
+        };
+        this.refresh = function () {
+            if (!_this.gridControl) {
+                return;
+            }
+            _this.gridControl.resize();
         };
         this.hostElement = document.getElementById(elementName);
     }

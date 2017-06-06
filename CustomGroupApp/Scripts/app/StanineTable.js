@@ -29,6 +29,17 @@ var StanineTables = (function () {
             }
             return 0;
         };
+        this.getStanines = function (subject) {
+            var tables = Enumerable.From(_this.stanines).Where(function (s) { return s.subject === subject; }).OrderBy(function (s) { return s.stanine; }).ToArray();
+            var lowerScore = 0;
+            for (var _i = 0, tables_1 = tables; _i < tables_1.length; _i++) {
+                var t = tables_1[_i];
+                t.lowerScore = lowerScore;
+                t.midScore = Math.floor((t.score - t.lowerScore) / 2) + t.lowerScore;
+                lowerScore = t.score;
+            }
+            return tables;
+        };
         this.getStanineRangeScore = function (score, subject, maxScore) {
             var table = Enumerable.From(_this.stanines).Where(function (s) { return s.subject === subject; }).OrderBy(function (s) { return s.score; }).ToArray();
             var stanine = 1;

@@ -167,7 +167,7 @@
                         template: kendo.template(
                             `Group: <input id='${groupNameElementId}' style='margin: 0 5px 0 5px' />` +
                             (this.editClassMode
-                                ? `<button id='${updateClassElementId}' ${btnStyle}'>Students</button>`
+                                ? `<button id='${updateClassElementId}' ${btnStyle}'>Edit Class</button>`
                                 : `<button id='${hideClassElementId}' ${btnStyle}'>Hide</button>`)
                         )
                     }

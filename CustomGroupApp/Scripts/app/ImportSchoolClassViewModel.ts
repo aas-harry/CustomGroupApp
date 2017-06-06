@@ -32,7 +32,6 @@
     classCount = 1;
     preallocatedStudents = new Array<PreAllocatedStudent>();
     unMatchedStudents = new Array<string>();
-    private dataSource = new Array<CustomGroupRowViewModel>();
 
     private groupingHelper = new GroupingHelper();
     private kendoHelper = new KendoHelper();
@@ -54,7 +53,7 @@
 
     downloadTemplate = () => {
         this.groupingHelper.downloadTemplateFile("DownloadSchoolClassTemplate", this.classesDefn.testFile.fileNumber);
-    }
+    };
 
     askToSaveClasses = (callback: (status: boolean) => any) => {
         if (this.hasImportedClasses && this.isSaved === false) {
@@ -86,22 +85,22 @@
                 tmpcallback(true);
             }
         }
-    }
+    };
 
     openCustomGroups = () => {
         this.askToSaveClasses((status) => {
             if (status) {
                 $.ajax({
                     url: "..\\Customgroup\\CustomGroupListView",
-                    type: 'POST',
+                    type: "POST",
                     success(html) {
                         $("#reportContent").replaceWith(html);
-                        $(window).trigger('resize');
+                        $(window).trigger("resize");
                     }
                 });
             }
         });
-    }
+    };
 
     startOver = () => {
         this.askToSaveClasses((status) => {
@@ -109,7 +108,7 @@
                 this.reset();
             }
         });
-    }
+    };
 
     saveClasses = (callback: (status) => any) => {
         const self = this;
@@ -135,11 +134,11 @@
                }
            }
        });
-    }
+    };
 
     importStudents = () => {
         const container = document.getElementById("uploader-container");
-        container.innerHTML = '<input type="file" id= "files" name= "files" />';
+        container.innerHTML = "<input type=\"file\" id= \"files\" name= \"files\" />";
         this.uploader =  this.kendoHelper.createUploadControl("files",
             "..\\Customgroup\\ImportSchoolClasses?id=" + this.classesDefn.testFile.fileNumber,
             this.onUploadCompleted);
@@ -160,7 +159,7 @@
             this.kendoHelper.addNumberCell(row, classItem.count);
             cnt++;
         }
-    }
+    };
 
     showUnmatchedStudents = () => {
         const table = document.getElementById("unmatched-student-list-container") as HTMLTableElement;
@@ -176,7 +175,7 @@
             this.kendoHelper.addCell(row, name);
             cnt++;
         }
-    }
+    };
 
     onUploadCompleted = (e: any): any => {
         const self = this;
@@ -200,7 +199,7 @@
 
         self.unMatchedStudents = [];
         for (let name of e.response.UnMatchedStudents) {
-            if (!name){
+            if (!name) {
                 continue;
             }
             self.unMatchedStudents.push(name);
@@ -258,6 +257,5 @@
         if (self.hasUnMatchedStudents) {
             self.showUnmatchedStudents();
         }
-    
-    }
+    };
 }

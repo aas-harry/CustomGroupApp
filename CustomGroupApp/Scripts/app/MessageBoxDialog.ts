@@ -2,6 +2,8 @@
 
     private commonUtils = new CommonUtils();
     private kendoHelper = new KendoHelper();
+    private waitDialog = false;
+    private popupWindow: kendo.ui.Window;
 
     showInfoDialog = (element: string,
         message: string,
@@ -12,6 +14,34 @@
 
         this.initWindowContainer(element, message, title, width, height, callback);
     }
+
+    showInputDialog = (element: string,
+        message: string,
+        title: string,
+        callback: (status: DialogResult) => any = null,
+        initialValue: string,
+        height: number = 130,
+        width: number = 400
+        ) => {
+
+        const container = document.createElement("div") as HTMLElement;
+        container.setAttribute("style", "width:100%;");
+        const msgElement = document.createElement("p") as HTMLElement;
+        msgElement.textContent = message;
+        container.appendChild(msgElement);
+        const inputDiv = document.createElement("div") as HTMLElement;
+        inputDiv.setAttribute("style", "width: 100%;");
+        const input = document.createElement("input") as HTMLInputElement;
+        input.value = initialValue;
+        input.type = "text";
+        input.id = "input-text";
+        input.setAttribute("style", "width: 100%; max-width: 500px");
+        input.setAttribute("class", "k-textbox");
+        inputDiv.appendChild(input);
+        container.appendChild(inputDiv);
+        this.initWindowContainerInternal(element, container, title, width, height, callback, "Continue", "Cancel");
+    }
+
 
     showWarningDialog = (element: string,
         message: string,
@@ -31,6 +61,16 @@
         callback: () => any) => {
 
         this.initWindowContainer(element, message, title, width, height, callback);
+    }
+
+    showWaitDialog = (element: string,
+        message: string,
+        title: string,
+        height: number = 120,
+        width: number = 400): kendo.ui.Window => {
+
+        this.waitDialog = true;
+        return this.initWindowContainer(element, message, title, width, height, null);
     }
 
     showSuccessDialog = (element: string,
@@ -79,17 +119,34 @@
         container.appendChild(button);
         this.kendoHelper.createKendoButton(id,
             () => {
-                popupWindow.close().destroy();
                 if (callback) {
-                    callback(dialogResult);
+                    const result = callback(dialogResult);
+                    if (result === undefined || result === true) {
+                        popupWindow.close().destroy();
+                    }
+                    return;
                 }
+                popupWindow.close().destroy();
             });
         return button;
     }
 
     private initWindowContainer = (element: string, message: string, title: string, width: number, height: number,
         callback: (result: DialogResult) => any, 
-        yesButton?: string, noButton?: string, cancelButton?: string): HTMLDivElement => {
+        yesButton?: string, noButton?: string, cancelButton?: string): kendo.ui.Window => {
+
+      
+        const messageElement = document.createElement("p") as HTMLParagraphElement;
+        messageElement.innerHTML = message;
+        messageElement.setAttribute("style", "margin-top: 10px");
+      
+        return this.initWindowContainerInternal(element, messageElement, title, width, height, callback,
+        yesButton, noButton, cancelButton);
+    }
+
+    private initWindowContainerInternal = (element: string, message: HTMLElement, title: string, width: number, height: number,
+        callback: (result: DialogResult) => any,
+        yesButton?: string, noButton?: string, cancelButton?: string): kendo.ui.Window => {
 
         const elementContainer = document.getElementById(element);
         if (elementContainer.childElementCount > 0) {
@@ -104,35 +161,35 @@
         window.id = this.commonUtils.createUid();
         window.setAttribute("style", "padding: 20px");
         elementContainer.appendChild(window);
-
-        const messageElement = document.createElement("p") as HTMLParagraphElement;
-        messageElement.innerHTML = message;
-        messageElement.setAttribute("style", "margin-top: 10px");
-        window.appendChild(messageElement);
+       
+        window.appendChild(message);
 
         const buttonContainer = document.createElement("div");
-        buttonContainer.setAttribute("style", "margin-top: 30px");
+        buttonContainer.setAttribute("style", "margin-top: 20px");
         window.appendChild(buttonContainer);
 
-        var popupWindow = this.showDialog(window, title, width, height);
+        this.popupWindow = this.showDialog(window, title, width, height);
 
-        if (! yesButton && ! noButton && ! cancelButton) {
-            this.createButton(buttonContainer, "OK", "ok-button", popupWindow, callback, DialogResult.Ok);
+        if (!yesButton && !noButton && !cancelButton) {
+            if (!this.waitDialog) {
+                this.createButton(buttonContainer, "OK", "ok-button", this.popupWindow, callback, DialogResult.Ok);
+            }
         }
 
         if (yesButton) {
-            this.createButton(buttonContainer, yesButton, "yes-button", popupWindow, callback, DialogResult.Yes);
+            this.createButton(buttonContainer, yesButton, "yes-button", this.popupWindow, callback, DialogResult.Yes);
         }
 
         if (noButton) {
-            this.createButton(buttonContainer, noButton, "no-button", popupWindow, callback, DialogResult.No);
+            this.createButton(buttonContainer, noButton, "no-button", this.popupWindow, callback, DialogResult.No);
         }
 
         if (cancelButton) {
-            this.createButton(buttonContainer, cancelButton, "cancel-button", popupWindow, callback, DialogResult.Cancel);
+            this.createButton(buttonContainer, cancelButton, "cancel-button", this.popupWindow, callback, DialogResult.Cancel);
         }
-        return window;
+        return this.popupWindow;
     }
+
 
     private showDialog = (window: HTMLElement, title: string, width: number, height: number): kendo.ui.Window => {
         var popupWindow = $(`#${window.id}`)
@@ -151,6 +208,13 @@
         popupWindow.center().open();
 
         return popupWindow;
+    }
+
+    closeWindow = () => {
+        if (!this.popupWindow) {
+            return;
+        }
+        this.popupWindow.close().destroy();
     }
 }
 

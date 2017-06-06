@@ -49,7 +49,11 @@
 
         // Create HTML element for hosting the grid control
         var container = document.createElement("div") as HTMLDivElement;
-        container.setAttribute("style", `width: ${width}px; height: ${height}px; margin: 5px 0 0 0;`);
+        if (height > 0) {
+            container.setAttribute("style", `width: ${width}px; height: ${height}px; margin: 5px 0 0 0;`);
+        } else {
+            container.setAttribute("style", `width: ${width}px; height: 100%; margin: 5px 0 0 0;`);
+        }
         container.id = `${name}-${this.commonUtils.createUid()}-container`;
 
         var gridElement = document.createElement("div") as HTMLDivElement;
@@ -77,7 +81,9 @@
                     var gridControl = e.sender as kendo.ui.Grid;
                     const row = gridControl.select().closest("tr");
                     const studentRow = gridControl.dataItem(row) as StudentRow;
-         
+                    if (!studentRow) {
+                        return;
+                    }
                     var student = Enumerable.From(self.students).FirstOrDefault(null, x => x.studentId === studentRow.id);
                     const tmpCallback = studentSelectedCallback;
                     if (tmpCallback != null) {
@@ -96,6 +102,17 @@
         return this.self;
     };
 
+    selectRow = (index: number = 0) => {
+        var models = this.gridControl.dataSource.view();
+        var student = models[index];
+        
+        //find the target row element:
+        var row = this.gridControl.table.find("[data-uid=" + student.uid + "]");
+        if (row) {
+            this.gridControl.select(row);
+        }
+
+    }
     setDatasource = (students: Array<Student>): StudentListControl => {
         // Populate the grid
         this.students = students;
@@ -109,5 +126,11 @@
         return this.self;
     }
 
+    refresh = () => {
+        if (! this.gridControl) {
+            return;
+        }
+        this.gridControl.resize();
+    }
 }
 

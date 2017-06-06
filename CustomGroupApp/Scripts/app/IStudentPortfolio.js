@@ -58,8 +58,22 @@ var StudentPortfolio = (function (_super) {
                 .FirstOrDefault(null, function (x) { return x.reportType === reportType; });
             return report ? report.urlLink : "";
         };
-        this.initReport = function (reportType) { };
+        this.initReport = function (reportType, width, height) {
+            _this.isViewReady = true;
+        };
+        this.resizeContent = function (width, height) {
+            var container = document.getElementById(_this.elementName);
+            if (!container) {
+                return;
+            }
+            container.setAttribute("style", "overflow: auto; height: " + height + "px");
+            _this.resizeOtherContent(width, height);
+        };
+        this.resizeOtherContent = function (width, height) {
+            // overwrite this in subclass
+        };
         this.elementName = elementName;
+        this.sex = "M";
     }
     StudentPortfolio.prototype.setStudent = function (student, refresh) {
         if (refresh === void 0) { refresh = false; }
@@ -72,7 +86,12 @@ var StudentPortfolio = (function (_super) {
         this.student = student;
         this.set("name", student.name);
         this.set("dob", student.dobString);
-        this.set("age", student.ca);
+        var year = Math.floor(student.ca);
+        var month = Math.round((student.ca - year) * 100);
+        this.set("age", (year + " Years") + (month <= 0 ? "" : (" " + month + " Month") + (month > 1 ? "s" : "")));
+        this.set("sex", student.sex === "M" ? "Male" : "Female");
+        this.set("speak", student.speak);
+        this.set("liveInAus", student.liveInAus);
         this.set("schoolStudentId", student.schoolStudentId);
         this.set("hasSchoolStudentId", student.hasSchoolStudentId);
         if (this.hasSchoolStudentId) {

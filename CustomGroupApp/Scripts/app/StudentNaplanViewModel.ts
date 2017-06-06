@@ -13,17 +13,17 @@
     get tooltipText(): string {
         if (this.testType === TestType.Naplan) {
             return "<div style='margin: 5px; text-align: left'>" +
-                "<div>Student Score: " + this.score + "<div>" +
-                "<div>School Mean: " + this.school.toFixed(2) + "<div>" +
-                "<div>State Mean: " + (this.state ? this.state.toFixed(2) : "NA") + "<div>" +
-                "<div>National Mean: " + (this.national ? this.national.toFixed(2) : "NA") + "<div>" +
+                "<div>Student Score: " + this.score + "</div>" +
+                "<div>School Mean: " + this.school.toFixed(0) + "</div>" +
+                "<div>State Mean: " + (this.state ? this.state.toFixed(0) : "NA") + "</div>" +
+                "<div>National Mean: " + (this.national ? this.national.toFixed(0) : "NA") + "</div>" +
                 "</div>";
         } else {
             return "<div style='margin: 5px; text-align: left'>" +
-                "<div>Test: " + this.testNumber + "<div>" +
-                "<div>Tested: " + (this.testDate ? kendo.toString(this.testDate, 'dd/MM/yyyy')  : "NA") + "<div>" +
-                "<div>Student Score: " + this.score + "<div>" +
-                "<div>School Mean: " + this.school.toFixed(2) + "<div>" +
+                "<div>Test: " + this.testNumber + "</div>" +
+                "<div>Tested: " + (this.testDate ? kendo.toString(this.testDate, 'dd/MM/yyyy')  : "NA") + "</div>" +
+                "<div>Student Score: " + this.score + "</div>" +
+                "<div>School Mean: " + this.school.toFixed(0) + "</div>" +
                 "</div>";
         }
     }
@@ -36,7 +36,6 @@
         this.testNumber = s.testNumber;
     }
 }
-
 
 class StudentNaplanViewModel extends StudentPortfolio
     implements IStudentPortfolio {
@@ -124,9 +123,9 @@ class StudentNaplanViewModel extends StudentPortfolio
             s.national = national ? national.reading : undefined;
         }
 
-        $("#numeracy-chart").height((this.numeracyDatasource.length * 25) + 30);
-        $("#reading-chart").height((this.readingDatasource.length * 25) + 30);
-        $("#writing-chart").height((this.writingDatasource.length * 25) + 30);
+        $("#numeracy-chart").height((this.numeracyDatasource.length * 25) + 90);
+        $("#reading-chart").height((this.readingDatasource.length * 25) + 90);
+        $("#writing-chart").height((this.writingDatasource.length * 25) + 90);
 
       
 
@@ -183,7 +182,7 @@ class StudentNaplanViewModel extends StudentPortfolio
         const self = this;
         $.ajax({
             type: "POST",
-            url: "Home\\GetNaplanData",
+            url: "GetNaplanData",
             data: JSON.stringify({ 'testnum': self.testFile.fileNumber }),
             contentType: "application/json",
             success(data) {

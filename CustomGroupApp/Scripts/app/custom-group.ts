@@ -297,6 +297,10 @@ class StudentClass {
         toClass.addStudent(this);
         fromClass.addStudent(studentTo);
     }
+
+    copy = (): StudentClass => {
+        return new StudentClass(this.source);
+    }
 }
 
 class GroupContext {
@@ -856,6 +860,7 @@ class GroupingHelper {
 
     mergeClasses = (groupSets: Array<number>,
         testnum: number,
+        groupName: string,
         callback: (boolean, classItem: ClassDefinition, message: string) => any) => {
         $.ajax({
             type: "POST",
@@ -864,7 +869,8 @@ class GroupingHelper {
             data:
                 JSON.stringify({
                     'groupSets': groupSets,
-                    'testnum': testnum
+                    'testnum': testnum,
+                    'groupName': groupName
                 }),
             success(result) {
                 const tmpCallback = callback;

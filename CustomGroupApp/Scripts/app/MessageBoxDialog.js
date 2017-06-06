@@ -3,11 +3,33 @@ var MessageBoxDialog = (function () {
         var _this = this;
         this.commonUtils = new CommonUtils();
         this.kendoHelper = new KendoHelper();
+        this.waitDialog = false;
         this.showInfoDialog = function (element, message, title, height, width, callback) {
             if (height === void 0) { height = 120; }
             if (width === void 0) { width = 400; }
             if (callback === void 0) { callback = null; }
             _this.initWindowContainer(element, message, title, width, height, callback);
+        };
+        this.showInputDialog = function (element, message, title, callback, initialValue, height, width) {
+            if (callback === void 0) { callback = null; }
+            if (height === void 0) { height = 130; }
+            if (width === void 0) { width = 400; }
+            var container = document.createElement("div");
+            container.setAttribute("style", "width:100%;");
+            var msgElement = document.createElement("p");
+            msgElement.textContent = message;
+            container.appendChild(msgElement);
+            var inputDiv = document.createElement("div");
+            inputDiv.setAttribute("style", "width: 100%;");
+            var input = document.createElement("input");
+            input.value = initialValue;
+            input.type = "text";
+            input.id = "input-text";
+            input.setAttribute("style", "width: 100%; max-width: 500px");
+            input.setAttribute("class", "k-textbox");
+            inputDiv.appendChild(input);
+            container.appendChild(inputDiv);
+            _this.initWindowContainerInternal(element, container, title, width, height, callback, "Continue", "Cancel");
         };
         this.showWarningDialog = function (element, message, title, height, width, callback) {
             if (height === void 0) { height = 120; }
@@ -19,6 +41,12 @@ var MessageBoxDialog = (function () {
             if (height === void 0) { height = 120; }
             if (width === void 0) { width = 400; }
             _this.initWindowContainer(element, message, title, width, height, callback);
+        };
+        this.showWaitDialog = function (element, message, title, height, width) {
+            if (height === void 0) { height = 120; }
+            if (width === void 0) { width = 400; }
+            _this.waitDialog = true;
+            return _this.initWindowContainer(element, message, title, width, height, null);
         };
         this.showSuccessDialog = function (element, message, title, height, width, callback) {
             if (height === void 0) { height = 120; }
@@ -48,14 +76,24 @@ var MessageBoxDialog = (function () {
             button.setAttribute("style", "margin-left: 2.5px; margin-right: 2.5px");
             container.appendChild(button);
             _this.kendoHelper.createKendoButton(id, function () {
-                popupWindow.close().destroy();
                 if (callback) {
-                    callback(dialogResult);
+                    var result = callback(dialogResult);
+                    if (result === undefined || result === true) {
+                        popupWindow.close().destroy();
+                    }
+                    return;
                 }
+                popupWindow.close().destroy();
             });
             return button;
         };
         this.initWindowContainer = function (element, message, title, width, height, callback, yesButton, noButton, cancelButton) {
+            var messageElement = document.createElement("p");
+            messageElement.innerHTML = message;
+            messageElement.setAttribute("style", "margin-top: 10px");
+            return _this.initWindowContainerInternal(element, messageElement, title, width, height, callback, yesButton, noButton, cancelButton);
+        };
+        this.initWindowContainerInternal = function (element, message, title, width, height, callback, yesButton, noButton, cancelButton) {
             var elementContainer = document.getElementById(element);
             if (elementContainer.childElementCount > 0) {
                 while (elementContainer.hasChildNodes()) {
@@ -68,27 +106,26 @@ var MessageBoxDialog = (function () {
             window.id = _this.commonUtils.createUid();
             window.setAttribute("style", "padding: 20px");
             elementContainer.appendChild(window);
-            var messageElement = document.createElement("p");
-            messageElement.innerHTML = message;
-            messageElement.setAttribute("style", "margin-top: 10px");
-            window.appendChild(messageElement);
+            window.appendChild(message);
             var buttonContainer = document.createElement("div");
-            buttonContainer.setAttribute("style", "margin-top: 30px");
+            buttonContainer.setAttribute("style", "margin-top: 20px");
             window.appendChild(buttonContainer);
-            var popupWindow = _this.showDialog(window, title, width, height);
+            _this.popupWindow = _this.showDialog(window, title, width, height);
             if (!yesButton && !noButton && !cancelButton) {
-                _this.createButton(buttonContainer, "OK", "ok-button", popupWindow, callback, DialogResult.Ok);
+                if (!_this.waitDialog) {
+                    _this.createButton(buttonContainer, "OK", "ok-button", _this.popupWindow, callback, DialogResult.Ok);
+                }
             }
             if (yesButton) {
-                _this.createButton(buttonContainer, yesButton, "yes-button", popupWindow, callback, DialogResult.Yes);
+                _this.createButton(buttonContainer, yesButton, "yes-button", _this.popupWindow, callback, DialogResult.Yes);
             }
             if (noButton) {
-                _this.createButton(buttonContainer, noButton, "no-button", popupWindow, callback, DialogResult.No);
+                _this.createButton(buttonContainer, noButton, "no-button", _this.popupWindow, callback, DialogResult.No);
             }
             if (cancelButton) {
-                _this.createButton(buttonContainer, cancelButton, "cancel-button", popupWindow, callback, DialogResult.Cancel);
+                _this.createButton(buttonContainer, cancelButton, "cancel-button", _this.popupWindow, callback, DialogResult.Cancel);
             }
-            return window;
+            return _this.popupWindow;
         };
         this.showDialog = function (window, title, width, height) {
             var popupWindow = $("#" + window.id)
@@ -105,6 +142,12 @@ var MessageBoxDialog = (function () {
             $("#" + window.id).parent().addClass("h-window-caption");
             popupWindow.center().open();
             return popupWindow;
+        };
+        this.closeWindow = function () {
+            if (!_this.popupWindow) {
+                return;
+            }
+            _this.popupWindow.close().destroy();
         };
     }
     return MessageBoxDialog;

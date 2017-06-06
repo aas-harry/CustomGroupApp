@@ -81,7 +81,7 @@ var SchoolStudentRecordViewModel = (function (_super) {
                     {
                         field: "subjectName",
                         title: " ",
-                        width: 250
+                        width: 225
                     },
                     {
                         field: "totalCount",
@@ -122,8 +122,8 @@ var SchoolStudentRecordViewModel = (function (_super) {
                 dataSource.push({
                     subjectName: s.name,
                     totalCount: s.count,
-                    attemptedCount: s.getScore(student).attemptedQuestions,
-                    correctCount: s.getScore(student).correctAnswers,
+                    attemptedCount: s.getScore(student).scoreProfile.attemptedQuestions,
+                    correctCount: s.getScore(student).scoreProfile.correctAnswers,
                     stanine: s.getScore(student).stanine
                 });
             }

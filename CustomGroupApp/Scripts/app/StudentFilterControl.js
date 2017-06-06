@@ -3,12 +3,12 @@ var StudentFilterControl = (function () {
         var _this = this;
         this.create = function (elementName, callback) {
             var container = document.getElementById(elementName);
-            _this.addCustomGroupFiler(container, callback);
+            _this.addCustomGroupFilter(container, callback);
             if (_this.testFile.isUnisex) {
                 _this.addGenderFiler(container, callback);
             }
         };
-        this.addCustomGroupFiler = function (container, callback) {
+        this.addCustomGroupFilter = function (container, callback) {
             var groupElementName = "custom-group-list";
             var label = document.createElement("span");
             label.textContent = "Filter:";

@@ -26,7 +26,7 @@
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-    <TypeScriptToolsVersion>1.8</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>2.0</TypeScriptToolsVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -1024,6 +1024,7 @@
     <Content Include="Views\Report\StudentPortfolioPrintDialogView.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Report\StudentMathProfileView.cshtml" />
+    <Content Include="Views\Report\AlphanumericReport.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1046,12 +1047,16 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\app\AddCustomGroupDialog.ts" />
+    <TypeScriptCompile Include="Scripts\app\AlphanumericViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\BandClassDefinitionViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\BandTabControl.ts" />
     <TypeScriptCompile Include="Scripts\app\ClassBandInputContainer.ts" />
     <TypeScriptCompile Include="Scripts\app\CustomGroupBaseViewModel.ts" />
+    <TypeScriptCompile Include="Scripts\app\PastTestsComparisonViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\ReadingSkillsProfileViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\StanineTable.ts" />
+    <TypeScriptCompile Include="Scripts\app\StudentCareerProfileViewModel.ts" />
+    <TypeScriptCompile Include="Scripts\app\StudentDetailsViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\StudentFilterControl.ts" />
     <TypeScriptCompile Include="Scripts\app\CustomGroupListControl.ts" />
     <TypeScriptCompile Include="Scripts\app\CustomGroupListViewModel.ts" />
@@ -1077,6 +1082,7 @@
     <TypeScriptCompile Include="Scripts\app\LanguageClassDefinitionViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\ResultHelper.ts" />
     <TypeScriptCompile Include="Scripts\app\SchoolGroupClassDefinitionViewModel.ts" />
+    <TypeScriptCompile Include="Scripts\app\StudentMathsSkillsProfileViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\StudentNaplanViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\StudentNavigationControl.ts" />
     <TypeScriptCompile Include="Scripts\app\StudentPortfolioListViewModel.ts" />
@@ -1089,10 +1095,14 @@
     <TypeScriptCompile Include="Scripts\app\StudentClassListControl.ts" />
     <TypeScriptCompile Include="Scripts\app\StudentClassRow.ts" />
     <TypeScriptCompile Include="Scripts\app\StudentListControl.ts" />
+    <TypeScriptCompile Include="Scripts\app\StudentPreallocatedClassInputContainer.ts" />
+    <TypeScriptCompile Include="Scripts\app\StudentReadingSkillsProfileViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\StudentRow.ts" />
     <TypeScriptCompile Include="Scripts\app\StudentSelector.ts" />
     <TypeScriptCompile Include="Scripts\app\StudentSetListControl.ts" />
+    <TypeScriptCompile Include="Scripts\app\StudentWritingCriteriaViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\Subject.ts" />
+    <TypeScriptCompile Include="Scripts\app\TestInformationDialog.ts" />
     <TypeScriptCompile Include="Scripts\app\TopMiddleLowestBandClassDefinitionViewModel.ts" />
     <TypeScriptCompile Include="Scripts\app\WritingCriteriaViewModel.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />

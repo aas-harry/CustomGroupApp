@@ -10,12 +10,67 @@
     }
 }
 
+class SubjectPerformanceScore {
+
+    name: string;    
+    lowCount: number;
+    lowPct: number;
+    avgCount: number;
+    avgPct: number;
+    highCount: number;
+    highPct: number;
+
+    constructor(public subject: SubjectType, public testNumber: number, public testDate: Date) {
+        const subjectHelper = new SubjectHelper();
+        this.name = subjectHelper.description(subject);
+    }
+}
+
+class SubjectHelper {
+    description(subjectType: SubjectType): string {
+        switch (subjectType) {
+        case SubjectType.Genab:
+            return "General Reasoning";
+
+        case SubjectType.Verbal:
+            return "Verbal Reasoning";
+
+        case SubjectType.NonVerbal:
+            return "Non Verbal Reasoning";
+
+        case SubjectType.Ravens:
+            return "Ravens SPM";
+
+        case SubjectType.MathReasoning:
+            return "Maths Reasoning";
+
+        case SubjectType.MathPerformance:
+            return "Maths Performance";
+
+        case SubjectType.Reading:
+            return "Reading Comprehension";
+
+        case SubjectType.Writing:
+            return "Writing Expression";
+
+        case SubjectType.Spelling:
+            return "Spelling";
+
+        case SubjectType.MathQr:
+            return "Math Reasoning";
+
+        default:
+            return "Unknown test subject";
+        }
+    }
+}
+
 class SubjectSummary {
     subject: ISubject;
     stanineAverage: number;
     rawScoreAverage: number;
     naplanAverage: number;
-
+   
     constructor(subject: ISubject) {
         this.subject = subject;
     }
@@ -57,7 +112,6 @@ interface ISubject {
     hasNaplanScore: boolean;
     hasCorrelationScore: boolean;
 }
-
 
 class GenabSubject implements ISubject{
     getScore = (student: Student): Score => {

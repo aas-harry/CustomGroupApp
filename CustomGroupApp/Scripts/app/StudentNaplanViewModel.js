@@ -23,18 +23,18 @@ var NaplanChartData = (function () {
         get: function () {
             if (this.testType === TestType.Naplan) {
                 return "<div style='margin: 5px; text-align: left'>" +
-                    "<div>Student Score: " + this.score + "<div>" +
-                    "<div>School Mean: " + this.school.toFixed(2) + "<div>" +
-                    "<div>State Mean: " + (this.state ? this.state.toFixed(2) : "NA") + "<div>" +
-                    "<div>National Mean: " + (this.national ? this.national.toFixed(2) : "NA") + "<div>" +
+                    "<div>Student Score: " + this.score + "</div>" +
+                    "<div>School Mean: " + this.school.toFixed(0) + "</div>" +
+                    "<div>State Mean: " + (this.state ? this.state.toFixed(0) : "NA") + "</div>" +
+                    "<div>National Mean: " + (this.national ? this.national.toFixed(0) : "NA") + "</div>" +
                     "</div>";
             }
             else {
                 return "<div style='margin: 5px; text-align: left'>" +
-                    "<div>Test: " + this.testNumber + "<div>" +
-                    "<div>Tested: " + (this.testDate ? kendo.toString(this.testDate, 'dd/MM/yyyy') : "NA") + "<div>" +
-                    "<div>Student Score: " + this.score + "<div>" +
-                    "<div>School Mean: " + this.school.toFixed(2) + "<div>" +
+                    "<div>Test: " + this.testNumber + "</div>" +
+                    "<div>Tested: " + (this.testDate ? kendo.toString(this.testDate, 'dd/MM/yyyy') : "NA") + "</div>" +
+                    "<div>Student Score: " + this.score + "</div>" +
+                    "<div>School Mean: " + this.school.toFixed(0) + "</div>" +
                     "</div>";
             }
         },
@@ -119,9 +119,9 @@ var StudentNaplanViewModel = (function (_super) {
                 var s = _g[_f];
                 _loop_3(s);
             }
-            $("#numeracy-chart").height((_this.numeracyDatasource.length * 25) + 30);
-            $("#reading-chart").height((_this.readingDatasource.length * 25) + 30);
-            $("#writing-chart").height((_this.writingDatasource.length * 25) + 30);
+            $("#numeracy-chart").height((_this.numeracyDatasource.length * 25) + 90);
+            $("#reading-chart").height((_this.readingDatasource.length * 25) + 90);
+            $("#writing-chart").height((_this.writingDatasource.length * 25) + 90);
             _this.numeracyChartControl.dataSource.data(_this.numeracyDatasource);
             _this.readingChartControl.dataSource.data(_this.readingDatasource);
             _this.writingChartControl.dataSource.data(_this.writingDatasource);
@@ -155,7 +155,7 @@ var StudentNaplanViewModel = (function (_super) {
             var self = _this;
             $.ajax({
                 type: "POST",
-                url: "Home\\GetNaplanData",
+                url: "GetNaplanData",
                 data: JSON.stringify({ 'testnum': self.testFile.fileNumber }),
                 contentType: "application/json",
                 success: function (data) {

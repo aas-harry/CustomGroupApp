@@ -2,14 +2,47 @@
 
     container: HTMLElement;
     name: string;
-    students: Array<Student> = [];
+    private students: Array<StudentClass> = [];
     maxRows = 21;
 
+    private studentSelectedChanged: (count: number) => any;
     private studentCheckboxes = new Array<HTMLInputElement>();
     private commonUtils = new CommonUtils();
     private kendoHelper = new KendoHelper();
+    saveButton: kendo.ui.Button;
+    cancelButton: kendo.ui.Button;
+    popupWindow: kendo.ui.Window;
+    windowContent: HTMLElement;
+    popupWindowContainer: HTMLElement;  // this is the div that contains popupWindow
 
-    createTable = (element: HTMLElement, students: Array<StudentClass>, previoustudents: Array<StudentClass> = []) => {
+    destroy = () => {
+        this.students = [];
+        this.studentCheckboxes = [];
+        this.studentSelectedChanged = undefined;
+        if (this.saveButton) {
+            this.saveButton.options.click = undefined;
+            this.saveButton.destroy();
+        }
+        if (this.cancelButton) {
+            this.cancelButton.options.click = undefined;
+            this.cancelButton.destroy();
+        }
+
+        // remove window content
+        if (this.windowContent) {
+            const parent = this.windowContent.parentNode as HTMLElement;
+            parent.parentNode.removeChild(parent);
+
+        }
+    }
+
+    createTable = (element: HTMLElement, students: Array<StudentClass>, previoustudents: Array<StudentClass> = [], studentSelectedChanged: (count: number) => any) => {
+        this.students = [];
+        for (let s of students) {
+            this.students.push(s.copy());
+        }
+        this.studentSelectedChanged = studentSelectedChanged;
+
         var cnt = 0;
         var maxRows = 3;
         var previousStudentRows = [];
@@ -32,6 +65,7 @@
             previousTableContainer.setAttribute("style", "overflow-y: hidden; overflow-x: auto");
 
             const previousStudentsTable = document.createElement("table") as HTMLTableElement;
+            previousStudentsTable.setAttribute("style", "margin-bottom: 10px");
             previousStudentsContainer.appendChild(previousTableContainer);
             previousTableContainer.appendChild(previousStudentsTable);
             const previousStudentBody = previousStudentsTable.createTBody();
@@ -83,16 +117,17 @@
         availableStudentsContainer.appendChild(label);
 
         const availableTableContainer = document.createElement("div");
-        availableTableContainer.setAttribute("style", "overflow-y: hidden; overflow-x: auto");
+        availableTableContainer.setAttribute("style", "overflow-y: hidden; overflow-x: auto;");
         availableStudentsContainer.appendChild(availableTableContainer);
 
         const table = document.createElement("table") as HTMLTableElement;
+        table.setAttribute("style", "margin-bottom: 10px");
         availableTableContainer.appendChild(table);
         const body = table.createTBody();
         studentRows.push(body.insertRow());
 
         const previousStudentLookup = Enumerable.From(previoustudents).ToDictionary(s => s.studentId, s => s);
-        for (let student of Enumerable.From(students).OrderBy(x => x.name).ToArray()) {
+        for (let student of Enumerable.From(this.students).OrderBy(x => x.name).ToArray()) {
             if (previousStudentLookup.Contains(student.studentId)) {
                 continue;
             }
@@ -109,18 +144,29 @@
         }
     }
 
-
     createStudentCell = (cell: HTMLTableCellElement, student: StudentClass, isSelected: boolean = false) => {
         const container = document.createElement("div");
         container.setAttribute("style", "width: 200px; margin-right: 15px");
         cell.appendChild(container);
 
+        const self = this;
         const checkBox = document.createElement("input");
         checkBox.type = "checkbox";
-        checkBox.id = "studentid-" + student.id;
+        checkBox.id = `studentid-${student.id}`;
         if (isSelected) {
             checkBox.checked = true;
         }
+
+        if (self.studentSelectedChanged)
+        {
+            checkBox.addEventListener("click", (e) => {
+            const tmpCallback = self.studentSelectedChanged;
+            if (tmpCallback) {
+                tmpCallback(1);
+            }
+            });
+        }
+
         this.studentCheckboxes.push(checkBox);
         container.appendChild(checkBox);
 
@@ -130,7 +176,6 @@
         container.appendChild(label);
     }
 
-    popupWindow: kendo.ui.Window;
     openDialog = (element: HTMLElement,
         students: Array<StudentClass>,
         previoustudents: Array<StudentClass> = [],
@@ -139,20 +184,21 @@
         if (maxRows) {
             this.maxRows = this.maxRows;
         }
+        this.popupWindowContainer = element;
 
         // create window content
-        const window = document.createElement("div");
-        window.setAttribute("style", "margin: 10px 0 10px 0; overflow: none");
-        window.id = this.commonUtils.createUid();
+        this.windowContent = document.createElement("div");
+        this.windowContent.setAttribute("style", "margin: 10px 0 10px 0; overflow: none");
+        this.windowContent.id = `popup-content-${this.commonUtils.createUid()}`;
 
         if (element.childElementCount > 0) {
             while (element.hasChildNodes()) {
                 element.removeChild(element.lastChild);
             }
         }
-        element.appendChild(window);
+        element.appendChild(this.windowContent);
 
-        this.popupWindow = $(`#${window.id}`)
+        this.popupWindow = $(`#${this.windowContent.id}`)
             .kendoWindow({
                 width: "700px",
                 height: "625px",
@@ -160,54 +206,64 @@
                 scrollable: true,
                 actions: ["Maximize", "Close"],
                 resizable: false,
-                title: 'Select Students'
+                title: "Select Students"
             })
             .data("kendoWindow");
 
+        // Create save and cancel buttons
         const buttonContainer = document.createElement("div");
         const saveButtonElement = document.createElement("button");
-        saveButtonElement.id = "save-button";
+        saveButtonElement.id = `save-button-${this.commonUtils.createUid()}`;
         saveButtonElement.textContent = "Save";
         saveButtonElement.setAttribute("style", "margin-left: 2.5px; margin-right: 2.5px");
+
         const cancelButtonElement = document.createElement("button");
-        cancelButtonElement.id = "cancel-button";
+        cancelButtonElement.id = `cancel-button-${this.commonUtils.createUid()}`;
         cancelButtonElement.textContent = "Cancel";
 
         buttonContainer.setAttribute("style", "margin: 0 5px 5px 0px");
         buttonContainer.appendChild(saveButtonElement);
         buttonContainer.appendChild(cancelButtonElement);
-        window.appendChild(buttonContainer);
+        this.windowContent.appendChild(buttonContainer);
 
-        this.createTable(window, students, previoustudents);
-
-        this.kendoHelper.createKendoButton("save-button",
+        const self = this;
+        this.saveButton = this.kendoHelper.createKendoButton(saveButtonElement.id,
             (e) => {
-                var selectedStudents = new Array<StudentClass>();
-                var lookup = Enumerable.From(students).ToDictionary(x => x.id, x => x);
-                Enumerable.From(this.studentCheckboxes)
-                    .Where(x => x.checked)
-                    .ForEach(x => {
-                        var studentid = parseInt(this.commonUtils.getUid(x.id));
-                        if (lookup.Contains(studentid)) {
-                            selectedStudents.push(lookup.Get(studentid));
-                        }
-                    });
 
-
-                this.popupWindow.close().destroy();
+                var selectedStudents = self.selectedStudents();
 
                 const tmpCallback = callback;
                 if (tmpCallback) {
                     tmpCallback(selectedStudents);
                 }
+                self.popupWindow.close();
+                self.destroy();
             });
 
-        this.kendoHelper.createKendoButton("cancel-button",
+        this.cancelButton = this.kendoHelper.createKendoButton(cancelButtonElement.id,
             (e) => {
-                this.popupWindow.close().destroy();
+                self.popupWindow.close();
+                self.destroy();
             });
 
-        $(`#${window.id}`).parent().addClass("h-window-caption");
+        this.createTable(this.windowContent, students, previoustudents, null);
+        
+        $(`#${this.windowContent.id}`).parent().addClass("h-window-caption");
         this.popupWindow.center().open();
+    }
+
+    selectedStudents = (): Array<StudentClass> => {
+        const selectedStudents = new Array<StudentClass>();
+        var lookup = Enumerable.From(this.students).ToDictionary(x => x.id, x => x);
+        Enumerable.From(this.studentCheckboxes)
+            .Where(x => x.checked)
+            .ForEach(x => {
+                var studentid = parseInt(this.commonUtils.getUid(x.id));
+                if (lookup.Contains(studentid)) {
+                    selectedStudents.push(lookup.Get(studentid));
+                }
+            });
+
+        return selectedStudents;
     }
 }

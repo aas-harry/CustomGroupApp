@@ -1,0 +1,34 @@
+﻿<div id="popup-window-container"></div>
+<div id="alphanumeric-report-container">
+    <style scoped>
+        .k-grid-header th.k-header {
+            border-width: 1px 1px 1px 1px;
+        }
+    </style>
+
+    <div id="alphanumeric-report-toolbar" style="margin-top: 10px;"></div>
+    <div id="student-list-container">
+        <div id="student-list"></div>
+    </div>
+</div>
+
+<script>
+
+    var alphanumericViewModel;
+    $(document).ready(function () {
+        $("#alphanumeric-report-toolbar").kendoToolBar({
+            items: [
+                { type: "button", text: "Export Report", click: printReports },
+                { type: "button", text: "Print Report", click: printReports }
+            ]
+        });
+
+
+        alphanumericViewModel = new AlphanumericViewModel();
+        alphanumericViewModel.showReport(testFile, "student-list");
+
+        function printReports() { }
+    });
+
+
+</script>
